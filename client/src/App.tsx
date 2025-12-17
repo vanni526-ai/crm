@@ -15,6 +15,7 @@ import Finance from "./pages/Finance";
 import Analytics from "./pages/Analytics";
 import Users from "./pages/Users";
 import Import from "./pages/Import";
+import CustomerOverview from "./pages/CustomerOverview";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function Router() {
       <Route path={"/analytics"} component={Analytics} />
       <Route path={"/users"} component={Users} />
       <Route path={"/import"} component={Import} />
+      <Route path={"/customer-overview"} component={CustomerOverview} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

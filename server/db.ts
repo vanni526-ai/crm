@@ -518,6 +518,93 @@ export async function getCityRevenueTrend() {
   };
 }
 
+// ========== 顾客统计 ==========
+
+export async function getCustomerStats() {
+  const db = await getDb();
+  if (!db) return {
+    totalCustomers: 0,
+    returningCustomers: 0,
+    memberCustomers: 0,
+    todayNewCustomers: 0,
+    todayReturningCustomers: 0,
+  };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = today.toISOString().split('T')[0];
+
+  // 累计顾客数(所有客户)
+  const totalCustomersResult = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(customers);
+  const totalCustomers = totalCustomersResult[0]?.count || 0;
+
+  // 累计回头客(有多个订单的客户)
+  const returningCustomersResult = await db
+    .select({
+      customerId: orders.customerId,
+      orderCount: sql<number>`COUNT(*)`
+    })
+    .from(orders)
+    .where(sql`${orders.customerId} IS NOT NULL AND ${orders.status} NOT IN ('pending', 'cancelled')`)
+    .groupBy(orders.customerId)
+    .having(sql`COUNT(*) > 1`);
+  const returningCustomers = returningCustomersResult.length;
+
+  // 累计会员(这里暂时用有3个或以上订单的客户作为会员)
+  const memberCustomersResult = await db
+    .select({
+      customerId: orders.customerId,
+      orderCount: sql<number>`COUNT(*)`
+    })
+    .from(orders)
+    .where(sql`${orders.customerId} IS NOT NULL AND ${orders.status} NOT IN ('pending', 'cancelled')`)
+    .groupBy(orders.customerId)
+    .having(sql`COUNT(*) >= 3`);
+  const memberCustomers = memberCustomersResult.length;
+
+  // 今日新客(今天创建的客户)
+  const todayNewCustomersResult = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(customers)
+    .where(sql`DATE(${customers.createdAt}) = ${todayStr}`);
+  const todayNewCustomers = todayNewCustomersResult[0]?.count || 0;
+
+  // 今日老客(今天有订单的回头客)
+  const todayReturningCustomersResult = await db
+    .select({
+      customerId: orders.customerId,
+    })
+    .from(orders)
+    .where(
+      sql`${orders.customerId} IS NOT NULL AND DATE(${orders.paymentDate}) = ${todayStr} AND ${orders.status} NOT IN ('pending', 'cancelled')`
+    )
+    .groupBy(orders.customerId);
+  
+  // 检查这些客户是否是回头客
+  let todayReturningCustomers = 0;
+  for (const row of todayReturningCustomersResult) {
+    const orderCountResult = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(orders)
+      .where(
+        sql`${orders.customerId} = ${row.customerId} AND ${orders.status} NOT IN ('pending', 'cancelled')`
+      );
+    if ((orderCountResult[0]?.count || 0) > 1) {
+      todayReturningCustomers++;
+    }
+  }
+
+  return {
+    totalCustomers,
+    returningCustomers,
+    memberCustomers,
+    todayNewCustomers,
+    todayReturningCustomers,
+  };
+}
+
 // ========== 数据导入日志 ==========
 
 export async function createImportLog(log: InsertImportLog) {

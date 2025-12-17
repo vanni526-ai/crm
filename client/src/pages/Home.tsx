@@ -201,6 +201,10 @@ export default function Home() {
                   <div className="text-sm text-muted-foreground">查看收支明细和对账报表</div>
                 </a>
               )}
+              <a href="/customer-overview" className="block p-3 rounded-lg border hover:bg-accent transition-colors">
+                <div className="font-medium">顾客情况</div>
+                <div className="text-sm text-muted-foreground">查看顾客统计和顾客列表</div>
+              </a>
               <a href="/schedules" className="block p-3 rounded-lg border hover:bg-accent transition-colors">
                 <div className="font-medium">课程排课</div>
                 <div className="text-sm text-muted-foreground">查看和管理课程安排</div>
