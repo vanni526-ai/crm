@@ -1604,14 +1604,40 @@ function SmartRegisterDialog({
   
   const handleParse = () => {
     if (!rawText.trim()) {
-      toast.error("请粘贴微信账单数据");
+      toast.error("请粘贴微信账单数据或转账备注");
       return;
     }
     
     setIsParsing(true);
     
-    // 解析CSV格式的文本(支持引号包裹的字段)
     const lines = rawText.trim().split('\n');
+    
+    // 检测是否为单行文本(没有表头或只有一行)
+    if (lines.length === 1 || (lines.length === 2 && lines[0].includes('交易时间'))) {
+      // 单行文本模式(如转账备注)
+      const singleLine = lines.length === 1 ? lines[0] : lines[1];
+      
+      // 直接将单行文本作为一条记录发送给LLM解析
+      parseWechatBill.mutate({ 
+        rows: [{
+          transactionTime: "",
+          transactionType: "",
+          counterparty: "",
+          goods: singleLine, // 将整行文本作为商品字段
+          incomeExpense: "",
+          amount: "",
+          paymentMethod: "",
+          status: "",
+          transactionNo: "",
+          merchantNo: "",
+          notes: "",
+        }], 
+        template 
+      });
+      return;
+    }
+    
+    // CSV表格模式
     const rows = lines.slice(1).map(line => {
       // 简单的CSV解析(不处理引号,直接按逗号分割)
       // 微信账单格式: 交易时间,交易类型,交易对方,商品,收/支,金额(元),支付方式,当前状态,交易单号,商户单号,备注
