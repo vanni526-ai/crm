@@ -323,7 +323,19 @@ export const importRouter = router({
 
         for (const event of events) {
           try {
-            // 从事件描述中提取课程信息
+            // 从summary中提取客户名(第一个空格前的内容)
+            const summaryParts = event.summary.split(' ');
+            const customerName = summaryParts[0] || '未知客户';
+            
+            // 提取日期和时间
+            const classDateStr = event.startTime.toISOString().split('T')[0];
+            const classDate = new Date(classDateStr); // 转换为Date对象
+            const startHour = event.startTime.getHours().toString().padStart(2, '0');
+            const startMin = event.startTime.getMinutes().toString().padStart(2, '0');
+            const endHour = event.endTime.getHours().toString().padStart(2, '0');
+            const endMin = event.endTime.getMinutes().toString().padStart(2, '0');
+            const classTime = `${startHour}:${startMin}-${endHour}:${endMin}`;
+            
             await db.createSchedule({
               courseType: event.summary,
               startTime: event.startTime,
@@ -332,6 +344,11 @@ export const importRouter = router({
               teacherName: event.organizer,
               notes: event.description,
               customerId: 0, // 需要关联客户
+              customerName, // 从 summary 中提取的客户名
+              deliveryTeacher: event.organizer, // 交付老师使用organizer
+              deliveryCourse: event.summary, // 交付课程使用summary
+              classDate, // 上课日期
+              classTime, // 上课时间
             });
 
             successCount++;

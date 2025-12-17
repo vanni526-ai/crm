@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, customerName, deliveryCourse, deliveryTeacher, classDate, classTime FROM schedules LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, customerName, deliveryCourse, deliveryTeacher, classDate, classTime FROM schedules LIMIT 5;",
+  "rows": [
+    {
+      "id": "90001",
+      "customerName": "昭昭",
+      "deliveryCourse": "昭昭 北京单 基础+丝足 yy上 全款4400已付 报销老师200车费 共给老师1460",
+      "deliveryTeacher": "瀛姬 G",
+      "classDate": "2025-09-10",
+      "classTime": "14:00-17:00"
+    },
+    {
+      "id": "90002",
+      "customerName": "昭昭",
+      "deliveryCourse": "昭昭 网调课 全款699 小梨上",
+      "deliveryTeacher": "瀛姬岚兮",
+      "classDate": "2025-04-10",
+      "classTime": "20:00-20:40"
+    },
+    {
+      "id": "90003",
+      "customerName": "昭昭",
+      "deliveryCourse": "昭昭 线下理论+女木 熠耀 九淑+安雅（1101）定金2000 尾款2000未付",
+      "deliveryTeacher": "瀛姬岚兮",
+      "classDate": "2025-04-18",
+      "classTime": "14:00-16:00"
+    },
+    {
+      "id": "90004",
+      "customerName": "aneh",
+      "deliveryCourse": "aneh 19:30 至21:30",
+      "deliveryTeacher": "韩顗杰",
+      "classDate": "2025-08-09",
+      "classTime": "19:30-21:30"
+    },
+    {
+      "id": "90005",
+      "customerName": "直播",
+      "deliveryCourse": "直播",
+      "deliveryTeacher": "瀛姬瑶瑶",
+      "classDate": "2025-08-10",
+      "classTime": "00:00-04:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcustomerName\tdeliveryCourse\tdeliveryTeacher\tclassDate\tclassTime\n90001\t昭昭\t昭昭 北京单 基础+丝足 yy上 全款4400已付 报销老师200车费 共给老师1460\t瀛姬 G\t2025-09-10\t14:00-17:00\n90002\t昭昭\t昭昭 网调课 全款699 小梨上\t瀛姬岚兮\t2025-04-10\t20:00-20:40\n90003\t昭昭\t昭昭 线下理论+女木 熠耀 九淑+安雅（1101）定金2000 尾款2000未付\t瀛姬岚兮\t2025-04-18\t14:00-16:00\n90004\taneh\taneh 19:30 至21:30\t韩顗杰\t2025-08-09\t19:30-21:30\n90005\t直播\t直播\t瀛姬瑶瑶\t2025-08-10\t00:00-04:00\n",
+  "stderr": "",
+  "execution_time_ms": 1531
+}

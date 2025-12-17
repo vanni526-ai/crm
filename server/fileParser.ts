@@ -197,13 +197,34 @@ export async function parseICS(fileBuffer: Buffer): Promise<ICSEvent[]> {
   for (const key in events) {
     const event = events[key];
     if (event.type === "VEVENT") {
+      // 提取organizer的名称
+      let organizerName = "";
+      if (event.organizer) {
+        if (typeof event.organizer === "object" && event.organizer.params && event.organizer.params.CN) {
+          // 去除引号
+          organizerName = event.organizer.params.CN.replace(/"/g, "");
+        } else if (typeof event.organizer === "string") {
+          organizerName = event.organizer;
+        }
+      }
+
+      // 处理时间对象
+      let startTime = new Date();
+      let endTime = new Date();
+      if (event.start) {
+        startTime = event.start instanceof Date ? event.start : new Date(event.start);
+      }
+      if (event.end) {
+        endTime = event.end instanceof Date ? event.end : new Date(event.end);
+      }
+
       result.push({
         summary: event.summary || "",
         description: event.description || "",
         location: event.location || "",
-        startTime: event.start || new Date(),
-        endTime: event.end || new Date(),
-        organizer: event.organizer ? String(event.organizer) : "",
+        startTime,
+        endTime,
+        organizer: organizerName,
         attendees: event.attendee ? (Array.isArray(event.attendee) ? event.attendee.map(String) : [String(event.attendee)]) : [],
       });
     }

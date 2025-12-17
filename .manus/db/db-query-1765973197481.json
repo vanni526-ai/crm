@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total FROM schedules;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as total FROM schedules;",
+  "rows": [
+    {
+      "total": "718"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n718\n",
+  "stderr": "",
+  "execution_time_ms": 1536
+}

@@ -1,0 +1,46 @@
+{
+  "query": "SELECT * FROM importLogs WHERE fileType = 'ics' ORDER BY createdAt DESC LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT * FROM importLogs WHERE fileType = 'ics' ORDER BY createdAt DESC LIMIT 3;",
+  "rows": [
+    {
+      "id": "30002",
+      "fileName": "calendar.ics",
+      "fileType": "ics",
+      "dataType": "preview",
+      "totalRows": "0",
+      "successRows": "0",
+      "failedRows": "0",
+      "errorLog": "ical.parseICS is not a function",
+      "importedBy": "1",
+      "createdAt": "2025-12-17 11:58:41"
+    },
+    {
+      "id": "30001",
+      "fileName": "calendar.ics",
+      "fileType": "ics",
+      "dataType": "preview",
+      "totalRows": "0",
+      "successRows": "0",
+      "failedRows": "0",
+      "errorLog": "ical.parseICS is not a function",
+      "importedBy": "1",
+      "createdAt": "2025-12-17 11:52:47"
+    },
+    {
+      "id": "3",
+      "fileName": "calendar.ics",
+      "fileType": "ics",
+      "dataType": "preview",
+      "totalRows": "0",
+      "successRows": "0",
+      "failedRows": "0",
+      "errorLog": "ical.parseICS is not a function",
+      "importedBy": "1",
+      "createdAt": "2025-12-17 08:20:45"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tfileName\tfileType\tdataType\ttotalRows\tsuccessRows\tfailedRows\terrorLog\timportedBy\tcreatedAt\n30002\tcalendar.ics\tics\tpreview\t0\t0\t0\tical.parseICS is not a function\t1\t2025-12-17 11:58:41\n30001\tcalendar.ics\tics\tpreview\t0\t0\t0\tical.parseICS is not a function\t1\t2025-12-17 11:52:47\n3\tcalendar.ics\tics\tpreview\t0\t0\t0\tical.parseICS is not a function\t1\t2025-12-17 08:20:45\n",
+  "stderr": "",
+  "execution_time_ms": 1536
+}
