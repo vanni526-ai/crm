@@ -172,6 +172,13 @@ export async function deleteCustomer(id: number) {
 
 // ========== 订单管理 ==========
 
+export async function checkOrderNoExists(orderNo: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  const result = await db.select().from(orders).where(eq(orders.orderNo, orderNo)).limit(1);
+  return result.length > 0;
+}
+
 export async function createOrder(order: InsertOrder) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

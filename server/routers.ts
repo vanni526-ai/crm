@@ -172,7 +172,23 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         // 如果没有提供订单号,自动生成
-        const orderNo = input.orderNo || generateOrderNo(input.paymentCity || input.deliveryCity);
+        let orderNo = input.orderNo || generateOrderNo(input.paymentCity || input.deliveryCity);
+        
+        // 查重验证,如果订单号已存在,添加随机后缀
+        let suffix = 1;
+        while (await db.checkOrderNoExists(orderNo)) {
+          const suffixStr = String(suffix).padStart(3, '0'); // 生成三位数后缀 001, 002, ...
+          orderNo = generateOrderNo(input.paymentCity || input.deliveryCity, suffixStr);
+          suffix++;
+          
+          // 防止无限循环,最多尝试999次
+          if (suffix > 999) {
+            throw new TRPCError({ 
+              code: "INTERNAL_SERVER_ERROR", 
+              message: "订单号生成失败,请稍后重试" 
+            });
+          }
+        }
         
         const orderData: any = {
           ...input,

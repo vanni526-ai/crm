@@ -43,9 +43,10 @@ const CITY_AREA_CODES: Record<string, string> = {
  * 例如: 20231216143021-021 (上海)
  * 
  * @param city 城市名称
+ * @param suffix 可选后缀，用于解决冲突
  * @returns 订单号
  */
-export function generateOrderNo(city?: string): string {
+export function generateOrderNo(city?: string, suffix?: string): string {
   const now = new Date();
   
   // 格式化日期时间为 YYYYMMDDHHMMSS
@@ -61,7 +62,10 @@ export function generateOrderNo(city?: string): string {
   // 获取城市区号,如果城市不在映射中,使用默认区号 000
   const areaCode = city && CITY_AREA_CODES[city] ? CITY_AREA_CODES[city] : "000";
   
-  return `${dateTimePart}-${areaCode}`;
+  // 如果有后缀,添加到订单号末尾
+  const suffixPart = suffix ? `-${suffix}` : "";
+  
+  return `${dateTimePart}-${areaCode}${suffixPart}`;
 }
 
 /**
