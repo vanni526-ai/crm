@@ -191,16 +191,33 @@ export const appRouter = router({
         }
         
         const orderData: any = {
-          ...input,
           orderNo,
+          customerName: input.customerName,
           salesId: ctx.user.id,
+          salesPerson: input.salesPerson || undefined,
+          trafficSource: input.trafficSource || undefined,
+          paymentAmount: input.paymentAmount,
+          courseAmount: input.courseAmount,
+          accountBalance: input.accountBalance || undefined,
+          paymentCity: input.paymentCity || undefined,
+          paymentChannel: input.paymentChannel || undefined,
+          channelOrderNo: input.channelOrderNo || undefined,
+          paymentDate: input.paymentDate ? new Date(input.paymentDate) : undefined,
+          paymentTime: input.paymentTime || undefined,
+          teacherFee: input.teacherFee || undefined,
+          transportFee: input.transportFee || undefined,
+          otherFee: input.otherFee || undefined,
+          partnerFee: input.partnerFee || undefined,
+          finalAmount: input.finalAmount || undefined,
+          deliveryCity: input.deliveryCity || undefined,
+          deliveryRoom: input.deliveryRoom || undefined,
+          deliveryTeacher: input.deliveryTeacher || undefined,
+          deliveryCourse: input.deliveryCourse || undefined,
+          classDate: input.classDate ? new Date(input.classDate) : undefined,
+          classTime: input.classTime || undefined,
+          status: input.status || undefined,
+          notes: input.notes || undefined,
         };
-        if (input.paymentDate) {
-          orderData.paymentDate = new Date(input.paymentDate);
-        }
-        if (input.classDate) {
-          orderData.classDate = new Date(input.classDate);
-        }
         const id = await db.createOrder(orderData);
         return { id, success: true };
       }),
