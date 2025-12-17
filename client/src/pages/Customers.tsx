@@ -160,6 +160,7 @@ export default function Customers() {
                     <TableHead>联系电话</TableHead>
                     <TableHead>微信</TableHead>
                     <TableHead>流量来源</TableHead>
+                    <TableHead>账户余额</TableHead>
                     <TableHead>创建时间</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
@@ -192,6 +193,9 @@ export default function Customers() {
                           ) : (
                             "-"
                           )}
+                        </TableCell>
+                        <TableCell className="font-medium text-green-600">
+                          ¥{Number(customer.accountBalance || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>{new Date(customer.createdAt).toLocaleDateString()}</TableCell>
                         <TableCell>

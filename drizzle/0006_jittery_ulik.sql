@@ -1,0 +1,1 @@
+ALTER TABLE `customers` ADD `accountBalance` decimal(10,2) DEFAULT '0.00' NOT NULL;

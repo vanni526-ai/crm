@@ -26,6 +26,7 @@ export const customers = mysqlTable("customers", {
   wechatId: varchar("wechatId", { length: 100 }), // 微信号
   phone: varchar("phone", { length: 20 }),
   trafficSource: varchar("trafficSource", { length: 100 }), // 流量来源(花名)
+  accountBalance: decimal("accountBalance", { precision: 10, scale: 2 }).default("0.00").notNull(), // 账户余额
   notes: text("notes"),
   createdBy: int("createdBy").notNull(), // 创建人(销售)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
