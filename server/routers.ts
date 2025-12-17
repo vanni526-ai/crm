@@ -547,12 +547,30 @@ export const appRouter = router({
     cityRevenue: protectedProcedure.query(async () => {
       return db.getCityRevenue();
     }),
+        cityRevenueTrend: publicProcedure
+      .query(async () => {
+        return db.getCityRevenueTrend();
+      }),
     
-    cityRevenueTrend: protectedProcedure.query(async () => {
-      return db.getCityRevenueTrend();
-    }),
+    teacherMonthlyStats: publicProcedure
+      .query(async () => {
+        return db.getTeacherMonthlyStats();
+      }),
     
-    customerStats: protectedProcedure.query(async () => {
+    trafficSourceMonthlyStats: publicProcedure
+      .query(async () => {
+        return db.getTrafficSourceMonthlyStats();
+      }),
+    
+    salesPersonPaymentStats: publicProcedure
+      .query(async () => {
+        return db.getSalesPersonPaymentStats();
+      }),
+    
+    customerBalanceRanking: publicProcedure
+      .query(async () => {
+        return db.getCustomerBalanceRanking();
+      }),   customerStats: protectedProcedure.query(async () => {
       return db.getCustomerStats();
     }),
     

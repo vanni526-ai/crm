@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, sql, between } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, between, isNotNull, ne } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -713,4 +713,123 @@ export async function getImportLogs() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(importLogs).orderBy(desc(importLogs.createdAt)).limit(50);
+}
+
+// ========== 数据看板统计 ==========
+
+// 交付老师月度统计(上课数量和收益金额)
+export async function getTeacherMonthlyStats() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  const result = await db
+    .select({
+      teacher: orders.deliveryTeacher,
+      classCount: sql<number>`count(*)`,
+      totalRevenue: sql<string>`sum(CAST(${orders.paymentAmount} AS DECIMAL(10,2)) - COALESCE(CAST(${orders.teacherFee} AS DECIMAL(10,2)), 0))`,
+    })
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, startOfMonth),
+        ne(orders.status, "cancelled"),
+        isNotNull(orders.deliveryTeacher)
+      )
+    )
+    .groupBy(orders.deliveryTeacher);
+  
+  return result.map(r => ({
+    teacher: r.teacher || '未知',
+    classCount: r.classCount,
+    totalRevenue: parseFloat(r.totalRevenue || '0'),
+  })).sort((a, b) => b.classCount - a.classCount);
+}
+
+// 流量来源月度统计
+export async function getTrafficSourceMonthlyStats() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  const result = await db
+    .select({
+      source: orders.trafficSource,
+      orderCount: sql<number>`count(*)`,
+    })
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, startOfMonth),
+        ne(orders.status, "cancelled"),
+        isNotNull(orders.trafficSource)
+      )
+    )
+    .groupBy(orders.trafficSource);
+  
+  return result.map(r => ({
+    source: r.source || '未知',
+    orderCount: r.orderCount,
+  })).sort((a, b) => b.orderCount - a.orderCount);
+}
+
+// 销售人员支付金额统计
+export async function getSalesPersonPaymentStats() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select({
+      salesPerson: orders.salesPerson,
+      totalPayment: sql<string>`sum(CAST(${orders.paymentAmount} AS DECIMAL(10,2)))`,
+      orderCount: sql<number>`count(*)`,
+    })
+    .from(orders)
+    .where(
+      and(
+        ne(orders.status, "cancelled"),
+        isNotNull(orders.salesPerson)
+      )
+    )
+    .groupBy(orders.salesPerson);
+  
+  return result.map(r => ({
+    salesPerson: r.salesPerson || '未知',
+    totalPayment: parseFloat(r.totalPayment || '0'),
+    orderCount: r.orderCount,
+  })).sort((a, b) => b.totalPayment - a.totalPayment);
+}
+
+// 客户账户余额排名
+export async function getCustomerBalanceRanking() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db
+    .select({
+      customerName: orders.customerName,
+      accountBalance: sql<string>`max(CAST(${orders.accountBalance} AS DECIMAL(10,2)))`,
+    })
+    .from(orders)
+    .where(
+      and(
+        isNotNull(orders.customerName),
+        isNotNull(orders.accountBalance),
+        ne(orders.accountBalance, ''),
+        ne(orders.accountBalance, '0')
+      )
+    )
+    .groupBy(orders.customerName);
+  
+  return result.map(r => ({
+    customerName: r.customerName || '未知',
+    accountBalance: parseFloat(r.accountBalance || '0'),
+  }))
+  .filter(r => r.accountBalance > 0)
+  .sort((a, b) => b.accountBalance - a.accountBalance)
+  .slice(0, 20); // 只返回前20名
 }

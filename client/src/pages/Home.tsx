@@ -18,6 +18,10 @@ export default function Home() {
   
   const { data: cityRevenue } = trpc.analytics.cityRevenue.useQuery();
   const { data: cityRevenueTrend } = trpc.analytics.cityRevenueTrend.useQuery();
+  const { data: teacherStats } = trpc.analytics.teacherMonthlyStats.useQuery();
+  const { data: trafficStats } = trpc.analytics.trafficSourceMonthlyStats.useQuery();
+  const { data: salesStats } = trpc.analytics.salesPersonPaymentStats.useQuery();
+  const { data: customerBalances } = trpc.analytics.customerBalanceRanking.useQuery();
 
   return (
     <DashboardLayout>
@@ -181,6 +185,113 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* 交付老师月度统计 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>交付老师月度统计</CardTitle>
+            <CardDescription>本月上课数量和收益金额</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {teacherStats && teacherStats.length > 0 ? (
+                teacherStats.slice(0, 5).map((stat, index) => (
+                  <div key={index} className="flex items-center justify-between border-b pb-2">
+                    <div>
+                      <div className="font-medium">{stat.teacher}</div>
+                      <div className="text-sm text-muted-foreground">{stat.classCount} 节课</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">¥{stat.totalRevenue.toLocaleString()}</div>
+                      <div className="text-xs text-muted-foreground">收益</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-muted-foreground py-4">暂无数据</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 流量来源月度统计 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>流量来源月度统计</CardTitle>
+            <CardDescription>本月各流量来源订单数量</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {trafficStats && trafficStats.length > 0 ? (
+                trafficStats.slice(0, 5).map((stat, index) => (
+                  <div key={index} className="flex items-center justify-between border-b pb-2">
+                    <div className="font-medium">{stat.source}</div>
+                    <div className="text-right">
+                      <div className="font-bold text-blue-600">{stat.orderCount} 单</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-muted-foreground py-4">暂无数据</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 销售人员业绩统计 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>销售人员业绩排名</CardTitle>
+            <CardDescription>支付金额统计</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {salesStats && salesStats.length > 0 ? (
+                salesStats.slice(0, 5).map((stat, index) => (
+                  <div key={index} className="flex items-center justify-between border-b pb-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>
+                        <span className="font-medium">{stat.salesPerson}</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">{stat.orderCount} 单</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">¥{stat.totalPayment.toLocaleString()}</div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-muted-foreground py-4">暂无数据</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 客户账户余额排名 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>客户账户余额排名</CardTitle>
+            <CardDescription>前20名客户余额</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+              {customerBalances && customerBalances.length > 0 ? (
+                customerBalances.map((customer, index) => (
+                  <div key={index} className="flex items-center justify-between border-b pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-lg text-muted-foreground">#{index + 1}</span>
+                      <span className="font-medium">{customer.customerName}</span>
+                    </div>
+                    <div className="font-bold text-blue-600">¥{customer.accountBalance.toLocaleString()}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center text-muted-foreground py-4">暂无数据</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
