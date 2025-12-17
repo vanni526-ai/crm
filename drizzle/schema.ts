@@ -43,7 +43,9 @@ export const orders = mysqlTable("orders", {
   orderNo: varchar("orderNo", { length: 50 }).notNull().unique(), // 序号
   customerId: int("customerId"), // 关联客户(可选)
   customerName: varchar("customerName", { length: 100 }), // 客户姓名(手动输入)
-  salesId: int("salesId").notNull(), // 销售人(花名)
+  salesId: int("salesId").notNull(), // 销售人ID
+  salesPerson: varchar("salesPerson", { length: 100 }), // 销售人(花名)
+  trafficSource: varchar("trafficSource", { length: 100 }), // 流量来源(花名)
   
   // 金额相关
   paymentAmount: decimal("paymentAmount", { precision: 10, scale: 2 }).notNull(), // 支付金额
@@ -51,8 +53,9 @@ export const orders = mysqlTable("orders", {
   accountBalance: decimal("accountBalance", { precision: 10, scale: 2 }).default("0.00").notNull(), // 账户余额
   
   // 支付信息
+  paymentCity: varchar("paymentCity", { length: 50 }), // 支付城市
   paymentChannel: varchar("paymentChannel", { length: 50 }), // 支付渠道(富掌柜/微信/支付宝)
-  channelOrderNo: text("channelOrderNo"), // 渠道订单号；商户订单号；退款单号
+  channelOrderNo: text("channelOrderNo"), // 渠道订单号;商户订单号;退款单号
   paymentDate: date("paymentDate"), // 支付日期
   paymentTime: time("paymentTime"), // 支付时间
   
