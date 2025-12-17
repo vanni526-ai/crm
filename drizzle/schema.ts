@@ -1,28 +1,212 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time } from "drizzle-orm/mysql-core";
 
 /**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
+ * 用户表 - 支持管理员、销售、财务三种角色
  */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
+  nickname: varchar("nickname", { length: 50 }), // 花名
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["admin", "sales", "finance", "user"]).default("user").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
+/**
+ * 客户表
+ */
+export const customers = mysqlTable("customers", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(), // 客户名
+  wechatId: varchar("wechatId", { length: 100 }), // 微信号
+  phone: varchar("phone", { length: 20 }),
+  trafficSource: varchar("trafficSource", { length: 100 }), // 流量来源(花名)
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull(), // 创建人(销售)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  wechatIdx: index("wechat_idx").on(table.wechatId),
+  createdByIdx: index("created_by_idx").on(table.createdBy),
+}));
+
+/**
+ * 订单表 - 根据瀛姬体验馆订单信息登记表设计
+ */
+export const orders = mysqlTable("orders", {
+  id: int("id").autoincrement().primaryKey(),
+  orderNo: varchar("orderNo", { length: 50 }).notNull().unique(), // 序号
+  customerId: int("customerId").notNull(), // 关联客户
+  salesId: int("salesId").notNull(), // 销售人(花名)
+  
+  // 金额相关
+  paymentAmount: decimal("paymentAmount", { precision: 10, scale: 2 }).notNull(), // 支付金额
+  courseAmount: decimal("courseAmount", { precision: 10, scale: 2 }).notNull(), // 课程金额
+  accountBalance: decimal("accountBalance", { precision: 10, scale: 2 }).default("0.00").notNull(), // 账户余额
+  
+  // 支付信息
+  paymentChannel: varchar("paymentChannel", { length: 50 }), // 支付渠道(富掌柜/微信/支付宝)
+  channelOrderNo: text("channelOrderNo"), // 渠道订单号；商户订单号；退款单号
+  paymentDate: date("paymentDate"), // 支付日期
+  paymentTime: time("paymentTime"), // 支付时间
+  
+  // 费用明细
+  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }).default("0.00"), // 老师费用
+  transportFee: decimal("transportFee", { precision: 10, scale: 2 }).default("0.00"), // 车费
+  otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
+  partnerFee: decimal("partnerFee", { precision: 10, scale: 2 }).default("0.00"), // 合伙人费用
+  finalAmount: decimal("finalAmount", { precision: 10, scale: 2 }).default("0.00"), // 金串到账金额
+  
+  // 交付信息
+  deliveryCity: varchar("deliveryCity", { length: 50 }), // 交付城市
+  deliveryRoom: varchar("deliveryRoom", { length: 100 }), // 交付教室
+  deliveryTeacher: varchar("deliveryTeacher", { length: 100 }), // 交付老师
+  deliveryCourse: varchar("deliveryCourse", { length: 200 }), // 交付课程
+  classDate: date("classDate"), // 上课日期
+  classTime: time("classTime"), // 上课时间
+  
+  status: mysqlEnum("status", ["pending", "paid", "completed", "cancelled", "refunded"]).default("pending").notNull(),
+  notes: text("notes"), // 备注
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  customerIdx: index("customer_idx").on(table.customerId),
+  salesIdx: index("sales_idx").on(table.salesId),
+  statusIdx: index("status_idx").on(table.status),
+  paymentDateIdx: index("payment_date_idx").on(table.paymentDate),
+  classDateIdx: index("class_date_idx").on(table.classDate),
+}));
+
+/**
+ * 老师表
+ */
+export const teachers = mysqlTable("teachers", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  nickname: varchar("nickname", { length: 50 }), // 花名
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  wechat: varchar("wechat", { length: 100 }),
+  hourlyRate: decimal("hourlyRate", { precision: 10, scale: 2 }), // 课时费标准
+  bankAccount: varchar("bankAccount", { length: 100 }), // 银行账号
+  bankName: varchar("bankName", { length: 100 }), // 开户行
+  city: varchar("city", { length: 50 }), // 所在城市
+  isActive: boolean("isActive").default(true).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  phoneIdx: index("teacher_phone_idx").on(table.phone),
+  cityIdx: index("teacher_city_idx").on(table.city),
+}));
+
+/**
+ * 课程排课表
+ */
+export const schedules = mysqlTable("schedules", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId"), // 关联订单(可选)
+  customerId: int("customerId").notNull(), // 学员
+  teacherId: int("teacherId"), // 授课老师ID
+  teacherName: varchar("teacherName", { length: 100 }), // 授课老师名称(冗余字段,方便查询)
+  courseType: varchar("courseType", { length: 200 }).notNull(), // 课程类型
+  startTime: timestamp("startTime").notNull(),
+  endTime: timestamp("endTime").notNull(),
+  city: varchar("city", { length: 50 }), // 城市
+  location: varchar("location", { length: 200 }), // 教室/地点
+  status: mysqlEnum("status", ["scheduled", "completed", "cancelled"]).default("scheduled").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  teacherIdx: index("teacher_idx").on(table.teacherId),
+  customerIdx: index("schedule_customer_idx").on(table.customerId),
+  startTimeIdx: index("start_time_idx").on(table.startTime),
+  cityIdx: index("schedule_city_idx").on(table.city),
+}));
+
+/**
+ * 老师费用结算表
+ */
+export const teacherPayments = mysqlTable("teacherPayments", {
+  id: int("id").autoincrement().primaryKey(),
+  teacherId: int("teacherId").notNull(),
+  orderId: int("orderId"), // 关联订单
+  scheduleId: int("scheduleId"), // 关联排课(可选)
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // 费用金额
+  paymentMethod: mysqlEnum("paymentMethod", ["wechat", "alipay", "bank", "cash", "other"]),
+  transactionNo: varchar("transactionNo", { length: 100 }),
+  paymentTime: timestamp("paymentTime"),
+  status: mysqlEnum("status", ["pending", "paid"]).default("pending").notNull(),
+  notes: text("notes"),
+  recordedBy: int("recordedBy").notNull(), // 登记人(财务)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  teacherIdx: index("teacher_payment_idx").on(table.teacherId),
+  orderIdx: index("order_payment_idx").on(table.orderId),
+  statusIdx: index("payment_status_idx").on(table.status),
+}));
+
+/**
+ * 财务对账表
+ */
+export const reconciliations = mysqlTable("reconciliations", {
+  id: int("id").autoincrement().primaryKey(),
+  periodStart: date("periodStart").notNull(), // 对账周期开始
+  periodEnd: date("periodEnd").notNull(), // 对账周期结束
+  totalIncome: decimal("totalIncome", { precision: 12, scale: 2 }).notNull(), // 总收入
+  totalExpense: decimal("totalExpense", { precision: 12, scale: 2 }).notNull(), // 总支出(老师费用+车费+其他费用+合伙人费用)
+  teacherFeeTotal: decimal("teacherFeeTotal", { precision: 12, scale: 2 }).default("0.00"), // 老师费用合计
+  transportFeeTotal: decimal("transportFeeTotal", { precision: 12, scale: 2 }).default("0.00"), // 车费合计
+  otherFeeTotal: decimal("otherFeeTotal", { precision: 12, scale: 2 }).default("0.00"), // 其他费用合计
+  partnerFeeTotal: decimal("partnerFeeTotal", { precision: 12, scale: 2 }).default("0.00"), // 合伙人费用合计
+  profit: decimal("profit", { precision: 12, scale: 2 }).notNull(), // 利润
+  status: mysqlEnum("status", ["draft", "confirmed"]).default("draft").notNull(),
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull(), // 创建人(财务)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  periodIdx: index("period_idx").on(table.periodStart, table.periodEnd),
+}));
+
+/**
+ * 数据导入记录表
+ */
+export const importLogs = mysqlTable("importLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileType: varchar("fileType", { length: 20 }).notNull(), // csv, excel, xml, ics
+  dataType: varchar("dataType", { length: 50 }).notNull(), // orders, schedules, etc.
+  totalRows: int("totalRows").notNull(),
+  successRows: int("successRows").notNull(),
+  failedRows: int("failedRows").notNull(),
+  errorLog: text("errorLog"),
+  importedBy: int("importedBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// 类型导出
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
-
-// TODO: Add your tables here
+export type Customer = typeof customers.$inferSelect;
+export type InsertCustomer = typeof customers.$inferInsert;
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+export type Teacher = typeof teachers.$inferSelect;
+export type InsertTeacher = typeof teachers.$inferInsert;
+export type Schedule = typeof schedules.$inferSelect;
+export type InsertSchedule = typeof schedules.$inferInsert;
+export type TeacherPayment = typeof teacherPayments.$inferSelect;
+export type InsertTeacherPayment = typeof teacherPayments.$inferInsert;
+export type Reconciliation = typeof reconciliations.$inferSelect;
+export type InsertReconciliation = typeof reconciliations.$inferInsert;
+export type ImportLog = typeof importLogs.$inferSelect;
+export type InsertImportLog = typeof importLogs.$inferInsert;

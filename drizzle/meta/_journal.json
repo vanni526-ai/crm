@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1765952610476,
+      "tag": "0000_loose_living_lightning",
+      "breakpoints": true
+    }
+  ]
 }
