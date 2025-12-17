@@ -488,6 +488,10 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return db.getSalesPerformance(input.startDate, input.endDate);
       }),
+    
+    cityRevenue: protectedProcedure.query(async () => {
+      return db.getCityRevenue();
+    }),
   }),
 
   // 数据导入

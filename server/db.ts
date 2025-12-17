@@ -377,6 +377,60 @@ export async function getSalesPerformance(startDate: string, endDate: string) {
     .groupBy(orders.salesId);
 }
 
+export async function getCityRevenue() {
+  const db = await getDb();
+  if (!db) return [];
+
+  // 获取所有订单
+  const allOrders = await db
+    .select({
+      paymentCity: orders.paymentCity,
+      paymentAmount: orders.paymentAmount,
+      teacherFee: orders.teacherFee,
+    })
+    .from(orders)
+    .where(sql`${orders.status} != 'cancelled'`);
+
+  // 按城市分组计算收益
+  const cityRevenueMap = new Map<string, { revenue: number; orderCount: number }>();
+  
+  for (const order of allOrders) {
+    const city = order.paymentCity || '未知城市';
+    const paymentAmount = parseFloat(order.paymentAmount?.toString() || '0');
+    const teacherFee = parseFloat(order.teacherFee?.toString() || '0');
+    const baseRevenue = paymentAmount - teacherFee;
+    
+    // 根据城市计算收益比例
+    let ratio = 0.3; // 默认比例
+    if (city === '天津') {
+      ratio = 0.5;
+    } else if (city === '武汉') {
+      ratio = 0.4;
+    } else if (city === '上海') {
+      ratio = 1.0;
+    }
+    
+    const revenue = baseRevenue * ratio;
+    
+    if (!cityRevenueMap.has(city)) {
+      cityRevenueMap.set(city, { revenue: 0, orderCount: 0 });
+    }
+    
+    const cityData = cityRevenueMap.get(city)!;
+    cityData.revenue += revenue;
+    cityData.orderCount += 1;
+  }
+  
+  // 转换为数组并按收益排序
+  return Array.from(cityRevenueMap.entries())
+    .map(([city, data]) => ({
+      city,
+      revenue: data.revenue.toFixed(2),
+      orderCount: data.orderCount,
+    }))
+    .sort((a, b) => parseFloat(b.revenue) - parseFloat(a.revenue));
+}
+
 // ========== 数据导入日志 ==========
 
 export async function createImportLog(log: InsertImportLog) {

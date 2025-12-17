@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DollarSign, ShoppingCart, Users, TrendingUp } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, TrendingUp, MapPin } from "lucide-react";
 
 export default function Home() {
   const { data: user } = trpc.auth.me.useQuery();
@@ -14,6 +14,8 @@ export default function Home() {
     startDate,
     endDate,
   });
+  
+  const { data: cityRevenue } = trpc.analytics.cityRevenue.useQuery();
 
   return (
     <DashboardLayout>
@@ -86,6 +88,52 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>城市收益统计</CardTitle>
+            <CardDescription>按城市分配比例计算收益</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {cityRevenue && cityRevenue.length > 0 ? (
+              <div className="space-y-3">
+                {cityRevenue.slice(0, 5).map((city) => (
+                  <div key={city.city} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div className="flex items-center gap-3">
+                      <MapPin className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <div className="font-medium">{city.city}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {city.orderCount} 个订单
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-green-600">
+                        ¥{parseFloat(city.revenue).toLocaleString()}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {city.city === '天津' && '50%分配'}
+                        {city.city === '武汉' && '40%分配'}
+                        {city.city === '上海' && '100%分配'}
+                        {city.city !== '天津' && city.city !== '武汉' && city.city !== '上海' && '30%分配'}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {cityRevenue.length > 5 && (
+                  <div className="text-center text-sm text-muted-foreground pt-2">
+                    还有 {cityRevenue.length - 5} 个城市...
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground py-8">
+                暂无数据
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
