@@ -112,9 +112,10 @@ export const teachers = mysqlTable("teachers", {
 export const schedules = mysqlTable("schedules", {
   id: int("id").autoincrement().primaryKey(),
   orderId: int("orderId"), // 关联订单(可选)
-  customerId: int("customerId").notNull(), // 学员
+  customerId: int("customerId"), // 学员ID(可选)
+  customerName: varchar("customerName", { length: 100 }), // 学员姓名(手动输入)
   teacherId: int("teacherId"), // 授课老师ID
-  teacherName: varchar("teacherName", { length: 100 }), // 授课老师名称(冗余字段,方便查询)
+  teacherName: varchar("teacherName", { length: 100 }), // 授课老师名称(手动输入)
   courseType: varchar("courseType", { length: 200 }).notNull(), // 课程类型
   startTime: timestamp("startTime").notNull(),
   endTime: timestamp("endTime").notNull(),

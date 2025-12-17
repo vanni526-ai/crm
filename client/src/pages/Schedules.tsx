@@ -17,8 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const scheduleSchema = z.object({
-  customerId: z.number().min(1, "请选择客户"),
-  teacherId: z.number().optional(),
+  customerName: z.string().min(1, "请输入客户姓名"),
+  teacherName: z.string().optional(),
   courseType: z.string().min(1, "请输入课程类型"),
   startTime: z.string().min(1, "请选择开始时间"),
   endTime: z.string().min(1, "请选择结束时间"),
@@ -72,13 +72,12 @@ export default function Schedules() {
     resolver: zodResolver(scheduleSchema),
   });
 
-  const selectedCustomerId = watch("customerId");
-  const selectedTeacherId = watch("teacherId");
+
 
   const onCreateSubmit = (data: ScheduleFormData) => {
     createSchedule.mutate({
-      customerId: data.customerId,
-      teacherId: data.teacherId,
+      customerName: data.customerName,
+      teacherName: data.teacherName,
       courseType: data.courseType,
       startTime: new Date(data.startTime),
       endTime: new Date(data.endTime),
@@ -102,14 +101,12 @@ export default function Schedules() {
         schedule.courseType.toLowerCase().includes(searchTerm.toLowerCase()) ||
         schedule.teacherName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         schedule.location?.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchTeacher =
+      const matchesTeacher =
         filterTeacher === "all" || schedule.teacherId?.toString() === filterTeacher;
-
-      const matchCustomer =
-        filterCustomer === "all" || schedule.customerId.toString() === filterCustomer;
-
-      return matchSearch && matchTeacher && matchCustomer;
+      const matchesCustomer =
+        filterCustomer === "all" || schedule.customerId?.toString() === filterCustomer;
+      
+      return matchSearch && matchesTeacher && matchesCustomer;
     });
   }, [schedules, searchTerm, filterTeacher, filterCustomer]);
 
@@ -334,44 +331,24 @@ export default function Schedules() {
             <form onSubmit={handleSubmit(onCreateSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="customerId">客户 *</Label>
-                  <Select
-                    value={selectedCustomerId?.toString() || ""}
-                    onValueChange={(value) => setValue("customerId", parseInt(value))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="选择客户" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customers?.map((customer) => (
-                        <SelectItem key={customer.id} value={customer.id.toString()}>
-                          {customer.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.customerId && (
-                    <p className="text-sm text-destructive mt-1">{errors.customerId.message}</p>
+                  <Label htmlFor="customerName">客户 *</Label>
+                  <Input 
+                    id="customerName" 
+                    {...register("customerName")} 
+                    placeholder="输入客户姓名" 
+                  />
+                  {errors.customerName && (
+                    <p className="text-sm text-destructive mt-1">{errors.customerName.message}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label htmlFor="teacherId">老师</Label>
-                  <Select
-                    value={selectedTeacherId?.toString() || ""}
-                    onValueChange={(value) => setValue("teacherId", parseInt(value))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="选择老师" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teachers?.map((teacher) => (
-                        <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                          {teacher.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="teacherName">老师</Label>
+                  <Input 
+                    id="teacherName" 
+                    {...register("teacherName")} 
+                    placeholder="输入老师姓名" 
+                  />
                 </div>
               </div>
 

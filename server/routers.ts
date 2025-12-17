@@ -317,7 +317,7 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         orderId: z.number().optional(),
-        customerId: z.number(),
+        customerName: z.string(),
         teacherId: z.number().optional(),
         teacherName: z.string().optional(),
         courseType: z.string(),

@@ -45,7 +45,7 @@ describe("schedules router", () => {
     const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
     const result = await caller.schedules.create({
-      customerId: 1,
+      customerName: "测试客户",
       courseType: "瑜伽课",
       startTime: now,
       endTime: oneHourLater,
@@ -65,7 +65,7 @@ describe("schedules router", () => {
     const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
     const createResult = await caller.schedules.create({
-      customerId: 1,
+      customerName: "测试客户",
       courseType: "舞蹈课",
       startTime: now,
       endTime: oneHourLater,
