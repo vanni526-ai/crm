@@ -182,12 +182,18 @@ export default function Orders() {
     return <Badge variant={variants[status] || "default"}>{labels[status] || status}</Badge>;
   };
 
-  const filteredOrders = useMemo(() => {
+  const [sortBy, setSortBy] = useState<"createdAt" | "paymentAmount" | "customerName">("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const filteredAndSortedOrders = useMemo(() => {
     if (!orders) return [];
-    return orders.filter((order) => {
+    
+    // 筛选
+    let filtered = orders.filter((order) => {
       const matchesSearch =
         !searchTerm ||
         order.orderNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.deliveryCourse?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.deliveryTeacher?.toLowerCase().includes(searchTerm.toLowerCase());
       
@@ -196,7 +202,24 @@ export default function Orders() {
 
       return matchesSearch && matchesStatus && matchesSales;
     });
-  }, [orders, searchTerm, statusFilter, salesFilter]);
+
+    // 排序
+    filtered.sort((a, b) => {
+      let compareValue = 0;
+      
+      if (sortBy === "createdAt") {
+        compareValue = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortBy === "paymentAmount") {
+        compareValue = parseFloat(a.paymentAmount || "0") - parseFloat(b.paymentAmount || "0");
+      } else if (sortBy === "customerName") {
+        compareValue = (a.customerName || "").localeCompare(b.customerName || "");
+      }
+
+      return sortOrder === "asc" ? compareValue : -compareValue;
+    });
+
+    return filtered;
+  }, [orders, searchTerm, statusFilter, salesFilter, sortBy, sortOrder]);
 
   // 导出订单数据
   const handleExport = async () => {
@@ -220,7 +243,7 @@ export default function Orders() {
       ];
 
       sheet.addRows(
-        filteredOrders.map((order) => {
+        filteredAndSortedOrders.map((order) => {
           const customer = customers?.find((c) => c.id === order.customerId);
           return {
             orderNo: order.orderNo,
@@ -307,10 +330,29 @@ export default function Orders() {
                     ))}
                   </SelectContent>
                 </Select>
+                <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue placeholder="排序方式" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="createdAt">创建时间</SelectItem>
+                    <SelectItem value="paymentAmount">支付金额</SelectItem>
+                    <SelectItem value="customerName">客户名称</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={sortOrder} onValueChange={(value: any) => setSortOrder(value)}>
+                  <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="排序顺序" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="desc">降序</SelectItem>
+                    <SelectItem value="asc">升序</SelectItem>
+                  </SelectContent>
+                </Select>
                 <div className="relative">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="搜索订单号、课程、老师..."
+                    placeholder="搜索订单号、客户、课程..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-8 w-[250px]"
@@ -341,13 +383,13 @@ export default function Orders() {
                         加载中...
                       </TableCell>
                     </TableRow>
-                  ) : filteredOrders && filteredOrders.length > 0 ? (
-                    filteredOrders.map((order) => {
+                  ) : filteredAndSortedOrders && filteredAndSortedOrders.length > 0 ? (
+                    filteredAndSortedOrders.map((order) => {
                       const customer = customers?.find((c) => c.id === order.customerId);
                       return (
                         <TableRow key={order.id}>
                           <TableCell className="font-medium">{order.orderNo}</TableCell>
-                          <TableCell>{customer?.name || "-"}</TableCell>
+                          <TableCell>{order.customerName || customer?.name || "-"}</TableCell>
                           <TableCell className="text-green-600 font-medium">
                             ¥{parseFloat(order.paymentAmount || "0").toFixed(2)}
                           </TableCell>
