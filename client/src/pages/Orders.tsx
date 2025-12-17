@@ -1583,10 +1583,16 @@ function SmartRegisterDialog({
   const [rawText, setRawText] = useState("");
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [isParsing, setIsParsing] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingData, setEditingData] = useState<any>(null);
   const [template, setTemplate] = useState<"wechat" | "alipay" | "custom">("wechat");
+  
+  // 批量编辑相关状态
+  const [batchCity, setBatchCity] = useState("");
+  const [batchTeacher, setBatchTeacher] = useState("");
+  const [batchRoom, setBatchRoom] = useState("");
   
   const parseWechatBill = trpc.orders.parseWechatBill.useMutation({
     onSuccess: (data) => {
@@ -1671,6 +1677,23 @@ function SmartRegisterDialog({
     parseWechatBill.mutate({ rows: rows as any[], template });
   };
   
+  // 批量设置处理函数
+  const handleBatchSet = (field: string, value: string) => {
+    if (!value.trim()) {
+      toast.error("请输入要设置的值");
+      return;
+    }
+    
+    setParsedData(prevData => 
+      prevData.map(item => ({
+        ...item,
+        [field]: value
+      }))
+    );
+    
+    toast.success(`已将所有记录的${field === 'deliveryCity' ? '城市' : field === 'deliveryTeacher' ? '老师' : '教室'}设置为: ${value}`);
+  };
+  
   const handleBatchCreate = async () => {
     if (parsedData.length === 0) {
       toast.error("没有可创建的订单");
@@ -1736,14 +1759,45 @@ function SmartRegisterDialog({
           </div>
           
           <div>
-            <Label>粘贴账单数据</Label>
+            <div className="flex items-center justify-between mb-2">
+              <Label>粘贴账单数据</Label>
+              <button
+                type="button"
+                onClick={() => setShowExamples(!showExamples)}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                {showExamples ? "隐藏示例" : "查看示例"}
+              </button>
+            </div>
+            
+            {showExamples && (
+              <div className="mb-3 p-3 bg-gray-50 rounded-md text-sm space-y-2">
+                <div>
+                  <p className="font-semibold text-gray-700 mb-1">CSV表格格式示例:</p>
+                  <pre className="text-xs bg-white p-2 rounded border overflow-x-auto">
+交易时间,交易类型,交易对方,商品,收/支,金额(元),支付方式,当前状态,交易单号,商户单号,备注{"\n"}
+2024-11-22 13:00:00,商户收款,瑛姬 Rin,七七 11.22 基础+丝袜 Tohsaka Rin yy 13:00-15:00(北京上),支,3000.00,微信支付,支付成功,123456789,987654321,转账备注
+                  </pre>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-700 mb-1">单行文本格式示例:</p>
+                  <pre className="text-xs bg-white p-2 rounded border overflow-x-auto">
+转账备注: 七七  11.22 基础+丝袜 Tohsaka Rin yy 13:00-15:00（北京上）
+                  </pre>
+                  <p className="text-xs text-gray-600 mt-1">
+                    提示: 单行文本应包含客户名、日期、课程、老师、时间、城市等信息
+                  </p>
+                </div>
+              </div>
+            )}
+            
             <textarea
               className="w-full h-40 p-2 border rounded-md font-mono text-sm"
               placeholder={
                 template === "wechat" 
-                  ? "请粘贴微信支付账单的CSV数据..."
+                  ? "支持CSV表格或单行文本..."
                   : template === "alipay"
-                  ? "请粘贴支付宝账单的CSV数据..."
+                  ? "支持CSV表格或单行文本..."
                   : "请粘贴账单数据..."
               }
               value={rawText}
@@ -1766,6 +1820,66 @@ function SmartRegisterDialog({
                 <h3 className="font-semibold">解析结果</h3>
                 <div className="text-sm text-muted-foreground">
                   共 {parsedData.length} 条记录
+                </div>
+              </div>
+              
+              {/* 批量操作工具栏 */}
+              <div className="mb-3 p-3 bg-gray-50 rounded-md">
+                <p className="text-sm font-semibold mb-2">批量设置:</p>
+                <div className="flex gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs">城市:</Label>
+                    <Input
+                      placeholder="如: 北京"
+                      className="h-8 w-24"
+                      value={batchCity}
+                      onChange={(e) => setBatchCity(e.target.value)}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleBatchSet('deliveryCity', batchCity)}
+                      disabled={!batchCity}
+                    >
+                      应用
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs">老师:</Label>
+                    <Input
+                      placeholder="如: yy"
+                      className="h-8 w-24"
+                      value={batchTeacher}
+                      onChange={(e) => setBatchTeacher(e.target.value)}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleBatchSet('deliveryTeacher', batchTeacher)}
+                      disabled={!batchTeacher}
+                    >
+                      应用
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs">教室:</Label>
+                    <Input
+                      placeholder="如: 404"
+                      className="h-8 w-24"
+                      value={batchRoom}
+                      onChange={(e) => setBatchRoom(e.target.value)}
+                    />
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleBatchSet('deliveryRoom', batchRoom)}
+                      disabled={!batchRoom}
+                    >
+                      应用
+                    </Button>
+                  </div>
                 </div>
               </div>
               
