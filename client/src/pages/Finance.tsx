@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle } from "lucide-react";
+import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle, MapPin } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
@@ -15,6 +15,8 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Toolti
 export default function Finance() {
   const { data: orders } = trpc.orders.list.useQuery();
   const { data: users } = trpc.users.list.useQuery();
+  const { data: cityRevenue } = trpc.analytics.cityRevenue.useQuery();
+  const { data: cityRevenueTrend } = trpc.analytics.cityRevenueTrend.useQuery();
   
   const [dateRange, setDateRange] = useState("thisMonth");
   const [searchTerm, setSearchTerm] = useState("");
@@ -374,6 +376,98 @@ export default function Finance() {
             <Download className="mr-2 h-4 w-4" />
             导出报表
           </Button>
+        </div>
+
+        {/* 城市收益统计和趋势 */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>城市收益统计</CardTitle>
+              <p className="text-sm text-muted-foreground">按城市分配比例计算收益</p>
+            </CardHeader>
+            <CardContent>
+              {cityRevenue && cityRevenue.length > 0 ? (
+                <div className="space-y-3">
+                  {cityRevenue.slice(0, 5).map((city) => (
+                    <div key={city.city} className="flex items-center justify-between p-3 rounded-lg border">
+                      <div className="flex items-center gap-3">
+                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <div className="font-medium">{city.city}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {city.orderCount} 个订单
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-600">
+                          ¥{parseFloat(city.revenue).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {city.city === '天津' && '50%分配'}
+                          {city.city === '武汉' && '40%分配'}
+                          {city.city === '上海' && '100%分配'}
+                          {city.city !== '天津' && city.city !== '武汉' && city.city !== '上海' && '30%分配'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {cityRevenue.length > 5 && (
+                    <div className="text-center text-sm text-muted-foreground pt-2">
+                      还有 {cityRevenue.length - 5} 个城市...
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  暂无数据
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>城市收益趋势</CardTitle>
+              <p className="text-sm text-muted-foreground">最近6个月收益变化</p>
+            </CardHeader>
+            <CardContent>
+              {cityRevenueTrend && cityRevenueTrend.cities.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={cityRevenueTrend.months.map((month, index) => {
+                    const dataPoint: any = { month: month.substring(5) + '月' };
+                    cityRevenueTrend.cities.forEach(city => {
+                      dataPoint[city.city] = city.data[index];
+                    });
+                    return dataPoint;
+                  })}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value: number) => `¥${value.toLocaleString()}`} />
+                    <Legend />
+                    {cityRevenueTrend.cities.map((city, index) => {
+                      const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#a78bfa'];
+                      return (
+                        <Line
+                          key={city.city}
+                          type="monotone"
+                          dataKey={city.city}
+                          stroke={colors[index % colors.length]}
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                      );
+                    })}
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  暂无数据
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* 财务概览 */}
