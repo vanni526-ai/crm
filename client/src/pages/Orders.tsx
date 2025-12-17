@@ -1618,8 +1618,39 @@ function SmartRegisterDialog({
     
     const lines = rawText.trim().split('\n');
     
-    // 检测是否为单行文本(没有表头或只有一行)
-    if (lines.length === 1 || (lines.length === 2 && lines[0].includes('交易时间'))) {
+    // 检测是否为CSV格式(检查第一行是否包含足够多的分隔符)
+    const firstLine = lines[0];
+    const tabCount = (firstLine.match(/\t/g) || []).length;
+    const commaCount = (firstLine.match(/,/g) || []).length;
+    const isCSVFormat = tabCount >= 10 || commaCount >= 10;
+    
+    // 如果是单行且是CSV格式,直接解析这一行
+    if (lines.length === 1 && isCSVFormat) {
+      // 使用Tab或逗号分割(优先Tab)
+      const parts = tabCount > commaCount ? firstLine.split('\t') : firstLine.split(',');
+      
+      if (parts.length >= 11) {
+        const goods = parts.slice(3, parts.length - 7).join(',');
+        const row = {
+          transactionTime: parts[0] || "",
+          transactionType: parts[1] || "",
+          counterparty: parts[2] || "",
+          goods: goods,
+          incomeExpense: parts[parts.length - 7] || "",
+          amount: parts[parts.length - 6] || "",
+          paymentMethod: parts[parts.length - 5] || "",
+          status: parts[parts.length - 4] || "",
+          transactionNo: parts[parts.length - 3] || "",
+          merchantNo: parts[parts.length - 2] || "",
+          notes: parts[parts.length - 1] || "",
+        };
+        parseWechatBill.mutate({ rows: [row], template });
+        return;
+      }
+    }
+    
+    // 检测是否为单行文本(没有表头或只有一行,且不是CSV格式)
+    if ((lines.length === 1 && !isCSVFormat) || (lines.length === 2 && lines[0].includes('交易时间'))) {
       // 单行文本模式(如转账备注)
       const singleLine = lines.length === 1 ? lines[0] : lines[1];
       
