@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileSpreadsheet, FileText, Calendar, CheckCircle, XCircle, List, CalendarDays } from "lucide-react";
+import { Upload, FileSpreadsheet, FileText, Calendar, CheckCircle, XCircle, List, CalendarDays, CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -22,7 +22,8 @@ export default function Import() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState<any[]>([]);
   const [currentFile, setCurrentFile] = useState<{ type: string; content: string } | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'month'>('list');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const csvInputRef = useRef<HTMLInputElement>(null);
@@ -221,6 +222,14 @@ export default function Import() {
                   <CalendarDays className="h-4 w-4 mr-1" />
                   日历视图
                 </Button>
+                <Button
+                  variant={viewMode === 'month' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('month')}
+                >
+                  <CalendarRange className="h-4 w-4 mr-1" />
+                  月度日历
+                </Button>
               </div>
             </div>
           </CardHeader>
@@ -266,7 +275,7 @@ export default function Import() {
                       </TableBody>
                     </Table>
                   </div>
-                  ) : (
+                  ) : viewMode === 'calendar' ? (
                     <div className="space-y-4">
                       {/* 简单的按日期分组展示 */}
                       {Object.entries(
@@ -305,6 +314,123 @@ export default function Import() {
                             </div>
                           </div>
                         ))}
+                    </div>
+                  ) : (
+                    // 月度日历视图
+                    <div className="space-y-4">
+                      {/* 月份导航 */}
+                      <div className="flex items-center justify-between">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newMonth = new Date(currentMonth);
+                            newMonth.setMonth(newMonth.getMonth() - 1);
+                            setCurrentMonth(newMonth);
+                          }}
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="text-lg font-semibold">
+                          {currentMonth.getFullYear()}年 {currentMonth.getMonth() + 1}月
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const newMonth = new Date(currentMonth);
+                            newMonth.setMonth(newMonth.getMonth() + 1);
+                            setCurrentMonth(newMonth);
+                          }}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {/* 日历网格 */}
+                      <div className="border rounded-lg overflow-hidden">
+                        {/* 星期标题 */}
+                        <div className="grid grid-cols-7 bg-muted">
+                          {['日', '一', '二', '三', '四', '五', '六'].map((day) => (
+                            <div key={day} className="p-2 text-center text-sm font-medium border-r last:border-r-0">
+                              {day}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* 日期网格 */}
+                        <div className="grid grid-cols-7">
+                          {(() => {
+                            const year = currentMonth.getFullYear();
+                            const month = currentMonth.getMonth();
+                            const firstDay = new Date(year, month, 1).getDay();
+                            const daysInMonth = new Date(year, month + 1, 0).getDate();
+                            const today = new Date();
+                            const cells = [];
+
+                            // 填充空白单元格
+                            for (let i = 0; i < firstDay; i++) {
+                              cells.push(
+                                <div key={`empty-${i}`} className="min-h-[100px] p-2 border-r border-b bg-muted/30" />
+                              );
+                            }
+
+                            // 填充日期单元格
+                            for (let day = 1; day <= daysInMonth; day++) {
+                              const currentDate = new Date(year, month, day);
+                              const dateStr = currentDate.toLocaleDateString();
+                              const isToday = 
+                                currentDate.getDate() === today.getDate() &&
+                                currentDate.getMonth() === today.getMonth() &&
+                                currentDate.getFullYear() === today.getFullYear();
+
+                              // 获取当天的课程
+                              const daySchedules = schedules.filter((schedule) => {
+                                if (!schedule.classDate) return false;
+                                const scheduleDate = new Date(schedule.classDate);
+                                return scheduleDate.toLocaleDateString() === dateStr;
+                              });
+
+                              cells.push(
+                                <div
+                                  key={day}
+                                  className={`min-h-[100px] p-2 border-r border-b ${
+                                    isToday ? 'bg-primary/5 border-primary' : ''
+                                  }`}
+                                >
+                                  <div className={`text-sm font-medium mb-1 ${
+                                    isToday ? 'text-primary' : ''
+                                  }`}>
+                                    {day}
+                                  </div>
+                                  {daySchedules.length > 0 && (
+                                    <div className="space-y-1">
+                                      {daySchedules.slice(0, 3).map((schedule) => (
+                                        <div
+                                          key={schedule.id}
+                                          className="text-xs p-1 bg-blue-100 dark:bg-blue-900/30 rounded truncate"
+                                          title={`${schedule.classTime} ${schedule.deliveryCourse} - ${schedule.customerName}`}
+                                        >
+                                          <div className="font-medium truncate">
+                                            {schedule.classTime?.split('-')[0]} {schedule.customerName}
+                                          </div>
+                                        </div>
+                                      ))}
+                                      {daySchedules.length > 3 && (
+                                        <div className="text-xs text-muted-foreground">
+                                          +{daySchedules.length - 3} 更多
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+
+                            return cells;
+                          })()}
+                        </div>
+                      </div>
                     </div>
                   )}
                 </>
