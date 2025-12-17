@@ -431,6 +431,93 @@ export async function getCityRevenue() {
     .sort((a, b) => parseFloat(b.revenue) - parseFloat(a.revenue));
 }
 
+export async function getCityRevenueTrend() {
+  const db = await getDb();
+  if (!db) return { months: [], cities: [] };
+
+  // 计算最近6个月的日期范围
+  const now = new Date();
+  const months: string[] = [];
+  for (let i = 5; i >= 0; i--) {
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+  }
+
+  // 获取最近6个月的订单
+  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+  const allOrders = await db
+    .select({
+      paymentCity: orders.paymentCity,
+      paymentAmount: orders.paymentAmount,
+      teacherFee: orders.teacherFee,
+      paymentDate: orders.paymentDate,
+    })
+    .from(orders)
+    .where(
+      sql`${orders.status} != 'cancelled' AND ${orders.paymentDate} >= ${sixMonthsAgo.toISOString().split('T')[0]}`
+    );
+
+  // 按城市和月份分组计算收益
+  const cityMonthRevenueMap = new Map<string, Map<string, number>>();
+  
+  for (const order of allOrders) {
+    if (!order.paymentDate) continue;
+    
+    const city = order.paymentCity || '未知城市';
+    const paymentAmount = parseFloat(order.paymentAmount?.toString() || '0');
+    const teacherFee = parseFloat(order.teacherFee?.toString() || '0');
+    const baseRevenue = paymentAmount - teacherFee;
+    
+    // 根据城市计算收益比例
+    let ratio = 0.3;
+    if (city === '天津') {
+      ratio = 0.5;
+    } else if (city === '武汉') {
+      ratio = 0.4;
+    } else if (city === '上海') {
+      ratio = 1.0;
+    }
+    
+    const revenue = baseRevenue * ratio;
+    
+    // 获取月份
+    const date = new Date(order.paymentDate);
+    const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    
+    if (!cityMonthRevenueMap.has(city)) {
+      cityMonthRevenueMap.set(city, new Map());
+    }
+    
+    const monthRevenueMap = cityMonthRevenueMap.get(city)!;
+    monthRevenueMap.set(month, (monthRevenueMap.get(month) || 0) + revenue);
+  }
+  
+  // 转换为前端需要的格式
+  const cities = Array.from(cityMonthRevenueMap.entries()).map(([city, monthRevenueMap]) => {
+    const data = months.map(month => {
+      const revenue = monthRevenueMap.get(month) || 0;
+      return parseFloat(revenue.toFixed(2));
+    });
+    
+    return {
+      city,
+      data,
+    };
+  });
+  
+  // 按总收益排序,只返回前5个城市
+  cities.sort((a, b) => {
+    const sumA = a.data.reduce((acc, val) => acc + val, 0);
+    const sumB = b.data.reduce((acc, val) => acc + val, 0);
+    return sumB - sumA;
+  });
+  
+  return {
+    months,
+    cities: cities.slice(0, 5),
+  };
+}
+
 // ========== 数据导入日志 ==========
 
 export async function createImportLog(log: InsertImportLog) {

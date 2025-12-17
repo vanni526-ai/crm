@@ -153,3 +153,87 @@ describe("city revenue calculation", () => {
     expect(Array.isArray(cityRevenue)).toBe(true);
   });
 });
+
+describe("city revenue trend", () => {
+  it("should return monthly revenue trend for cities", async () => {
+    const { ctx } = createTestContext("admin");
+    const caller = appRouter.createCaller(ctx);
+
+    // 创建不同月份的订单
+    const now = new Date();
+    
+    // 上个月的订单
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 15);
+    await caller.orders.create({
+      orderNo: "TREND1" + Date.now(),
+      customerName: "测试客户1",
+      paymentAmount: "2000.00",
+      courseAmount: "2000.00",
+      paymentCity: "天津",
+      teacherFee: "800.00",
+      paymentDate: lastMonth.toISOString().split('T')[0],
+    });
+
+    // 当月的订单
+    await caller.orders.create({
+      orderNo: "TREND2" + Date.now(),
+      customerName: "测试客户2",
+      paymentAmount: "3000.00",
+      courseAmount: "3000.00",
+      paymentCity: "上海",
+      teacherFee: "1000.00",
+      paymentDate: now.toISOString().split('T')[0],
+    });
+
+    const trend = await caller.analytics.cityRevenueTrend();
+
+    expect(trend).toBeDefined();
+    expect(Array.isArray(trend.months)).toBe(true);
+    expect(trend.months.length).toBe(6);
+    expect(Array.isArray(trend.cities)).toBe(true);
+    
+    // 验证月份格式
+    trend.months.forEach(month => {
+      expect(month).toMatch(/^\d{4}-\d{2}$/);
+    });
+    
+    // 验证城市数据结构
+    trend.cities.forEach(city => {
+      expect(city).toHaveProperty('city');
+      expect(city).toHaveProperty('data');
+      expect(Array.isArray(city.data)).toBe(true);
+      expect(city.data.length).toBe(6);
+    });
+  });
+
+  it("should limit to top 5 cities by total revenue", async () => {
+    const { ctx } = createTestContext("admin");
+    const caller = appRouter.createCaller(ctx);
+
+    const trend = await caller.analytics.cityRevenueTrend();
+    
+    expect(trend.cities.length).toBeLessThanOrEqual(5);
+  });
+
+  it("should exclude cancelled orders from trend calculation", async () => {
+    const { ctx } = createTestContext("admin");
+    const caller = appRouter.createCaller(ctx);
+
+    // 创建已取消的订单
+    await caller.orders.create({
+      orderNo: "TRENDCANCEL" + Date.now(),
+      customerName: "取消订单",
+      paymentAmount: "10000.00",
+      courseAmount: "10000.00",
+      paymentCity: "天津",
+      teacherFee: "2000.00",
+      paymentDate: new Date().toISOString().split('T')[0],
+      status: "cancelled",
+    });
+
+    const trend = await caller.analytics.cityRevenueTrend();
+    
+    expect(trend).toBeDefined();
+    expect(Array.isArray(trend.cities)).toBe(true);
+  });
+});

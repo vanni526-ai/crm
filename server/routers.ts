@@ -492,6 +492,10 @@ export const appRouter = router({
     cityRevenue: protectedProcedure.query(async () => {
       return db.getCityRevenue();
     }),
+    
+    cityRevenueTrend: protectedProcedure.query(async () => {
+      return db.getCityRevenueTrend();
+    }),
   }),
 
   // 数据导入
