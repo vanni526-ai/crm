@@ -78,10 +78,14 @@ export default function Orders() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [salesFilter, setSalesFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [salesFilter, setSalesFilter] = useState("all");
+  const [exportTimeRange, setExportTimeRange] = useState<"yesterday" | "last7days" | "thisMonth" | "custom">("thisMonth");
+  const [exportStartDate, setExportStartDate] = useState("");
+  const [exportEndDate, setExportEndDate] = useState("");
 
   const {
     register,
@@ -221,8 +225,52 @@ export default function Orders() {
     return filtered;
   }, [orders, searchTerm, statusFilter, salesFilter, sortBy, sortOrder]);
 
+  // 根据时间范围过滤订单
+  const getFilteredOrdersByTimeRange = () => {
+    const now = new Date();
+    let startDate: Date;
+    let endDate: Date = now;
+
+    if (exportTimeRange === "yesterday") {
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 1);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(startDate);
+      endDate.setHours(23, 59, 59, 999);
+    } else if (exportTimeRange === "last7days") {
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
+    } else if (exportTimeRange === "thisMonth") {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    } else if (exportTimeRange === "custom") {
+      if (!exportStartDate || !exportEndDate) {
+        toast.error("请选择开始和结束日期");
+        return [];
+      }
+      startDate = new Date(exportStartDate);
+      endDate = new Date(exportEndDate);
+      endDate.setHours(23, 59, 59, 999);
+    } else {
+      return filteredAndSortedOrders;
+    }
+
+    return filteredAndSortedOrders.filter((order) => {
+      const orderDate = new Date(order.createdAt);
+      return orderDate >= startDate && orderDate <= endDate;
+    });
+  };
+
   // 导出订单数据
   const handleExport = async () => {
+    const ordersToExport = getFilteredOrdersByTimeRange();
+    
+    if (ordersToExport.length === 0) {
+      toast.error("没有符合条件的订单数据");
+      return;
+    }
+
     try {
       const ExcelJS = (await import("exceljs")).default;
       const workbook = new ExcelJS.Workbook();
@@ -243,7 +291,7 @@ export default function Orders() {
       ];
 
       sheet.addRows(
-        filteredAndSortedOrders.map((order) => {
+        ordersToExport.map((order) => {
           const customer = customers?.find((c) => c.id === order.customerId);
           return {
             orderNo: order.orderNo,
@@ -288,7 +336,7 @@ export default function Orders() {
             <p className="text-muted-foreground mt-2">查看和管理所有客户订单</p>
           </div>
           <div className="flex space-x-2">
-            <Button variant="outline" onClick={handleExport}>
+            <Button variant="outline" onClick={() => setExportOpen(true)}>
               <Download className="mr-2 h-4 w-4" />
               导出订单
             </Button>
@@ -909,6 +957,65 @@ export default function Orders() {
             <DialogFooter>
               <Button variant="outline" onClick={() => setDetailOpen(false)}>
                 关闭
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 导出订单对话框 */}
+        <Dialog open={exportOpen} onOpenChange={setExportOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>导出订单</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>时间范围</Label>
+                <Select value={exportTimeRange} onValueChange={(value: any) => setExportTimeRange(value)}>
+                  <SelectTrigger className="w-full mt-2">
+                    <SelectValue placeholder="选择时间范围" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yesterday">昨天</SelectItem>
+                    <SelectItem value="last7days">近7天</SelectItem>
+                    <SelectItem value="thisMonth">当月</SelectItem>
+                    <SelectItem value="custom">自定义</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {exportTimeRange === "custom" && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>开始日期</Label>
+                    <Input
+                      type="date"
+                      value={exportStartDate}
+                      onChange={(e) => setExportStartDate(e.target.value)}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label>结束日期</Label>
+                    <Input
+                      type="date"
+                      value={exportEndDate}
+                      onChange={(e) => setExportEndDate(e.target.value)}
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setExportOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={() => {
+                handleExport();
+                setExportOpen(false);
+              }}>
+                导出
               </Button>
             </DialogFooter>
           </DialogContent>
