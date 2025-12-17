@@ -33,9 +33,6 @@ export interface ParsedOrderInfo {
   teacherFee: string; // 老师费用
   notes: string; // 备注(原始商品信息)
   rawData: WechatBillRow; // 原始数据
-  // 客户匹配相关字段
-  matchedCustomerId?: number; // 匹配到的客户ID
-  matchedCustomers?: Array<{ id: number; name: string; wechatId?: string; phone?: string }>; // 可能匹配的客户列表
 }
 
 /**
@@ -62,11 +59,8 @@ export async function parseWechatBillWithLLM(
 
 需要提取的信息:
 1. **customerName** (客户名): 
-   - **重要**: 客户名和销售人员是不同的!
-   - 客户名通常在开头,如"七七"、"山竹"
-   - 销售人员通常是英文名字,如"ivy"、"yy"、"AL1987"
-   - **如果无法确定客户名,请返回空字符串**
-   - 单行文本中,客户名可能在"转账备注:"后面,但不是所有情况都有
+   - 通常在开头,如"七七"、"山竹"、"ivy"
+   - 单行文本中可能在"转账备注:"后面
    
 2. **classDate** (上课日期):
    - 格式: YYYY-MM-DD
@@ -103,8 +97,7 @@ export async function parseWechatBillWithLLM(
    - 如果没有则为空
 
 **重要规则**:
-- **客户名区分**: 客户名通常是2-4个字的**中文名字**,英文名字通常是销售人员
-- **如果没有明确的客户名,必须返回空字符串**
+- 客户名通常是2-4个字的中文或英文名字
 - 日期必须转换为 YYYY-MM-DD 格式
 - 城市名只保留汉字,去掉"上"、"下"等后缀
 - 如果信息不完整或无法提取,对应字段返回空字符串`,

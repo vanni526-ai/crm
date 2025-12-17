@@ -297,7 +297,6 @@ export const appRouter = router({
       .input(z.object({
         template: z.enum(["wechat", "alipay", "custom"]),
         orders: z.array(z.object({
-          customerId: z.number().optional(), // 匹配的客户ID
           customerName: z.string(),
           deliveryTeacher: z.string().optional(),
           deliveryCourse: z.string().optional(),
@@ -328,7 +327,6 @@ export const appRouter = router({
             
             await db.createOrder({
               orderNo,
-              customerId: orderData.customerId, // 匹配的客户ID
               customerName: orderData.customerName,
               salesId: ctx.user.id, // 使用当前用户作为销售人
               deliveryTeacher: filterValue(orderData.deliveryTeacher),

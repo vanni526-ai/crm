@@ -1616,43 +1616,10 @@ function SmartRegisterDialog({
   const [batchTeacher, setBatchTeacher] = useState("");
   const [batchRoom, setBatchRoom] = useState("");
   
-  const utils = trpc.useUtils();
-  
   const parseWechatBill = trpc.orders.parseWechatBill.useMutation({
-    onSuccess: async (data) => {
-      // 为每条解析结果匹配客户
-      const dataWithMatches = await Promise.all(
-        data.data.map(async (item: any, index: number) => {
-          try {
-            // 搜索匹配的客户
-            const customers = await utils.client.customers.search.query({ keyword: item.customerName });
-            
-            // 如果找到完全匹配的客户(名称相同),自动选中
-            const exactMatch = customers.find((c: any) => c.name === item.customerName);
-            
-            return {
-              ...item,
-              id: index,
-              matchedCustomers: customers.slice(0, 5), // 最多显示5个匹配结果
-              matchedCustomerId: exactMatch?.id, // 完全匹配的客户ID
-            };
-          } catch (error) {
-            console.error(`客户匹配失败: ${item.customerName}`, error);
-            return { ...item, id: index };
-          }
-        })
-      );
-      
-      setParsedData(dataWithMatches);
-      
-      // 统计匹配情况
-      const matchedCount = dataWithMatches.filter((item: any) => item.matchedCustomerId).length;
-      if (matchedCount > 0) {
-        toast.success(`解析成功，共识别 ${data.data.length} 条订单，其中 ${matchedCount} 条匹配到已有客户`);
-      } else {
-        toast.success(`解析成功，共识别 ${data.data.length} 条订单`);
-      }
-      
+    onSuccess: (data) => {
+      setParsedData(data.data.map((item: any, index: number) => ({ ...item, id: index })));
+      toast.success(`解析成功，共识别 ${data.data.length} 条订单`);
       setIsParsing(false);
     },
     onError: (error) => {
@@ -1685,17 +1652,7 @@ function SmartRegisterDialog({
       const parts = tabCount > commaCount ? firstLine.split('\t') : firstLine.split(',');
       
       if (parts.length >= 11) {
-        // 微信账单格式: 交易时间,交易类型,交易对方,商品,收/支,金额,支付方式,当前状态,交易单号,商户单号,备注
-        // 如果恰好11个字段,直接映射
-        // 如果超过11个字段,说明商品字段包含分隔符,需要合并
-        let goods;
-        if (parts.length === 11) {
-          goods = parts[3] || "";
-        } else {
-          // 商品字段从第4个字段开始,到倒数第8个字段结束
-          goods = parts.slice(3, parts.length - 7).join(',');
-        }
-        
+        const goods = parts.slice(3, parts.length - 7).join(',');
         const row = {
           transactionTime: parts[0] || "",
           transactionType: parts[1] || "",
@@ -1802,7 +1759,6 @@ function SmartRegisterDialog({
       const result = await batchCreateOrders.mutateAsync({
         template,
         orders: parsedData.map(data => ({
-          customerId: data.matchedCustomerId, // 匹配的客户ID
           customerName: data.customerName,
           deliveryTeacher: data.deliveryTeacher,
           deliveryCourse: data.deliveryCourse,
@@ -2006,35 +1962,7 @@ function SmartRegisterDialog({
                               className="h-8"
                             />
                           ) : (
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <span>{data.customerName}</span>
-                                {data.matchedCustomerId && (
-                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                                    已匹配
-                                  </span>
-                                )}
-                              </div>
-                              {data.matchedCustomers && data.matchedCustomers.length > 0 && (
-                                <select
-                                  className="text-xs border rounded px-2 py-1 w-full"
-                                  value={data.matchedCustomerId || ""}
-                                  onChange={(e) => {
-                                    const customerId = e.target.value ? parseInt(e.target.value) : undefined;
-                                    setParsedData(prev => prev.map(item => 
-                                      item.id === data.id ? { ...item, matchedCustomerId: customerId } : item
-                                    ));
-                                  }}
-                                >
-                                  <option value="">创建新客户</option>
-                                  {data.matchedCustomers.map((customer: any) => (
-                                    <option key={customer.id} value={customer.id}>
-                                      {customer.name} {customer.wechatId ? `(${customer.wechatId})` : ''}
-                                    </option>
-                                  ))}
-                                </select>
-                              )}
-                            </div>
+                            data.customerName
                           )}
                         </TableCell>
                         <TableCell>
