@@ -13,6 +13,7 @@ import TeacherPayments from "./pages/TeacherPayments";
 import Reconciliations from "./pages/Reconciliations";
 import Analytics from "./pages/Analytics";
 import Users from "./pages/Users";
+import Import from "./pages/Import";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path={"/reconciliations"} component={Reconciliations} />
       <Route path={"/analytics"} component={Analytics} />
       <Route path={"/users"} component={Users} />
+      <Route path={"/import"} component={Import} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -3,6 +3,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { importRouter } from "./importRouter";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 
@@ -410,12 +411,8 @@ export const appRouter = router({
       }),
   }),
 
-  // 数据导入日志
-  importLogs: router({
-    list: protectedProcedure.query(async () => {
-      return db.getImportLogs();
-    }),
-  }),
+  // 数据导入
+  import: importRouter,
 });
 
 export type AppRouter = typeof appRouter;

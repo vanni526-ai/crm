@@ -110,6 +110,10 @@ export default function Home() {
                 <div className="font-medium">课程排课</div>
                 <div className="text-sm text-muted-foreground">查看和管理课程安排</div>
               </a>
+              <a href="/import" className="block p-3 rounded-lg border hover:bg-accent transition-colors">
+                <div className="font-medium">数据导入</div>
+                <div className="text-sm text-muted-foreground">批量导入CSV、Excel、ICS文件</div>
+              </a>
             </CardContent>
           </Card>
 
