@@ -112,6 +112,7 @@ export default function Orders() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [smartRegisterOpen, setSmartRegisterOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -584,6 +585,10 @@ export default function Orders() {
             <Button variant="outline" onClick={() => setExportOpen(true)}>
               <Download className="mr-2 h-4 w-4" />
               导出订单
+            </Button>
+            <Button variant="outline" onClick={() => setSmartRegisterOpen(true)}>
+              <Upload className="mr-2 h-4 w-4" />
+              智能登记
             </Button>
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
@@ -1550,7 +1555,200 @@ export default function Orders() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* 智能登记对话框 */}
+        <SmartRegisterDialog 
+          open={smartRegisterOpen} 
+          onOpenChange={setSmartRegisterOpen}
+          onSuccess={() => {
+            utils.orders.list.invalidate();
+            setSmartRegisterOpen(false);
+          }}
+        />
       </div>
     </DashboardLayout>
+  );
+}
+
+// 智能登记对话框组件
+function SmartRegisterDialog({ 
+  open, 
+  onOpenChange, 
+  onSuccess 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}) {
+  const [rawText, setRawText] = useState("");
+  const [parsedData, setParsedData] = useState<any[]>([]);
+  const [isParsing, setIsParsing] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  
+  const parseWechatBill = trpc.orders.parseWechatBill.useMutation({
+    onSuccess: (data) => {
+      setParsedData(data.data);
+      toast.success(`解析成功，共识别 ${data.data.length} 条订单`);
+      setIsParsing(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "解析失败");
+      setIsParsing(false);
+    },
+  });
+  
+  const createOrder = trpc.orders.create.useMutation();
+  
+  const handleParse = () => {
+    if (!rawText.trim()) {
+      toast.error("请粘贴微信账单数据");
+      return;
+    }
+    
+    setIsParsing(true);
+    
+    // 解析CSV格式的文本(支持引号包裹的字段)
+    const lines = rawText.trim().split('\n');
+    const rows = lines.slice(1).map(line => {
+      // 简单的CSV解析(不处理引号,直接按逗号分割)
+      // 微信账单格式: 交易时间,交易类型,交易对方,商品,收/支,金额(元),支付方式,当前状态,交易单号,商户单号,备注
+      const parts = line.split(',');
+      if (parts.length < 11) return null;
+      
+      // 合并中间的所有部分作为商品字段(因为商品字段中可能包含逗号)
+      const goods = parts.slice(3, parts.length - 7).join(',');
+      
+      return {
+        transactionTime: parts[0] || "",
+        transactionType: parts[1] || "",
+        counterparty: parts[2] || "",
+        goods: goods,
+        incomeExpense: parts[parts.length - 7] || "",
+        amount: parts[parts.length - 6] || "",
+        paymentMethod: parts[parts.length - 5] || "",
+        status: parts[parts.length - 4] || "",
+        transactionNo: parts[parts.length - 3] || "",
+        merchantNo: parts[parts.length - 2] || "",
+        notes: parts[parts.length - 1] || "",
+      };
+    }).filter(Boolean);
+    
+    if (rows.length === 0) {
+      toast.error("未识别到有效数据");
+      setIsParsing(false);
+      return;
+    }
+    
+    parseWechatBill.mutate({ rows: rows as any[] });
+  };
+  
+  const handleBatchCreate = async () => {
+    if (parsedData.length === 0) {
+      toast.error("没有可创建的订单");
+      return;
+    }
+    
+    setIsCreating(true);
+    
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const data of parsedData) {
+      try {
+        await createOrder.mutateAsync({
+          customerName: data.customerName,
+          deliveryTeacher: data.deliveryTeacher,
+          deliveryCourse: data.deliveryCourse,
+          deliveryCity: data.deliveryCity,
+          deliveryRoom: data.deliveryRoom,
+          classDate: data.classDate,
+          classTime: data.classTime,
+          paymentAmount: data.paymentAmount,
+          courseAmount: data.courseAmount,
+          teacherFee: data.teacherFee,
+          notes: data.notes,
+        });
+        successCount++;
+      } catch (error) {
+        failCount++;
+        console.error("创建订单失败:", error);
+      }
+    }
+    
+    setIsCreating(false);
+    
+    if (successCount > 0) {
+      toast.success(`批量创建成功，成功 ${successCount} 条，失败 ${failCount} 条`);
+      onSuccess();
+    } else {
+      toast.error("批量创建失败");
+    }
+  };
+  
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>智能登记</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div>
+            <Label>粘贴微信账单数据</Label>
+            <textarea
+              className="w-full h-40 p-2 border rounded-md font-mono text-sm"
+              placeholder="请粘贴微信支付账单的CSV数据..."
+              value={rawText}
+              onChange={(e) => setRawText(e.target.value)}
+            />
+          </div>
+          
+          <Button onClick={handleParse} disabled={isParsing}>
+            {isParsing ? "解析中..." : "开始解析"}
+          </Button>
+          
+          {parsedData.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="font-semibold">解析结果 ({parsedData.length} 条)</h3>
+              
+              <div className="border rounded-md overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>客户名</TableHead>
+                      <TableHead>上课日期</TableHead>
+                      <TableHead>上课时间</TableHead>
+                      <TableHead>课程</TableHead>
+                      <TableHead>老师</TableHead>
+                      <TableHead>城市</TableHead>
+                      <TableHead>教室</TableHead>
+                      <TableHead>金额</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {parsedData.map((data, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{data.customerName}</TableCell>
+                        <TableCell>{data.classDate}</TableCell>
+                        <TableCell>{data.classTime}</TableCell>
+                        <TableCell>{data.deliveryCourse}</TableCell>
+                        <TableCell>{data.deliveryTeacher}</TableCell>
+                        <TableCell>{data.deliveryCity}</TableCell>
+                        <TableCell>{data.deliveryRoom}</TableCell>
+                        <TableCell>¥{data.paymentAmount}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              <Button onClick={handleBatchCreate} disabled={isCreating}>
+                {isCreating ? "创建中..." : `批量创建 ${parsedData.length} 条订单`}
+              </Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

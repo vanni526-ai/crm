@@ -167,6 +167,28 @@ export const appRouter = router({
         return db.getOrderById(input.id);
       }),
     
+    parseWechatBill: salesOrAdminProcedure
+      .input(z.object({
+        rows: z.array(z.object({
+          transactionTime: z.string(),
+          transactionType: z.string(),
+          counterparty: z.string(),
+          goods: z.string(),
+          incomeExpense: z.string(),
+          amount: z.string(),
+          paymentMethod: z.string(),
+          status: z.string(),
+          transactionNo: z.string(),
+          merchantNo: z.string(),
+          notes: z.string(),
+        })),
+      }))
+      .mutation(async ({ input }) => {
+        const { parseWechatBillBatch } = await import("./wechatBillParser");
+        const results = await parseWechatBillBatch(input.rows);
+        return { success: true, data: results };
+      }),
+    
     create: salesOrAdminProcedure
       .input(z.object({
         orderNo: z.string().optional(),
