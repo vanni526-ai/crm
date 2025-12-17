@@ -73,7 +73,7 @@ export const orders = mysqlTable("orders", {
   deliveryTeacher: varchar("deliveryTeacher", { length: 100 }), // 交付老师
   deliveryCourse: varchar("deliveryCourse", { length: 200 }), // 交付课程
   classDate: date("classDate"), // 上课日期
-  classTime: time("classTime"), // 上课时间
+  classTime: varchar("classTime", { length: 50 }), // 上课时间(支持时间范围如"14:00-16:00")
   
   status: mysqlEnum("status", ["pending", "paid", "completed", "cancelled", "refunded"]).default("pending").notNull(),
   notes: text("notes"), // 备注

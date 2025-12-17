@@ -1744,9 +1744,9 @@ function SmartRegisterDialog({
           deliveryRoom: data.deliveryRoom,
           classDate: data.classDate,
           classTime: data.classTime,
-          paymentAmount: data.paymentAmount,
-          courseAmount: data.courseAmount,
-          teacherFee: data.teacherFee,
+          paymentAmount: String(data.paymentAmount),
+          courseAmount: data.courseAmount ? String(data.courseAmount) : String(data.paymentAmount),
+          teacherFee: data.teacherFee ? String(data.teacherFee) : undefined,
           notes: data.notes,
         })),
       });

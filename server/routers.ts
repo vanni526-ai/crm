@@ -319,20 +319,26 @@ export const appRouter = router({
             // 生成订单号
             const orderNo = `ORD${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
             
+            // 辅助函数:过滤无效值
+            const filterValue = (val: string | undefined) => {
+              if (!val || val === "?" || val.trim() === "") return undefined;
+              return val;
+            };
+            
             await db.createOrder({
               orderNo,
               customerName: orderData.customerName,
               salesId: ctx.user.id, // 使用当前用户作为销售人
-              deliveryTeacher: orderData.deliveryTeacher,
-              deliveryCourse: orderData.deliveryCourse,
-              deliveryCity: orderData.deliveryCity,
-              deliveryRoom: orderData.deliveryRoom,
+              deliveryTeacher: filterValue(orderData.deliveryTeacher),
+              deliveryCourse: filterValue(orderData.deliveryCourse),
+              deliveryCity: filterValue(orderData.deliveryCity),
+              deliveryRoom: filterValue(orderData.deliveryRoom),
               classDate: orderData.classDate ? new Date(orderData.classDate) : undefined,
-              classTime: orderData.classTime,
+              classTime: filterValue(orderData.classTime),
               paymentAmount: orderData.paymentAmount,
               courseAmount: orderData.courseAmount || orderData.paymentAmount,
-              teacherFee: orderData.teacherFee,
-              notes: orderData.notes,
+              teacherFee: filterValue(orderData.teacherFee),
+              notes: filterValue(orderData.notes),
             });
             successCount++;
           } catch (error) {

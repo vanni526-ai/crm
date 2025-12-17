@@ -1,0 +1,1 @@
+ALTER TABLE `orders` MODIFY COLUMN `classTime` varchar(50);
