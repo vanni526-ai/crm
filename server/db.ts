@@ -276,6 +276,12 @@ export async function getSchedulesByTeacher(teacherId: number) {
   return db.select().from(schedules).where(eq(schedules.teacherId, teacherId)).orderBy(desc(schedules.startTime));
 }
 
+export async function deleteSchedule(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(schedules).where(eq(schedules.id, id));
+}
+
 // ========== 老师费用 ==========
 
 export async function createTeacherPayment(payment: InsertTeacherPayment) {

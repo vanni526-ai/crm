@@ -322,6 +322,13 @@ export const appRouter = router({
         const id = await db.createSchedule(input);
         return { id, success: true };
       }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteSchedule(input.id);
+        return { success: true };
+      }),
   }),
 
   // 老师费用结算

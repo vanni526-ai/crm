@@ -11,6 +11,7 @@ import Teachers from "./pages/Teachers";
 import Schedules from "./pages/Schedules";
 import TeacherPayments from "./pages/TeacherPayments";
 import Reconciliations from "./pages/Reconciliations";
+import Finance from "./pages/Finance";
 import Analytics from "./pages/Analytics";
 import Users from "./pages/Users";
 import Import from "./pages/Import";
@@ -25,6 +26,7 @@ function Router() {
       <Route path={"/schedules"} component={Schedules} />
       <Route path={"/teacher-payments"} component={TeacherPayments} />
       <Route path={"/reconciliations"} component={Reconciliations} />
+      <Route path={"/finance"} component={Finance} />
       <Route path={"/analytics"} component={Analytics} />
       <Route path={"/users"} component={Users} />
       <Route path={"/import"} component={Import} />
