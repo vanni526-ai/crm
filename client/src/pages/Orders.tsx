@@ -18,7 +18,7 @@ import { z } from "zod";
 
 const orderSchema = z.object({
   orderNo: z.string().min(1, "订单号不能为空"),
-  customerId: z.number().min(1, "请选择客户"),
+  customerName: z.string().min(1, "请输入客户姓名"),
   paymentAmount: z.string().min(1, "支付金额不能为空"),
   courseAmount: z.string().min(1, "课程金额不能为空"),
   paymentChannel: z.string().optional(),
@@ -97,7 +97,7 @@ export default function Orders() {
   const onCreateSubmit = (data: OrderFormData) => {
     createOrder.mutate({
       orderNo: data.orderNo,
-      customerId: data.customerId,
+      customerName: data.customerName,
       paymentAmount: data.paymentAmount,
       courseAmount: data.courseAmount,
       paymentChannel: data.paymentChannel,
@@ -118,7 +118,7 @@ export default function Orders() {
     updateOrder.mutate({
       id: selectedOrder.id,
       orderNo: data.orderNo,
-      customerId: data.customerId,
+      customerName: data.customerName,
       paymentAmount: data.paymentAmount,
       courseAmount: data.courseAmount,
       paymentChannel: data.paymentChannel,
@@ -137,7 +137,7 @@ export default function Orders() {
   const handleEdit = (order: any) => {
     setSelectedOrder(order);
     setValue("orderNo", order.orderNo);
-    setValue("customerId", order.customerId);
+    setValue("customerName", order.customerName || "");
     setValue("paymentAmount", order.paymentAmount || "");
     setValue("courseAmount", order.courseAmount || "");
     setValue("paymentChannel", order.paymentChannel || "");
@@ -418,24 +418,10 @@ export default function Orders() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="customerId">客户 *</Label>
-                      <Select
-                        value={watch("customerId")?.toString()}
-                        onValueChange={(value) => setValue("customerId", parseInt(value))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="选择客户" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {customers?.map((customer) => (
-                            <SelectItem key={customer.id} value={customer.id.toString()}>
-                              {customer.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.customerId && (
-                        <p className="text-sm text-destructive mt-1">{errors.customerId.message}</p>
+                      <Label htmlFor="customerName">客户 *</Label>
+                      <Input id="customerName" {...register("customerName")} placeholder="输入客户姓名" />
+                      {errors.customerName && (
+                        <p className="text-sm text-destructive mt-1">{errors.customerName.message}</p>
                       )}
                     </div>
                     <div>
@@ -606,24 +592,10 @@ export default function Orders() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="edit-customerId">客户 *</Label>
-                      <Select
-                        value={watch("customerId")?.toString()}
-                        onValueChange={(value) => setValue("customerId", parseInt(value))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="选择客户" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {customers?.map((customer) => (
-                            <SelectItem key={customer.id} value={customer.id.toString()}>
-                              {customer.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {errors.customerId && (
-                        <p className="text-sm text-destructive mt-1">{errors.customerId.message}</p>
+                      <Label htmlFor="edit-customerName">客户 *</Label>
+                      <Input id="edit-customerName" {...register("customerName")} placeholder="输入客户姓名" />
+                      {errors.customerName && (
+                        <p className="text-sm text-destructive mt-1">{errors.customerName.message}</p>
                       )}
                     </div>
                     <div>

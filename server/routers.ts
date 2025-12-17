@@ -144,7 +144,7 @@ export const appRouter = router({
     create: salesOrAdminProcedure
       .input(z.object({
         orderNo: z.string(),
-        customerId: z.number(),
+        customerName: z.string(),
         paymentAmount: z.string(),
         courseAmount: z.string(),
         accountBalance: z.string().optional(),
@@ -185,7 +185,7 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         orderNo: z.string().optional(),
-        customerId: z.number().optional(),
+        customerName: z.string().optional(),
         paymentAmount: z.string().optional(),
         courseAmount: z.string().optional(),
         accountBalance: z.string().optional(),

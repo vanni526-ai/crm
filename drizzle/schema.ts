@@ -41,7 +41,8 @@ export const customers = mysqlTable("customers", {
 export const orders = mysqlTable("orders", {
   id: int("id").autoincrement().primaryKey(),
   orderNo: varchar("orderNo", { length: 50 }).notNull().unique(), // 序号
-  customerId: int("customerId").notNull(), // 关联客户
+  customerId: int("customerId"), // 关联客户(可选)
+  customerName: varchar("customerName", { length: 100 }), // 客户姓名(手动输入)
   salesId: int("salesId").notNull(), // 销售人(花名)
   
   // 金额相关
