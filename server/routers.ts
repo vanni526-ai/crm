@@ -43,7 +43,7 @@ export const appRouter = router({
 
   // 用户管理(仅管理员)
   users: router({
-    list: adminProcedure.query(async () => {
+    list: protectedProcedure.query(async () => {
       return db.getAllUsers();
     }),
     
