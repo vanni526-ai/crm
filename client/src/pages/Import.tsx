@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileSpreadsheet, FileText, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Upload, FileSpreadsheet, FileText, Calendar, CheckCircle, XCircle, List, CalendarDays } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Import() {
   const { data: logs, refetch } = trpc.import.getLogs.useQuery();
+  const { data: schedules } = trpc.schedules.list.useQuery();
   const parseCSV = trpc.import.parseCSV.useMutation();
   const importCSV = trpc.import.importCSVToOrders.useMutation();
   const parseExcel = trpc.import.parseExcel.useMutation();
@@ -21,6 +22,8 @@ export default function Import() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState<any[]>([]);
   const [currentFile, setCurrentFile] = useState<{ type: string; content: string } | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const csvInputRef = useRef<HTMLInputElement>(null);
   const excelInputRef = useRef<HTMLInputElement>(null);
@@ -192,6 +195,127 @@ export default function Import() {
             </CardContent>
           </Card>
         </div>
+
+        {/* 课程日程看板 */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>课程日程看板</CardTitle>
+                <CardDescription>已导入的课程安排</CardDescription>
+              </div>
+              <div className="flex space-x-2">
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                >
+                  <List className="h-4 w-4 mr-1" />
+                  列表视图
+                </Button>
+                <Button
+                  variant={viewMode === 'calendar' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('calendar')}
+                >
+                  <CalendarDays className="h-4 w-4 mr-1" />
+                  日历视图
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {schedules && schedules.length > 0 ? (
+                <>
+                  <div className="text-sm text-muted-foreground">
+                    共有 {schedules.length} 节课安排
+                  </div>
+                  {viewMode === 'list' ? (
+                  <div className="max-h-[500px] overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>上课日期</TableHead>
+                          <TableHead>上课时间</TableHead>
+                          <TableHead>课程名称</TableHead>
+                          <TableHead>交付老师</TableHead>
+                          <TableHead>交付教室</TableHead>
+                          <TableHead>客户名</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {schedules
+                          .sort((a, b) => {
+                            const dateA = new Date(a.classDate || '');
+                            const dateB = new Date(b.classDate || '');
+                            return dateB.getTime() - dateA.getTime();
+                          })
+                          .map((schedule) => (
+                            <TableRow key={schedule.id}>
+                              <TableCell className="font-medium">
+                                {schedule.classDate ? new Date(schedule.classDate).toLocaleDateString() : '-'}
+                              </TableCell>
+                              <TableCell>{schedule.classTime || '-'}</TableCell>
+                              <TableCell>{schedule.deliveryCourse || '-'}</TableCell>
+                              <TableCell>{schedule.deliveryTeacher || '-'}</TableCell>
+                              <TableCell>{schedule.deliveryClassroom || '-'}</TableCell>
+                              <TableCell>{schedule.customerName || '-'}</TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* 简单的按日期分组展示 */}
+                      {Object.entries(
+                        schedules.reduce((acc, schedule) => {
+                          const date = schedule.classDate ? new Date(schedule.classDate).toLocaleDateString() : '未设置日期';
+                          if (!acc[date]) acc[date] = [];
+                          acc[date].push(schedule);
+                          return acc;
+                        }, {} as Record<string, typeof schedules>)
+                      )
+                        .sort(([dateA], [dateB]) => {
+                          if (dateA === '未设置日期') return 1;
+                          if (dateB === '未设置日期') return -1;
+                          return new Date(dateB).getTime() - new Date(dateA).getTime();
+                        })
+                        .map(([date, daySchedules]) => (
+                          <div key={date} className="border rounded-lg p-4">
+                            <h3 className="font-semibold text-lg mb-3">{date}</h3>
+                            <div className="space-y-2">
+                              {daySchedules.map((schedule) => (
+                                <div
+                                  key={schedule.id}
+                                  className="flex items-center justify-between p-3 bg-muted/50 rounded-md"
+                                >
+                                  <div className="flex-1">
+                                    <div className="font-medium">{schedule.deliveryCourse || '未命名课程'}</div>
+                                    <div className="text-sm text-muted-foreground">
+                                      {schedule.classTime || '-'} | {schedule.deliveryTeacher || '-'} | {schedule.deliveryClassroom || '-'}
+                                    </div>
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {schedule.customerName || '-'}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  暂无课程安排，请先导入ICS文件
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>
