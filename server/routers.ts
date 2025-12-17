@@ -317,10 +317,39 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         orderId: z.number().optional(),
+        // 客户信息
         customerName: z.string(),
+        wechatId: z.string().optional(),
+        // 销售信息
+        salesName: z.string().optional(),
+        trafficSource: z.string().optional(),
+        // 支付信息
+        paymentAmount: z.string().optional(),
+        courseAmount: z.string().optional(),
+        accountBalance: z.string().optional(),
+        paymentCity: z.string().optional(),
+        channelOrderNo: z.string().optional(),
+        overflowOrderNo: z.string().optional(),
+        refundNo: z.string().optional(),
+        paymentDate: z.date().optional(),
+        paymentTime: z.string().optional(),
+        // 费用信息
+        teacherFee: z.string().optional(),
+        transportFee: z.string().optional(),
+        otherFee: z.string().optional(),
+        partnerFee: z.string().optional(),
+        receivedAmount: z.string().optional(), // 金串到账金额
+        // 交付信息
+        deliveryCity: z.string().optional(),
+        deliveryClassroom: z.string().optional(),
+        deliveryTeacher: z.string().optional(),
+        deliveryCourse: z.string().optional(),
+        // 课程信息
         teacherId: z.number().optional(),
         teacherName: z.string().optional(),
         courseType: z.string(),
+        classDate: z.date().optional(),
+        classTime: z.string().optional(),
         startTime: z.date(),
         endTime: z.date(),
         city: z.string().optional(),

@@ -1,0 +1,24 @@
+ALTER TABLE `schedules` ADD `wechatId` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `salesName` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `trafficSource` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `paymentAmount` decimal(10,2);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `courseAmount` decimal(10,2);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `accountBalance` decimal(10,2);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `paymentCity` varchar(50);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `channelOrderNo` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `overflowOrderNo` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `refundNo` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `paymentDate` date;--> statement-breakpoint
+ALTER TABLE `schedules` ADD `paymentTime` varchar(20);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `teacherFee` decimal(10,2);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `transportFee` decimal(10,2);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `otherFee` decimal(10,2);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `partnerFee` decimal(10,2);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `deliveryCity` varchar(50);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `deliveryClassroom` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `deliveryTeacher` varchar(100);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `deliveryCourse` varchar(200);--> statement-breakpoint
+ALTER TABLE `schedules` ADD `classDate` date;--> statement-breakpoint
+ALTER TABLE `schedules` ADD `classTime` varchar(20);--> statement-breakpoint
+CREATE INDEX `sales_idx` ON `schedules` (`salesName`);--> statement-breakpoint
+CREATE INDEX `payment_date_idx` ON `schedules` (`paymentDate`);

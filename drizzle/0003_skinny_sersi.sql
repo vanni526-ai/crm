@@ -1,0 +1,1 @@
+ALTER TABLE `schedules` ADD `receivedAmount` decimal(10,2);

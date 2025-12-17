@@ -112,15 +112,51 @@ export const teachers = mysqlTable("teachers", {
 export const schedules = mysqlTable("schedules", {
   id: int("id").autoincrement().primaryKey(),
   orderId: int("orderId"), // 关联订单(可选)
+  
+  // 客户信息
   customerId: int("customerId"), // 学员ID(可选)
-  customerName: varchar("customerName", { length: 100 }), // 学员姓名(手动输入)
+  customerName: varchar("customerName", { length: 100 }), // 客户名(微信号)
+  wechatId: varchar("wechatId", { length: 100 }), // 微信号
+  
+  // 销售信息
+  salesName: varchar("salesName", { length: 100 }), // 销售人(花名)
+  trafficSource: varchar("trafficSource", { length: 100 }), // 流量来源(花名)
+  
+  // 支付信息
+  paymentAmount: decimal("paymentAmount", { precision: 10, scale: 2 }), // 支付金额
+  courseAmount: decimal("courseAmount", { precision: 10, scale: 2 }), // 课程金额
+  accountBalance: decimal("accountBalance", { precision: 10, scale: 2 }), // 账户余额
+  paymentCity: varchar("paymentCity", { length: 50 }), // 支付城市
+  channelOrderNo: varchar("channelOrderNo", { length: 100 }), // 城道订单号
+  overflowOrderNo: varchar("overflowOrderNo", { length: 100 }), // 溢户订单号
+  refundNo: varchar("refundNo", { length: 100 }), // 退款单号
+  paymentDate: date("paymentDate"), // 支付日期
+  paymentTime: varchar("paymentTime", { length: 20 }), // 支付时间
+  
+  // 费用信息
+  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }), // 老师费用
+  transportFee: decimal("transportFee", { precision: 10, scale: 2 }), // 车费
+  otherFee: decimal("otherFee", { precision: 10, scale: 2 }), // 其他费用
+  partnerFee: decimal("partnerFee", { precision: 10, scale: 2 }), // 合伙人费用
+  receivedAmount: decimal("receivedAmount", { precision: 10, scale: 2 }), // 金串到账金额
+  
+  // 交付信息
+  deliveryCity: varchar("deliveryCity", { length: 50 }), // 交付城市
+  deliveryClassroom: varchar("deliveryClassroom", { length: 100 }), // 交付教室
+  deliveryTeacher: varchar("deliveryTeacher", { length: 100 }), // 交付老师
+  deliveryCourse: varchar("deliveryCourse", { length: 200 }), // 交付课程
+  
+  // 课程信息
   teacherId: int("teacherId"), // 授课老师ID
   teacherName: varchar("teacherName", { length: 100 }), // 授课老师名称(手动输入)
   courseType: varchar("courseType", { length: 200 }).notNull(), // 课程类型
+  classDate: date("classDate"), // 上课日期
+  classTime: varchar("classTime", { length: 20 }), // 上课时间
   startTime: timestamp("startTime").notNull(),
   endTime: timestamp("endTime").notNull(),
   city: varchar("city", { length: 50 }), // 城市
   location: varchar("location", { length: 200 }), // 教室/地点
+  
   status: mysqlEnum("status", ["scheduled", "completed", "cancelled"]).default("scheduled").notNull(),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -130,6 +166,8 @@ export const schedules = mysqlTable("schedules", {
   customerIdx: index("schedule_customer_idx").on(table.customerId),
   startTimeIdx: index("start_time_idx").on(table.startTime),
   cityIdx: index("schedule_city_idx").on(table.city),
+  salesIdx: index("sales_idx").on(table.salesName),
+  paymentDateIdx: index("payment_date_idx").on(table.paymentDate),
 }));
 
 /**

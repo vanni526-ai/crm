@@ -15,6 +15,20 @@
       "when": 1765961536304,
       "tag": "0001_tense_spitfire",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765962017170,
+      "tag": "0002_chubby_gunslinger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1765962215039,
+      "tag": "0003_skinny_sersi",
+      "breakpoints": true
     }
   ]
 }
