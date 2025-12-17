@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const orderSchema = z.object({
-  orderNo: z.string().min(1, "订单号不能为空"),
+  orderNo: z.string().optional(),
   customerName: z.string().min(1, "请输入客户姓名"),
   salesPerson: z.string().optional(),
   trafficSource: z.string().optional(),
@@ -130,6 +130,7 @@ export default function Orders() {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -1112,11 +1113,17 @@ export default function Orders() {
                 <TabsContent value="basic" className="space-y-4 mt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="orderNo">订单号 *</Label>
-                      <Input id="orderNo" {...register("orderNo")} placeholder="请输入订单号" />
-                      {errors.orderNo && (
-                        <p className="text-sm text-destructive mt-1">{errors.orderNo.message}</p>
-                      )}
+                      <Label htmlFor="orderNo">订单号</Label>
+                      <Input 
+                        id="orderNo" 
+                        {...register("orderNo")} 
+                        placeholder="留空将根据城市自动生成"
+                        disabled
+                        className="bg-muted"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        订单号将自动生成，格式：日期时间-城市区号
+                      </p>
                     </div>
                     <div>
                       <Label htmlFor="customerName">客户名 *</Label>
@@ -1176,7 +1183,41 @@ export default function Orders() {
                     </div>
                     <div>
                       <Label htmlFor="paymentCity">支付城市</Label>
-                      <Input id="paymentCity" {...register("paymentCity")} placeholder="请输入支付城市" />
+                      <Select 
+                        value={watch("paymentCity") || ""} 
+                        onValueChange={(value) => setValue("paymentCity", value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="请选择支付城市" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="上海">上海 (021)</SelectItem>
+                          <SelectItem value="北京">北京 (010)</SelectItem>
+                          <SelectItem value="天津">天津 (022)</SelectItem>
+                          <SelectItem value="重庆">重庆 (023)</SelectItem>
+                          <SelectItem value="广州">广州 (020)</SelectItem>
+                          <SelectItem value="深圳">深圳 (0755)</SelectItem>
+                          <SelectItem value="杭州">杭州 (0571)</SelectItem>
+                          <SelectItem value="南京">南京 (025)</SelectItem>
+                          <SelectItem value="武汉">武汉 (027)</SelectItem>
+                          <SelectItem value="成都">成都 (028)</SelectItem>
+                          <SelectItem value="西安">西安 (029)</SelectItem>
+                          <SelectItem value="郑州">郑州 (0371)</SelectItem>
+                          <SelectItem value="济南">济南 (0531)</SelectItem>
+                          <SelectItem value="青岛">青岛 (0532)</SelectItem>
+                          <SelectItem value="大连">大连 (0411)</SelectItem>
+                          <SelectItem value="沈阳">沈阳 (024)</SelectItem>
+                          <SelectItem value="长春">长春 (0431)</SelectItem>
+                          <SelectItem value="哈尔滨">哈尔滨 (0451)</SelectItem>
+                          <SelectItem value="福州">福州 (0591)</SelectItem>
+                          <SelectItem value="厦门">厦门 (0592)</SelectItem>
+                          <SelectItem value="南昌">南昌 (0791)</SelectItem>
+                          <SelectItem value="长沙">长沙 (0731)</SelectItem>
+                          <SelectItem value="合肥">合肥 (0551)</SelectItem>
+                          <SelectItem value="石家庄">石家庄 (0311)</SelectItem>
+                          <SelectItem value="太原">太原 (0351)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <Label htmlFor="paymentChannel">支付渠道</Label>

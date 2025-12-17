@@ -6,6 +6,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { importRouter } from "./importRouter";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
+import { generateOrderNo } from "./orderNoGenerator";
 
 // 权限检查中间件
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -143,7 +144,7 @@ export const appRouter = router({
     
     create: salesOrAdminProcedure
       .input(z.object({
-        orderNo: z.string(),
+        orderNo: z.string().optional(),
         customerName: z.string(),
         salesPerson: z.string().optional(),
         trafficSource: z.string().optional(),
@@ -170,8 +171,12 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // 如果没有提供订单号,自动生成
+        const orderNo = input.orderNo || generateOrderNo(input.paymentCity || input.deliveryCity);
+        
         const orderData: any = {
           ...input,
+          orderNo,
           salesId: ctx.user.id,
         };
         if (input.paymentDate) {
