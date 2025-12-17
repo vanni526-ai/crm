@@ -605,6 +605,71 @@ export async function getCustomerStats() {
   };
 }
 
+// ========== 流失预警 ==========
+
+export async function getChurnRiskCustomers() {
+  const db = await getDb();
+  if (!db) return [];
+
+  // 计算30天前的日期
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+  // 查找所有有过订单的客户（老客）
+  const allCustomersWithOrders = await db
+    .select({
+      customerId: orders.customerId,
+      customerName: orders.customerName,
+      lastOrderDate: sql<string>`MAX(${orders.paymentDate})`,
+      orderCount: sql<number>`COUNT(*)`,
+      totalAmount: sql<string>`SUM(${orders.paymentAmount})`,
+    })
+    .from(orders)
+    .where(
+      sql`${orders.customerId} IS NOT NULL AND ${orders.status} NOT IN ('pending', 'cancelled')`
+    )
+    .groupBy(orders.customerId, orders.customerName);
+
+  // 筛选出超过30天未下单的老客户
+  const churnRiskCustomers = allCustomersWithOrders.filter(customer => {
+    if (!customer.lastOrderDate) return false;
+    const lastOrderDate = new Date(customer.lastOrderDate);
+    return lastOrderDate < thirtyDaysAgo;
+  });
+
+  // 获取客户详细信息
+  const result = await Promise.all(
+    churnRiskCustomers.map(async (customer) => {
+      const customerInfo = await db
+        .select()
+        .from(customers)
+        .where(eq(customers.id, customer.customerId!))
+        .limit(1);
+
+      const daysSinceLastOrder = Math.floor(
+        (Date.now() - new Date(customer.lastOrderDate!).getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      return {
+        customerId: customer.customerId,
+        customerName: customer.customerName,
+        phone: customerInfo[0]?.phone || null,
+        wechatId: customerInfo[0]?.wechatId || null,
+        lastOrderDate: customer.lastOrderDate,
+        daysSinceLastOrder,
+        orderCount: customer.orderCount,
+        totalAmount: parseFloat(customer.totalAmount || '0'),
+      };
+    })
+  );
+
+  // 按距离最后一次订单的天数排序（降序）
+  result.sort((a, b) => b.daysSinceLastOrder - a.daysSinceLastOrder);
+
+  return result;
+}
+
 // ========== 数据导入日志 ==========
 
 export async function createImportLog(log: InsertImportLog) {

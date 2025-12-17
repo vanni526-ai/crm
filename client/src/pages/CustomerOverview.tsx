@@ -7,6 +7,7 @@ import { useState } from "react";
 export default function CustomerOverview() {
   const { data: stats, isLoading } = trpc.analytics.customerStats.useQuery();
   const { data: customers } = trpc.customers.list.useQuery();
+  const { data: churnRiskCustomers, isLoading: isLoadingChurn } = trpc.analytics.churnRiskCustomers.useQuery();
 
   return (
     <DashboardLayout>
@@ -58,6 +59,61 @@ export default function CustomerOverview() {
                   <div className="text-3xl font-bold">{stats?.todayReturningCustomers || 0}</div>
                   <div className="text-sm text-muted-foreground mt-1">今日老客</div>
                 </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 流失预警 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>流失预警</CardTitle>
+            <CardDescription>超过30天未下单的老客户</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoadingChurn ? (
+              <div className="text-center text-muted-foreground py-8">加载中...</div>
+            ) : churnRiskCustomers && churnRiskCustomers.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-3 font-medium">客户名</th>
+                      <th className="text-left p-3 font-medium">微信号</th>
+                      <th className="text-left p-3 font-medium">电话</th>
+                      <th className="text-left p-3 font-medium">最后下单日期</th>
+                      <th className="text-left p-3 font-medium">未下单天数</th>
+                      <th className="text-left p-3 font-medium">历史订单数</th>
+                      <th className="text-left p-3 font-medium">累计消费</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {churnRiskCustomers.map((customer) => (
+                      <tr key={customer.customerId} className="border-b hover:bg-accent">
+                        <td className="p-3">{customer.customerName}</td>
+                        <td className="p-3">{customer.wechatId || '-'}</td>
+                        <td className="p-3">{customer.phone || '-'}</td>
+                        <td className="p-3">
+                          {customer.lastOrderDate ? new Date(customer.lastOrderDate).toLocaleDateString('zh-CN') : '-'}
+                        </td>
+                        <td className="p-3">
+                          <span className={customer.daysSinceLastOrder > 60 ? 'text-red-500 font-medium' : 'text-orange-500'}>
+                            {customer.daysSinceLastOrder}天
+                          </span>
+                        </td>
+                        <td className="p-3">{customer.orderCount}</td>
+                        <td className="p-3">¥{customer.totalAmount.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="mt-4 text-sm text-muted-foreground">
+                  共找到 {churnRiskCustomers.length} 位流失风险客户
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground py-8">
+                暂无流失风险客户
               </div>
             )}
           </CardContent>

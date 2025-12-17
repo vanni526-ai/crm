@@ -500,6 +500,10 @@ export const appRouter = router({
     customerStats: protectedProcedure.query(async () => {
       return db.getCustomerStats();
     }),
+    
+    churnRiskCustomers: protectedProcedure.query(async () => {
+      return db.getChurnRiskCustomers();
+    }),
   }),
 
   // 数据导入
