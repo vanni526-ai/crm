@@ -1,12 +1,476 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import { trpc } from "@/lib/trpc";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Search, Edit, Trash2, Eye, Phone, Mail } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const customerSchema = z.object({
+  name: z.string().min(1, "客户姓名不能为空"),
+  phone: z.string().optional(),
+  wechat: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+type CustomerFormData = z.infer<typeof customerSchema>;
 
 export default function Customers() {
+  const utils = trpc.useUtils();
+  const { data: customers, isLoading } = trpc.customers.list.useQuery();
+  const createCustomer = trpc.customers.create.useMutation({
+    onSuccess: () => {
+      utils.customers.list.invalidate();
+      toast.success("客户创建成功");
+      setCreateOpen(false);
+      reset();
+    },
+    onError: (error) => {
+      toast.error(error.message || "创建失败");
+    },
+  });
+  const updateCustomer = trpc.customers.update.useMutation({
+    onSuccess: () => {
+      utils.customers.list.invalidate();
+      toast.success("客户更新成功");
+      setEditOpen(false);
+      reset();
+    },
+    onError: (error) => {
+      toast.error(error.message || "更新失败");
+    },
+  });
+  const deleteCustomer = trpc.customers.delete.useMutation({
+    onSuccess: () => {
+      utils.customers.list.invalidate();
+      toast.success("客户删除成功");
+    },
+    onError: (error) => {
+      toast.error(error.message || "删除失败");
+    },
+  });
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<CustomerFormData>({
+    resolver: zodResolver(customerSchema),
+  });
+
+  const onCreateSubmit = (data: CustomerFormData) => {
+    createCustomer.mutate({
+      name: data.name,
+      wechatId: data.wechat,
+      phone: data.phone,
+      notes: data.notes,
+    });
+  };
+
+  const onEditSubmit = (data: CustomerFormData) => {
+    if (!selectedCustomer) return;
+    updateCustomer.mutate({
+      id: selectedCustomer.id,
+      name: data.name,
+      wechatId: data.wechat,
+      phone: data.phone,
+      notes: data.notes,
+    });
+  };
+
+  const handleEdit = (customer: any) => {
+    setSelectedCustomer(customer);
+    setValue("name", customer.name);
+    setValue("phone", customer.phone || "");
+    setValue("wechat", customer.wechatId || "");
+    setValue("notes", customer.notes || "");
+    setEditOpen(true);
+  };
+
+  const handleDelete = (id: number) => {
+    if (confirm("确定要删除这个客户吗?")) {
+      deleteCustomer.mutate({ id });
+    }
+  };
+
+  const handleViewDetail = (customer: any) => {
+    setSelectedCustomer(customer);
+    setDetailOpen(true);
+  };
+
+  const filteredCustomers = customers?.filter(
+    (customer) =>
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.wechatId?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <DashboardLayout>
-      <div>
-        <h1 className="text-3xl font-bold">客户管理</h1>
-        <p className="text-muted-foreground mt-2">功能开发中...</p>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">客户管理</h1>
+            <p className="text-muted-foreground mt-2">管理客户档案和消费记录</p>
+          </div>
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            新增客户
+          </Button>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center space-x-2">
+              <Search className="h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="搜索客户姓名、电话、微信..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>客户姓名</TableHead>
+                    <TableHead>联系电话</TableHead>
+                    <TableHead>微信</TableHead>
+                    <TableHead>流量来源</TableHead>
+                    <TableHead>创建时间</TableHead>
+                    <TableHead>操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8">
+                        加载中...
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredCustomers && filteredCustomers.length > 0 ? (
+                    filteredCustomers.map((customer) => (
+                      <TableRow key={customer.id}>
+                        <TableCell className="font-medium">{customer.name}</TableCell>
+                        <TableCell>
+                          {customer.phone ? (
+                            <div className="flex items-center space-x-1">
+                              <Phone className="h-3 w-3 text-muted-foreground" />
+                              <span>{customer.phone}</span>
+                            </div>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell>{customer.wechatId || "-"}</TableCell>
+                        <TableCell>
+                          {customer.trafficSource ? (
+                            <Badge variant="outline">{customer.trafficSource}</Badge>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell>{new Date(customer.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewDetail(customer)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleEdit(customer)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(customer.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                        {searchTerm ? "未找到匹配的客户" : "暂无客户数据"}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 新增客户对话框 */}
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>新增客户</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit(onCreateSubmit)} className="space-y-4">
+              <div>
+                <Label htmlFor="name">客户姓名 *</Label>
+                <Input id="name" {...register("name")} />
+                {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+              </div>
+              <div>
+                <Label htmlFor="phone">联系电话</Label>
+                <Input id="phone" {...register("phone")} />
+              </div>
+              <div>
+                <Label htmlFor="wechat">微信号</Label>
+                <Input id="wechat" {...register("wechat")} />
+              </div>
+              <div>
+                <Label htmlFor="notes">备注</Label>
+                <Input id="notes" {...register("notes")} />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
+                  取消
+                </Button>
+                <Button type="submit" disabled={createCustomer.isPending}>
+                  {createCustomer.isPending ? "创建中..." : "创建"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* 编辑客户对话框 */}
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>编辑客户</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-4">
+              <div>
+                <Label htmlFor="edit-name">客户姓名 *</Label>
+                <Input id="edit-name" {...register("name")} />
+                {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+              </div>
+              <div>
+                <Label htmlFor="edit-phone">联系电话</Label>
+                <Input id="edit-phone" {...register("phone")} />
+              </div>
+              <div>
+                <Label htmlFor="edit-wechat">微信号</Label>
+                <Input id="edit-wechat" {...register("wechat")} />
+              </div>
+              <div>
+                <Label htmlFor="edit-notes">备注</Label>
+                <Input id="edit-notes" {...register("notes")} />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
+                  取消
+                </Button>
+                <Button type="submit" disabled={updateCustomer.isPending}>
+                  {updateCustomer.isPending ? "保存中..." : "保存"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* 客户详情对话框 */}
+        <CustomerDetailDialog
+          open={detailOpen}
+          onOpenChange={setDetailOpen}
+          customer={selectedCustomer}
+        />
       </div>
     </DashboardLayout>
+  );
+}
+
+// 客户详情对话框组件
+function CustomerDetailDialog({
+  open,
+  onOpenChange,
+  customer,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  customer: any;
+}) {
+  const { data: orders } = trpc.orders.list.useQuery(undefined, {
+    enabled: open && !!customer,
+  });
+  const { data: schedules } = trpc.schedules.list.useQuery(undefined, {
+    enabled: open && !!customer,
+  });
+
+  if (!customer) return null;
+
+  const customerOrders = orders?.filter((order) => order.customerId === customer.id) || [];
+  const customerSchedules = schedules?.filter((schedule) => schedule.customerId === customer.id) || [];
+
+  const totalSpent = customerOrders.reduce(
+    (sum, order) => sum + parseFloat(order.paymentAmount || "0"),
+    0
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>客户详情</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-6">
+          {/* 基本信息 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">基本信息</CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">客户姓名</p>
+                <p className="font-medium">{customer.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">联系电话</p>
+                <p className="font-medium">{customer.phone || "-"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">微信号</p>
+                <p className="font-medium">{customer.wechatId || "-"}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">流量来源</p>
+                <p className="font-medium">{customer.trafficSource || "-"}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm text-muted-foreground">备注</p>
+                <p className="font-medium">{customer.notes || "-"}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 消费统计 */}
+          <div className="grid grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">总消费金额</p>
+                <p className="text-2xl font-bold">￥{totalSpent.toFixed(2)}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">订单数量</p>
+                <p className="text-2xl font-bold">{customerOrders.length}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">课程次数</p>
+                <p className="text-2xl font-bold">{customerSchedules.length}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 订单历史 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">订单历史</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {customerOrders.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>订单编号</TableHead>
+                      <TableHead>支付金额</TableHead>
+                      <TableHead>支付时间</TableHead>
+                      <TableHead>状态</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {customerOrders.map((order) => (
+                      <TableRow key={order.id}>
+                        <TableCell className="font-medium">{order.orderNo}</TableCell>
+                        <TableCell>￥{order.paymentAmount}</TableCell>
+                        <TableCell>
+                          {order.paymentDate
+                            ? new Date(order.paymentDate).toLocaleDateString()
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={order.status === "paid" ? "default" : "secondary"}>
+                            {order.status === "paid" ? "已支付" : order.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center py-4 text-muted-foreground">暂无订单记录</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 排课记录 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">排课记录</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {customerSchedules.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>课程类型</TableHead>
+                      <TableHead>开始时间</TableHead>
+                      <TableHead>地点</TableHead>
+                      <TableHead>老师</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {customerSchedules.map((schedule) => (
+                      <TableRow key={schedule.id}>
+                        <TableCell className="font-medium">{schedule.courseType}</TableCell>
+                        <TableCell>
+                          {new Date(schedule.startTime).toLocaleString()}
+                        </TableCell>
+                        <TableCell>{schedule.location || "-"}</TableCell>
+                        <TableCell>{schedule.teacherName || "-"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center py-4 text-muted-foreground">暂无排课记录</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

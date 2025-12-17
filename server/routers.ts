@@ -101,6 +101,28 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return db.getCustomerById(input.id);
       }),
+    
+    update: salesOrAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        wechatId: z.string().optional(),
+        phone: z.string().optional(),
+        trafficSource: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await db.updateCustomer(id, data);
+        return { success: true };
+      }),
+    
+    delete: salesOrAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteCustomer(input.id);
+        return { success: true };
+      }),
   }),
 
   // 订单管理
@@ -264,11 +286,17 @@ export const appRouter = router({
   schedules: router({
     list: protectedProcedure
       .input(z.object({
-        startTime: z.date(),
-        endTime: z.date(),
-      }))
+        startTime: z.date().optional(),
+        endTime: z.date().optional(),
+      }).optional())
       .query(async ({ input }) => {
-        return db.getSchedulesByDateRange(input.startTime, input.endTime);
+        if (input?.startTime && input?.endTime) {
+          return db.getSchedulesByDateRange(input.startTime, input.endTime);
+        }
+        // 如果没有提供时间范围,返回最近一个月的排课
+        const now = new Date();
+        const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return db.getSchedulesByDateRange(oneMonthAgo, now);
       }),
     
     getByTeacher: protectedProcedure

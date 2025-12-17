@@ -158,6 +158,18 @@ export async function searchCustomers(keyword: string) {
     .orderBy(desc(customers.createdAt));
 }
 
+export async function updateCustomer(id: number, data: Partial<InsertCustomer>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(customers).set(data).where(eq(customers.id, id));
+}
+
+export async function deleteCustomer(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(customers).where(eq(customers.id, id));
+}
+
 // ========== 订单管理 ==========
 
 export async function createOrder(order: InsertOrder) {
