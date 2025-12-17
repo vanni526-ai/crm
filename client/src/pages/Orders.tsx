@@ -774,7 +774,11 @@ export default function Orders() {
                           <TableCell>{order.classTime || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.notes || "-"}</TableCell>
                           <TableCell>{getStatusBadge(order.status)}</TableCell>
-                          <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            {order.createdAt instanceof Date 
+                              ? order.createdAt.toLocaleDateString()
+                              : new Date(order.createdAt).toLocaleDateString()}
+                          </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
                               <Button
@@ -951,7 +955,9 @@ export default function Orders() {
                     <div>
                       <p className="text-sm text-muted-foreground">创建时间</p>
                       <p className="font-medium">
-                        {new Date(selectedOrder.createdAt).toLocaleString()}
+                        {selectedOrder.createdAt instanceof Date 
+                          ? selectedOrder.createdAt.toLocaleString()
+                          : new Date(selectedOrder.createdAt).toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -978,7 +984,15 @@ export default function Orders() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">支付日期</p>
-                      <p className="font-medium">{selectedOrder.paymentDate || "-"}</p>
+                      <p className="font-medium">
+                        {selectedOrder.paymentDate 
+                          ? (selectedOrder.paymentDate instanceof Date 
+                              ? selectedOrder.paymentDate.toLocaleDateString()
+                              : (typeof selectedOrder.paymentDate === 'string' 
+                                  ? selectedOrder.paymentDate 
+                                  : new Date(selectedOrder.paymentDate).toLocaleDateString()))
+                          : "-"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">支付时间</p>
@@ -1038,7 +1052,15 @@ export default function Orders() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">上课日期</p>
-                      <p className="font-medium">{selectedOrder.classDate || "-"}</p>
+                      <p className="font-medium">
+                        {selectedOrder.classDate 
+                          ? (selectedOrder.classDate instanceof Date 
+                              ? selectedOrder.classDate.toLocaleDateString()
+                              : (typeof selectedOrder.classDate === 'string' 
+                                  ? selectedOrder.classDate 
+                                  : new Date(selectedOrder.classDate).toLocaleDateString()))
+                          : "-"}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">上课时间</p>
