@@ -124,6 +124,31 @@ export const appRouter = router({
         await db.deleteCustomer(input.id);
         return { success: true };
       }),
+    
+    // 获取客户账户流水
+    getTransactions: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getCustomerTransactions(input.customerId);
+      }),
+    
+    // 客户充值
+    recharge: salesOrAdminProcedure
+      .input(z.object({
+        customerId: z.number(),
+        amount: z.number().positive(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.rechargeCustomerAccount({
+          customerId: input.customerId,
+          amount: input.amount,
+          notes: input.notes,
+          operatorId: ctx.user.id,
+          operatorName: ctx.user.name || ctx.user.nickname || "未知",
+        });
+        return { success: true, ...result };
+      }),
   }),
 
   // 订单管理
@@ -145,12 +170,14 @@ export const appRouter = router({
     create: salesOrAdminProcedure
       .input(z.object({
         orderNo: z.string().optional(),
+        customerId: z.number().optional(), // 客户ID(用于余额扣款)
         customerName: z.string(),
         salesPerson: z.string().optional(),
         trafficSource: z.string().optional(),
         paymentAmount: z.string(),
         courseAmount: z.string(),
         accountBalance: z.string().optional(),
+        useAccountBalance: z.boolean().optional(), // 是否使用账户余额支付
         paymentCity: z.string().optional(),
         paymentChannel: z.string().optional(),
         channelOrderNo: z.string().optional(),
@@ -190,8 +217,29 @@ export const appRouter = router({
           }
         }
         
+        // 如果需要使用账户余额支付,先执行扣款
+        if (input.useAccountBalance && input.customerId) {
+          const paymentAmount = parseFloat(input.paymentAmount);
+          try {
+            await db.consumeCustomerAccount({
+              customerId: input.customerId,
+              amount: paymentAmount,
+              orderId: 0, // 临时值,后面会更新
+              orderNo,
+              operatorId: ctx.user.id,
+              operatorName: ctx.user.name || ctx.user.nickname || "未知",
+            });
+          } catch (error: any) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: error.message || "余额扣款失败",
+            });
+          }
+        }
+        
         const orderData: any = {
           orderNo,
+          customerId: input.customerId || undefined,
           customerName: input.customerName,
           salesId: ctx.user.id,
           salesPerson: input.salesPerson || undefined,

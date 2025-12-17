@@ -343,6 +343,10 @@ function CustomerDetailDialog({
   const { data: schedules } = trpc.schedules.list.useQuery(undefined, {
     enabled: open && !!customer,
   });
+  const { data: transactions } = trpc.customers.getTransactions.useQuery(
+    { customerId: customer?.id },
+    { enabled: open && !!customer }
+  );
 
   if (!customer) return null;
 
@@ -391,7 +395,13 @@ function CustomerDetailDialog({
           </Card>
 
           {/* 消费统计 */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">账户余额</p>
+                <p className="text-2xl font-bold text-green-600">¥{Number(customer.accountBalance || 0).toFixed(2)}</p>
+              </CardContent>
+            </Card>
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">总消费金额</p>
@@ -410,6 +420,11 @@ function CustomerDetailDialog({
                 <p className="text-2xl font-bold">{customerSchedules.length}</p>
               </CardContent>
             </Card>
+          </div>
+          
+          {/* 充值按钮 */}
+          <div className="flex justify-end">
+            <RechargeButton customerId={customer.id} customerName={customer.name} />
           </div>
 
           {/* 订单历史 */}
@@ -453,6 +468,51 @@ function CustomerDetailDialog({
             </CardContent>
           </Card>
 
+          {/* 账户流水 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">账户流水</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {transactions && transactions.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>类型</TableHead>
+                      <TableHead>金额</TableHead>
+                      <TableHead>余额变动</TableHead>
+                      <TableHead>备注</TableHead>
+                      <TableHead>时间</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((tx: any) => (
+                      <TableRow key={tx.id}>
+                        <TableCell>
+                          <Badge variant={tx.type === "recharge" ? "default" : tx.type === "consume" ? "destructive" : "secondary"}>
+                            {tx.type === "recharge" ? "充值" : tx.type === "consume" ? "消费" : "退款"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className={Number(tx.amount) > 0 ? "text-green-600" : "text-red-600"}>
+                          {Number(tx.amount) > 0 ? "+" : ""}¥{Number(tx.amount).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          ¥{Number(tx.balanceBefore).toFixed(2)} → ¥{Number(tx.balanceAfter).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-sm">{tx.notes || "-"}</TableCell>
+                        <TableCell className="text-sm">
+                          {new Date(tx.createdAt).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="text-center py-4 text-muted-foreground">暂无流水记录</p>
+              )}
+            </CardContent>
+          </Card>
+          
           {/* 排课记录 */}
           <Card>
             <CardHeader>
@@ -490,5 +550,87 @@ function CustomerDetailDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// 充值按钮组件
+function RechargeButton({ customerId, customerName }: { customerId: number; customerName: string }) {
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [notes, setNotes] = useState("");
+  const utils = trpc.useUtils();
+  
+  const rechargeMutation = trpc.customers.recharge.useMutation({
+    onSuccess: () => {
+      toast.success("充值成功");
+      setOpen(false);
+      setAmount("");
+      setNotes("");
+      utils.customers.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "充值失败");
+    },
+  });
+  
+  const handleRecharge = () => {
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      toast.error("请输入有效的充值金额");
+      return;
+    }
+    rechargeMutation.mutate({
+      customerId,
+      amount: amountNum,
+      notes: notes || undefined,
+    });
+  };
+  
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>
+        <Plus className="h-4 w-4 mr-2" />
+        充值
+      </Button>
+      
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>客户充值 - {customerName}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="amount">充值金额 *</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="请输入充值金额"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="notes">备注</Label>
+              <Input
+                id="notes"
+                placeholder="请输入备注信息(可选)"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={handleRecharge} disabled={rechargeMutation.isPending}>
+              {rechargeMutation.isPending ? "充值中..." : "确认充值"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

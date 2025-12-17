@@ -254,3 +254,30 @@ export type Reconciliation = typeof reconciliations.$inferSelect;
 export type InsertReconciliation = typeof reconciliations.$inferInsert;
 export type ImportLog = typeof importLogs.$inferSelect;
 export type InsertImportLog = typeof importLogs.$inferInsert;
+
+/**
+ * 账户流水表 - 记录客户账户余额变动
+ */
+export const accountTransactions = mysqlTable("accountTransactions", {
+  id: int("id").autoincrement().primaryKey(),
+  customerId: int("customerId").notNull(), // 客户ID
+  customerName: varchar("customerName", { length: 100 }).notNull(), // 客户姓名(冗余字段,方便查询)
+  type: mysqlEnum("type", ["recharge", "consume", "refund"]).notNull(), // 流水类型: 充值/消费/退款
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // 金额(正数为增加,负数为减少)
+  balanceBefore: decimal("balanceBefore", { precision: 10, scale: 2 }).notNull(), // 变动前余额
+  balanceAfter: decimal("balanceAfter", { precision: 10, scale: 2 }).notNull(), // 变动后余额
+  relatedOrderId: int("relatedOrderId"), // 关联订单ID(消费/退款时)
+  relatedOrderNo: varchar("relatedOrderNo", { length: 50 }), // 关联订单号(冗余字段)
+  notes: text("notes"), // 备注
+  operatorId: int("operatorId").notNull(), // 操作人 ID
+  operatorName: varchar("operatorName", { length: 100 }), // 操作人姓名(冗余字段)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  customerIdx: index("customer_idx").on(table.customerId),
+  typeIdx: index("type_idx").on(table.type),
+  orderIdx: index("order_idx").on(table.relatedOrderId),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type AccountTransaction = typeof accountTransactions.$inferSelect;
+export type InsertAccountTransaction = typeof accountTransactions.$inferInsert;

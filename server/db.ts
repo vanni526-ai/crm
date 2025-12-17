@@ -17,6 +17,8 @@ import {
   InsertReconciliation,
   importLogs,
   InsertImportLog,
+  accountTransactions,
+  InsertAccountTransaction,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -832,4 +834,185 @@ export async function getCustomerBalanceRanking() {
   .filter(r => r.accountBalance > 0)
   .sort((a, b) => b.accountBalance - a.accountBalance)
   .slice(0, 20); // 只返回前20名
+}
+
+// ==================== 账户流水管理 ====================
+
+/**
+ * 获取客户的账户流水列表
+ */
+export async function getCustomerTransactions(customerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  return db
+    .select()
+    .from(accountTransactions)
+    .where(eq(accountTransactions.customerId, customerId))
+    .orderBy(desc(accountTransactions.createdAt));
+}
+
+/**
+ * 创建账户流水记录
+ */
+export async function createAccountTransaction(data: InsertAccountTransaction) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  const [result] = await db.insert(accountTransactions).values(data);
+  return result;
+}
+
+/**
+ * 客户充值(事务操作:更新余额+记录流水)
+ */
+export async function rechargeCustomerAccount(params: {
+  customerId: number;
+  amount: number;
+  notes?: string;
+  operatorId: number;
+  operatorName: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 1. 获取当前余额
+  const [customer] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.id, params.customerId));
+  
+  if (!customer) {
+    throw new Error("客户不存在");
+  }
+  
+  const balanceBefore = Number(customer.accountBalance);
+  const balanceAfter = balanceBefore + params.amount;
+  
+  // 2. 更新客户余额
+  await db
+    .update(customers)
+    .set({ accountBalance: balanceAfter.toFixed(2) })
+    .where(eq(customers.id, params.customerId));
+  
+  // 3. 记录流水
+  await db.insert(accountTransactions).values({
+    customerId: params.customerId,
+    customerName: customer.name,
+    type: "recharge",
+    amount: params.amount.toFixed(2),
+    balanceBefore: balanceBefore.toFixed(2),
+    balanceAfter: balanceAfter.toFixed(2),
+    notes: params.notes,
+    operatorId: params.operatorId,
+    operatorName: params.operatorName,
+  });
+  
+  return { balanceBefore, balanceAfter };
+}
+
+/**
+ * 订单消费扣款(事务操作:更新余额+记录流水)
+ */
+export async function consumeCustomerAccount(params: {
+  customerId: number;
+  amount: number;
+  orderId: number;
+  orderNo: string;
+  operatorId: number;
+  operatorName: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 1. 获取当前余额
+  const [customer] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.id, params.customerId));
+  
+  if (!customer) {
+    throw new Error("客户不存在");
+  }
+  
+  const balanceBefore = Number(customer.accountBalance);
+  
+  // 2. 检查余额是否足够
+  if (balanceBefore < params.amount) {
+    throw new Error(`余额不足,当前余额¥${balanceBefore.toFixed(2)},需要¥${params.amount.toFixed(2)}`);
+  }
+  
+  const balanceAfter = balanceBefore - params.amount;
+  
+  // 3. 更新客户余额
+  await db
+    .update(customers)
+    .set({ accountBalance: balanceAfter.toFixed(2) })
+    .where(eq(customers.id, params.customerId));
+  
+  // 4. 记录流水
+  await db.insert(accountTransactions).values({
+    customerId: params.customerId,
+    customerName: customer.name,
+    type: "consume",
+    amount: (-params.amount).toFixed(2),
+    balanceBefore: balanceBefore.toFixed(2),
+    balanceAfter: balanceAfter.toFixed(2),
+    relatedOrderId: params.orderId,
+    relatedOrderNo: params.orderNo,
+    notes: `订单消费:${params.orderNo}`,
+    operatorId: params.operatorId,
+    operatorName: params.operatorName,
+  });
+  
+  return { balanceBefore, balanceAfter };
+}
+
+/**
+ * 订单退款(事务操作:更新余额+记录流水)
+ */
+export async function refundCustomerAccount(params: {
+  customerId: number;
+  amount: number;
+  orderId: number;
+  orderNo: string;
+  operatorId: number;
+  operatorName: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 1. 获取当前余额
+  const [customer] = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.id, params.customerId));
+  
+  if (!customer) {
+    throw new Error("客户不存在");
+  }
+  
+  const balanceBefore = Number(customer.accountBalance);
+  const balanceAfter = balanceBefore + params.amount;
+  
+  // 2. 更新客户余额
+  await db
+    .update(customers)
+    .set({ accountBalance: balanceAfter.toFixed(2) })
+    .where(eq(customers.id, params.customerId));
+  
+  // 3. 记录流水
+  await db.insert(accountTransactions).values({
+    customerId: params.customerId,
+    customerName: customer.name,
+    type: "refund",
+    amount: params.amount.toFixed(2),
+    balanceBefore: balanceBefore.toFixed(2),
+    balanceAfter: balanceAfter.toFixed(2),
+    relatedOrderId: params.orderId,
+    relatedOrderNo: params.orderNo,
+    notes: `订单退款:${params.orderNo}`,
+    operatorId: params.operatorId,
+    operatorName: params.operatorName,
+  });
+  
+  return { balanceBefore, balanceAfter };
 }
