@@ -16,8 +16,9 @@ import { z } from "zod";
 
 const customerSchema = z.object({
   name: z.string().min(1, "客户姓名不能为空"),
+  wechat: z.string().min(1, "微信号不能为空"),
   phone: z.string().optional(),
-  wechat: z.string().optional(),
+  trafficSource: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -79,6 +80,7 @@ export default function Customers() {
       name: data.name,
       wechatId: data.wechat,
       phone: data.phone,
+      trafficSource: data.trafficSource,
       notes: data.notes,
     });
   };
@@ -90,6 +92,7 @@ export default function Customers() {
       name: data.name,
       wechatId: data.wechat,
       phone: data.phone,
+      trafficSource: data.trafficSource,
       notes: data.notes,
     });
   };
@@ -97,8 +100,9 @@ export default function Customers() {
   const handleEdit = (customer: any) => {
     setSelectedCustomer(customer);
     setValue("name", customer.name);
-    setValue("phone", customer.phone || "");
     setValue("wechat", customer.wechatId || "");
+    setValue("phone", customer.phone || "");
+    setValue("trafficSource", customer.trafficSource || "");
     setValue("notes", customer.notes || "");
     setEditOpen(true);
   };
@@ -235,20 +239,25 @@ export default function Customers() {
             <form onSubmit={handleSubmit(onCreateSubmit)} className="space-y-4">
               <div>
                 <Label htmlFor="name">客户姓名 *</Label>
-                <Input id="name" {...register("name")} />
+                <Input id="name" {...register("name")} placeholder="请输入客户姓名" />
                 {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
               </div>
               <div>
-                <Label htmlFor="phone">联系电话</Label>
-                <Input id="phone" {...register("phone")} />
+                <Label htmlFor="wechat">微信号 *</Label>
+                <Input id="wechat" {...register("wechat")} placeholder="请输入微信号" />
+                {errors.wechat && <p className="text-sm text-destructive mt-1">{errors.wechat.message}</p>}
               </div>
               <div>
-                <Label htmlFor="wechat">微信号</Label>
-                <Input id="wechat" {...register("wechat")} />
+                <Label htmlFor="phone">联系电话</Label>
+                <Input id="phone" {...register("phone")} placeholder="请输入联系电话" />
+              </div>
+              <div>
+                <Label htmlFor="trafficSource">流量来源</Label>
+                <Input id="trafficSource" {...register("trafficSource")} placeholder="请输入流量来源" />
               </div>
               <div>
                 <Label htmlFor="notes">备注</Label>
-                <Input id="notes" {...register("notes")} />
+                <Input id="notes" {...register("notes")} placeholder="请输入备注信息" />
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
@@ -271,20 +280,25 @@ export default function Customers() {
             <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-4">
               <div>
                 <Label htmlFor="edit-name">客户姓名 *</Label>
-                <Input id="edit-name" {...register("name")} />
+                <Input id="edit-name" {...register("name")} placeholder="请输入客户姓名" />
                 {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
               </div>
               <div>
-                <Label htmlFor="edit-phone">联系电话</Label>
-                <Input id="edit-phone" {...register("phone")} />
+                <Label htmlFor="edit-wechat">微信号 *</Label>
+                <Input id="edit-wechat" {...register("wechat")} placeholder="请输入微信号" />
+                {errors.wechat && <p className="text-sm text-destructive mt-1">{errors.wechat.message}</p>}
               </div>
               <div>
-                <Label htmlFor="edit-wechat">微信号</Label>
-                <Input id="edit-wechat" {...register("wechat")} />
+                <Label htmlFor="edit-phone">联系电话</Label>
+                <Input id="edit-phone" {...register("phone")} placeholder="请输入联系电话" />
+              </div>
+              <div>
+                <Label htmlFor="edit-trafficSource">流量来源</Label>
+                <Input id="edit-trafficSource" {...register("trafficSource")} placeholder="请输入流量来源" />
               </div>
               <div>
                 <Label htmlFor="edit-notes">备注</Label>
-                <Input id="edit-notes" {...register("notes")} />
+                <Input id="edit-notes" {...register("notes")} placeholder="请输入备注信息" />
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
