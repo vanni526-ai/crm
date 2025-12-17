@@ -19,6 +19,8 @@ import {
   InsertImportLog,
   accountTransactions,
   InsertAccountTransaction,
+  smartRegisterHistory,
+  InsertSmartRegisterHistory,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1015,4 +1017,25 @@ export async function refundCustomerAccount(params: {
   });
   
   return { balanceBefore, balanceAfter };
+}
+
+// ============ Smart Register History ============
+
+export async function createSmartRegisterHistory(data: InsertSmartRegisterHistory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const result = await db.insert(smartRegisterHistory).values(data);
+  return result;
+}
+
+export async function getSmartRegisterHistory(limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return db
+    .select()
+    .from(smartRegisterHistory)
+    .orderBy(desc(smartRegisterHistory.createdAt))
+    .limit(limit);
 }

@@ -1584,10 +1584,13 @@ function SmartRegisterDialog({
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [isParsing, setIsParsing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingData, setEditingData] = useState<any>(null);
+  const [template, setTemplate] = useState<"wechat" | "alipay" | "custom">("wechat");
   
   const parseWechatBill = trpc.orders.parseWechatBill.useMutation({
     onSuccess: (data) => {
-      setParsedData(data.data);
+      setParsedData(data.data.map((item: any, index: number) => ({ ...item, id: index })));
       toast.success(`解析成功，共识别 ${data.data.length} 条订单`);
       setIsParsing(false);
     },
@@ -1597,7 +1600,7 @@ function SmartRegisterDialog({
     },
   });
   
-  const createOrder = trpc.orders.create.useMutation();
+  const batchCreateOrders = trpc.orders.batchCreate.useMutation();
   
   const handleParse = () => {
     if (!rawText.trim()) {
@@ -1639,7 +1642,7 @@ function SmartRegisterDialog({
       return;
     }
     
-    parseWechatBill.mutate({ rows: rows as any[] });
+    parseWechatBill.mutate({ rows: rows as any[], template });
   };
   
   const handleBatchCreate = async () => {
@@ -1650,12 +1653,10 @@ function SmartRegisterDialog({
     
     setIsCreating(true);
     
-    let successCount = 0;
-    let failCount = 0;
-    
-    for (const data of parsedData) {
-      try {
-        await createOrder.mutateAsync({
+    try {
+      const result = await batchCreateOrders.mutateAsync({
+        template,
+        orders: parsedData.map(data => ({
           customerName: data.customerName,
           deliveryTeacher: data.deliveryTeacher,
           deliveryCourse: data.deliveryCourse,
@@ -1667,21 +1668,22 @@ function SmartRegisterDialog({
           courseAmount: data.courseAmount,
           teacherFee: data.teacherFee,
           notes: data.notes,
-        });
-        successCount++;
-      } catch (error) {
-        failCount++;
-        console.error("创建订单失败:", error);
+        })),
+      });
+      
+      setIsCreating(false);
+      
+      if (result.successCount > 0) {
+        toast.success(`批量创建成功，成功 ${result.successCount} 条，失败 ${result.failCount} 条`);
+        onSuccess();
+        onOpenChange(false);
+      } else {
+        toast.error("批量创建失败");
       }
-    }
-    
-    setIsCreating(false);
-    
-    if (successCount > 0) {
-      toast.success(`批量创建成功，成功 ${successCount} 条，失败 ${failCount} 条`);
-      onSuccess();
-    } else {
+    } catch (error) {
+      setIsCreating(false);
       toast.error("批量创建失败");
+      console.error("批量创建失败:", error);
     }
   };
   
@@ -1694,13 +1696,38 @@ function SmartRegisterDialog({
         
         <div className="space-y-4">
           <div>
-            <Label>粘贴微信账单数据</Label>
+            <Label>选择数据源模板</Label>
+            <Select value={template} onValueChange={(value) => setTemplate(value as "wechat" | "alipay" | "custom")}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="wechat">微信支付账单</SelectItem>
+                <SelectItem value="alipay">支付宝账单</SelectItem>
+                <SelectItem value="custom">自定义格式</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label>粘贴账单数据</Label>
             <textarea
               className="w-full h-40 p-2 border rounded-md font-mono text-sm"
-              placeholder="请粘贴微信支付账单的CSV数据..."
+              placeholder={
+                template === "wechat" 
+                  ? "请粘贴微信支付账单的CSV数据..."
+                  : template === "alipay"
+                  ? "请粘贴支付宝账单的CSV数据..."
+                  : "请粘贴账单数据..."
+              }
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
             />
+            <p className="text-xs text-muted-foreground mt-2">
+              {template === "wechat" && "支持格式: 交易时间,交易类型,交易对方,商品,收/支,金额(元),..."}
+              {template === "alipay" && "支持格式: 交易时间,交易分类,交易对方,商品名称,金额,..."}
+              {template === "custom" && "请确保数据包含: 客户名、老师、课程、日期、时间、金额等字段"}
+            </p>
           </div>
           
           <Button onClick={handleParse} disabled={isParsing}>
@@ -1709,7 +1736,12 @@ function SmartRegisterDialog({
           
           {parsedData.length > 0 && (
             <div className="space-y-4">
-              <h3 className="font-semibold">解析结果 ({parsedData.length} 条)</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">解析结果</h3>
+                <div className="text-sm text-muted-foreground">
+                  共 {parsedData.length} 条记录
+                </div>
+              </div>
               
               <div className="border rounded-md overflow-x-auto">
                 <Table>
@@ -1723,19 +1755,154 @@ function SmartRegisterDialog({
                       <TableHead>城市</TableHead>
                       <TableHead>教室</TableHead>
                       <TableHead>金额</TableHead>
+                      <TableHead className="w-24">操作</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {parsedData.map((data, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{data.customerName}</TableCell>
-                        <TableCell>{data.classDate}</TableCell>
-                        <TableCell>{data.classTime}</TableCell>
-                        <TableCell>{data.deliveryCourse}</TableCell>
-                        <TableCell>{data.deliveryTeacher}</TableCell>
-                        <TableCell>{data.deliveryCity}</TableCell>
-                        <TableCell>{data.deliveryRoom}</TableCell>
-                        <TableCell>¥{data.paymentAmount}</TableCell>
+                      <TableRow key={data.id}>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              value={editingData.customerName}
+                              onChange={(e) => setEditingData({...editingData, customerName: e.target.value})}
+                              className="h-8"
+                            />
+                          ) : (
+                            data.customerName
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              value={editingData.classDate}
+                              onChange={(e) => setEditingData({...editingData, classDate: e.target.value})}
+                              className="h-8"
+                            />
+                          ) : (
+                            data.classDate
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              value={editingData.classTime}
+                              onChange={(e) => setEditingData({...editingData, classTime: e.target.value})}
+                              className="h-8"
+                            />
+                          ) : (
+                            data.classTime
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              value={editingData.deliveryCourse}
+                              onChange={(e) => setEditingData({...editingData, deliveryCourse: e.target.value})}
+                              className="h-8"
+                            />
+                          ) : (
+                            data.deliveryCourse
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              value={editingData.deliveryTeacher}
+                              onChange={(e) => setEditingData({...editingData, deliveryTeacher: e.target.value})}
+                              className="h-8"
+                            />
+                          ) : (
+                            data.deliveryTeacher
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              value={editingData.deliveryCity}
+                              onChange={(e) => setEditingData({...editingData, deliveryCity: e.target.value})}
+                              className="h-8"
+                            />
+                          ) : (
+                            data.deliveryCity
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              value={editingData.deliveryRoom}
+                              onChange={(e) => setEditingData({...editingData, deliveryRoom: e.target.value})}
+                              className="h-8"
+                            />
+                          ) : (
+                            data.deliveryRoom
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <Input
+                              type="number"
+                              value={editingData.paymentAmount}
+                              onChange={(e) => setEditingData({...editingData, paymentAmount: parseFloat(e.target.value)})}
+                              className="h-8"
+                            />
+                          ) : (
+                            `¥${data.paymentAmount}`
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {editingIndex === index ? (
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  const newData = [...parsedData];
+                                  newData[index] = editingData;
+                                  setParsedData(newData);
+                                  setEditingIndex(null);
+                                  setEditingData(null);
+                                  toast.success("修改成功");
+                                }}
+                              >
+                                保存
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingIndex(null);
+                                  setEditingData(null);
+                                }}
+                              >
+                                取消
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-1">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingIndex(index);
+                                  setEditingData({...data});
+                                }}
+                              >
+                                编辑
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setParsedData(parsedData.filter((_, i) => i !== index));
+                                  toast.success("删除成功");
+                                }}
+                              >
+                                删除
+                              </Button>
+                            </div>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

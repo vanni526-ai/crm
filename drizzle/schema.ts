@@ -281,3 +281,21 @@ export const accountTransactions = mysqlTable("accountTransactions", {
 
 export type AccountTransaction = typeof accountTransactions.$inferSelect;
 export type InsertAccountTransaction = typeof accountTransactions.$inferInsert;
+
+// 智能登记历史表
+export const smartRegisterHistory = mysqlTable("smartRegisterHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  template: mysqlEnum("template", ["wechat", "alipay", "custom"]).notNull(), // 数据源模板
+  totalRows: int("totalRows").notNull(), // 总记录数
+  successCount: int("successCount").notNull(), // 成功创建数量
+  failCount: int("failCount").notNull(), // 失败数量
+  operatorId: int("operatorId").notNull(), // 操作人 ID
+  operatorName: varchar("operatorName", { length: 100 }), // 操作人姓名(冗余字段)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  operatorIdx: index("operator_idx").on(table.operatorId),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type SmartRegisterHistory = typeof smartRegisterHistory.$inferSelect;
+export type InsertSmartRegisterHistory = typeof smartRegisterHistory.$inferInsert;

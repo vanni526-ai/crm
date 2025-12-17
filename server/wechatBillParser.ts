@@ -210,7 +210,8 @@ function extractTeacherName(counterparty: string): string {
  * 批量解析微信账单
  */
 export async function parseWechatBillBatch(
-  rows: WechatBillRow[]
+  rows: WechatBillRow[],
+  template: "wechat" | "alipay" | "custom" = "wechat"
 ): Promise<ParsedOrderInfo[]> {
   const results: ParsedOrderInfo[] = [];
 

@@ -182,10 +182,11 @@ export const appRouter = router({
           merchantNo: z.string(),
           notes: z.string(),
         })),
+        template: z.enum(["wechat", "alipay", "custom"]).optional(),
       }))
       .mutation(async ({ input }) => {
         const { parseWechatBillBatch } = await import("./wechatBillParser");
-        const results = await parseWechatBillBatch(input.rows);
+        const results = await parseWechatBillBatch(input.rows, input.template || "wechat");
         return { success: true, data: results };
       }),
     
@@ -290,6 +291,67 @@ export const appRouter = router({
         };
         const id = await db.createOrder(orderData);
         return { id, success: true };
+      }),
+    
+    batchCreate: salesOrAdminProcedure
+      .input(z.object({
+        template: z.enum(["wechat", "alipay", "custom"]),
+        orders: z.array(z.object({
+          customerName: z.string(),
+          deliveryTeacher: z.string().optional(),
+          deliveryCourse: z.string().optional(),
+          deliveryCity: z.string().optional(),
+          deliveryRoom: z.string().optional(),
+          classDate: z.string().optional(),
+          classTime: z.string().optional(),
+          paymentAmount: z.string(),
+          courseAmount: z.string().optional(),
+          teacherFee: z.string().optional(),
+          notes: z.string().optional(),
+        })),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        let successCount = 0;
+        let failCount = 0;
+        
+        for (const orderData of input.orders) {
+          try {
+            // 生成订单号
+            const orderNo = `ORD${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+            
+            await db.createOrder({
+              orderNo,
+              customerName: orderData.customerName,
+              salesId: ctx.user.id, // 使用当前用户作为销售人
+              deliveryTeacher: orderData.deliveryTeacher,
+              deliveryCourse: orderData.deliveryCourse,
+              deliveryCity: orderData.deliveryCity,
+              deliveryRoom: orderData.deliveryRoom,
+              classDate: orderData.classDate ? new Date(orderData.classDate) : undefined,
+              classTime: orderData.classTime,
+              paymentAmount: orderData.paymentAmount,
+              courseAmount: orderData.courseAmount || orderData.paymentAmount,
+              teacherFee: orderData.teacherFee,
+              notes: orderData.notes,
+            });
+            successCount++;
+          } catch (error) {
+            failCount++;
+            console.error("创建订单失败:", error);
+          }
+        }
+        
+        // 记录导入历史
+        await db.createSmartRegisterHistory({
+          template: input.template,
+          totalRows: input.orders.length,
+          successCount,
+          failCount,
+          operatorId: ctx.user.id,
+          operatorName: ctx.user.name,
+        });
+        
+        return { successCount, failCount };
       }),
     
     update: salesOrAdminProcedure
