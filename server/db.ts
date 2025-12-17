@@ -216,6 +216,12 @@ export async function updateOrder(id: number, data: Partial<InsertOrder>) {
   await db.update(orders).set(data).where(eq(orders.id, id));
 }
 
+export async function deleteOrder(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(orders).where(eq(orders.id, id));
+}
+
 // ========== 老师管理 ==========
 
 export async function createTeacher(teacher: InsertTeacher) {

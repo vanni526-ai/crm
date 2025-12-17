@@ -184,40 +184,49 @@ export const appRouter = router({
     update: salesOrAdminProcedure
       .input(z.object({
         id: z.number(),
-        data: z.object({
-          paymentAmount: z.string().optional(),
-          courseAmount: z.string().optional(),
-          accountBalance: z.string().optional(),
-          paymentChannel: z.string().optional(),
-          channelOrderNo: z.string().optional(),
-          paymentDate: z.string().optional(),
-          paymentTime: z.string().optional(),
-          teacherFee: z.string().optional(),
-          transportFee: z.string().optional(),
-          otherFee: z.string().optional(),
-          partnerFee: z.string().optional(),
-          finalAmount: z.string().optional(),
-          deliveryCity: z.string().optional(),
-          deliveryRoom: z.string().optional(),
-          deliveryTeacher: z.string().optional(),
-          deliveryCourse: z.string().optional(),
-          classDate: z.string().optional(),
-          classTime: z.string().optional(),
-          status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
-          notes: z.string().optional(),
-        }),
+        orderNo: z.string().optional(),
+        customerId: z.number().optional(),
+        paymentAmount: z.string().optional(),
+        courseAmount: z.string().optional(),
+        accountBalance: z.string().optional(),
+        paymentChannel: z.string().optional(),
+        channelOrderNo: z.string().optional(),
+        paymentDate: z.string().optional(),
+        paymentTime: z.string().optional(),
+        teacherFee: z.string().optional(),
+        transportFee: z.string().optional(),
+        otherFee: z.string().optional(),
+        partnerFee: z.string().optional(),
+        finalAmount: z.string().optional(),
+        deliveryCity: z.string().optional(),
+        deliveryRoom: z.string().optional(),
+        deliveryTeacher: z.string().optional(),
+        deliveryCourse: z.string().optional(),
+        classDate: z.string().optional(),
+        classTime: z.string().optional(),
+        status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+        notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        const updateData: any = { ...input.data };
-        if (input.data.paymentDate) {
-          updateData.paymentDate = new Date(input.data.paymentDate);
+        const { id, ...updateData } = input;
+        const processedData: any = { ...updateData };
+        if (updateData.paymentDate) {
+          processedData.paymentDate = new Date(updateData.paymentDate);
         }
-        if (input.data.classDate) {
-          updateData.classDate = new Date(input.data.classDate);
+        if (updateData.classDate) {
+          processedData.classDate = new Date(updateData.classDate);
         }
-        await db.updateOrder(input.id, updateData);
+        await db.updateOrder(id, processedData);
         return { success: true };
       }),
+    
+    delete: salesOrAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteOrder(input.id);
+        return { success: true };
+      }),
+    
     
     getByDateRange: protectedProcedure
       .input(z.object({
