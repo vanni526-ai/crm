@@ -233,6 +233,23 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    batchDelete: salesOrAdminProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ input }) => {
+        await db.batchDeleteOrders(input.ids);
+        return { success: true, count: input.ids.length };
+      }),
+    
+    batchUpdateStatus: salesOrAdminProcedure
+      .input(z.object({ 
+        ids: z.array(z.number()),
+        status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.batchUpdateOrderStatus(input.ids, input.status);
+        return { success: true, count: input.ids.length };
+      }),
+    
     
     getByDateRange: protectedProcedure
       .input(z.object({

@@ -670,6 +670,29 @@ export async function getChurnRiskCustomers() {
   return result;
 }
 
+// ========== 订单批量操作 ==========
+
+export async function batchDeleteOrders(ids: number[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  for (const id of ids) {
+    await db.delete(orders).where(eq(orders.id, id));
+  }
+}
+
+export async function batchUpdateOrderStatus(
+  ids: number[], 
+  status: "pending" | "paid" | "completed" | "cancelled" | "refunded"
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  for (const id of ids) {
+    await db.update(orders).set({ status }).where(eq(orders.id, id));
+  }
+}
+
 // ========== 数据导入日志 ==========
 
 export async function createImportLog(log: InsertImportLog) {

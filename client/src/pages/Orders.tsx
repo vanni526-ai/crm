@@ -84,6 +84,29 @@ export default function Orders() {
     },
   });
 
+  const batchDeleteOrders = trpc.orders.batchDelete.useMutation({
+    onSuccess: (data) => {
+      utils.orders.list.invalidate();
+      toast.success(`批量删除成功，共删除 ${data.count} 条订单`);
+      setSelectedOrderIds([]);
+    },
+    onError: (error) => {
+      toast.error(error.message || "批量删除失败");
+    },
+  });
+
+  const batchUpdateStatus = trpc.orders.batchUpdateStatus.useMutation({
+    onSuccess: (data) => {
+      utils.orders.list.invalidate();
+      toast.success(`批量更新成功，共更新 ${data.count} 条订单`);
+      setSelectedOrderIds([]);
+      setBatchStatusOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "批量更新失败");
+    },
+  });
+
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -98,6 +121,9 @@ export default function Orders() {
   const [exportEndDate, setExportEndDate] = useState("");
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
+  const [batchStatusOpen, setBatchStatusOpen] = useState(false);
+  const [batchStatus, setBatchStatus] = useState<"pending" | "paid" | "completed" | "cancelled" | "refunded">("paid");
 
   const {
     register,
@@ -201,6 +227,44 @@ export default function Orders() {
   const handleDelete = (id: number) => {
     if (confirm("确定要删除这个订单吗?")) {
       deleteOrder.mutate({ id });
+    }
+  };
+
+  const handleBatchDelete = () => {
+    if (selectedOrderIds.length === 0) {
+      toast.error("请至少选择一个订单");
+      return;
+    }
+    if (confirm(`确定要删除选中的 ${selectedOrderIds.length} 个订单吗?？`)) {
+      batchDeleteOrders.mutate({ ids: selectedOrderIds });
+    }
+  };
+
+  const handleBatchUpdateStatus = () => {
+    if (selectedOrderIds.length === 0) {
+      toast.error("请至少选择一个订单");
+      return;
+    }
+    setBatchStatusOpen(true);
+  };
+
+  const confirmBatchUpdateStatus = () => {
+    batchUpdateStatus.mutate({ ids: selectedOrderIds, status: batchStatus });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedOrderIds.length === filteredAndSortedOrders.length) {
+      setSelectedOrderIds([]);
+    } else {
+      setSelectedOrderIds(filteredAndSortedOrders.map(order => order.id));
+    }
+  };
+
+  const toggleSelectOrder = (orderId: number) => {
+    if (selectedOrderIds.includes(orderId)) {
+      setSelectedOrderIds(selectedOrderIds.filter(id => id !== orderId));
+    } else {
+      setSelectedOrderIds([...selectedOrderIds, orderId]);
     }
   };
 
@@ -533,6 +597,36 @@ export default function Orders() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {/* 批量操作按钮 */}
+              {selectedOrderIds.length > 0 && (
+                <div className="flex gap-2 p-3 bg-muted rounded-md">
+                  <span className="text-sm text-muted-foreground flex items-center">
+                    已选择 {selectedOrderIds.length} 个订单
+                  </span>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleBatchUpdateStatus}
+                  >
+                    批量修改状态
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={handleBatchDelete}
+                  >
+                    批量删除
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setSelectedOrderIds([])}
+                  >
+                    取消选择
+                  </Button>
+                </div>
+              )}
+
               <div className="flex flex-wrap gap-4 items-center">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-[180px]">
@@ -603,6 +697,14 @@ export default function Orders() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead className="w-[50px]">
+                          <input 
+                            type="checkbox" 
+                            checked={selectedOrderIds.length === filteredAndSortedOrders.length && filteredAndSortedOrders.length > 0}
+                            onChange={toggleSelectAll}
+                            className="cursor-pointer"
+                          />
+                        </TableHead>
                         <TableHead>订单号</TableHead>
                         <TableHead>销售人</TableHead>
                         <TableHead>流量来源</TableHead>
@@ -634,6 +736,14 @@ export default function Orders() {
                     <TableBody>
                       {filteredAndSortedOrders.map((order) => (
                         <TableRow key={order.id}>
+                          <TableCell>
+                            <input 
+                              type="checkbox" 
+                              checked={selectedOrderIds.includes(order.id)}
+                              onChange={() => toggleSelectOrder(order.id)}
+                              className="cursor-pointer"
+                            />
+                          </TableCell>
                           <TableCell className="font-medium">{order.orderNo}</TableCell>
                           <TableCell>{order.salesPerson || "-"}</TableCell>
                           <TableCell>{order.trafficSource || "-"}</TableCell>
@@ -942,6 +1052,43 @@ export default function Orders() {
             <DialogFooter>
               <Button variant="outline" onClick={() => setDetailOpen(false)}>
                 关闭
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 批量修改状态对话框 */}
+        <Dialog open={batchStatusOpen} onOpenChange={setBatchStatusOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>批量修改订单状态</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-muted-foreground">
+                将为 {selectedOrderIds.length} 个订单修改状态
+              </p>
+              <div>
+                <Label htmlFor="batchStatus">选择新状态</Label>
+                <Select value={batchStatus} onValueChange={(v: any) => setBatchStatus(v)}>
+                  <SelectTrigger id="batchStatus">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">待支付</SelectItem>
+                    <SelectItem value="paid">已支付</SelectItem>
+                    <SelectItem value="completed">已完成</SelectItem>
+                    <SelectItem value="cancelled">已取消</SelectItem>
+                    <SelectItem value="refunded">已退款</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBatchStatusOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={confirmBatchUpdateStatus}>
+                确认修改
               </Button>
             </DialogFooter>
           </DialogContent>
