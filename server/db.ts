@@ -1121,11 +1121,11 @@ export async function getSalesStatistics(params: {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  // 基础查询条件
-  const conditions: any[] = [eq(orders.status, "paid")];
+  // 基础查询条件 - 统计所有非取消状态的订单
+  const conditions: any[] = [ne(orders.status, "cancelled")];
   
   if (params.salespersonId) {
-    conditions.push(eq(orders.salesId, params.salespersonId));
+    conditions.push(eq(orders.salespersonId, params.salespersonId));
   }
   
   if (params.startDate) {
@@ -1171,7 +1171,7 @@ export async function getMonthlySales(salespersonId: number | undefined, year: n
   ];
   
   if (salespersonId) {
-    conditions.push(eq(orders.salesId, salespersonId));
+    conditions.push(eq(orders.salespersonId, salespersonId));
   }
   
   const orderList = await db
@@ -1221,7 +1221,7 @@ export async function getYearlySales(
   ];
   
   if (salespersonId) {
-    conditions.push(eq(orders.salesId, salespersonId));
+    conditions.push(eq(orders.salespersonId, salespersonId));
   }
   
   const orderList = await db

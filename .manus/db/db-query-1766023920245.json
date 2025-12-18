@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, orderNo, customerName, salespersonId, salesPerson, paymentAmount, status, createdAt FROM orders ORDER BY createdAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, orderNo, customerName, salespersonId, salesPerson, paymentAmount, status, createdAt FROM orders ORDER BY createdAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "390025",
+      "orderNo": "20251217210921-000",
+      "customerName": "测试客户",
+      "salespersonId": "NULL",
+      "salesPerson": "妍渊",
+      "paymentAmount": "1000.00",
+      "status": "pending",
+      "createdAt": "2025-12-18 02:09:21"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNo\tcustomerName\tsalespersonId\tsalesPerson\tpaymentAmount\tstatus\tcreatedAt\n390025\t20251217210921-000\t测试客户\tNULL\t妍渊\t1000.00\tpending\t2025-12-18 02:09:21\n",
+  "stderr": "",
+  "execution_time_ms": 1910
+}

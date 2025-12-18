@@ -207,6 +207,7 @@ export const appRouter = router({
         orderNo: z.string().optional(),
         customerId: z.number().optional(), // 客户ID(用于余额扣款)
         customerName: z.string(),
+        salespersonId: z.number().optional(), // 销售人员ID(关联salespersons表)
         salesPerson: z.string().optional(),
         trafficSource: z.string().optional(),
         paymentAmount: z.string(),
@@ -276,6 +277,7 @@ export const appRouter = router({
           orderNo,
           customerId: input.customerId || undefined,
           customerName: input.customerName,
+          salespersonId: input.salespersonId || undefined,
           salesId: ctx.user.id,
           salesPerson: input.salesPerson || undefined,
           trafficSource: input.trafficSource || undefined,
@@ -377,6 +379,7 @@ export const appRouter = router({
         id: z.number(),
         orderNo: z.string().optional(),
         customerName: z.string().optional(),
+        salespersonId: z.number().optional(),
         salesPerson: z.string().optional(),
         trafficSource: z.string().optional(),
         paymentAmount: z.string().optional(),

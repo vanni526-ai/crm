@@ -44,7 +44,8 @@ export const orders = mysqlTable("orders", {
   orderNo: varchar("orderNo", { length: 50 }).notNull().unique(), // 序号
   customerId: int("customerId"), // 关联客户(可选)
   customerName: varchar("customerName", { length: 100 }), // 客户姓名(手动输入)
-  salesId: int("salesId").notNull(), // 销售人ID
+  salespersonId: int("salespersonId"), // 关联销售人员表(可选)
+  salesId: int("salesId").notNull(), // 销售人ID(用户ID,保留兼容)
   salesPerson: varchar("salesPerson", { length: 100 }), // 销售人(花名)
   trafficSource: varchar("trafficSource", { length: 100 }), // 流量来源(花名)
   

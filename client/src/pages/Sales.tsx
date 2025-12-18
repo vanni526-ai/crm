@@ -32,6 +32,9 @@ export default function Sales() {
 
   // 查询销售人员列表
   const { data: salespersons, isLoading, refetch } = trpc.salespersons.list.useQuery();
+  
+  // 查询所有销售人员的统计数据
+  const { data: allStatistics } = trpc.salespersons.getStatistics.useQuery({});
 
   // 创建销售人员
   const createMutation = trpc.salespersons.create.useMutation({
@@ -268,6 +271,8 @@ export default function Sales() {
               <TableHead>微信</TableHead>
               <TableHead>提成比例</TableHead>
               <TableHead>城市</TableHead>
+              <TableHead>订单数</TableHead>
+              <TableHead>销售额</TableHead>
               <TableHead>状态</TableHead>
               <TableHead className="text-right">操作</TableHead>
             </TableRow>
@@ -275,13 +280,13 @@ export default function Sales() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   加载中...
                 </TableCell>
               </TableRow>
             ) : filteredSalespersons?.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   暂无销售人员
                 </TableCell>
               </TableRow>
@@ -294,6 +299,15 @@ export default function Sales() {
                   <TableCell>{sp.wechat || "-"}</TableCell>
                   <TableCell>{sp.commissionRate ? `${sp.commissionRate}%` : "-"}</TableCell>
                   <TableCell>{sp.city || "-"}</TableCell>
+                  <TableCell>
+                    {allStatistics?.orders?.filter(o => o.salespersonId === sp.id).length || 0}
+                  </TableCell>
+                  <TableCell>
+                    ¥{allStatistics?.orders
+                      ?.filter(o => o.salespersonId === sp.id)
+                      .reduce((sum, o) => sum + Number(o.paymentAmount), 0)
+                      .toFixed(2) || "0.00"}
+                  </TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
                       sp.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"

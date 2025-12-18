@@ -20,6 +20,7 @@ import { z } from "zod";
 const orderSchema = z.object({
   orderNo: z.string().optional(),
   customerName: z.string().min(1, "请输入客户姓名"),
+  salespersonId: z.number().optional(),
   salesPerson: z.string().optional(),
   trafficSource: z.string().optional(),
   paymentAmount: z.string().min(1, "支付金额不能为空"),
@@ -50,6 +51,7 @@ export default function Orders() {
   const utils = trpc.useUtils();
   const { data: orders, isLoading } = trpc.orders.list.useQuery();
   const { data: users } = trpc.users.list.useQuery();
+  const { data: salespersons } = trpc.salespersons.list.useQuery();
   
   const createOrder = trpc.orders.create.useMutation({
     onSuccess: () => {
@@ -142,6 +144,7 @@ export default function Orders() {
     createOrder.mutate({
       orderNo: data.orderNo,
       customerName: data.customerName,
+      salespersonId: data.salespersonId,
       salesPerson: data.salesPerson,
       trafficSource: data.trafficSource,
       paymentAmount: data.paymentAmount,
@@ -173,6 +176,7 @@ export default function Orders() {
       id: selectedOrder.id,
       orderNo: data.orderNo,
       customerName: data.customerName,
+      salespersonId: data.salespersonId,
       salesPerson: data.salesPerson,
       trafficSource: data.trafficSource,
       paymentAmount: data.paymentAmount,
@@ -1161,8 +1165,30 @@ export default function Orders() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="salesPerson">销售人</Label>
-                      <Input id="salesPerson" {...register("salesPerson")} placeholder="请输入销售人姓名" />
+                      <Label htmlFor="salespersonId">销售人员</Label>
+                      <Select
+                        value={watch("salespersonId")?.toString() || ""}
+                        onValueChange={(value) => {
+                          const id = value ? parseInt(value) : undefined;
+                          setValue("salespersonId", id);
+                          // 自动填充salesPerson字段
+                          const sp = salespersons?.find(s => s.id === id);
+                          if (sp) {
+                            setValue("salesPerson", sp.nickname || sp.name);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="选择销售人员" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {salespersons?.map((sp) => (
+                            <SelectItem key={sp.id} value={sp.id.toString()}>
+                              {sp.nickname || sp.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <Label htmlFor="trafficSource">流量来源</Label>
@@ -1403,8 +1429,30 @@ export default function Orders() {
                       )}
                     </div>
                     <div>
-                      <Label htmlFor="edit-salesPerson">销售人</Label>
-                      <Input id="edit-salesPerson" {...register("salesPerson")} placeholder="请输入销售人姓名" />
+                      <Label htmlFor="edit-salespersonId">销售人员</Label>
+                      <Select
+                        value={watch("salespersonId")?.toString() || ""}
+                        onValueChange={(value) => {
+                          const id = value ? parseInt(value) : undefined;
+                          setValue("salespersonId", id);
+                          // 自动填充salesPerson字段
+                          const sp = salespersons?.find(s => s.id === id);
+                          if (sp) {
+                            setValue("salesPerson", sp.nickname || sp.name);
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="选择销售人员" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {salespersons?.map((sp) => (
+                            <SelectItem key={sp.id} value={sp.id.toString()}>
+                              {sp.nickname || sp.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <Label htmlFor="edit-trafficSource">流量来源</Label>
