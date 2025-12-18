@@ -22,12 +22,32 @@ export function ThemeProvider({
   switchable = false,
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
-    if (switchable) {
-      const stored = localStorage.getItem("theme");
-      return (stored as Theme) || defaultTheme;
+    // Check if user prefers system theme
+    const stored = localStorage.getItem("theme");
+    if (stored === "system" || !stored) {
+      // Follow system preference
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
     }
-    return defaultTheme;
+    return (stored as Theme) || defaultTheme;
   });
+
+  useEffect(() => {
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const stored = localStorage.getItem("theme");
+    
+    const handleChange = (e: MediaQueryListEvent) => {
+      // Only auto-switch if user hasn't manually set a preference
+      if (stored === "system" || !stored) {
+        setTheme(e.matches ? "dark" : "light");
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -36,11 +56,7 @@ export function ThemeProvider({
     } else {
       root.classList.remove("dark");
     }
-
-    if (switchable) {
-      localStorage.setItem("theme", theme);
-    }
-  }, [theme, switchable]);
+  }, [theme]);
 
   const toggleTheme = switchable
     ? () => {

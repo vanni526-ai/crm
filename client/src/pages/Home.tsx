@@ -27,7 +27,7 @@ export default function Home() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">本月销售额</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -42,7 +42,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">订单数量</CardTitle>
               <ShoppingCart className="h-4 w-4 text-muted-foreground" />
@@ -57,7 +57,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">老师费用</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -72,7 +72,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">净利润</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -97,7 +97,7 @@ export default function Home() {
             <div className="grid gap-4 md:grid-cols-2">
             {/* 订单管理 */}
             <Link href="/orders">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card className="glass-card cursor-pointer hover:shadow-lg transition-all">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">订单管理</h3>
                   <p className="text-sm text-muted-foreground">查看和管理客户订单</p>
@@ -107,7 +107,7 @@ export default function Home() {
 
             {/* 财务对账 */}
             <Link href="/reconciliations">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card className="glass-card cursor-pointer hover:shadow-lg transition-all">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">财务对账</h3>
                   <p className="text-sm text-muted-foreground">查看收支明细和对账报表</p>
@@ -117,7 +117,7 @@ export default function Home() {
 
             {/* 顾客情况 */}
             <Link href="/customers">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card className="glass-card cursor-pointer hover:shadow-lg transition-all">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">顾客情况</h3>
                   <p className="text-sm text-muted-foreground">查看顾客统计和顾客列表</p>
@@ -127,7 +127,7 @@ export default function Home() {
 
             {/* 课程排课 */}
             <Link href="/schedules">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card className="glass-card cursor-pointer hover:shadow-lg transition-all">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">课程排课</h3>
                   <p className="text-sm text-muted-foreground">查看和管理课程安排</p>
@@ -137,7 +137,7 @@ export default function Home() {
 
             {/* 数据导入 */}
             <Link href="/import">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card className="glass-card cursor-pointer hover:shadow-lg transition-all">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">数据导入</h3>
                   <p className="text-sm text-muted-foreground">批量导入CSV、Excel、ICS文件</p>
@@ -152,21 +152,21 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-4">系统说明</h2>
             <p className="text-sm text-muted-foreground mb-4">功能介绍</p>
             <div className="space-y-4">
-              <Card>
+              <Card className="glass-card">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">销售人员</h3>
                   <p className="text-sm text-muted-foreground">可以登记客户订单、收款信息</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-card">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">财务人员</h3>
                   <p className="text-sm text-muted-foreground">可以管理老师费用结算、财务对账</p>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="glass-card">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2">管理员</h3>
                   <p className="text-sm text-muted-foreground">可以管理用户权限、查看所有数据</p>
