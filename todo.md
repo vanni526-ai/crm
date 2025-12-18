@@ -780,3 +780,16 @@
 - [ ] 添加路由守卫
 - [ ] 测试账号密码登录功能
 - [ ] 保存检查点
+
+## 独立登录页面开发
+- [x] 创建Login.tsx登录页面组件
+- [x] 实现登录表单UI(用户名、密码输入框)
+- [x] 实现登录提交逻辑(调用passwordAuth.login API)
+- [x] 实现token存储到localStorage
+- [x] 创建usePasswordAuth hook管理认证状态
+- [x] 创建ProtectedRoute组件实现路由守卫
+- [x] 添加登录页面路由(/login)
+- [x] 为所有需要保护的路由添加ProtectedRoute包装
+- [x] 实现登录成功后跳转到首页
+- [x] 测试完整登录流程
+- [x] 保存检查点
