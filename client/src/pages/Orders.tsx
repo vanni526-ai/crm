@@ -50,7 +50,7 @@ type OrderFormData = z.infer<typeof orderSchema>;
 export default function Orders() {
   const utils = trpc.useUtils();
   const { data: orders, isLoading } = trpc.orders.list.useQuery();
-  const { data: users } = trpc.userManagement.list.useQuery();
+  const { data: users } = trpc.users.list.useQuery();
   const { data: salespersons } = trpc.salespersons.list.useQuery();
   
   const createOrder = trpc.orders.create.useMutation({
@@ -399,14 +399,8 @@ export default function Orders() {
         headers[colNumber] = cell.text;
       });
 
-      // 验证27个字段的表头
-      const requiredHeaders = [
-        "销售人", "流量来源", "客户微信号", "课程金额", "首付金额", "尾款金额", 
-        "充值金额", "账户余额", "老师费用", "车费", "其他费用", "合伙人费用", 
-        "净收入", "支付渠道", "订单号", "支付日期", "支付时间", "上课日期", 
-        "上课时间", "交付城市", "交付教室", "交付老师", "交付课程", 
-        "状态", "置信度", "备注", "原始文本"
-      ];
+      // 验证表头
+      const requiredHeaders = ["订单号", "客户名", "支付金额", "课程金额"];
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
       if (missingHeaders.length > 0) {
         toast.error(`缺少必要字段: ${missingHeaders.join(", ")}`);
@@ -429,45 +423,28 @@ export default function Orders() {
         if (rowData["订单号"]) {
           orders.push({
             orderNo: rowData["订单号"],
-            customerName: rowData["销售人"] || "",  // 使用销售人作为客户名
+            customerName: rowData["客户名"],
             salesPerson: rowData["销售人"],
             trafficSource: rowData["流量来源"],
-            customerWechat: rowData["客户微信号"],
-            paymentAmount: rowData["课程金额"],  // 支付金额使用课程金额
+            paymentAmount: rowData["支付金额"],
             courseAmount: rowData["课程金额"],
-            downPayment: rowData["首付金额"],
-            finalPayment: rowData["尾款金额"],
-            rechargeAmount: rowData["充值金额"],
             accountBalance: rowData["账户余额"],
+            paymentCity: rowData["支付城市"],
+            channelOrderNo: rowData["渠道订单号"],
             teacherFee: rowData["老师费用"],
             transportFee: rowData["车费"],
             otherFee: rowData["其他费用"],
-            partnerFee: rowData["合伙人费用"],
-            netIncome: rowData["净收入"],
-            paymentChannel: rowData["支付渠道"],
-            channelOrderNo: rowData["订单号"],  // 渠道订单号使用订单号
+            partnerFee: rowData["合伙人费"],
+            finalAmount: rowData["金串到账金额"],
             paymentDate: rowData["支付日期"],
             paymentTime: rowData["支付时间"],
-            classDate: rowData["上课日期"],
-            classTime: rowData["上课时间"],
             deliveryCity: rowData["交付城市"],
             deliveryRoom: rowData["交付教室"],
             deliveryTeacher: rowData["交付老师"],
             deliveryCourse: rowData["交付课程"],
-            status: (() => {
-              const statusText = rowData["状态"];
-              const statusMap: Record<string, string> = {
-                "待支付": "pending",
-                "已支付": "paid",
-                "已完成": "completed",
-                "已取消": "cancelled",
-                "已退款": "refunded"
-              };
-              return statusMap[statusText] || "pending";
-            })(),
-            confidence: rowData["置信度"],
+            classDate: rowData["上课日期"],
+            classTime: rowData["上课时间"],
             notes: rowData["备注"],
-            originalText: rowData["原始文本"],
           });
         }
       });
@@ -516,7 +493,7 @@ export default function Orders() {
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet("订单列表");
 
-      // 设置所有27个详细字段的表头
+      // 设置所有23个详细字段的表头
       sheet.columns = [
         { header: "订单号", key: "orderNo", width: 20 },
         { header: "销售人", key: "salesPerson", width: 12 },
@@ -739,33 +716,31 @@ export default function Orders() {
                             className="cursor-pointer"
                           />
                         </TableHead>
+                        <TableHead>订单号</TableHead>
                         <TableHead>销售人</TableHead>
                         <TableHead>流量来源</TableHead>
-                        <TableHead>客户微信号</TableHead>
+                        <TableHead>客户名</TableHead>
+                        <TableHead>支付金额</TableHead>
                         <TableHead>课程金额</TableHead>
-                        <TableHead>首付金额</TableHead>
-                        <TableHead>尾款金额</TableHead>
-                        <TableHead>充值金额</TableHead>
                         <TableHead>账户余额</TableHead>
+                        <TableHead>支付城市</TableHead>
+                        <TableHead>渠道订单号</TableHead>
                         <TableHead>老师费用</TableHead>
                         <TableHead>车费</TableHead>
                         <TableHead>其他费用</TableHead>
-                        <TableHead>合伙人费用</TableHead>
-                        <TableHead>净收入</TableHead>
-                        <TableHead>支付渠道</TableHead>
-                        <TableHead>订单号</TableHead>
+                        <TableHead>合伙人费</TableHead>
+                        <TableHead>金串到账金额</TableHead>
                         <TableHead>支付日期</TableHead>
                         <TableHead>支付时间</TableHead>
-                        <TableHead>上课日期</TableHead>
-                        <TableHead>上课时间</TableHead>
                         <TableHead>交付城市</TableHead>
                         <TableHead>交付教室</TableHead>
                         <TableHead>交付老师</TableHead>
                         <TableHead>交付课程</TableHead>
-                        <TableHead>状态</TableHead>
-                        <TableHead>置信度</TableHead>
+                        <TableHead>上课日期</TableHead>
+                        <TableHead>上课时间</TableHead>
                         <TableHead>备注</TableHead>
-                        <TableHead>原始文本</TableHead>
+                        <TableHead>状态</TableHead>
+                        <TableHead>创建时间</TableHead>
                         <TableHead className="text-right">操作</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -780,33 +755,35 @@ export default function Orders() {
                               className="cursor-pointer"
                             />
                           </TableCell>
+                          <TableCell className="font-medium">{order.orderNo}</TableCell>
                           <TableCell>{order.salesPerson || "-"}</TableCell>
                           <TableCell>{order.trafficSource || "-"}</TableCell>
-                          <TableCell>{order.customerWechat || "-"}</TableCell>
+                          <TableCell>{order.customerName || "-"}</TableCell>
+                          <TableCell className="text-green-600">¥{order.paymentAmount}</TableCell>
                           <TableCell>¥{order.courseAmount}</TableCell>
-                          <TableCell>¥{order.downPayment || "0.00"}</TableCell>
-                          <TableCell>¥{order.finalPayment || "0.00"}</TableCell>
-                          <TableCell>¥{order.rechargeAmount || "0.00"}</TableCell>
                           <TableCell>¥{order.accountBalance || "0.00"}</TableCell>
+                          <TableCell>{order.paymentCity || "-"}</TableCell>
+                          <TableCell className="max-w-[150px] truncate">{order.channelOrderNo || "-"}</TableCell>
                           <TableCell>¥{order.teacherFee || "0.00"}</TableCell>
                           <TableCell>¥{order.transportFee || "0.00"}</TableCell>
                           <TableCell>¥{order.otherFee || "0.00"}</TableCell>
                           <TableCell>¥{order.partnerFee || "0.00"}</TableCell>
-                          <TableCell>¥{order.netIncome || "0.00"}</TableCell>
-                          <TableCell>{order.paymentChannel || "-"}</TableCell>
-                          <TableCell className="font-medium">{order.orderNo}</TableCell>
+                          <TableCell>¥{order.finalAmount || "0.00"}</TableCell>
                           <TableCell>{order.paymentDate ? (typeof order.paymentDate === 'string' ? order.paymentDate : new Date(order.paymentDate).toLocaleDateString()) : "-"}</TableCell>
                           <TableCell>{order.paymentTime || "-"}</TableCell>
-                          <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : new Date(order.classDate).toLocaleDateString()) : "-"}</TableCell>
-                          <TableCell>{order.classTime || "-"}</TableCell>
                           <TableCell>{order.deliveryCity || "-"}</TableCell>
                           <TableCell>{order.deliveryRoom || "-"}</TableCell>
                           <TableCell>{order.deliveryTeacher || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.deliveryCourse || "-"}</TableCell>
-                          <TableCell>{getStatusBadge(order.status)}</TableCell>
-                          <TableCell>{order.confidence || "-"}</TableCell>
+                          <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : new Date(order.classDate).toLocaleDateString()) : "-"}</TableCell>
+                          <TableCell>{order.classTime || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.notes || "-"}</TableCell>
-                          <TableCell className="max-w-[150px] truncate">{order.originalText || "-"}</TableCell>
+                          <TableCell>{getStatusBadge(order.status)}</TableCell>
+                          <TableCell>
+                            {order.createdAt instanceof Date 
+                              ? order.createdAt.toLocaleDateString()
+                              : new Date(order.createdAt).toLocaleDateString()}
+                          </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
                               <Button
@@ -909,7 +886,7 @@ export default function Orders() {
                   点击或拖拽Excel文件到此处上传
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  支持 .xlsx 格式,文件需包含所有27个字段
+                  支持 .xlsx 格式,文件需包含所有23个字段
                 </p>
                 <Input
                   type="file"
@@ -977,16 +954,8 @@ export default function Orders() {
                       <p className="font-medium">{selectedOrder.customerName || "-"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">客户微信号</p>
-                      <p className="font-medium">{selectedOrder.customerWechat || "-"}</p>
-                    </div>
-                    <div>
                       <p className="text-sm text-muted-foreground">状态</p>
                       <div>{getStatusBadge(selectedOrder.status)}</div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">置信度</p>
-                      <p className="font-medium">{selectedOrder.confidence || "-"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">创建时间</p>
@@ -1003,28 +972,20 @@ export default function Orders() {
                   <h3 className="font-semibold mb-3 text-lg">支付信息</h3>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
+                      <p className="text-sm text-muted-foreground">支付金额</p>
+                      <p className="font-medium text-green-600">¥{selectedOrder.paymentAmount}</p>
+                    </div>
+                    <div>
                       <p className="text-sm text-muted-foreground">课程金额</p>
                       <p className="font-medium">¥{selectedOrder.courseAmount}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">首付金额</p>
-                      <p className="font-medium">¥{selectedOrder.downPayment || "0.00"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">尾款金额</p>
-                      <p className="font-medium">¥{selectedOrder.finalPayment || "0.00"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">充值金额</p>
-                      <p className="font-medium">¥{selectedOrder.rechargeAmount || "0.00"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">账户余额</p>
                       <p className="font-medium">¥{selectedOrder.accountBalance || "0.00"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">支付渠道</p>
-                      <p className="font-medium">{selectedOrder.paymentChannel || "-"}</p>
+                      <p className="text-sm text-muted-foreground">支付城市</p>
+                      <p className="font-medium">{selectedOrder.paymentCity || "-"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">支付日期</p>
@@ -1065,12 +1026,8 @@ export default function Orders() {
                       <p className="font-medium">¥{selectedOrder.otherFee || "0.00"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">合伙人费用</p>
+                      <p className="text-sm text-muted-foreground">合伙人费</p>
                       <p className="font-medium">¥{selectedOrder.partnerFee || "0.00"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">净收入</p>
-                      <p className="font-medium text-green-600">¥{selectedOrder.netIncome || "0.00"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">金串到账金额</p>
@@ -1121,13 +1078,6 @@ export default function Orders() {
                   <div>
                     <h3 className="font-semibold mb-3 text-lg">备注</h3>
                     <p className="text-sm">{selectedOrder.notes}</p>
-                  </div>
-                )}
-                
-                {selectedOrder.originalText && (
-                  <div>
-                    <h3 className="font-semibold mb-3 text-lg">原始文本</h3>
-                    <p className="text-sm text-muted-foreground">{selectedOrder.originalText}</p>
                   </div>
                 )}
               </div>

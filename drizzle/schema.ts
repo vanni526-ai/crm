@@ -1,27 +1,21 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time } from "drizzle-orm/mysql-core";
 
 /**
  * 用户表 - 支持管理员、销售、财务三种角色
  */
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
-  openId: varchar("openId", { length: 64 }).unique(), // OAuth登录时必填
-  username: varchar("username", { length: 50 }).unique(), // 账号密码登录时必填
-  passwordHash: varchar("passwordHash", { length: 255 }), // 账号密码登录时必填
+  openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   nickname: varchar("nickname", { length: 50 }), // 花名
   email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }), // 'oauth' or 'password'
+  loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["admin", "sales", "finance", "user"]).default("user").notNull(),
-  salespersonId: int("salespersonId"), // 关联销售人员表(销售角色时使用)
   isActive: boolean("isActive").default(true).notNull(),
-  createdBy: int("createdBy"), // 创建人ID(超级管理员)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-}, (table) => ({
-  salespersonIdx: index("salesperson_idx").on(table.salespersonId),
-}));
+});
 
 /**
  * 客户表
@@ -50,7 +44,6 @@ export const orders = mysqlTable("orders", {
   orderNo: varchar("orderNo", { length: 50 }).notNull().unique(), // 序号
   customerId: int("customerId"), // 关联客户(可选)
   customerName: varchar("customerName", { length: 100 }), // 客户姓名(手动输入)
-  customerWechat: varchar("customerWechat", { length: 100 }), // 客户微信号
   salespersonId: int("salespersonId"), // 关联销售人员表(可选)
   salesId: int("salesId").notNull(), // 销售人ID(用户ID,保留兼容)
   salesPerson: varchar("salesPerson", { length: 100 }), // 销售人(花名)
@@ -59,11 +52,7 @@ export const orders = mysqlTable("orders", {
   // 金额相关
   paymentAmount: decimal("paymentAmount", { precision: 10, scale: 2 }).notNull(), // 支付金额
   courseAmount: decimal("courseAmount", { precision: 10, scale: 2 }).notNull(), // 课程金额
-  downPayment: decimal("downPayment", { precision: 10, scale: 2 }).default("0.00"), // 首付金额
-  finalPayment: decimal("finalPayment", { precision: 10, scale: 2 }).default("0.00"), // 尾款金额
-  rechargeAmount: decimal("rechargeAmount", { precision: 10, scale: 2 }).default("0.00"), // 充值金额
   accountBalance: decimal("accountBalance", { precision: 10, scale: 2 }).default("0.00").notNull(), // 账户余额
-  netIncome: decimal("netIncome", { precision: 10, scale: 2 }).default("0.00"), // 净收入(可计算)
   
   // 支付信息
   paymentCity: varchar("paymentCity", { length: 50 }), // 支付城市
@@ -88,9 +77,7 @@ export const orders = mysqlTable("orders", {
   classTime: varchar("classTime", { length: 50 }), // 上课时间(支持时间范围如"14:00-16:00")
   
   status: mysqlEnum("status", ["pending", "paid", "completed", "cancelled", "refunded"]).default("pending").notNull(),
-  confidence: decimal("confidence", { precision: 5, scale: 2 }), // 置信度(0-100)
   notes: text("notes"), // 备注
-  originalText: text("originalText"), // 原始文本(智能登记时使用)
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -338,54 +325,3 @@ export const smartRegisterHistory = mysqlTable("smartRegisterHistory", {
 
 export type SmartRegisterHistory = typeof smartRegisterHistory.$inferSelect;
 export type InsertSmartRegisterHistory = typeof smartRegisterHistory.$inferInsert;
-
-
-/**
- * 操作日志审计表 - 记录系统关键操作
- */
-export const auditLogs = mysqlTable("auditLogs", {
-  id: int("id").autoincrement().primaryKey(),
-  // 操作类型
-  action: mysqlEnum("action", [
-    "order_create",      // 订单创建
-    "order_update",      // 订单修改
-    "order_delete",      // 订单删除
-    "user_create",       // 用户创建
-    "user_role_update",  // 用户角色变更
-    "user_status_update",// 用户状态变更
-    "user_delete",       // 用户删除
-    "data_import",       // 数据导入
-    "customer_create",   // 客户创建
-    "customer_update",   // 客户修改
-    "customer_delete",   // 客户删除
-    "teacher_create",    // 老师创建
-    "teacher_update",    // 老师修改
-    "teacher_delete",    // 老师删除
-    "schedule_create",   // 排课创建
-    "schedule_update",   // 排课修改
-    "schedule_delete",   // 排课删除
-  ]).notNull(),
-  // 操作人信息
-  userId: int("userId").notNull(),           // 操作人ID
-  userName: varchar("userName", { length: 100 }),  // 操作人姓名(冗余)
-  userRole: varchar("userRole", { length: 20 }),   // 操作人角色(冗余)
-  // 操作目标
-  targetType: varchar("targetType", { length: 50 }), // 目标类型(order/user/customer等)
-  targetId: int("targetId"),                 // 目标ID
-  targetName: varchar("targetName", { length: 200 }), // 目标名称(冗余)
-  // 操作详情
-  description: text("description").notNull(), // 操作描述
-  changes: json("changes"),                   // 变更内容(JSON格式,记录before/after)
-  ipAddress: varchar("ipAddress", { length: 45 }), // IP地址
-  userAgent: text("userAgent"),               // 用户代理
-  // 时间戳
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
-  actionIdx: index("action_idx").on(table.action),
-  userIdx: index("user_idx").on(table.userId),
-  targetIdx: index("target_idx").on(table.targetType, table.targetId),
-  createdAtIdx: index("created_at_idx").on(table.createdAt),
-}));
-
-export type AuditLog = typeof auditLogs.$inferSelect;
-export type InsertAuditLog = typeof auditLogs.$inferInsert;

@@ -17,28 +17,23 @@ import Users from "./pages/Users";
 import Import from "./pages/Import";
 import CustomerOverview from "./pages/CustomerOverview";
 import Sales from "./pages/Sales";
-import AuditLogs from "./pages/AuditLogs";
-import Login from "./pages/Login";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/login"} component={Login} />
-      <Route path={"/"}><ProtectedRoute><Home /></ProtectedRoute></Route>
-      <Route path={"/orders"}><ProtectedRoute><Orders /></ProtectedRoute></Route>
-      <Route path={"/customers"}><ProtectedRoute><Customers /></ProtectedRoute></Route>
-      <Route path={"/teachers"}><ProtectedRoute><Teachers /></ProtectedRoute></Route>
-      <Route path={"/schedules"}><ProtectedRoute><Schedules /></ProtectedRoute></Route>
-      <Route path={"/teacher-payments"}><ProtectedRoute><TeacherPayments /></ProtectedRoute></Route>
-      <Route path={"/reconciliations"}><ProtectedRoute><Reconciliations /></ProtectedRoute></Route>
-      <Route path={"/finance"}><ProtectedRoute><Finance /></ProtectedRoute></Route>
-      <Route path={"/analytics"}><ProtectedRoute><Analytics /></ProtectedRoute></Route>
-      <Route path={"/users"}><ProtectedRoute><Users /></ProtectedRoute></Route>
-      <Route path={"/import"}><ProtectedRoute><Import /></ProtectedRoute></Route>
-      <Route path={"/customer-overview"}><ProtectedRoute><CustomerOverview /></ProtectedRoute></Route>
-      <Route path={"/sales"}><ProtectedRoute><Sales /></ProtectedRoute></Route>
-      <Route path={"/audit-logs"}><ProtectedRoute><AuditLogs /></ProtectedRoute></Route>
+      <Route path={"/"} component={Home} />
+      <Route path={"/orders"} component={Orders} />
+      <Route path={"/customers"} component={Customers} />
+      <Route path={"/teachers"} component={Teachers} />
+      <Route path={"/schedules"} component={Schedules} />
+      <Route path={"/teacher-payments"} component={TeacherPayments} />
+      <Route path={"/reconciliations"} component={Reconciliations} />
+      <Route path={"/finance"} component={Finance} />
+      <Route path={"/analytics"} component={Analytics} />
+      <Route path={"/users"} component={Users} />
+      <Route path={"/import"} component={Import} />
+      <Route path={"/customer-overview"} component={CustomerOverview} />
+      <Route path={"/sales"} component={Sales} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -192,16 +192,6 @@ export async function createOrder(order: InsertOrder) {
   return result[0].insertId;
 }
 
-export async function batchCreateOrders(orderList: InsertOrder[]) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  if (orderList.length === 0) return { insertedCount: 0 };
-  
-  // Drizzle ORM支持批量插入
-  const result = await db.insert(orders).values(orderList);
-  return { insertedCount: result[0].affectedRows || orderList.length };
-}
-
 export async function getOrderById(id: number) {
   const db = await getDb();
   if (!db) return null;
@@ -215,16 +205,10 @@ export async function getAllOrders() {
   return db.select().from(orders).orderBy(desc(orders.createdAt));
 }
 
-export async function getOrdersBySales(userId: number) {
+export async function getOrdersBySales(salesId: number) {
   const db = await getDb();
   if (!db) return [];
-  
-  // 首先获取用户的salespersonId
-  const user = await db.select().from(users).where(eq(users.id, userId)).limit(1).then(rows => rows[0]);
-  if (!user || !user.salespersonId) return [];
-  
-  // 根据salespersonId查询订单
-  return db.select().from(orders).where(eq(orders.salespersonId, user.salespersonId)).orderBy(desc(orders.createdAt));
+  return db.select().from(orders).where(eq(orders.salesId, salesId)).orderBy(desc(orders.createdAt));
 }
 
 export async function getOrdersByDateRange(startDate: string, endDate: string) {

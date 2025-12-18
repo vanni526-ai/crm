@@ -26,17 +26,6 @@ export function useAuth(options?: UseAuthOptions) {
 
   const logout = useCallback(async () => {
     try {
-      // 检查是否是密码登录
-      const authToken = localStorage.getItem("auth_token");
-      if (authToken) {
-        // 密码登录:清除本地token并跳转到登录页
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("auth_user");
-        window.location.href = "/login";
-        return;
-      }
-      
-      // OAuth登录:调用logout API
       await logoutMutation.mutateAsync();
     } catch (error: unknown) {
       if (
