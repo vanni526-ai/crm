@@ -5,6 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { importRouter } from "./importRouter";
 import { salespersonRouter } from "./salespersonRouter";
+import { userManagementRouter } from "./userManagementRouter";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
@@ -34,6 +35,7 @@ const financeOrAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
 export const appRouter = router({
   system: systemRouter,
   salespersons: salespersonRouter,
+  userManagement: userManagementRouter,
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -44,32 +46,7 @@ export const appRouter = router({
     }),
   }),
 
-  // 用户管理(仅管理员)
-  users: router({
-    list: protectedProcedure.query(async () => {
-      return db.getAllUsers();
-    }),
-    
-    updateRole: adminProcedure
-      .input(z.object({
-        userId: z.number(),
-        role: z.enum(["admin", "sales", "finance", "user"]),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateUserRole(input.userId, input.role);
-        return { success: true };
-      }),
-    
-    updateStatus: adminProcedure
-      .input(z.object({
-        userId: z.number(),
-        isActive: z.boolean(),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateUserStatus(input.userId, input.isActive);
-        return { success: true };
-      }),
-  }),
+
 
   // 客户管理
   customers: router({

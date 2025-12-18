@@ -16,25 +16,15 @@ import { useAuth } from "@/_core/hooks/useAuth";
 export default function Users() {
   const { user: currentUser } = useAuth();
   const utils = trpc.useUtils();
-  const { data: users, isLoading } = trpc.users.list.useQuery();
+  const { data: users, isLoading } = trpc.userManagement.list.useQuery();
   
-  const updateRole = trpc.users.updateRole.useMutation({
+  const updateMutation = trpc.userManagement.update.useMutation({
     onSuccess: () => {
-      utils.users.list.invalidate();
-      toast.success("角色更新成功");
+      utils.userManagement.list.invalidate();
+      toast.success("更新成功");
       setRoleDialogOpen(false);
     },
-    onError: (error) => {
-      toast.error(error.message || "更新失败");
-    },
-  });
-
-  const updateStatus = trpc.users.updateStatus.useMutation({
-    onSuccess: () => {
-      utils.users.list.invalidate();
-      toast.success("状态更新成功");
-    },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "更新失败");
     },
   });
@@ -54,8 +44,8 @@ export default function Users() {
 
   const handleUpdateRole = () => {
     if (!selectedUser || !newRole) return;
-    updateRole.mutate({
-      userId: selectedUser.id,
+    updateMutation.mutate({
+      id: selectedUser.id,
       role: newRole as "admin" | "sales" | "finance" | "user",
     });
   };
@@ -63,8 +53,8 @@ export default function Users() {
   const handleToggleStatus = (user: any) => {
     const action = user.isActive ? "禁用" : "启用";
     if (confirm(`确定要${action}用户 ${user.name} 吗?`)) {
-      updateStatus.mutate({
-        userId: user.id,
+      updateMutation.mutate({
+        id: user.id,
         isActive: !user.isActive,
       });
     }
@@ -303,8 +293,8 @@ export default function Users() {
               <Button variant="outline" onClick={() => setRoleDialogOpen(false)}>
                 取消
               </Button>
-              <Button onClick={handleUpdateRole} disabled={updateRole.isPending}>
-                {updateRole.isPending ? "保存中..." : "保存"}
+              <Button onClick={handleUpdateRole} disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? "保存中..." : "保存"}
               </Button>
             </DialogFooter>
           </DialogContent>

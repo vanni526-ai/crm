@@ -11,11 +11,15 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["admin", "sales", "finance", "user"]).default("user").notNull(),
+  salespersonId: int("salespersonId"), // 关联销售人员表(销售角色时使用)
   isActive: boolean("isActive").default(true).notNull(),
+  createdBy: int("createdBy"), // 创建人ID(超级管理员)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-});
+}, (table) => ({
+  salespersonIdx: index("salesperson_idx").on(table.salespersonId),
+}));
 
 /**
  * 客户表
@@ -325,3 +329,5 @@ export const smartRegisterHistory = mysqlTable("smartRegisterHistory", {
 
 export type SmartRegisterHistory = typeof smartRegisterHistory.$inferSelect;
 export type InsertSmartRegisterHistory = typeof smartRegisterHistory.$inferInsert;
+
+

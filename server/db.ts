@@ -205,10 +205,16 @@ export async function getAllOrders() {
   return db.select().from(orders).orderBy(desc(orders.createdAt));
 }
 
-export async function getOrdersBySales(salesId: number) {
+export async function getOrdersBySales(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(orders).where(eq(orders.salesId, salesId)).orderBy(desc(orders.createdAt));
+  
+  // 首先获取用户的salespersonId
+  const user = await db.select().from(users).where(eq(users.id, userId)).limit(1).then(rows => rows[0]);
+  if (!user || !user.salespersonId) return [];
+  
+  // 根据salespersonId查询订单
+  return db.select().from(orders).where(eq(orders.salespersonId, user.salespersonId)).orderBy(desc(orders.createdAt));
 }
 
 export async function getOrdersByDateRange(startDate: string, endDate: string) {

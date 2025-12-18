@@ -676,3 +676,18 @@
 - [x] 使用DashboardLayout包裹页面内容,保持左侧导航栏
 - [x] 测试销售管理页面导航栏显示
 - [x] 保存检查点
+
+## 基于角色的权限管理系统(简化方案)
+- [x] 清理不必要的文件(accountRouter.ts, userAuthRouter.ts, session配置)
+- [x] 保留users表的role和salespersonId字段
+- [x] 实现用户管理API(仅超级管理员可访问)
+- [x] 实现用户创建、编辑、删除、角色分配功能
+- [x] 实现用户管理页面(仅超级管理员可见)
+- [x] 实现基于角色的权限中间件(adminProcedure, salesOrAdminProcedure, financeOrAdminProcedure)
+- [x] 销售人员数据隔离(只能查看自己名下的订单)
+- [x] 财务人员权限配置(订单管理、财务对账)
+- [x] 超级管理员权限配置(所有功能)
+- [x] 更新导航菜单,根据角色显示不同菜单项
+- [x] 编写单元测试验证权限控制(userManagement.test.ts)
+- [x] 测试所有角色的权限(所有测试通过)
+- [x] 保存检查点

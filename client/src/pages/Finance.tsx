@@ -14,7 +14,7 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Toolti
 
 export default function Finance() {
   const { data: orders } = trpc.orders.list.useQuery();
-  const { data: users } = trpc.users.list.useQuery();
+  const { data: users } = trpc.userManagement.list.useQuery();
   const { data: cityRevenue } = trpc.analytics.cityRevenue.useQuery();
   const { data: cityRevenueTrend } = trpc.analytics.cityRevenueTrend.useQuery();
   

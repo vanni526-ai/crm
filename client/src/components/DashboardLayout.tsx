@@ -27,16 +27,22 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "首页", path: "/" },
-  { icon: ShoppingCart, label: "订单管理", path: "/orders" },
-  { icon: Users, label: "客户管理", path: "/customers" },
-  { icon: TrendingUp, label: "销售管理", path: "/sales" },
-  { icon: GraduationCap, label: "课程排课", path: "/schedules" },
-  { icon: UserCheck, label: "老师管理", path: "/teachers" },
-  { icon: DollarSign, label: "财务管理", path: "/finance" },
-  { icon: Upload, label: "数据导入", path: "/import" },
-];
+const getMenuItems = (userRole?: string) => {
+  const allItems = [
+    { icon: LayoutDashboard, label: "首页", path: "/", roles: ["admin", "sales", "finance", "user"] },
+    { icon: ShoppingCart, label: "订单管理", path: "/orders", roles: ["admin", "sales", "finance"] },
+    { icon: Users, label: "客户管理", path: "/customers", roles: ["admin", "sales"] },
+    { icon: TrendingUp, label: "销售管理", path: "/sales", roles: ["admin"] },
+    { icon: GraduationCap, label: "课程排课", path: "/schedules", roles: ["admin"] },
+    { icon: UserCheck, label: "老师管理", path: "/teachers", roles: ["admin"] },
+    { icon: DollarSign, label: "财务管理", path: "/finance", roles: ["admin", "finance"] },
+    { icon: Upload, label: "数据导入", path: "/import", roles: ["admin"] },
+    { icon: Users, label: "用户管理", path: "/users", roles: ["admin"] },
+  ];
+  
+  if (!userRole) return allItems;
+  return allItems.filter(item => item.roles.includes(userRole));
+};
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -118,7 +124,8 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find(item => item.path === location);
+  const menuItems = getMenuItems(user?.role);
+  const activeMenuItem = menuItems.find((item: any) => item.path === location);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -186,7 +193,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
+              {menuItems.map((item: any) => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>

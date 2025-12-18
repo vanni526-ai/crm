@@ -50,7 +50,7 @@ type OrderFormData = z.infer<typeof orderSchema>;
 export default function Orders() {
   const utils = trpc.useUtils();
   const { data: orders, isLoading } = trpc.orders.list.useQuery();
-  const { data: users } = trpc.users.list.useQuery();
+  const { data: users } = trpc.userManagement.list.useQuery();
   const { data: salespersons } = trpc.salespersons.list.useQuery();
   
   const createOrder = trpc.orders.create.useMutation({
