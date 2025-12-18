@@ -752,3 +752,31 @@
 - [x] 编写单元测试验证权限控制(userManagement.test.ts)
 - [x] 测试所有角色的权限(所有测试通过)
 - [x] 保存检查点
+
+## 账号密码登录系统开发
+- [ ] 检查users表schema,确认username和passwordHash字段存在
+- [ ] 实现用户创建API(createUser),支持设置账号密码
+- [ ] 实现账号密码登录API(loginWithPassword)
+- [ ] 实现session管理(使用JWT或cookie)
+- [ ] 在用户管理页面添加"新增用户"按钮和对话框
+- [ ] 实现新增用户表单(用户名、密码、角色、关联销售人员)
+- [ ] 创建独立的登录页面(支持账号密码登录)
+- [ ] 修改认证中间件,支持双重认证(OAuth + 账号密码)
+- [ ] 实现登出功能(清除session)
+- [ ] 编写单元测试验证登录功能
+- [ ] 测试完整登录流程
+- [ ] 保存检查点
+
+## 账号密码登录系统开发
+- [x] 检查users表schema,确认username和passwordHash字段存在
+- [x] 实现账号密码登录API(passwordAuthRouter)
+- [x] 实现token验证API
+- [x] 在userManagementRouter中添加创建用户API
+- [x] 在用户管理页面添加"新增用户"按钮
+- [x] 实现新增用户对话框UI
+- [ ] 创建登录页面(Login.tsx)
+- [ ] 实现登录表单和token存储
+- [ ] 实现双重认证支持(OAuth + 账号密码)
+- [ ] 添加路由守卫
+- [ ] 测试账号密码登录功能
+- [ ] 保存检查点

@@ -5,11 +5,13 @@ import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean,
  */
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  openId: varchar("openId", { length: 64 }).unique(), // OAuth登录时必填
+  username: varchar("username", { length: 50 }).unique(), // 账号密码登录时必填
+  passwordHash: varchar("passwordHash", { length: 255 }), // 账号密码登录时必填
   name: text("name"),
   nickname: varchar("nickname", { length: 50 }), // 花名
   email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
+  loginMethod: varchar("loginMethod", { length: 64 }), // 'oauth' or 'password'
   role: mysqlEnum("role", ["admin", "sales", "finance", "user"]).default("user").notNull(),
   salespersonId: int("salespersonId"), // 关联销售人员表(销售角色时使用)
   isActive: boolean("isActive").default(true).notNull(),
@@ -341,6 +343,7 @@ export const auditLogs = mysqlTable("auditLogs", {
     "order_create",      // 订单创建
     "order_update",      // 订单修改
     "order_delete",      // 订单删除
+    "user_create",       // 用户创建
     "user_role_update",  // 用户角色变更
     "user_status_update",// 用户状态变更
     "user_delete",       // 用户删除

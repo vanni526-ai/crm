@@ -5,6 +5,7 @@ import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { logAudit } from "./auditLogger";
+import bcrypt from "bcryptjs";
 
 // 检查是否为超级管理员
 async function checkAdmin(ctx: any) {
@@ -26,6 +27,66 @@ async function checkAdmin(ctx: any) {
 }
 
 export const userManagementRouter = router({
+  // 创建用户(账号密码登录)
+  create: protectedProcedure
+    .input(z.object({
+      username: z.string().min(3, "用户名至少3个字符"),
+      password: z.string().min(6, "密码至少6个字符"),
+      name: z.string().min(1, "姓名不能为空"),
+      nickname: z.string().optional(),
+      email: z.string().email().optional(),
+      role: z.enum(["admin", "sales", "finance", "user"]),
+      salespersonId: z.number().optional().nullable(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      await checkAdmin(ctx);
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      // 检查用户名是否已存在
+      const existingUser = await db.select().from(users).where(eq(users.username, input.username)).limit(1).then(rows => rows[0]);
+      if (existingUser) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "用户名已存在",
+        });
+      }
+
+      // 加密密码
+      const passwordHash = await bcrypt.hash(input.password, 10);
+
+      // 创建用户
+      const [newUser] = await db.insert(users).values({
+        username: input.username,
+        passwordHash,
+        name: input.name,
+        nickname: input.nickname,
+        email: input.email,
+        role: input.role,
+        salespersonId: input.salespersonId,
+        loginMethod: "password",
+        isActive: true,
+        createdBy: ctx.user.id,
+        openId: `password_${input.username}`, // 为密码登录用户生成虚拟openId
+      });
+
+      // 记录审计日志
+      await logAudit({
+        action: "user_create",
+        userId: ctx.user.id,
+        userName: ctx.user.name || ctx.user.nickname || undefined,
+        userRole: ctx.user.role,
+        targetType: "user",
+        targetId: newUser.insertId,
+        targetName: input.name,
+        description: `创建新用户: ${input.username} (${input.name})`,
+        changes: { username: input.username, role: input.role },
+      });
+
+      return { success: true, userId: newUser.insertId };
+    }),
+
   // 列出所有用户
   list: protectedProcedure
     .query(async ({ ctx }) => {

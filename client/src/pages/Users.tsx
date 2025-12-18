@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Edit, UserCheck, UserX, Shield } from "lucide-react";
+import { Search, Edit, UserCheck, UserX, Shield, Plus } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -35,6 +35,42 @@ export default function Users() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [newUserData, setNewUserData] = useState({
+    username: "",
+    password: "",
+    name: "",
+    nickname: "",
+    email: "",
+    role: "user" as "admin" | "sales" | "finance" | "user",
+  });
+
+  const createMutation = trpc.userManagement.create.useMutation({
+    onSuccess: () => {
+      utils.userManagement.list.invalidate();
+      toast.success("用户创建成功");
+      setCreateDialogOpen(false);
+      setNewUserData({
+        username: "",
+        password: "",
+        name: "",
+        nickname: "",
+        email: "",
+        role: "user",
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "创建失败");
+    },
+  });
+
+  const handleCreateUser = () => {
+    if (!newUserData.username || !newUserData.password || !newUserData.name) {
+      toast.error("请填写必填字段");
+      return;
+    }
+    createMutation.mutate(newUserData);
+  };
 
   const handleEditRole = (user: any) => {
     setSelectedUser(user);
@@ -125,6 +161,10 @@ export default function Users() {
             <h1 className="text-3xl font-bold">用户管理</h1>
             <p className="text-muted-foreground mt-2">管理系统用户和权限</p>
           </div>
+          <Button onClick={() => setCreateDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            新增用户
+          </Button>
         </div>
 
         <Card>
@@ -295,6 +335,86 @@ export default function Users() {
               </Button>
               <Button onClick={handleUpdateRole} disabled={updateMutation.isPending}>
                 {updateMutation.isPending ? "保存中..." : "保存"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 新增用户对话框 */}
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>新增用户</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="username">用户名 *</Label>
+                <Input
+                  id="username"
+                  value={newUserData.username}
+                  onChange={(e) => setNewUserData({ ...newUserData, username: e.target.value })}
+                  placeholder="至少3个字符"
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">密码 *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={newUserData.password}
+                  onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
+                  placeholder="至少6个字符"
+                />
+              </div>
+              <div>
+                <Label htmlFor="name">姓名 *</Label>
+                <Input
+                  id="name"
+                  value={newUserData.name}
+                  onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
+                  placeholder="请输入姓名"
+                />
+              </div>
+              <div>
+                <Label htmlFor="nickname">花名</Label>
+                <Input
+                  id="nickname"
+                  value={newUserData.nickname}
+                  onChange={(e) => setNewUserData({ ...newUserData, nickname: e.target.value })}
+                  placeholder="可选"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">邮箱</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={newUserData.email}
+                  onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
+                  placeholder="可选"
+                />
+              </div>
+              <div>
+                <Label htmlFor="newUserRole">角色 *</Label>
+                <Select value={newUserData.role} onValueChange={(value: any) => setNewUserData({ ...newUserData, role: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择角色" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">管理员</SelectItem>
+                    <SelectItem value="sales">销售</SelectItem>
+                    <SelectItem value="finance">财务</SelectItem>
+                    <SelectItem value="user">普通用户</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={handleCreateUser} disabled={createMutation.isPending}>
+                {createMutation.isPending ? "创建中..." : "创建"}
               </Button>
             </DialogFooter>
           </DialogContent>

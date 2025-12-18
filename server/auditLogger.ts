@@ -5,6 +5,7 @@ export type AuditAction =
   | "order_create"
   | "order_update"
   | "order_delete"
+  | "user_create"
   | "user_role_update"
   | "user_status_update"
   | "user_delete"

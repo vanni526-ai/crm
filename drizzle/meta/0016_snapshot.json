@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "ef950695-b5aa-43b4-b47e-155cbda00af9",
-  "prevId": "3c6a1af7-0020-458b-9aca-41875857b895",
+  "id": "f2ef550b-fb14-4e9f-b014-d4e97a3fbc4a",
+  "prevId": "ef950695-b5aa-43b4-b47e-155cbda00af9",
   "tables": {
     "accountTransactions": {
       "name": "accountTransactions",
@@ -154,7 +154,7 @@
         },
         "action": {
           "name": "action",
-          "type": "enum('order_create','order_update','order_delete','user_role_update','user_status_update','user_delete','data_import','customer_create','customer_update','customer_delete','teacher_create','teacher_update','teacher_delete','schedule_create','schedule_update','schedule_delete')",
+          "type": "enum('order_create','order_update','order_delete','user_create','user_role_update','user_status_update','user_delete','data_import','customer_create','customer_update','customer_delete','teacher_create','teacher_update','teacher_delete','schedule_create','schedule_update','schedule_delete')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

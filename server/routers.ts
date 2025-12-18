@@ -7,6 +7,7 @@ import { importRouter } from "./importRouter";
 import { salespersonRouter } from "./salespersonRouter";
 import { userManagementRouter } from "./userManagementRouter";
 import { auditLogRouter } from "./auditLogRouter";
+import { passwordAuthRouter } from "./passwordAuthRouter";
 import { logAudit } from "./auditLogger";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
@@ -38,6 +39,7 @@ export const appRouter = router({
   system: systemRouter,
   salespersons: salespersonRouter,
   userManagement: userManagementRouter,
+  passwordAuth: passwordAuthRouter,
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

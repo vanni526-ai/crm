@@ -1,0 +1,1 @@
+ALTER TABLE `auditLogs` MODIFY COLUMN `action` enum('order_create','order_update','order_delete','user_create','user_role_update','user_status_update','user_delete','data_import','customer_create','customer_update','customer_delete','teacher_create','teacher_update','teacher_delete','schedule_create','schedule_update','schedule_delete') NOT NULL;
