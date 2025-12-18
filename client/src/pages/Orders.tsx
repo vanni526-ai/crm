@@ -602,7 +602,7 @@ export default function Orders() {
           </div>
         </div>
 
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>订单列表</CardTitle>
           </CardHeader>

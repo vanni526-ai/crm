@@ -130,7 +130,7 @@ export default function Teachers() {
           </Button>
         </div>
 
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>老师列表</CardTitle>
           </CardHeader>

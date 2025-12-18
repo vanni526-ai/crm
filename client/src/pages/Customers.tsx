@@ -139,7 +139,7 @@ export default function Customers() {
           </Button>
         </div>
 
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <div className="flex items-center space-x-2">
               <Search className="h-5 w-5 text-muted-foreground" />
@@ -366,7 +366,7 @@ function CustomerDetailDialog({
         </DialogHeader>
         <div className="space-y-6">
           {/* 基本信息 */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-lg">基本信息</CardTitle>
             </CardHeader>
@@ -396,25 +396,25 @@ function CustomerDetailDialog({
 
           {/* 消费统计 */}
           <div className="grid grid-cols-4 gap-4">
-            <Card>
+            <Card className="glass-card">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">账户余额</p>
                 <p className="text-2xl font-bold text-green-600">¥{Number(customer.accountBalance || 0).toFixed(2)}</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="glass-card">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">总消费金额</p>
                 <p className="text-2xl font-bold">￥{totalSpent.toFixed(2)}</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="glass-card">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">订单数量</p>
                 <p className="text-2xl font-bold">{customerOrders.length}</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="glass-card">
               <CardContent className="pt-6">
                 <p className="text-sm text-muted-foreground">课程次数</p>
                 <p className="text-2xl font-bold">{customerSchedules.length}</p>
@@ -428,7 +428,7 @@ function CustomerDetailDialog({
           </div>
 
           {/* 订单历史 */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-lg">订单历史</CardTitle>
             </CardHeader>
@@ -469,7 +469,7 @@ function CustomerDetailDialog({
           </Card>
 
           {/* 账户流水 */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-lg">账户流水</CardTitle>
             </CardHeader>
@@ -514,7 +514,7 @@ function CustomerDetailDialog({
           </Card>
           
           {/* 排课记录 */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-lg">排课记录</CardTitle>
             </CardHeader>

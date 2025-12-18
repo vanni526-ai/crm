@@ -207,7 +207,7 @@ export default function Schedules() {
 
         {/* 统计卡片 */}
         <div className="grid gap-4 md:grid-cols-3">
-          <Card>
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">总排课数</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -217,7 +217,7 @@ export default function Schedules() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">即将到来</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
@@ -227,7 +227,7 @@ export default function Schedules() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">活跃老师</CardTitle>
             </CardHeader>
@@ -240,7 +240,7 @@ export default function Schedules() {
         </div>
 
         {/* 排课列表 */}
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>排课列表</CardTitle>

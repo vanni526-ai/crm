@@ -106,7 +106,7 @@ export default function Import() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <Card className="cursor-pointer hover:border-primary transition-colors">
+          <Card className="glass-card cursor-pointer hover:border-primary transition-colors">
             <CardHeader>
               <div className="flex items-center space-x-2">
                 <FileText className="h-5 w-5 text-primary" />
@@ -136,7 +136,7 @@ export default function Import() {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:border-primary transition-colors">
+          <Card className="glass-card cursor-pointer hover:border-primary transition-colors">
             <CardHeader>
               <div className="flex items-center space-x-2">
                 <FileSpreadsheet className="h-5 w-5 text-green-600" />
@@ -166,7 +166,7 @@ export default function Import() {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:border-primary transition-colors">
+          <Card className="glass-card cursor-pointer hover:border-primary transition-colors">
             <CardHeader>
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-blue-600" />

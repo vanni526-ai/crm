@@ -380,7 +380,7 @@ export default function Finance() {
 
         {/* 城市收益统计和趋势 */}
         <div className="grid gap-4 lg:grid-cols-2">
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>城市收益统计</CardTitle>
               <p className="text-sm text-muted-foreground">按城市分配比例计算收益</p>
@@ -426,7 +426,7 @@ export default function Finance() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>城市收益趋势</CardTitle>
               <p className="text-sm text-muted-foreground">最近6个月收益变化</p>
@@ -472,7 +472,7 @@ export default function Finance() {
 
         {/* 财务概览 */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <Card>
+          <Card className="glass-card">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -486,7 +486,7 @@ export default function Finance() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -500,7 +500,7 @@ export default function Finance() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -514,7 +514,7 @@ export default function Finance() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -528,7 +528,7 @@ export default function Finance() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="glass-card">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -544,7 +544,7 @@ export default function Finance() {
         {/* 图表展示 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 收支趋势图 */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>收支趋势(最近6个月)</CardTitle>
             </CardHeader>
@@ -565,7 +565,7 @@ export default function Finance() {
           </Card>
 
           {/* 费用占比饼图 */}
-          <Card>
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>费用占比</CardTitle>
             </CardHeader>
@@ -594,7 +594,7 @@ export default function Finance() {
         </div>
 
         {/* 销售业绩排名 */}
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>销售业绩排名</CardTitle>
           </CardHeader>
@@ -615,7 +615,7 @@ export default function Finance() {
         </Card>
 
         {/* 筛选工具栏 */}
-        <Card>
+        <Card className="glass-card">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>收支明细</CardTitle>
