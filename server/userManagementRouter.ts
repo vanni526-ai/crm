@@ -34,7 +34,7 @@ export const userManagementRouter = router({
       password: z.string().min(6, "密码至少6个字符"),
       name: z.string().min(1, "姓名不能为空"),
       nickname: z.string().optional(),
-      email: z.string().email().optional(),
+      email: z.string().email().optional().or(z.literal("")),
       role: z.enum(["admin", "sales", "finance", "user"]),
       salespersonId: z.number().optional().nullable(),
     }))

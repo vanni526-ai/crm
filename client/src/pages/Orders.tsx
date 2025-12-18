@@ -716,31 +716,33 @@ export default function Orders() {
                             className="cursor-pointer"
                           />
                         </TableHead>
-                        <TableHead>订单号</TableHead>
                         <TableHead>销售人</TableHead>
                         <TableHead>流量来源</TableHead>
-                        <TableHead>客户名</TableHead>
-                        <TableHead>支付金额</TableHead>
+                        <TableHead>客户微信号</TableHead>
                         <TableHead>课程金额</TableHead>
+                        <TableHead>首付金额</TableHead>
+                        <TableHead>尾款金额</TableHead>
+                        <TableHead>充值金额</TableHead>
                         <TableHead>账户余额</TableHead>
-                        <TableHead>支付城市</TableHead>
-                        <TableHead>渠道订单号</TableHead>
                         <TableHead>老师费用</TableHead>
                         <TableHead>车费</TableHead>
                         <TableHead>其他费用</TableHead>
-                        <TableHead>合伙人费</TableHead>
-                        <TableHead>金串到账金额</TableHead>
+                        <TableHead>合伙人费用</TableHead>
+                        <TableHead>净收入</TableHead>
+                        <TableHead>支付渠道</TableHead>
+                        <TableHead>订单号</TableHead>
                         <TableHead>支付日期</TableHead>
                         <TableHead>支付时间</TableHead>
+                        <TableHead>上课日期</TableHead>
+                        <TableHead>上课时间</TableHead>
                         <TableHead>交付城市</TableHead>
                         <TableHead>交付教室</TableHead>
                         <TableHead>交付老师</TableHead>
                         <TableHead>交付课程</TableHead>
-                        <TableHead>上课日期</TableHead>
-                        <TableHead>上课时间</TableHead>
-                        <TableHead>备注</TableHead>
                         <TableHead>状态</TableHead>
-                        <TableHead>创建时间</TableHead>
+                        <TableHead>置信度</TableHead>
+                        <TableHead>备注</TableHead>
+                        <TableHead>原始文本</TableHead>
                         <TableHead className="text-right">操作</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -755,35 +757,33 @@ export default function Orders() {
                               className="cursor-pointer"
                             />
                           </TableCell>
-                          <TableCell className="font-medium">{order.orderNo}</TableCell>
                           <TableCell>{order.salesPerson || "-"}</TableCell>
                           <TableCell>{order.trafficSource || "-"}</TableCell>
-                          <TableCell>{order.customerName || "-"}</TableCell>
-                          <TableCell className="text-green-600">¥{order.paymentAmount}</TableCell>
+                          <TableCell>{order.customerWechat || "-"}</TableCell>
                           <TableCell>¥{order.courseAmount}</TableCell>
+                          <TableCell>¥{order.downPayment || "0.00"}</TableCell>
+                          <TableCell>¥{order.finalPayment || "0.00"}</TableCell>
+                          <TableCell>¥{order.rechargeAmount || "0.00"}</TableCell>
                           <TableCell>¥{order.accountBalance || "0.00"}</TableCell>
-                          <TableCell>{order.paymentCity || "-"}</TableCell>
-                          <TableCell className="max-w-[150px] truncate">{order.channelOrderNo || "-"}</TableCell>
                           <TableCell>¥{order.teacherFee || "0.00"}</TableCell>
                           <TableCell>¥{order.transportFee || "0.00"}</TableCell>
                           <TableCell>¥{order.otherFee || "0.00"}</TableCell>
                           <TableCell>¥{order.partnerFee || "0.00"}</TableCell>
-                          <TableCell>¥{order.finalAmount || "0.00"}</TableCell>
+                          <TableCell>¥{order.netIncome || "0.00"}</TableCell>
+                          <TableCell>{order.paymentChannel || "-"}</TableCell>
+                          <TableCell className="font-medium">{order.orderNo}</TableCell>
                           <TableCell>{order.paymentDate ? (typeof order.paymentDate === 'string' ? order.paymentDate : new Date(order.paymentDate).toLocaleDateString()) : "-"}</TableCell>
                           <TableCell>{order.paymentTime || "-"}</TableCell>
+                          <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : new Date(order.classDate).toLocaleDateString()) : "-"}</TableCell>
+                          <TableCell>{order.classTime || "-"}</TableCell>
                           <TableCell>{order.deliveryCity || "-"}</TableCell>
                           <TableCell>{order.deliveryRoom || "-"}</TableCell>
                           <TableCell>{order.deliveryTeacher || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.deliveryCourse || "-"}</TableCell>
-                          <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : new Date(order.classDate).toLocaleDateString()) : "-"}</TableCell>
-                          <TableCell>{order.classTime || "-"}</TableCell>
-                          <TableCell className="max-w-[150px] truncate">{order.notes || "-"}</TableCell>
                           <TableCell>{getStatusBadge(order.status)}</TableCell>
-                          <TableCell>
-                            {order.createdAt instanceof Date 
-                              ? order.createdAt.toLocaleDateString()
-                              : new Date(order.createdAt).toLocaleDateString()}
-                          </TableCell>
+                          <TableCell>{order.confidence || "-"}</TableCell>
+                          <TableCell className="max-w-[150px] truncate">{order.notes || "-"}</TableCell>
+                          <TableCell className="max-w-[150px] truncate">{order.originalText || "-"}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
                               <Button
@@ -954,8 +954,16 @@ export default function Orders() {
                       <p className="font-medium">{selectedOrder.customerName || "-"}</p>
                     </div>
                     <div>
+                      <p className="text-sm text-muted-foreground">客户微信号</p>
+                      <p className="font-medium">{selectedOrder.customerWechat || "-"}</p>
+                    </div>
+                    <div>
                       <p className="text-sm text-muted-foreground">状态</p>
                       <div>{getStatusBadge(selectedOrder.status)}</div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">置信度</p>
+                      <p className="font-medium">{selectedOrder.confidence || "-"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">创建时间</p>
@@ -972,20 +980,28 @@ export default function Orders() {
                   <h3 className="font-semibold mb-3 text-lg">支付信息</h3>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">支付金额</p>
-                      <p className="font-medium text-green-600">¥{selectedOrder.paymentAmount}</p>
-                    </div>
-                    <div>
                       <p className="text-sm text-muted-foreground">课程金额</p>
                       <p className="font-medium">¥{selectedOrder.courseAmount}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">首付金额</p>
+                      <p className="font-medium">¥{selectedOrder.downPayment || "0.00"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">尾款金额</p>
+                      <p className="font-medium">¥{selectedOrder.finalPayment || "0.00"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">充值金额</p>
+                      <p className="font-medium">¥{selectedOrder.rechargeAmount || "0.00"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">账户余额</p>
                       <p className="font-medium">¥{selectedOrder.accountBalance || "0.00"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">支付城市</p>
-                      <p className="font-medium">{selectedOrder.paymentCity || "-"}</p>
+                      <p className="text-sm text-muted-foreground">支付渠道</p>
+                      <p className="font-medium">{selectedOrder.paymentChannel || "-"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">支付日期</p>
@@ -1026,8 +1042,12 @@ export default function Orders() {
                       <p className="font-medium">¥{selectedOrder.otherFee || "0.00"}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">合伙人费</p>
+                      <p className="text-sm text-muted-foreground">合伙人费用</p>
                       <p className="font-medium">¥{selectedOrder.partnerFee || "0.00"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">净收入</p>
+                      <p className="font-medium text-green-600">¥{selectedOrder.netIncome || "0.00"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">金串到账金额</p>
@@ -1078,6 +1098,13 @@ export default function Orders() {
                   <div>
                     <h3 className="font-semibold mb-3 text-lg">备注</h3>
                     <p className="text-sm">{selectedOrder.notes}</p>
+                  </div>
+                )}
+                
+                {selectedOrder.originalText && (
+                  <div>
+                    <h3 className="font-semibold mb-3 text-lg">原始文本</h3>
+                    <p className="text-sm text-muted-foreground">{selectedOrder.originalText}</p>
                   </div>
                 )}
               </div>

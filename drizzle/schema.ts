@@ -50,6 +50,7 @@ export const orders = mysqlTable("orders", {
   orderNo: varchar("orderNo", { length: 50 }).notNull().unique(), // 序号
   customerId: int("customerId"), // 关联客户(可选)
   customerName: varchar("customerName", { length: 100 }), // 客户姓名(手动输入)
+  customerWechat: varchar("customerWechat", { length: 100 }), // 客户微信号
   salespersonId: int("salespersonId"), // 关联销售人员表(可选)
   salesId: int("salesId").notNull(), // 销售人ID(用户ID,保留兼容)
   salesPerson: varchar("salesPerson", { length: 100 }), // 销售人(花名)
@@ -58,7 +59,11 @@ export const orders = mysqlTable("orders", {
   // 金额相关
   paymentAmount: decimal("paymentAmount", { precision: 10, scale: 2 }).notNull(), // 支付金额
   courseAmount: decimal("courseAmount", { precision: 10, scale: 2 }).notNull(), // 课程金额
+  downPayment: decimal("downPayment", { precision: 10, scale: 2 }).default("0.00"), // 首付金额
+  finalPayment: decimal("finalPayment", { precision: 10, scale: 2 }).default("0.00"), // 尾款金额
+  rechargeAmount: decimal("rechargeAmount", { precision: 10, scale: 2 }).default("0.00"), // 充值金额
   accountBalance: decimal("accountBalance", { precision: 10, scale: 2 }).default("0.00").notNull(), // 账户余额
+  netIncome: decimal("netIncome", { precision: 10, scale: 2 }).default("0.00"), // 净收入(可计算)
   
   // 支付信息
   paymentCity: varchar("paymentCity", { length: 50 }), // 支付城市
@@ -83,7 +88,9 @@ export const orders = mysqlTable("orders", {
   classTime: varchar("classTime", { length: 50 }), // 上课时间(支持时间范围如"14:00-16:00")
   
   status: mysqlEnum("status", ["pending", "paid", "completed", "cancelled", "refunded"]).default("pending").notNull(),
+  confidence: decimal("confidence", { precision: 5, scale: 2 }), // 置信度(0-100)
   notes: text("notes"), // 备注
+  originalText: text("originalText"), // 原始文本(智能登记时使用)
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
