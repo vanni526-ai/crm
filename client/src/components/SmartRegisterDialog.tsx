@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Edit, Trash2, Save, X } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
@@ -16,6 +19,8 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
   const [parsedData, setParsedData] = useState<any[]>([]);
   const [isParsing, setIsParsing] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingData, setEditingData] = useState<any>(null);
 
   const parseTransferNotes = trpc.orders.parseTransferNotes.useMutation({
     onSuccess: (data: any) => {
@@ -65,7 +70,40 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
   const handleClose = () => {
     setRawText("");
     setParsedData([]);
+    setEditingIndex(null);
+    setEditingData(null);
     onOpenChange(false);
+  };
+
+  const handleEdit = (index: number) => {
+    setEditingIndex(index);
+    setEditingData({ ...parsedData[index] });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingIndex !== null && editingData) {
+      const newData = [...parsedData];
+      newData[editingIndex] = editingData;
+      setParsedData(newData);
+      setEditingIndex(null);
+      setEditingData(null);
+      toast.success("修改已保存");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null);
+    setEditingData(null);
+  };
+
+  const handleDelete = (index: number) => {
+    const newData = parsedData.filter((_, i) => i !== index);
+    setParsedData(newData);
+    toast.success("已删除");
+  };
+
+  const updateEditingField = (field: string, value: string) => {
+    setEditingData({ ...editingData, [field]: value });
   };
 
   return (
@@ -115,23 +153,159 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
               <h3 className="font-medium mb-3">解析结果预览 ({parsedData.length} 条)</h3>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {parsedData.map((item, index) => (
-                  <div key={index} className="border-b pb-2 text-sm">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div><span className="text-muted-foreground">销售:</span> {item.salesperson}</div>
-                      <div><span className="text-muted-foreground">客户:</span> {item.customerName}</div>
-                      <div><span className="text-muted-foreground">课程:</span> {item.deliveryCourse}</div>
-                      <div><span className="text-muted-foreground">老师:</span> {item.deliveryTeacher}</div>
-                      <div><span className="text-muted-foreground">日期:</span> {item.classDate}</div>
-                      <div><span className="text-muted-foreground">时间:</span> {item.classTime}</div>
-                      <div><span className="text-muted-foreground">金额:</span> ¥{item.paymentAmount}</div>
-                      <div><span className="text-muted-foreground">地点:</span> {item.deliveryCity}</div>
-                      {item.deliveryRoom && (
-                        <div><span className="text-muted-foreground">教室:</span> {item.deliveryRoom}</div>
-                      )}
-                      {item.notes && (
-                        <div className="col-span-2"><span className="text-muted-foreground">备注:</span> {item.notes}</div>
-                      )}
-                    </div>
+                  <div key={index} className="border rounded-lg p-3 mb-3">
+                    {editingIndex === index ? (
+                      // 编辑模式
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs">销售</Label>
+                            <Input
+                              value={editingData.salesperson || ""}
+                              onChange={(e) => updateEditingField("salesperson", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">客户</Label>
+                            <Input
+                              value={editingData.customerName || ""}
+                              onChange={(e) => updateEditingField("customerName", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">课程</Label>
+                            <Input
+                              value={editingData.deliveryCourse || ""}
+                              onChange={(e) => updateEditingField("deliveryCourse", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">老师</Label>
+                            <Input
+                              value={editingData.deliveryTeacher || ""}
+                              onChange={(e) => updateEditingField("deliveryTeacher", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">日期</Label>
+                            <Input
+                              value={editingData.classDate || ""}
+                              onChange={(e) => updateEditingField("classDate", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="2024-12-25"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">时间</Label>
+                            <Input
+                              value={editingData.classTime || ""}
+                              onChange={(e) => updateEditingField("classTime", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="14:00-16:00"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">支付金额</Label>
+                            <Input
+                              value={editingData.paymentAmount || ""}
+                              onChange={(e) => updateEditingField("paymentAmount", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">课程金额</Label>
+                            <Input
+                              value={editingData.courseAmount || ""}
+                              onChange={(e) => updateEditingField("courseAmount", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">地点</Label>
+                            <Input
+                              value={editingData.deliveryCity || ""}
+                              onChange={(e) => updateEditingField("deliveryCity", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">教室</Label>
+                            <Input
+                              value={editingData.deliveryRoom || ""}
+                              onChange={(e) => updateEditingField("deliveryRoom", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Label className="text-xs">备注</Label>
+                            <Input
+                              value={editingData.notes || ""}
+                              onChange={(e) => updateEditingField("notes", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelEdit}
+                          >
+                            <X className="w-4 h-4 mr-1" />
+                            取消
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={handleSaveEdit}
+                          >
+                            <Save className="w-4 h-4 mr-1" />
+                            保存
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      // 预览模式
+                      <div>
+                        <div className="grid grid-cols-2 gap-2 text-sm mb-2">
+                          <div><span className="text-muted-foreground">销售:</span> {item.salesperson}</div>
+                          <div><span className="text-muted-foreground">客户:</span> {item.customerName}</div>
+                          <div><span className="text-muted-foreground">课程:</span> {item.deliveryCourse}</div>
+                          <div><span className="text-muted-foreground">老师:</span> {item.deliveryTeacher}</div>
+                          <div><span className="text-muted-foreground">日期:</span> {item.classDate}</div>
+                          <div><span className="text-muted-foreground">时间:</span> {item.classTime}</div>
+                          <div><span className="text-muted-foreground">金额:</span> ¥{item.paymentAmount}</div>
+                          <div><span className="text-muted-foreground">地点:</span> {item.deliveryCity}</div>
+                          {item.deliveryRoom && (
+                            <div><span className="text-muted-foreground">教室:</span> {item.deliveryRoom}</div>
+                          )}
+                          {item.notes && (
+                            <div className="col-span-2"><span className="text-muted-foreground">备注:</span> {item.notes}</div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(index)}
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            编辑
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDelete(index)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            删除
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
