@@ -21,6 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Search, Plus, Download, Upload, TrendingUp, Zap } from "lucide-react";
+import DashboardLayout from "@/components/DashboardLayout";
 
 export default function Sales() {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -222,7 +223,8 @@ export default function Sales() {
   };
 
   return (
-    <div className="container mx-auto py-6">
+    <DashboardLayout>
+      <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">销售管理</h1>
         <div className="flex gap-2">
@@ -543,5 +545,6 @@ export default function Sales() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }
