@@ -399,8 +399,14 @@ export default function Orders() {
         headers[colNumber] = cell.text;
       });
 
-      // 验证表头
-      const requiredHeaders = ["订单号", "客户名", "支付金额", "课程金额"];
+      // 验证27个字段的表头
+      const requiredHeaders = [
+        "销售人", "流量来源", "客户微信号", "课程金额", "首付金额", "尾款金额", 
+        "充值金额", "账户余额", "老师费用", "车费", "其他费用", "合伙人费用", 
+        "净收入", "支付渠道", "订单号", "支付日期", "支付时间", "上课日期", 
+        "上课时间", "交付城市", "交付教室", "交付老师", "交付课程", 
+        "状态", "置信度", "备注", "原始文本"
+      ];
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
       if (missingHeaders.length > 0) {
         toast.error(`缺少必要字段: ${missingHeaders.join(", ")}`);
@@ -423,28 +429,45 @@ export default function Orders() {
         if (rowData["订单号"]) {
           orders.push({
             orderNo: rowData["订单号"],
-            customerName: rowData["客户名"],
+            customerName: rowData["销售人"] || "",  // 使用销售人作为客户名
             salesPerson: rowData["销售人"],
             trafficSource: rowData["流量来源"],
-            paymentAmount: rowData["支付金额"],
+            customerWechat: rowData["客户微信号"],
+            paymentAmount: rowData["课程金额"],  // 支付金额使用课程金额
             courseAmount: rowData["课程金额"],
+            downPayment: rowData["首付金额"],
+            finalPayment: rowData["尾款金额"],
+            rechargeAmount: rowData["充值金额"],
             accountBalance: rowData["账户余额"],
-            paymentCity: rowData["支付城市"],
-            channelOrderNo: rowData["渠道订单号"],
             teacherFee: rowData["老师费用"],
             transportFee: rowData["车费"],
             otherFee: rowData["其他费用"],
-            partnerFee: rowData["合伙人费"],
-            finalAmount: rowData["金串到账金额"],
+            partnerFee: rowData["合伙人费用"],
+            netIncome: rowData["净收入"],
+            paymentChannel: rowData["支付渠道"],
+            channelOrderNo: rowData["订单号"],  // 渠道订单号使用订单号
             paymentDate: rowData["支付日期"],
             paymentTime: rowData["支付时间"],
+            classDate: rowData["上课日期"],
+            classTime: rowData["上课时间"],
             deliveryCity: rowData["交付城市"],
             deliveryRoom: rowData["交付教室"],
             deliveryTeacher: rowData["交付老师"],
             deliveryCourse: rowData["交付课程"],
-            classDate: rowData["上课日期"],
-            classTime: rowData["上课时间"],
+            status: (() => {
+              const statusText = rowData["状态"];
+              const statusMap: Record<string, string> = {
+                "待支付": "pending",
+                "已支付": "paid",
+                "已完成": "completed",
+                "已取消": "cancelled",
+                "已退款": "refunded"
+              };
+              return statusMap[statusText] || "pending";
+            })(),
+            confidence: rowData["置信度"],
             notes: rowData["备注"],
+            originalText: rowData["原始文本"],
           });
         }
       });
