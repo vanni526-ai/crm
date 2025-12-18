@@ -254,6 +254,31 @@ export type Reconciliation = typeof reconciliations.$inferSelect;
 export type InsertReconciliation = typeof reconciliations.$inferInsert;
 export type ImportLog = typeof importLogs.$inferSelect;
 export type InsertImportLog = typeof importLogs.$inferInsert;
+export type Salesperson = typeof salespersons.$inferSelect;
+export type InsertSalesperson = typeof salespersons.$inferInsert;
+
+/**
+ * 销售人员表
+ */
+export const salespersons = mysqlTable("salespersons", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // 关联用户表(可选)
+  name: varchar("name", { length: 100 }).notNull(), // 真实姓名
+  nickname: varchar("nickname", { length: 50 }), // 花名/昵称
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  wechat: varchar("wechat", { length: 100 }), // 微信号
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).default("0.00"), // 提成比例(%)
+  city: varchar("city", { length: 50 }), // 所在城市
+  isActive: boolean("isActive").default(true).notNull(), // 是否在职
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdx: index("sales_user_idx").on(table.userId),
+  phoneIdx: index("sales_phone_idx").on(table.phone),
+  cityIdx: index("sales_city_idx").on(table.city),
+}));
 
 /**
  * 账户流水表 - 记录客户账户余额变动

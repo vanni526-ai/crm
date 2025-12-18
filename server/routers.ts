@@ -4,6 +4,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { importRouter } from "./importRouter";
+import { salespersonRouter } from "./salespersonRouter";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
@@ -32,6 +33,7 @@ const financeOrAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
 
 export const appRouter = router({
   system: systemRouter,
+  salespersons: salespersonRouter,
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),

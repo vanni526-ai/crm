@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, sql, between, isNotNull, ne } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, between, isNotNull, ne, like, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -21,6 +21,8 @@ import {
   InsertAccountTransaction,
   smartRegisterHistory,
   InsertSmartRegisterHistory,
+  salespersons,
+  InsertSalesperson,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1038,4 +1040,213 @@ export async function getSmartRegisterHistory(limit: number = 50) {
     .from(smartRegisterHistory)
     .orderBy(desc(smartRegisterHistory.createdAt))
     .limit(limit);
+}
+
+// ============ Salesperson Management ============
+
+export async function getAllSalespersons() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return db
+    .select()
+    .from(salespersons)
+    .orderBy(desc(salespersons.createdAt));
+}
+
+export async function searchSalespersons(keyword: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return db
+    .select()
+    .from(salespersons)
+    .where(
+      or(
+        like(salespersons.name, `%${keyword}%`),
+        like(salespersons.nickname, `%${keyword}%`),
+        like(salespersons.phone, `%${keyword}%`),
+        like(salespersons.wechat, `%${keyword}%`)
+      )
+    )
+    .orderBy(desc(salespersons.createdAt));
+}
+
+export async function createSalesperson(data: InsertSalesperson) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const result = await db.insert(salespersons).values(data);
+  return result[0].insertId;
+}
+
+export async function updateSalesperson(id: number, data: Partial<InsertSalesperson>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  await db
+    .update(salespersons)
+    .set(data)
+    .where(eq(salespersons.id, id));
+}
+
+export async function deleteSalesperson(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 软删除:设置为不活跃
+  await db
+    .update(salespersons)
+    .set({ isActive: false })
+    .where(eq(salespersons.id, id));
+}
+
+export async function updateSalespersonStatus(id: number, isActive: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  await db
+    .update(salespersons)
+    .set({ isActive })
+    .where(eq(salespersons.id, id));
+}
+
+// 获取销售统计数据
+export async function getSalesStatistics(params: {
+  salespersonId?: number;
+  startDate?: string;
+  endDate?: string;
+  groupBy?: "month" | "year";
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 基础查询条件
+  const conditions: any[] = [eq(orders.status, "paid")];
+  
+  if (params.salespersonId) {
+    conditions.push(eq(orders.salesId, params.salespersonId));
+  }
+  
+  if (params.startDate) {
+    conditions.push(sql`${orders.paymentDate} >= ${params.startDate}`);
+  }
+  
+  if (params.endDate) {
+    conditions.push(sql`${orders.paymentDate} <= ${params.endDate}`);
+  }
+  
+  // 查询订单数据
+  const orderList = await db
+    .select()
+    .from(orders)
+    .where(and(...conditions))
+    .orderBy(desc(orders.paymentDate));
+  
+  // 计算统计数据
+  const totalSales = orderList.reduce((sum, order) => sum + Number(order.paymentAmount), 0);
+  const totalOrders = orderList.length;
+  const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
+  
+  return {
+    totalSales,
+    totalOrders,
+    avgOrderValue,
+    orders: orderList,
+  };
+}
+
+// 获取月度销售额
+export async function getMonthlySales(salespersonId: number | undefined, year: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const startDate = `${year}-01-01`;
+  const endDate = `${year}-12-31`;
+  
+  const conditions: any[] = [
+    eq(orders.status, "paid"),
+    sql`${orders.paymentDate} >= ${startDate}`,
+    sql`${orders.paymentDate} <= ${endDate}`,
+  ];
+  
+  if (salespersonId) {
+    conditions.push(eq(orders.salesId, salespersonId));
+  }
+  
+  const orderList = await db
+    .select()
+    .from(orders)
+    .where(and(...conditions));
+  
+  // 按月份分组统计
+  const monthlySales: { month: number; sales: number; orders: number }[] = [];
+  
+  for (let month = 1; month <= 12; month++) {
+    const monthOrders = orderList.filter(order => {
+      if (!order.paymentDate) return false;
+      const orderMonth = new Date(order.paymentDate).getMonth() + 1;
+      return orderMonth === month;
+    });
+    
+    const sales = monthOrders.reduce((sum, order) => sum + Number(order.paymentAmount), 0);
+    
+    monthlySales.push({
+      month,
+      sales,
+      orders: monthOrders.length,
+    });
+  }
+  
+  return monthlySales;
+}
+
+// 获取年度销售额
+export async function getYearlySales(
+  salespersonId: number | undefined,
+  startYear?: number,
+  endYear?: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const currentYear = new Date().getFullYear();
+  const start = startYear || currentYear - 2;
+  const end = endYear || currentYear;
+  
+  const conditions: any[] = [
+    eq(orders.status, "paid"),
+    sql`${orders.paymentDate} >= ${`${start}-01-01`}`,
+    sql`${orders.paymentDate} <= ${`${end}-12-31`}`,
+  ];
+  
+  if (salespersonId) {
+    conditions.push(eq(orders.salesId, salespersonId));
+  }
+  
+  const orderList = await db
+    .select()
+    .from(orders)
+    .where(and(...conditions));
+  
+  // 按年份分组统计
+  const yearlySales: { year: number; sales: number; orders: number }[] = [];
+  
+  for (let year = start; year <= end; year++) {
+    const yearOrders = orderList.filter(order => {
+      if (!order.paymentDate) return false;
+      const orderYear = new Date(order.paymentDate).getFullYear();
+      return orderYear === year;
+    });
+    
+    const sales = yearOrders.reduce((sum, order) => sum + Number(order.paymentAmount), 0);
+    
+    yearlySales.push({
+      year,
+      sales,
+      orders: yearOrders.length,
+    });
+  }
+  
+  return yearlySales;
 }

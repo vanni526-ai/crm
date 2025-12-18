@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, ShoppingCart, GraduationCap, UserCheck, DollarSign, Upload } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, ShoppingCart, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -31,6 +31,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "首页", path: "/" },
   { icon: ShoppingCart, label: "订单管理", path: "/orders" },
   { icon: Users, label: "客户管理", path: "/customers" },
+  { icon: TrendingUp, label: "销售管理", path: "/sales" },
   { icon: GraduationCap, label: "课程排课", path: "/schedules" },
   { icon: UserCheck, label: "老师管理", path: "/teachers" },
   { icon: DollarSign, label: "财务管理", path: "/finance" },
