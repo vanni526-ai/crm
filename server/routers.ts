@@ -167,6 +167,16 @@ export const appRouter = router({
         return db.getOrderById(input.id);
       }),
     
+    parseTransferNotes: salesOrAdminProcedure
+      .input(z.object({
+        text: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { parseTransferNotes } = await import("./transferNoteParser");
+        const results = await parseTransferNotes(input.text);
+        return results;
+      }),
+    
     parseWechatBill: salesOrAdminProcedure
       .input(z.object({
         rows: z.array(z.object({
