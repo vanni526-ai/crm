@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE orders \nADD COLUMN IF NOT EXISTS downPayment DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS finalPayment DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS rechargeAmount DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS accountBalance DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS netIncome DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS confidence INT DEFAULT 0,\nADD COLUMN IF NOT EXISTS originalText TEXT",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE orders \nADD COLUMN IF NOT EXISTS downPayment DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS finalPayment DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS rechargeAmount DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS accountBalance DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS netIncome DECIMAL(10,2) DEFAULT 0,\nADD COLUMN IF NOT EXISTS confidence INT DEFAULT 0,\nADD COLUMN IF NOT EXISTS originalText TEXT",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3349
+}

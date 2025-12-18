@@ -192,6 +192,16 @@ export async function createOrder(order: InsertOrder) {
   return result[0].insertId;
 }
 
+export async function batchCreateOrders(orderList: InsertOrder[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  if (orderList.length === 0) return { insertedCount: 0 };
+  
+  // Drizzle ORM支持批量插入
+  const result = await db.insert(orders).values(orderList);
+  return { insertedCount: result[0].affectedRows || orderList.length };
+}
+
 export async function getOrderById(id: number) {
   const db = await getDb();
   if (!db) return null;

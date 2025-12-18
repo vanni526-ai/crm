@@ -493,7 +493,7 @@ export default function Orders() {
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet("订单列表");
 
-      // 设置所有23个详细字段的表头
+      // 设置所有27个详细字段的表头
       sheet.columns = [
         { header: "订单号", key: "orderNo", width: 20 },
         { header: "销售人", key: "salesPerson", width: 12 },
@@ -886,7 +886,7 @@ export default function Orders() {
                   点击或拖拽Excel文件到此处上传
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  支持 .xlsx 格式,文件需包含所有23个字段
+                  支持 .xlsx 格式,文件需包含所有27个字段
                 </p>
                 <Input
                   type="file"

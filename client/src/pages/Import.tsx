@@ -16,6 +16,8 @@ export default function Import() {
   const importCSV = trpc.import.importCSVToOrders.useMutation();
   const parseExcel = trpc.import.parseExcel.useMutation();
   const importExcel = trpc.import.importExcelToOrders.useMutation();
+  const parseOrderExcel = trpc.import.parseOrderExcel.useMutation();
+  const importOrderExcel = trpc.import.importOrderExcelToOrders.useMutation();
   const parseICS = trpc.import.parseICS.useMutation();
   const importICS = trpc.import.importICSToSchedules.useMutation();
 
@@ -28,9 +30,10 @@ export default function Import() {
 
   const csvInputRef = useRef<HTMLInputElement>(null);
   const excelInputRef = useRef<HTMLInputElement>(null);
+  const orderExcelInputRef = useRef<HTMLInputElement>(null);
   const icsInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileRead = (file: File, type: "csv" | "excel" | "ics") => {
+  const handleFileRead = (file: File, type: "csv" | "excel" | "orderExcel" | "ics") => {
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
@@ -58,6 +61,11 @@ export default function Import() {
           setPreviewData(result.records);
           setPreviewOpen(true);
           toast.success(`成功解析 ${result.recordCount} 条记录`);
+        } else if (type === "orderExcel") {
+          const result = await parseOrderExcel.mutateAsync({ fileContent: base64 });
+          setPreviewData(result.records);
+          setPreviewOpen(true);
+          toast.success(`成功解析 ${result.recordCount} 条订单`);
         } else if (type === "ics") {
           const result = await parseICS.mutateAsync({ fileContent: base64 });
           setPreviewData(result.events);
@@ -80,6 +88,8 @@ export default function Import() {
         result = await importCSV.mutateAsync({ fileContent: currentFile.content });
       } else if (currentFile.type === "excel") {
         result = await importExcel.mutateAsync({ fileContent: currentFile.content });
+      } else if (currentFile.type === "orderExcel") {
+        result = await importOrderExcel.mutateAsync({ fileContent: currentFile.content });
       } else if (currentFile.type === "ics") {
         result = await importICS.mutateAsync({ fileContent: currentFile.content });
       }
@@ -105,7 +115,7 @@ export default function Import() {
           <p className="text-muted-foreground mt-2">支持CSV、Excel、XML、ICS文件格式</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="cursor-pointer hover:border-primary transition-colors">
             <CardHeader>
               <div className="flex items-center space-x-2">
@@ -162,6 +172,36 @@ export default function Import() {
               >
                 <Upload className="mr-2 h-4 w-4" />
                 {parseExcel.isPending ? "解析中..." : "上传Excel"}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:border-primary transition-colors">
+            <CardHeader>
+              <div className="flex items-center space-x-2">
+                <FileSpreadsheet className="h-5 w-5 text-orange-600" />
+                <CardTitle className="text-lg">订单Excel</CardTitle>
+              </div>
+              <CardDescription>完整订单数据表</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <input
+                ref={orderExcelInputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileRead(file, "orderExcel");
+                }}
+              />
+              <Button
+                className="w-full"
+                onClick={() => orderExcelInputRef.current?.click()}
+                disabled={parseOrderExcel.isPending}
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                {parseOrderExcel.isPending ? "解析中..." : "上传订单"}
               </Button>
             </CardContent>
           </Card>
@@ -536,10 +576,10 @@ export default function Import() {
                 <Button
                   onClick={handleImport}
                   disabled={
-                    importCSV.isPending || importExcel.isPending || importICS.isPending
+                    importCSV.isPending || importExcel.isPending || importOrderExcel.isPending || importICS.isPending
                   }
                 >
-                  {importCSV.isPending || importExcel.isPending || importICS.isPending
+                  {importCSV.isPending || importExcel.isPending || importOrderExcel.isPending || importICS.isPending
                     ? "导入中..."
                     : "确认导入"}
                 </Button>
