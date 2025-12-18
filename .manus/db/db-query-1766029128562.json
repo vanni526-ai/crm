@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `auditLogs` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`action` enum('order_create','order_update','order_delete','user_role_update','user_status_update','user_delete','data_import','customer_create','customer_update','customer_delete','teacher_create','teacher_update','teacher_delete','schedule_create','schedule_update','schedule_delete') NOT NULL,\n\t`userId` int NOT NULL,\n\t`userName` varchar(100),\n\t`userRole` varchar(20),\n\t`targetType` varchar(50),\n\t`targetId` int,\n\t`targetName` varchar(200),\n\t`description` text NOT NULL,\n\t`changes` json,\n\t`ipAddress` varchar(45),\n\t`userAgent` text,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `auditLogs_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `auditLogs` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`action` enum('order_create','order_update','order_delete','user_role_update','user_status_update','user_delete','data_import','customer_create','customer_update','customer_delete','teacher_create','teacher_update','teacher_delete','schedule_create','schedule_update','schedule_delete') NOT NULL,\n\t`userId` int NOT NULL,\n\t`userName` varchar(100),\n\t`userRole` varchar(20),\n\t`targetType` varchar(50),\n\t`targetId` int,\n\t`targetName` varchar(200),\n\t`description` text NOT NULL,\n\t`changes` json,\n\t`ipAddress` varchar(45),\n\t`userAgent` text,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `auditLogs_id` PRIMARY KEY(`id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1779
+}

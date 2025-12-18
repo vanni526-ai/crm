@@ -6,6 +6,8 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { importRouter } from "./importRouter";
 import { salespersonRouter } from "./salespersonRouter";
 import { userManagementRouter } from "./userManagementRouter";
+import { auditLogRouter } from "./auditLogRouter";
+import { logAudit } from "./auditLogger";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
@@ -281,6 +283,20 @@ export const appRouter = router({
           notes: input.notes || undefined,
         };
         const id = await db.createOrder(orderData);
+        
+        // 记录审计日志
+        await logAudit({
+          action: "order_create",
+          userId: ctx.user.id,
+          userName: ctx.user.name || ctx.user.nickname || undefined,
+          userRole: ctx.user.role,
+          targetType: "order",
+          targetId: id,
+          targetName: `${orderNo} - ${input.customerName}`,
+          description: `创建订单: ${orderNo}, 客户: ${input.customerName}, 金额: ￥${input.paymentAmount}`,
+          changes: { created: orderData },
+        });
+        
         return { id, success: true };
       }),
     
@@ -711,6 +727,9 @@ export const appRouter = router({
 
   // 数据导入
   import: importRouter,
+  
+  // 审计日志
+  auditLogs: auditLogRouter,
 });
 
 export type AppRouter = typeof appRouter;

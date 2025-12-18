@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
+import { logAudit } from "./auditLogger";
 
 // 检查是否为超级管理员
 async function checkAdmin(ctx: any) {
@@ -61,9 +62,31 @@ export const userManagementRouter = router({
 
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      // 获取用户信息用于日志
+      const targetUser = await db.select().from(users).where(eq(users.id, input.id)).limit(1).then(rows => rows[0]);
+      
       await db.update(users)
         .set(updateData)
         .where(eq(users.id, input.id));
+      
+      // 记录审计日志
+      const changes: string[] = [];
+      if (input.role) changes.push(`角色: ${targetUser?.role} → ${input.role}`);
+      if (input.salespersonId !== undefined) changes.push(`销售人员ID: ${targetUser?.salespersonId} → ${input.salespersonId}`);
+      if (input.isActive !== undefined) changes.push(`状态: ${targetUser?.isActive ? '活跃' : '禁用'} → ${input.isActive ? '活跃' : '禁用'}`);
+      
+      await logAudit({
+        action: input.role ? "user_role_update" : "user_status_update",
+        userId: ctx.user.id,
+        userName: ctx.user.name || ctx.user.nickname || undefined,
+        userRole: ctx.user.role,
+        targetType: "user",
+        targetId: input.id,
+        targetName: targetUser?.name || targetUser?.nickname || `User#${input.id}`,
+        description: `更新用户信息: ${changes.join(', ')}`,
+        changes: { before: { role: targetUser?.role, salespersonId: targetUser?.salespersonId, isActive: targetUser?.isActive }, after: updateData },
+      });
 
       return { success: true };
     }),

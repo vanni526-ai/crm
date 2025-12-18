@@ -1,0 +1,9 @@
+{
+  "query": "CREATE INDEX `action_idx` ON `auditLogs` (`action`);\nCREATE INDEX `user_idx` ON `auditLogs` (`userId`);\nCREATE INDEX `target_idx` ON `auditLogs` (`targetType`,`targetId`);\nCREATE INDEX `created_at_idx` ON `auditLogs` (`createdAt`)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE INDEX `action_idx` ON `auditLogs` (`action`);\nCREATE INDEX `user_idx` ON `auditLogs` (`userId`);\nCREATE INDEX `target_idx` ON `auditLogs` (`targetType`,`targetId`);\nCREATE INDEX `created_at_idx` ON `auditLogs` (`createdAt`)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4016
+}

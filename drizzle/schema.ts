@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time, json } from "drizzle-orm/mysql-core";
 
 /**
  * 用户表 - 支持管理员、销售、财务三种角色
@@ -331,3 +331,51 @@ export type SmartRegisterHistory = typeof smartRegisterHistory.$inferSelect;
 export type InsertSmartRegisterHistory = typeof smartRegisterHistory.$inferInsert;
 
 
+/**
+ * 操作日志审计表 - 记录系统关键操作
+ */
+export const auditLogs = mysqlTable("auditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  // 操作类型
+  action: mysqlEnum("action", [
+    "order_create",      // 订单创建
+    "order_update",      // 订单修改
+    "order_delete",      // 订单删除
+    "user_role_update",  // 用户角色变更
+    "user_status_update",// 用户状态变更
+    "user_delete",       // 用户删除
+    "data_import",       // 数据导入
+    "customer_create",   // 客户创建
+    "customer_update",   // 客户修改
+    "customer_delete",   // 客户删除
+    "teacher_create",    // 老师创建
+    "teacher_update",    // 老师修改
+    "teacher_delete",    // 老师删除
+    "schedule_create",   // 排课创建
+    "schedule_update",   // 排课修改
+    "schedule_delete",   // 排课删除
+  ]).notNull(),
+  // 操作人信息
+  userId: int("userId").notNull(),           // 操作人ID
+  userName: varchar("userName", { length: 100 }),  // 操作人姓名(冗余)
+  userRole: varchar("userRole", { length: 20 }),   // 操作人角色(冗余)
+  // 操作目标
+  targetType: varchar("targetType", { length: 50 }), // 目标类型(order/user/customer等)
+  targetId: int("targetId"),                 // 目标ID
+  targetName: varchar("targetName", { length: 200 }), // 目标名称(冗余)
+  // 操作详情
+  description: text("description").notNull(), // 操作描述
+  changes: json("changes"),                   // 变更内容(JSON格式,记录before/after)
+  ipAddress: varchar("ipAddress", { length: 45 }), // IP地址
+  userAgent: text("userAgent"),               // 用户代理
+  // 时间戳
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  actionIdx: index("action_idx").on(table.action),
+  userIdx: index("user_idx").on(table.userId),
+  targetIdx: index("target_idx").on(table.targetType, table.targetId),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;

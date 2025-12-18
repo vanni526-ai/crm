@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, ShoppingCart, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, ShoppingCart, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Calendar } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -38,6 +38,7 @@ const getMenuItems = (userRole?: string) => {
     { icon: DollarSign, label: "财务管理", path: "/finance", roles: ["admin", "finance"] },
     { icon: Upload, label: "数据导入", path: "/import", roles: ["admin"] },
     { icon: Users, label: "用户管理", path: "/users", roles: ["admin"] },
+    { icon: Calendar, label: "操作日志", path: "/audit-logs", roles: ["admin"] },
   ];
   
   if (!userRole) return allItems;
