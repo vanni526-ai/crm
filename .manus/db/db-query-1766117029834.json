@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `gmailImportConfig` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`configKey` varchar(100) NOT NULL,\n\t`configValue` json NOT NULL,\n\t`description` text,\n\t`createdAt` timestamp DEFAULT (now()),\n\t`updatedAt` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `gmailImportConfig_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `gmailImportConfig_configKey_unique` UNIQUE(`configKey`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `gmailImportConfig` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`configKey` varchar(100) NOT NULL,\n\t`configValue` json NOT NULL,\n\t`description` text,\n\t`createdAt` timestamp DEFAULT (now()),\n\t`updatedAt` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `gmailImportConfig_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `gmailImportConfig_configKey_unique` UNIQUE(`configKey`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1828
+}

@@ -2,15 +2,18 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, CheckCircle2, XCircle, AlertCircle, Eye, Trash2, RefreshCw, Download, AlertTriangle } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, Mail, CheckCircle2, XCircle, AlertCircle, Eye, Trash2, RefreshCw, Download, AlertTriangle, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import DashboardLayout from "@/components/DashboardLayout";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Link } from "wouter";
 
 export default function GmailImport() {
   const [isImporting, setIsImporting] = useState(false);
@@ -19,13 +22,16 @@ export default function GmailImport() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showClearAllDialog, setShowClearAllDialog] = useState(false);
   const [isReprocessing, setIsReprocessing] = useState(false);
-
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // 获取导入历史
   const { data: historyData, refetch: refetchHistory } = trpc.gmailAutoImport.getImportHistory.useQuery();
   
   // 获取统计数据
-  const { data: stats, refetch: refetchStats } = trpc.gmailAutoImport.getImportStats.useQuery();
+  const { data: statsData, refetch: refetchStats } = trpc.gmailAutoImport.getImportStats.useQuery();
+
+  // 获取失败原因统计
+  const { data: failureStats } = trpc.gmailAutoImport.getFailureStats.useQuery();
 
   // 删除单条记录
   const deleteLogMutation = trpc.gmailAutoImport.deleteImportLog.useMutation({
@@ -37,6 +43,19 @@ export default function GmailImport() {
     },
     onError: (error) => {
       toast.error("删除失败", { description: error.message });
+    },
+  });
+
+  // 批量删除记录
+  const batchDeleteMutation = trpc.gmailAutoImport.batchDeleteImportLogs.useMutation({
+    onSuccess: (data) => {
+      toast.success(`成功删除${data.deletedCount}条记录`);
+      refetchHistory();
+      refetchStats();
+      setSelectedIds([]);
+    },
+    onError: (error) => {
+      toast.error("批量删除失败", { description: error.message });
     },
   });
 
@@ -81,7 +100,6 @@ export default function GmailImport() {
       console.error("导入失败:", error);
     } finally {
       setIsImporting(false);
-      refetchHistory();
     }
   };
 
@@ -95,23 +113,6 @@ export default function GmailImport() {
   const handleDelete = (log: any) => {
     setSelectedLog(log);
     setShowDeleteDialog(true);
-  };
-
-  // 确认删除
-  const confirmDelete = () => {
-    if (selectedLog) {
-      deleteLogMutation.mutate({ id: selectedLog.id });
-    }
-  };
-
-  // 清空所有
-  const handleClearAll = () => {
-    setShowClearAllDialog(true);
-  };
-
-  // 确认清空
-  const confirmClearAll = () => {
-    clearAllMutation.mutate();
   };
 
   // 重新解析
@@ -136,33 +137,30 @@ export default function GmailImport() {
 
     // 准备导出数据
     const exportData = historyData.logs.map((log: any) => ({
-      "导入时间": format(new Date(log.createdAt), "yyyy-MM-dd HH:mm:ss", { locale: zhCN }),
       "邮件主题": log.emailSubject,
-      "邮件日期": format(new Date(log.emailDate), "yyyy-MM-dd HH:mm:ss", { locale: zhCN }),
-      "总订单数": log.totalOrders,
-      "成功录入": log.successOrders,
-      "录入失败": log.failedOrders,
-      "成功率": log.totalOrders > 0 ? `${((log.successOrders / log.totalOrders) * 100).toFixed(2)}%` : "0%",
+      "邮件日期": format(new Date(log.emailDate), "yyyy-MM-dd HH:mm", { locale: zhCN }),
+      "订单总数": log.totalOrders,
+      "成功数": log.successOrders,
+      "失败数": log.failedOrders,
       "状态": log.status === "success" ? "成功" : log.status === "partial" ? "部分成功" : "失败",
-      "错误信息": log.errorLog || "",
+      "导入时间": format(new Date(log.createdAt), "yyyy-MM-dd HH:mm", { locale: zhCN }),
     }));
 
     // 创建工作簿
-    const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Gmail导入记录");
+    const ws1 = XLSX.utils.json_to_sheet(exportData);
+    XLSX.utils.book_append_sheet(wb, ws1, "导入历史");
 
-    // 添加统计数据工作表
-    if (stats) {
-      const statsData = [
-        { "指标": "总导入次数", "数值": stats.totalImports },
-        { "指标": "总订单数", "数值": stats.totalOrders },
-        { "指标": "成功录入", "数值": stats.successOrders },
-        { "指标": "录入失败", "数值": stats.failedOrders },
-        { "指标": "成功率", "数值": `${stats.successRate}%` },
+    // 添加统计数据表
+    if (statsData) {
+      const statsExport = [
+        { "指标": "总导入次数", "数值": statsData.totalImports },
+        { "指标": "总订单数", "数值": statsData.totalOrders },
+        { "指标": "成功订单数", "数值": statsData.successOrders },
+        { "指标": "失败订单数", "数值": statsData.failedOrders },
       ];
-      const statsWs = XLSX.utils.json_to_sheet(statsData);
-      XLSX.utils.book_append_sheet(wb, statsWs, "统计数据");
+      const ws2 = XLSX.utils.json_to_sheet(statsExport);
+      XLSX.utils.book_append_sheet(wb, ws2, "统计数据");
     }
 
     // 下载文件
@@ -170,6 +168,32 @@ export default function GmailImport() {
     XLSX.writeFile(wb, fileName);
     
     toast.success("导出成功", { description: `已保存为 ${fileName}` });
+  };
+
+  // 批量选择
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && historyData?.logs) {
+      setSelectedIds(historyData.logs.map((log: any) => log.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number, checked: boolean) => {
+    if (checked) {
+      setSelectedIds([...selectedIds, id]);
+    } else {
+      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+    }
+  };
+
+  // 批量删除
+  const handleBatchDelete = () => {
+    if (selectedIds.length === 0) {
+      toast.error("请先选择要删除的记录");
+      return;
+    }
+    batchDeleteMutation.mutate({ ids: selectedIds });
   };
 
   const getStatusBadge = (status: string) => {
@@ -181,167 +205,205 @@ export default function GmailImport() {
       case "failed":
         return <Badge variant="destructive"><XCircle className="w-3 h-3 mr-1" />失败</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge variant="outline">{status}</Badge>;
     }
   };
 
+  // 失败原因图表数据
+  const failureChartData = failureStats?.failureReasons 
+    ? Object.entries(failureStats.failureReasons).map(([name, value]) => ({ name, value }))
+    : [];
+
+  const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6'];
+
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
-        {/* 页面标题 */}
-        <div className="flex items-center justify-between">
+      <div className="space-y-6">
+        {/* 页面标题和操作按钮 */}
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Gmail订单导入</h1>
-            <p className="text-muted-foreground mt-2">
-              自动从Gmail读取"打款群"邮件并解析订单信息
-            </p>
+            <h1 className="text-3xl font-bold">Gmail导入管理</h1>
+            <p className="text-muted-foreground mt-1">自动从Gmail读取订单信息并导入系统</p>
           </div>
           <div className="flex gap-2">
+            <Link href="/gmail-import/config">
+              <Button variant="outline">
+                <Settings className="w-4 h-4 mr-2" />
+                配置规则
+              </Button>
+            </Link>
             <Button onClick={handleExport} variant="outline">
               <Download className="w-4 h-4 mr-2" />
               导出报表
             </Button>
-            {historyData?.logs && historyData.logs.length > 0 && (
-              <Button onClick={handleClearAll} variant="outline">
-                <Trash2 className="w-4 h-4 mr-2" />
-                清空全部
-              </Button>
-            )}
             <Button onClick={handleManualImport} disabled={isImporting}>
-              {isImporting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  导入中...
-                </>
-              ) : (
-                <>
-                  <Mail className="w-4 h-4 mr-2" />
-                  手动触发导入
-                </>
-              )}
+              {isImporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Mail className="w-4 h-4 mr-2" />}
+              手动导入
             </Button>
           </div>
         </div>
 
         {/* 统计卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                总导入次数
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">总导入次数</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalImports || 0}</div>
+              <div className="text-2xl font-bold">{statsData?.totalImports || 0}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                总订单数: {statsData?.totalOrders || 0}
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                总订单数
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">总订单数</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.totalOrders || 0}</div>
+              <div className="text-2xl font-bold">{statsData?.totalOrders || 0}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                成功 {statsData?.successOrders || 0} / 失败 {statsData?.failedOrders || 0}
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                成功录入
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">
-                {stats?.successOrders || 0}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                成功率
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">成功率</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats?.successRate ? `${stats.successRate}%` : "0%"}
+                {statsData?.totalOrders 
+                  ? ((statsData.successOrders / statsData.totalOrders) * 100).toFixed(1) 
+                  : 0}%
               </div>
+              <p className="text-xs text-muted-foreground mt-1">基于订单数统计</p>
             </CardContent>
           </Card>
         </div>
 
+        {/* 失败原因分析 */}
+        {failureStats && failureStats.totalFailed > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                失败原因分析
+              </CardTitle>
+              <CardDescription>共 {failureStats.totalFailed} 次导入失败</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={failureChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {failureChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* 导入历史列表 */}
         <Card>
           <CardHeader>
-            <CardTitle>导入历史</CardTitle>
-            <CardDescription>查看所有Gmail邮件导入记录</CardDescription>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>导入历史</CardTitle>
+                <CardDescription>查看所有Gmail导入记录</CardDescription>
+              </div>
+              <div className="flex gap-2">
+                {selectedIds.length > 0 && (
+                  <>
+                    <Badge variant="secondary">{selectedIds.length} 条已选择</Badge>
+                    <Button variant="destructive" size="sm" onClick={handleBatchDelete}>
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      批量删除
+                    </Button>
+                  </>
+                )}
+                <Button variant="outline" size="sm" onClick={() => setShowClearAllDialog(true)}>
+                  清空全部
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            {!historyData?.logs || historyData.logs.length === 0 ? (
-              <Alert>
-                <AlertDescription>暂无导入记录</AlertDescription>
-              </Alert>
-            ) : (
-              <div className="space-y-4">
-                {historyData.logs.map((log: any) => (
-                  <div
-                    key={log.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                  >
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-medium">{log.emailSubject}</span>
-                        {getStatusBadge(log.status)}
-                        {log.emailSubject.includes("重新解析") && (
-                          <Badge variant="outline" className="text-blue-600">
-                            <RefreshCw className="w-3 h-3 mr-1" />
-                            已重新解析
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        导入时间: {format(new Date(log.createdAt), "yyyy-MM-dd HH:mm:ss", { locale: zhCN })}
-                      </div>
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">订单数: </span>
-                        <span className="font-medium">{log.totalOrders}</span>
-                        <span className="text-muted-foreground ml-4">成功: </span>
-                        <span className="text-green-600 font-medium">{log.successOrders}</span>
-                        {log.failedOrders > 0 && (
-                          <>
-                            <span className="text-muted-foreground ml-4">失败: </span>
-                            <span className="text-red-600 font-medium">{log.failedOrders}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewDetail(log)}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        查看详情
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(log)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        删除
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedIds.length === historyData?.logs?.length && historyData?.logs?.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </TableHead>
+                  <TableHead>邮件主题</TableHead>
+                  <TableHead>邮件日期</TableHead>
+                  <TableHead>订单数</TableHead>
+                  <TableHead>成功/失败</TableHead>
+                  <TableHead>状态</TableHead>
+                  <TableHead>导入时间</TableHead>
+                  <TableHead>操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {historyData?.logs && historyData.logs.length > 0 ? (
+                  historyData.logs.map((log: any) => (
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.includes(log.id)}
+                          onCheckedChange={(checked) => handleSelectOne(log.id, checked as boolean)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">{log.emailSubject}</TableCell>
+                      <TableCell>{format(new Date(log.emailDate), "yyyy-MM-dd HH:mm", { locale: zhCN })}</TableCell>
+                      <TableCell>{log.totalOrders}</TableCell>
+                      <TableCell>
+                        <span className="text-green-600">{log.successOrders}</span> / 
+                        <span className="text-red-600 ml-1">{log.failedOrders}</span>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(log.status)}</TableCell>
+                      <TableCell>{format(new Date(log.createdAt), "yyyy-MM-dd HH:mm", { locale: zhCN })}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleViewDetail(log)}>
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(log)}>
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                      暂无导入记录
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
 
@@ -349,120 +411,55 @@ export default function GmailImport() {
         <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
           <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>导入记录详情</DialogTitle>
+              <DialogTitle>导入详情</DialogTitle>
               <DialogDescription>
-                {selectedLog?.emailSubject}
+                {selectedLog?.emailSubject} - {selectedLog && format(new Date(selectedLog.emailDate), "yyyy-MM-dd HH:mm", { locale: zhCN })}
               </DialogDescription>
             </DialogHeader>
-            
             {selectedLog && (
               <div className="space-y-4">
-                {/* 基本信息 */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">邮件主题</div>
-                    <div className="font-medium">{selectedLog.emailSubject}</div>
+                    <p className="text-sm font-medium">订单总数</p>
+                    <p className="text-2xl font-bold">{selectedLog.totalOrders}</p>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">邮件日期</div>
-                    <div className="font-medium">
-                      {format(new Date(selectedLog.emailDate), "yyyy-MM-dd HH:mm:ss", { locale: zhCN })}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">导入状态</div>
-                    <div>{getStatusBadge(selectedLog.status)}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">导入时间</div>
-                    <div className="font-medium">
-                      {format(new Date(selectedLog.createdAt), "yyyy-MM-dd HH:mm:ss", { locale: zhCN })}
-                    </div>
+                    <p className="text-sm font-medium">成功/失败</p>
+                    <p className="text-2xl font-bold">
+                      <span className="text-green-600">{selectedLog.successOrders}</span> / 
+                      <span className="text-red-600">{selectedLog.failedOrders}</span>
+                    </p>
                   </div>
                 </div>
 
-                {/* 统计信息 */}
-                <div className="grid grid-cols-3 gap-4 p-4 bg-accent/50 rounded-lg">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{selectedLog.totalOrders}</div>
-                    <div className="text-sm text-muted-foreground">总订单数</div>
+                {selectedLog.parsedData && selectedLog.parsedData.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">解析数据</p>
+                    <div className="bg-muted p-4 rounded-md max-h-64 overflow-y-auto">
+                      <pre className="text-xs">{JSON.stringify(selectedLog.parsedData, null, 2)}</pre>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{selectedLog.successOrders}</div>
-                    <div className="text-sm text-muted-foreground">成功录入</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">{selectedLog.failedOrders}</div>
-                    <div className="text-sm text-muted-foreground">录入失败</div>
-                  </div>
-                </div>
+                )}
 
-                {/* 错误日志 */}
                 {selectedLog.errorLog && (
                   <div>
-                    <div className="text-sm font-medium mb-2">错误日志</div>
-                    <Alert variant="destructive">
-                      <AlertDescription className="whitespace-pre-wrap">
-                        {selectedLog.errorLog}
-                      </AlertDescription>
-                    </Alert>
-                  </div>
-                )}
-
-                {/* 解析的订单数据 */}
-                {selectedLog.parsedData && Array.isArray(selectedLog.parsedData) && (
-                  <div>
-                    <div className="text-sm font-medium mb-2">解析的订单数据</div>
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {selectedLog.parsedData.map((order: any, index: number) => (
-                        <div key={index} className="p-3 border rounded-lg text-sm">
-                          <div className="grid grid-cols-2 gap-2">
-                            <div><span className="text-muted-foreground">销售:</span> {order.salesperson}</div>
-                            <div><span className="text-muted-foreground">客户:</span> {order.customerName || "未知"}</div>
-                            <div><span className="text-muted-foreground">课程:</span> {order.course}</div>
-                            <div><span className="text-muted-foreground">老师:</span> {order.teacher}</div>
-                            <div><span className="text-muted-foreground">城市:</span> {order.city}</div>
-                            <div><span className="text-muted-foreground">金额:</span> ¥{order.paymentAmount}</div>
-                          </div>
-                        </div>
-                      ))}
+                    <p className="text-sm font-medium mb-2 text-red-600">错误日志</p>
+                    <div className="bg-red-50 p-4 rounded-md max-h-64 overflow-y-auto">
+                      <pre className="text-xs text-red-800">{selectedLog.errorLog}</pre>
                     </div>
                   </div>
                 )}
-
-                {/* 原始邮件内容 */}
-                {selectedLog.emailContent && (
-                  <div>
-                    <div className="text-sm font-medium mb-2">原始邮件内容</div>
-                    <div className="p-4 bg-muted rounded-lg text-sm whitespace-pre-wrap max-h-60 overflow-y-auto">
-                      {selectedLog.emailContent}
-                    </div>
-                  </div>
-                )}
-
-                {/* 操作按钮 */}
-                <div className="flex justify-end gap-2">
-                  {selectedLog.emailContent && (
-                    <Button 
-                      onClick={handleReprocess} 
-                      disabled={isReprocessing}
-                    >
-                      {isReprocessing ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          解析中...
-                        </>
-                      ) : (
-                        <>
-                          <RefreshCw className="w-4 h-4 mr-2" />
-                          重新解析
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
               </div>
             )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowDetailDialog(false)}>关闭</Button>
+              {selectedLog?.emailContent && (
+                <Button onClick={handleReprocess} disabled={isReprocessing}>
+                  {isReprocessing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                  重新解析
+                </Button>
+              )}
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 
@@ -472,26 +469,13 @@ export default function GmailImport() {
             <DialogHeader>
               <DialogTitle>确认删除</DialogTitle>
               <DialogDescription>
-                确定要删除这条导入记录吗?此操作不可撤销。
+                确定要删除这条导入记录吗?此操作不可恢复。
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-                取消
-              </Button>
-              <Button 
-                variant="destructive" 
-                onClick={confirmDelete}
-                disabled={deleteLogMutation.isPending}
-              >
-                {deleteLogMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    删除中...
-                  </>
-                ) : (
-                  "确认删除"
-                )}
+              <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>取消</Button>
+              <Button variant="destructive" onClick={() => selectedLog && deleteLogMutation.mutate({ id: selectedLog.id })}>
+                删除
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -501,31 +485,15 @@ export default function GmailImport() {
         <Dialog open={showClearAllDialog} onOpenChange={setShowClearAllDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-destructive" />
-                警告
-              </DialogTitle>
+              <DialogTitle>确认清空</DialogTitle>
               <DialogDescription>
-                确定要清空所有导入记录吗?此操作将删除所有历史数据,不可撤销!
+                确定要清空所有导入记录吗?此操作不可恢复。
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowClearAllDialog(false)}>
-                取消
-              </Button>
-              <Button 
-                variant="destructive" 
-                onClick={confirmClearAll}
-                disabled={clearAllMutation.isPending}
-              >
-                {clearAllMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    清空中...
-                  </>
-                ) : (
-                  "确认清空"
-                )}
+              <Button variant="outline" onClick={() => setShowClearAllDialog(false)}>取消</Button>
+              <Button variant="destructive" onClick={() => clearAllMutation.mutate()}>
+                清空全部
               </Button>
             </DialogFooter>
           </DialogContent>

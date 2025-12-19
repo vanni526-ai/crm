@@ -1,9 +1,7 @@
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { parseGmailOrderContent } from "./gmailOrderParser";
-import { 
-  createOrder, 
-  checkOrderNoExists,
+import {
   createGmailImportLog,
   getAllGmailImportLogs,
   getGmailImportLogById,
@@ -11,6 +9,8 @@ import {
   checkThreadIdExists,
   deleteGmailImportLog,
   deleteAllGmailImportLogs,
+  checkOrderNoExists,
+  createOrder,
 } from "./db";
 import { notifyOwner } from "./_core/notification";
 import { orders } from "../drizzle/schema";
@@ -240,11 +240,26 @@ export const gmailAutoImportRouter = router({
     }),
 
   /**
+   * 批量删除导入记录
+   */
+  batchDeleteImportLogs: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()) }))
+    .mutation(async ({ input }) => {
+      const { ids } = input;
+      if (ids.length === 0) return { deletedCount: 0 };
+
+      for (const id of ids) {
+        await deleteGmailImportLog(id);
+      }
+
+      return { deletedCount: ids.length };
+    }),
+
+  /**
    * 清空所有导入记录
    */
-  deleteAllImportLogs: protectedProcedure
-    .mutation(async () => {
-      await deleteAllGmailImportLogs();
+  deleteAllImportLogs: protectedProcedure.mutation(async () => {
+    await deleteAllGmailImportLogs();
       return { success: true };
     }),
 
@@ -367,4 +382,89 @@ export const gmailAutoImportRouter = router({
         results,
       };
     }),
+
+  /**
+   * 获取配置
+   */
+  getConfig: protectedProcedure
+    .input(z.object({ configKey: z.string() }))
+    .query(async ({ input }) => {
+      const { getGmailImportConfig } = await import("./db");
+      return getGmailImportConfig(input.configKey);
+    }),
+
+  /**
+   * 获取所有配置
+   */
+  getAllConfigs: protectedProcedure.query(async () => {
+    const { getAllGmailImportConfigs } = await import("./db");
+    return getAllGmailImportConfigs();
+  }),
+
+  /**
+   * 保存或更新配置
+   */
+  upsertConfig: protectedProcedure
+    .input(
+      z.object({
+        configKey: z.string(),
+        configValue: z.any(),
+        description: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { upsertGmailImportConfig } = await import("./db");
+      const id = await upsertGmailImportConfig(input);
+      return { id, success: true };
+    }),
+
+  /**
+   * 删除配置
+   */
+  deleteConfig: protectedProcedure
+    .input(z.object({ configKey: z.string() }))
+    .mutation(async ({ input }) => {
+      const { deleteGmailImportConfig } = await import("./db");
+      const success = await deleteGmailImportConfig(input.configKey);
+      return { success };
+    }),
+
+  /**
+   * 获取失败原因统计
+   */
+  getFailureStats: protectedProcedure.query(async () => {
+    const logs = await getAllGmailImportLogs();
+    
+    const failureReasons: Record<string, number> = {};
+    let totalFailed = 0;
+
+    for (const log of logs) {
+      if (log.status === "failed" || log.status === "partial") {
+        totalFailed++;
+        
+        // 解析错误日志提取失败原因
+        if (log.errorLog) {
+          const errorLines = log.errorLog.split("\n");
+          for (const line of errorLines) {
+            if (line.includes("解析失败")) {
+              failureReasons["解析失败"] = (failureReasons["解析失败"] || 0) + 1;
+            } else if (line.includes("字段缺失") || line.includes("缺少")) {
+              failureReasons["字段缺失"] = (failureReasons["字段缺失"] || 0) + 1;
+            } else if (line.includes("重复") || line.includes("已存在")) {
+              failureReasons["重复订单"] = (failureReasons["重复订单"] || 0) + 1;
+            } else if (line.includes("格式错误")) {
+              failureReasons["格式错误"] = (failureReasons["格式错误"] || 0) + 1;
+            } else if (line.trim()) {
+              failureReasons["其他错误"] = (failureReasons["其他错误"] || 0) + 1;
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      totalFailed,
+      failureReasons,
+    };
+  }),
 });

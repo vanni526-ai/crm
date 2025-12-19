@@ -25,6 +25,7 @@ import {
   InsertSalesperson,
   gmailImportLogs,
   InsertGmailImportLog,
+  gmailImportConfig,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1329,5 +1330,58 @@ export async function deleteAllGmailImportLogs() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(gmailImportLogs);
+  return true;
+}
+
+// ==================== Gmail导入配置管理 ====================
+
+export async function getGmailImportConfig(configKey: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [config] = await db
+    .select()
+    .from(gmailImportConfig)
+    .where(eq(gmailImportConfig.configKey, configKey))
+    .limit(1);
+  return config || null;
+}
+
+export async function getAllGmailImportConfigs() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(gmailImportConfig);
+}
+
+export async function upsertGmailImportConfig(data: {
+  configKey: string;
+  configValue: any;
+  description?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const existing = await getGmailImportConfig(data.configKey);
+  
+  if (existing) {
+    await db
+      .update(gmailImportConfig)
+      .set({
+        configValue: data.configValue,
+        description: data.description,
+        updatedAt: new Date(),
+      })
+      .where(eq(gmailImportConfig.configKey, data.configKey));
+    return existing.id;
+  } else {
+    const [result] = await db.insert(gmailImportConfig).values(data);
+    return result.insertId;
+  }
+}
+
+export async function deleteGmailImportConfig(configKey: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .delete(gmailImportConfig)
+    .where(eq(gmailImportConfig.configKey, configKey));
   return true;
 }

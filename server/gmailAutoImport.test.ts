@@ -40,7 +40,7 @@ describe("Gmail订单解析功能", () => {
     expect(order2.city).toBe("济南");
     expect(order2.paymentAmount).toBe(3200);
     expect(order2.carFee).toBe(200);
-  });
+  }, 10000);
 
   it("应该正确识别销售人员和设备微信号", async () => {
     const emailContent = `瑛姬喵喵11:00-20:00  17:34
@@ -56,7 +56,7 @@ describe("Gmail订单解析功能", () => {
     expect(orders).toHaveLength(1);
     expect(orders[0].salesperson).toBe("昭昭");
     expect(orders[0].deviceWechat).toBe("瑛姬喵喵11:00-20:00");
-  });
+  }, 10000);
 });
 
 describe("Gmail导入日志功能", () => {

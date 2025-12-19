@@ -224,8 +224,18 @@ export const reconciliations = mysqlTable("reconciliations", {
 
 /**
  * Gmail导入记录表
- */
-export const gmailImportLogs = mysqlTable("gmailImportLogs", {
+ */// Gmail导入配置表
+export const gmailImportConfig = mysqlTable("gmailImportConfig", (table) => ({
+  id: int("id").primaryKey().autoincrement(),
+  configKey: varchar("configKey", { length: 100 }).notNull().unique(), // 配置键
+  configValue: json("configValue").notNull(), // 配置值(JSON)
+  description: text("description"), // 配置说明
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+}));
+
+// Gmail导入日志表
+export const gmailImportLogs = mysqlTable("gmailImportLogs", (table) => ({
   id: int("id").autoincrement().primaryKey(),
   emailSubject: varchar("emailSubject", { length: 255 }).notNull(), // 邮件主题
   emailDate: timestamp("emailDate").notNull(), // 邮件日期
@@ -239,7 +249,7 @@ export const gmailImportLogs = mysqlTable("gmailImportLogs", {
   parsedData: json("parsedData"), // 解析后的订单数据(JSON)
   importedBy: int("importedBy").notNull(), // 导入人(0表示系统自动)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-}, (table) => ({
+}), (table) => ({
   threadIdIdx: index("thread_id_idx").on(table.threadId),
   statusIdx: index("status_idx").on(table.status),
   createdAtIdx: index("created_at_idx").on(table.createdAt),
@@ -279,6 +289,7 @@ export type InsertReconciliation = typeof reconciliations.$inferInsert;
 export type ImportLog = typeof importLogs.$inferSelect;
 export type InsertImportLog = typeof importLogs.$inferInsert;
 export type GmailImportLog = typeof gmailImportLogs.$inferSelect;
+export type GmailImportConfig = typeof gmailImportConfig.$inferSelect;
 export type InsertGmailImportLog = typeof gmailImportLogs.$inferInsert;
 export type Salesperson = typeof salespersons.$inferSelect;
 export type InsertSalesperson = typeof salespersons.$inferInsert;
