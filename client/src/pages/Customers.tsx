@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2, Eye, Phone, Mail, Download } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Phone, Mail, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -89,6 +89,8 @@ export default function Customers() {
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<number[]>([]);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const {
     register,
@@ -143,12 +145,64 @@ export default function Customers() {
     setDetailOpen(true);
   };
 
-  const filteredCustomers = customers?.filter(
-    (customer) =>
-      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.wechatId?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
+
+  const getSortIcon = (field: string) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 ml-1 inline" />;
+    }
+    return sortOrder === 'asc' ? 
+      <ArrowUp className="h-4 w-4 ml-1 inline" /> : 
+      <ArrowDown className="h-4 w-4 ml-1 inline" />;
+  };
+
+  const filteredCustomers = customers
+    ?.filter(
+      (customer) =>
+        customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        customer.wechatId?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (!sortField) return 0;
+      
+      let aValue: any;
+      let bValue: any;
+      
+      switch (sortField) {
+        case 'totalSpent':
+          aValue = parseFloat(a.totalSpent || '0');
+          bValue = parseFloat(b.totalSpent || '0');
+          break;
+        case 'accountBalance':
+          aValue = parseFloat(a.accountBalance || '0');
+          bValue = parseFloat(b.accountBalance || '0');
+          break;
+        case 'firstOrderDate':
+          aValue = a.firstOrderDate ? new Date(a.firstOrderDate).getTime() : 0;
+          bValue = b.firstOrderDate ? new Date(b.firstOrderDate).getTime() : 0;
+          break;
+        case 'lastOrderDate':
+          aValue = a.lastOrderDate ? new Date(a.lastOrderDate).getTime() : 0;
+          bValue = b.lastOrderDate ? new Date(b.lastOrderDate).getTime() : 0;
+          break;
+        default:
+          return 0;
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue - bValue;
+      } else {
+        return bValue - aValue;
+      }
+    });
 
   return (
     <DashboardLayout>
@@ -222,10 +276,18 @@ export default function Customers() {
                     </TableHead>
                     <TableHead>客户名</TableHead>
                     <TableHead>流量来源</TableHead>
-                    <TableHead>账户余额</TableHead>
-                    <TableHead>首次上课时间</TableHead>
-                    <TableHead>累计消费</TableHead>
-                    <TableHead>最后消费</TableHead>
+                    <TableHead className="cursor-pointer" onClick={() => handleSort('accountBalance')}>
+                      账户余额{getSortIcon('accountBalance')}
+                    </TableHead>
+                    <TableHead className="cursor-pointer" onClick={() => handleSort('firstOrderDate')}>
+                      首次上课时间{getSortIcon('firstOrderDate')}
+                    </TableHead>
+                    <TableHead className="cursor-pointer" onClick={() => handleSort('totalSpent')}>
+                      累计消费{getSortIcon('totalSpent')}
+                    </TableHead>
+                    <TableHead className="cursor-pointer" onClick={() => handleSort('lastOrderDate')}>
+                      最后消费{getSortIcon('lastOrderDate')}
+                    </TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
