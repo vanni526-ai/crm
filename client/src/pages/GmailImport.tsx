@@ -90,17 +90,33 @@ export default function GmailImport() {
   });
 
   // 手动触发导入
+  // 手动导入变更
+  const manualImportMutation = trpc.gmailAutoImport.manualImport.useMutation({
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success("导入成功", { 
+          description: data.message 
+        });
+        refetchHistory();
+        refetchStats();
+      } else {
+        toast.error("导入失败", { description: data.message });
+      }
+      setIsImporting(false);
+    },
+    onError: (error) => {
+      toast.error("导入失败", { description: error.message });
+      setIsImporting(false);
+    },
+  });
+
   const handleManualImport = async () => {
     setIsImporting(true);
-    try {
-      toast.info("提示", { 
-        description: "手动导入功能需要在服务器端配置。请使用: node scripts/gmail-auto-import.mjs" 
-      });
-    } catch (error) {
-      console.error("导入失败:", error);
-    } finally {
-      setIsImporting(false);
-    }
+    toast.info("开始导入", { description: "正在搜索Gmail邮件...请稍候" });
+    manualImportMutation.mutate({
+      searchQuery: "打款群",
+      maxResults: 5,
+    });
   };
 
   // 查看详情

@@ -515,4 +515,159 @@ export const gmailAutoImportRouter = router({
       // TODO: 实现编辑功能需要更复杂的数据库操作，暂时返回提示
       return { success: false, message: "编辑功能开发中，请使用重新解析功能" };
     }),
+
+  /**
+   * 手动触发Gmail导入
+   */
+  manualImport: protectedProcedure
+    .input(z.object({
+      searchQuery: z.string().optional().default("打款群"),
+      maxResults: z.number().optional().default(5),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const { searchGmailMessages, readGmailThread, extractEmailContent } = await import("./gmailMcpImporter");
+      const { parseGmailOrderContent } = await import("./gmailOrderParser");
+
+      try {
+        // 1. 搜索Gmail邮件
+        const searchResult = await searchGmailMessages(input.searchQuery, input.maxResults);
+        
+        if (!searchResult || !searchResult.messages || searchResult.messages.length === 0) {
+          return {
+            success: false,
+            message: "未找到相关邮件，请检查Gmail中是否有包含\"" + input.searchQuery + "\"的邮件",
+            totalEmails: 0,
+            processedEmails: 0,
+            totalOrders: 0,
+            successOrders: 0,
+            failedOrders: 0,
+          };
+        }
+
+        const messages = searchResult.messages;
+        let totalOrders = 0;
+        let successOrders = 0;
+        let failedOrders = 0;
+        let processedEmails = 0;
+
+        // 2. 处理每封邮件
+        for (const message of messages) {
+          try {
+            const threadId = message.threadId;
+            
+            // 检查是否已处理
+            const exists = await checkThreadIdExists(threadId);
+            if (exists) {
+              console.log(`邮件 ${threadId} 已处理，跳过`);
+              continue;
+            }
+
+            // 读取邮件内容
+            const emailData = await readGmailThread(threadId);
+            const emailContent = extractEmailContent(emailData);
+
+            if (!emailContent) {
+              console.log(`邮件 ${threadId} 内容为空，跳过`);
+              continue;
+            }
+
+            // 解析订单
+            const parsedOrders = await parseGmailOrderContent(emailContent);
+            totalOrders += parsedOrders.length;
+
+            // 创建订单
+            for (const orderData of parsedOrders) {
+              try {
+                const cityAreaCodes: Record<string, string> = {
+                  "上海": "021", "北京": "010", "天津": "022", "重庆": "023",
+                  "武汉": "027", "成都": "028", "西安": "029", "南京": "025",
+                  "杭州": "0571", "苏州": "0512", "无锡": "0510", "宁波": "0574",
+                  "温州": "0577", "嘉兴": "0573", "金华": "0579", "绍兴": "0575",
+                  "济南": "0531", "青岛": "0532", "烟台": "0535", "潍坊": "0536",
+                };
+
+                const areaCode = cityAreaCodes[orderData.city] || "000";
+                const now = new Date();
+                const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
+                const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, "");
+                let orderNo = `${dateStr}${timeStr}${areaCode}`;
+
+                let attempts = 0;
+                while (await checkOrderNoExists(orderNo) && attempts < 10) {
+                  const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
+                  orderNo = `${dateStr}${timeStr}${areaCode}${randomSuffix}`;
+                  attempts++;
+                }
+
+                await createOrder({
+                  orderNo,
+                  customerName: orderData.customerName,
+                  salesPerson: orderData.salesperson,
+                  salesId: ctx.user.id,
+                  trafficSource: orderData.deviceWechat,
+                  paymentAmount: orderData.paymentAmount.toString(),
+                  courseAmount: orderData.courseAmount.toString(),
+                  teacherFee: orderData.teacherFee.toString(),
+                  transportFee: orderData.carFee.toString(),
+                  classDate: orderData.classDate ? new Date(orderData.classDate) : undefined,
+                  classTime: orderData.classTime,
+                  deliveryCity: orderData.city,
+                  deliveryRoom: orderData.classroom,
+                  deliveryTeacher: orderData.teacher,
+                  deliveryCourse: orderData.course,
+                  notes: orderData.notes,
+                  status: "paid",
+                });
+
+                successOrders++;
+              } catch (error: any) {
+                console.error("创建订单失败:", error);
+                failedOrders++;
+              }
+            }
+
+            // 记录导入日志
+            const status = failedOrders === 0 ? "success" : (successOrders > 0 ? "partial" : "failed");
+            await createGmailImportLog({
+              emailSubject: message.subject || "未知邮件",
+              emailDate: message.date ? new Date(message.date) : new Date(),
+              threadId,
+              totalOrders: parsedOrders.length,
+              successOrders: parsedOrders.length - failedOrders,
+              failedOrders,
+              status,
+              errorLog: failedOrders > 0 ? `失败订单数: ${failedOrders}` : null,
+              emailContent,
+              parsedData: parsedOrders as any,
+              importedBy: ctx.user.id,
+            });
+
+            processedEmails++;
+          } catch (error: any) {
+            console.error("处理邮件失败:", error);
+          }
+        }
+
+        return {
+          success: true,
+          message: `导入完成！处理${processedEmails}封邮件，解析${totalOrders}个订单，成功${successOrders}个，失败${failedOrders}个`,
+          totalEmails: messages.length,
+          processedEmails,
+          totalOrders,
+          successOrders,
+          failedOrders,
+        };
+      } catch (error: any) {
+        console.error("手动导入失败:", error);
+        return {
+          success: false,
+          message: `导入失败: ${error.message}`,
+          totalEmails: 0,
+          processedEmails: 0,
+          totalOrders: 0,
+          successOrders: 0,
+          failedOrders: 0,
+        };
+      }
+    }),
 });
