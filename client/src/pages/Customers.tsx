@@ -156,12 +156,12 @@ export default function Customers() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>客户姓名</TableHead>
-                    <TableHead>联系电话</TableHead>
-                    <TableHead>微信</TableHead>
+                    <TableHead>客户名</TableHead>
                     <TableHead>流量来源</TableHead>
                     <TableHead>账户余额</TableHead>
                     <TableHead>创建时间</TableHead>
+                    <TableHead>累计消费</TableHead>
+                    <TableHead>最后消费</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -173,20 +173,9 @@ export default function Customers() {
                       </TableCell>
                     </TableRow>
                   ) : filteredCustomers && filteredCustomers.length > 0 ? (
-                    filteredCustomers.map((customer) => (
+                    filteredCustomers.map((customer: any) => (
                       <TableRow key={customer.id}>
                         <TableCell className="font-medium">{customer.name}</TableCell>
-                        <TableCell>
-                          {customer.phone ? (
-                            <div className="flex items-center space-x-1">
-                              <Phone className="h-3 w-3 text-muted-foreground" />
-                              <span>{customer.phone}</span>
-                            </div>
-                          ) : (
-                            "-"
-                          )}
-                        </TableCell>
-                        <TableCell>{customer.wechatId || "-"}</TableCell>
                         <TableCell>
                           {customer.trafficSource ? (
                             <Badge variant="outline">{customer.trafficSource}</Badge>
@@ -198,6 +187,12 @@ export default function Customers() {
                           ¥{Number(customer.accountBalance || 0).toFixed(2)}
                         </TableCell>
                         <TableCell>{new Date(customer.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell className="font-medium text-blue-600">
+                          ¥{Number(customer.totalSpent || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          {customer.lastOrderDate ? new Date(customer.lastOrderDate).toLocaleDateString() : "-"}
+                        </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
                             <Button

@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Search, Eye, Edit, Trash2, Download, Upload } from "lucide-react";
+import { Plus, Search, Eye, Edit, Trash2, Download, Upload, UserPlus } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { SmartRegisterDialog } from "@/components/SmartRegisterDialog";
@@ -107,6 +107,16 @@ export default function Orders() {
     },
     onError: (error) => {
       toast.error(error.message || "批量更新失败");
+    },
+  });
+
+  const createCustomerFromOrder = trpc.customers.createFromOrder.useMutation({
+    onSuccess: () => {
+      utils.customers.list.invalidate();
+      toast.success("客户创建成功");
+    },
+    onError: (error) => {
+      toast.error(error.message || "创建失败");
     },
   });
 
@@ -238,6 +248,19 @@ export default function Orders() {
   const handleDelete = (id: number) => {
     if (confirm("确定要删除这个订单吗?")) {
       deleteOrder.mutate({ id });
+    }
+  };
+
+  const handleCopyToCustomer = (order: any) => {
+    if (!order.customerName) {
+      toast.error("订单中没有客户名，无法创建客户");
+      return;
+    }
+    if (confirm(`确定要将客户“${order.customerName}”复制到客户管理吗？`)) {
+      createCustomerFromOrder.mutate({
+        name: order.customerName,
+        trafficSource: order.trafficSource,
+      });
     }
   };
 
@@ -799,6 +822,14 @@ export default function Orders() {
                               </Button>
                               <Button variant="ghost" size="sm" onClick={() => handleEdit(order)}>
                                 <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleCopyToCustomer(order)}
+                                title="复制到客户管理"
+                              >
+                                <UserPlus className="h-4 w-4 text-blue-600" />
                               </Button>
                               <Button
                                 variant="ghost"

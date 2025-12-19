@@ -152,7 +152,30 @@ export async function getCustomerById(id: number) {
 export async function getAllCustomers() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(customers).orderBy(desc(customers.createdAt));
+  
+  // 获取所有客户及其统计信息
+  const customersData = await db.select().from(customers).orderBy(desc(customers.createdAt));
+  
+  // 为每个客户计算累计消费和最后消费时间
+  const customersWithStats = await Promise.all(
+    customersData.map(async (customer) => {
+      const customerOrders = await db
+        .select({
+          totalAmount: sql<string>`SUM(${orders.paymentAmount})`,
+          lastOrderDate: sql<Date>`MAX(${orders.createdAt})`,
+        })
+        .from(orders)
+        .where(eq(orders.customerId, customer.id));
+      
+      return {
+        ...customer,
+        totalSpent: customerOrders[0]?.totalAmount || "0.00",
+        lastOrderDate: customerOrders[0]?.lastOrderDate || null,
+      };
+    })
+  );
+  
+  return customersWithStats;
 }
 
 export async function searchCustomers(keyword: string) {

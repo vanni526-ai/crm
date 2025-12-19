@@ -153,6 +153,30 @@ export const appRouter = router({
         });
         return { success: true, ...result };
       }),
+    
+    // 从订单创建客户
+    createFromOrder: salesOrAdminProcedure
+      .input(z.object({
+        name: z.string().min(1, "客户名不能为空"),
+        trafficSource: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // 检查客户是否已存在
+        const existingCustomer = await db.searchCustomers(input.name);
+        if (existingCustomer.length > 0) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "客户已存在，请勿重复创建",
+          });
+        }
+        
+        const id = await db.createCustomer({
+          name: input.name,
+          trafficSource: input.trafficSource,
+          createdBy: ctx.user.id,
+        });
+        return { id, success: true };
+      }),
   }),
 
   // 订单管理
