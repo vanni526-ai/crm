@@ -94,6 +94,15 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // 验证客户名不能是老师名
+        const teacherNames = await db.getAllTeacherNames();
+        if (teacherNames.includes(input.name)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `客户名不能使用老师名字: ${input.name}`,
+          });
+        }
+        
         const id = await db.createCustomer({
           ...input,
           createdBy: ctx.user.id,
@@ -172,6 +181,15 @@ export const appRouter = router({
         trafficSource: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // 验证客户名不能是老师名
+        const teacherNames = await db.getAllTeacherNames();
+        if (teacherNames.includes(input.name)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `客户名不能使用老师名字: ${input.name}`,
+          });
+        }
+        
         // 检查客户是否已存在
         const existingCustomer = await db.searchCustomers(input.name);
         if (existingCustomer.length > 0) {
@@ -291,6 +309,15 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // 验证客户名不能是老师名
+        const teacherNames = await db.getAllTeacherNames();
+        if (teacherNames.includes(input.customerName)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `客户名不能使用老师名字: ${input.customerName}`,
+          });
+        }
+        
         // 如果没有提供订单号,自动生成
         let orderNo = input.orderNo || generateOrderNo(input.paymentCity || input.deliveryCity);
         
@@ -524,15 +551,19 @@ export const appRouter = router({
     create: adminProcedure
       .input(z.object({
         name: z.string(),
-        nickname: z.string().optional(),
         phone: z.string().optional(),
+        status: z.string().optional(),
+        customerType: z.string().optional(),
+        notes: z.string().optional(),
+        category: z.string().optional(),
+        city: z.string().optional(),
+        // 兼容旧字段
+        nickname: z.string().optional(),
         email: z.string().optional(),
         wechat: z.string().optional(),
         hourlyRate: z.string().optional(),
         bankAccount: z.string().optional(),
         bankName: z.string().optional(),
-        city: z.string().optional(),
-        notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const id = await db.createTeacher(input);
@@ -544,22 +575,72 @@ export const appRouter = router({
         id: z.number(),
         data: z.object({
           name: z.string().optional(),
-          nickname: z.string().optional(),
           phone: z.string().optional(),
+          status: z.string().optional(),
+          customerType: z.string().optional(),
+          notes: z.string().optional(),
+          category: z.string().optional(),
+          city: z.string().optional(),
+          // 兼容旧字段
+          nickname: z.string().optional(),
           email: z.string().optional(),
           wechat: z.string().optional(),
           hourlyRate: z.string().optional(),
           bankAccount: z.string().optional(),
           bankName: z.string().optional(),
-          city: z.string().optional(),
           isActive: z.boolean().optional(),
-          notes: z.string().optional(),
         }),
       }))
       .mutation(async ({ input }) => {
         await db.updateTeacher(input.id, input.data);
         return { success: true };
       }),
+
+    // 批量删除
+    batchDelete: adminProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ input }) => {
+        await db.batchDeleteTeachers(input.ids);
+        return { success: true, deletedCount: input.ids.length };
+      }),
+
+    // 批量更新状态
+    batchUpdateStatus: adminProcedure
+      .input(z.object({ 
+        ids: z.array(z.number()),
+        status: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.batchUpdateTeacherStatus(input.ids, input.status);
+        return { success: true, updatedCount: input.ids.length };
+      }),
+
+    // Excel导入
+    importFromExcel: adminProcedure
+      .input(z.object({
+        teachers: z.array(z.object({
+          name: z.string(),
+          phone: z.string().optional(),
+          status: z.string().optional(),
+          customerType: z.string().optional(),
+          notes: z.string().optional(),
+          category: z.string().optional(),
+          city: z.string().optional(),
+        })),
+      }))
+      .mutation(async ({ input }) => {
+        const results = await db.batchCreateTeachers(input.teachers);
+        return { 
+          success: true, 
+          importedCount: results.length,
+          teachers: results,
+        };
+      }),
+
+    // 获取所有老师名字(用于验证)
+    getAllTeacherNames: protectedProcedure.query(async () => {
+      return db.getAllTeacherNames();
+    }),
   }),
 
   // 课程排课

@@ -95,22 +95,27 @@ export const orders = mysqlTable("orders", {
  */
 export const teachers = mysqlTable("teachers", {
   id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 100 }).notNull(),
+  name: varchar("name", { length: 100 }).notNull(), // 姓名
+  phone: varchar("phone", { length: 20 }), // 电话号码
+  status: varchar("status", { length: 20 }).default("活跃").notNull(), // 活跃状态(活跃/不活跃)
+  customerType: varchar("customerType", { length: 200 }), // 受众客户类型
+  notes: text("notes"), // 备注
+  category: varchar("category", { length: 50 }), // 分类(本部老师/合伙店老师)
+  city: varchar("city", { length: 50 }), // 所在城市(合伙店老师使用)
+  // 保留原有字段以兼容
   nickname: varchar("nickname", { length: 50 }), // 花名
-  phone: varchar("phone", { length: 20 }),
   email: varchar("email", { length: 320 }),
   wechat: varchar("wechat", { length: 100 }),
   hourlyRate: decimal("hourlyRate", { precision: 10, scale: 2 }), // 课时费标准
   bankAccount: varchar("bankAccount", { length: 100 }), // 银行账号
   bankName: varchar("bankName", { length: 100 }), // 开户行
-  city: varchar("city", { length: 50 }), // 所在城市
   isActive: boolean("isActive").default(true).notNull(),
-  notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   phoneIdx: index("teacher_phone_idx").on(table.phone),
   cityIdx: index("teacher_city_idx").on(table.city),
+  nameIdx: index("teacher_name_idx").on(table.name),
 }));
 
 /**

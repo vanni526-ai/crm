@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, sql, between, isNotNull, ne, like, or } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, between, isNotNull, ne, like, or, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -298,6 +298,40 @@ export async function updateTeacher(id: number, data: Partial<InsertTeacher>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(teachers).set(data).where(eq(teachers.id, id));
+}
+
+// 批量删除老师
+export async function batchDeleteTeachers(ids: number[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(teachers).where(inArray(teachers.id, ids));
+}
+
+// 批量更新老师状态
+export async function batchUpdateTeacherStatus(ids: number[], status: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(teachers).set({ status }).where(inArray(teachers.id, ids));
+}
+
+// 批量创建老师
+export async function batchCreateTeachers(teacherList: InsertTeacher[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const results = [];
+  for (const teacher of teacherList) {
+    const result = await db.insert(teachers).values(teacher);
+    results.push({ id: result[0].insertId, name: teacher.name });
+  }
+  return results;
+}
+
+// 获取所有老师名字(用于验证)
+export async function getAllTeacherNames() {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.select({ name: teachers.name }).from(teachers).where(eq(teachers.isActive, true));
+  return result.map(r => r.name);
 }
 
 // ========== 课程排课 ==========

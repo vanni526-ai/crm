@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/DashboardLayout";
+import { useState, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,24 +8,30 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Search, Eye, Edit } from "lucide-react";
-import { useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, Search, Eye, Edit, Upload, Download, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import * as XLSX from "xlsx";
+import DashboardLayout from "@/components/DashboardLayout";
 
 const teacherSchema = z.object({
   name: z.string().min(1, "老师姓名不能为空"),
-  nickname: z.string().optional(),
   phone: z.string().optional(),
+  status: z.string().optional(),
+  customerType: z.string().optional(),
+  notes: z.string().optional(),
+  category: z.string().optional(),
+  city: z.string().optional(),
+  // 兼容旧字段
+  nickname: z.string().optional(),
   email: z.string().email("请输入有效的邮箱地址").optional().or(z.literal("")),
   wechat: z.string().optional(),
   hourlyRate: z.string().optional(),
   bankAccount: z.string().optional(),
   bankName: z.string().optional(),
-  city: z.string().optional(),
-  notes: z.string().optional(),
 });
 
 type TeacherFormData = z.infer<typeof teacherSchema>;
@@ -33,6 +39,7 @@ type TeacherFormData = z.infer<typeof teacherSchema>;
 export default function Teachers() {
   const utils = trpc.useUtils();
   const { data: teachers, isLoading } = trpc.teachers.list.useQuery();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const createTeacher = trpc.teachers.create.useMutation({
     onSuccess: () => {
@@ -58,11 +65,50 @@ export default function Teachers() {
     },
   });
 
+  const batchDeleteMutation = trpc.teachers.batchDelete.useMutation({
+    onSuccess: (data) => {
+      utils.teachers.list.invalidate();
+      toast.success(`成功删除${data.deletedCount}位老师`);
+      setSelectedIds([]);
+    },
+    onError: (error) => {
+      toast.error(error.message || "批量删除失败");
+    },
+  });
+
+  const batchUpdateStatusMutation = trpc.teachers.batchUpdateStatus.useMutation({
+    onSuccess: (data) => {
+      utils.teachers.list.invalidate();
+      toast.success(`成功更新${data.updatedCount}位老师的状态`);
+      setSelectedIds([]);
+      setBatchStatusDialogOpen(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "批量更新失败");
+    },
+  });
+
+  const importMutation = trpc.teachers.importFromExcel.useMutation({
+    onSuccess: (data) => {
+      utils.teachers.list.invalidate();
+      toast.success(`成功导入${data.importedCount}位老师`);
+      setImporting(false);
+    },
+    onError: (error) => {
+      toast.error(error.message || "导入失败");
+      setImporting(false);
+    },
+  });
+
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [batchStatusDialogOpen, setBatchStatusDialogOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [importing, setImporting] = useState(false);
+  const [newStatus, setNewStatus] = useState("活跃");
 
   const {
     register,
@@ -81,15 +127,18 @@ export default function Teachers() {
   const handleEdit = (teacher: any) => {
     setSelectedTeacher(teacher);
     setValue("name", teacher.name);
-    setValue("nickname", teacher.nickname || "");
     setValue("phone", teacher.phone || "");
+    setValue("status", teacher.status || "活跃");
+    setValue("customerType", teacher.customerType || "");
+    setValue("notes", teacher.notes || "");
+    setValue("category", teacher.category || "");
+    setValue("city", teacher.city || "");
+    setValue("nickname", teacher.nickname || "");
     setValue("email", teacher.email || "");
     setValue("wechat", teacher.wechat || "");
     setValue("hourlyRate", teacher.hourlyRate || "");
     setValue("bankAccount", teacher.bankAccount || "");
     setValue("bankName", teacher.bankName || "");
-    setValue("city", teacher.city || "");
-    setValue("notes", teacher.notes || "");
     setEditOpen(true);
   };
 
@@ -106,94 +155,291 @@ export default function Teachers() {
     setDetailOpen(true);
   };
 
-  const filteredTeachers = teachers?.filter((teacher) => {
-    const searchLower = searchTerm.toLowerCase();
+  // 多选功能
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && teachers) {
+      setSelectedIds(teachers.map((t: any) => t.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number, checked: boolean) => {
+    if (checked) {
+      setSelectedIds([...selectedIds, id]);
+    } else {
+      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+    }
+  };
+
+  // 批量删除
+  const handleBatchDelete = () => {
+    if (selectedIds.length === 0) {
+      toast.error("请先选择要删除的老师");
+      return;
+    }
+    if (confirm(`确定要删除选中的${selectedIds.length}位老师吗?`)) {
+      batchDeleteMutation.mutate({ ids: selectedIds });
+    }
+  };
+
+  // 批量更新状态
+  const handleBatchUpdateStatus = () => {
+    if (selectedIds.length === 0) {
+      toast.error("请先选择要更新的老师");
+      return;
+    }
+    setBatchStatusDialogOpen(true);
+  };
+
+  const confirmBatchUpdateStatus = () => {
+    batchUpdateStatusMutation.mutate({ ids: selectedIds, status: newStatus });
+  };
+
+  // Excel导入
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      
+      const allTeachers: any[] = [];
+      
+      // 处理每个工作表
+      workbook.SheetNames.forEach((sheetName) => {
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+        
+        // 跳过标题行,从第二行开始
+        jsonData.forEach((row: any, index: number) => {
+          // 如果是标题行(包含"姓名"字段),跳过
+          if (row['姓名'] === '姓名') return;
+          
+          const teacher = {
+            name: row['姓名'] || row['name'] || '',
+            phone: row['电话号码'] || row['phone'] ? String(row['电话号码'] || row['phone']) : '',
+            status: row['活跃状态'] || row['status'] || '活跃',
+            customerType: row['受众客户类型'] || row['customerType'] || '',
+            notes: row['备注'] || row['notes'] || '',
+            category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '',
+            city: sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : '',
+          };
+          
+          // 只添加有姓名的记录
+          if (teacher.name && teacher.name.trim()) {
+            allTeachers.push(teacher);
+          }
+        });
+      });
+      
+      if (allTeachers.length === 0) {
+        toast.error("未找到有效的老师数据");
+        setImporting(false);
+        return;
+      }
+      
+      importMutation.mutate({ teachers: allTeachers });
+      
+    } catch (error: any) {
+      toast.error("文件解析失败: " + error.message);
+      setImporting(false);
+    }
+    
+    // 清空文件输入
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Excel导出
+  const handleExport = () => {
+    if (!teachers || teachers.length === 0) {
+      toast.error("没有数据可导出");
+      return;
+    }
+
+    // 按分类分组
+    const categories: Record<string, any[]> = {};
+    teachers.forEach((teacher: any) => {
+      const category = teacher.category || '其他';
+      if (!categories[category]) {
+        categories[category] = [];
+      }
+      categories[category].push({
+        '姓名': teacher.name,
+        '电话号码': teacher.phone || '',
+        '活跃状态': teacher.status || '活跃',
+        '受众客户类型': teacher.customerType || '',
+        '备注': teacher.notes || '',
+      });
+    });
+
+    // 创建工作簿
+    const wb = XLSX.utils.book_new();
+    
+    // 为每个分类创建工作表
+    Object.entries(categories).forEach(([category, data]) => {
+      const ws = XLSX.utils.json_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb, ws, category);
+    });
+
+    // 下载文件
+    const fileName = `老师信息_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    toast.success("导出成功");
+  };
+
+  // 过滤老师
+  const filteredTeachers = teachers?.filter((teacher: any) => {
+    if (!searchTerm) return true;
+    const term = searchTerm.toLowerCase();
     return (
-      teacher.name.toLowerCase().includes(searchLower) ||
-      teacher.nickname?.toLowerCase().includes(searchLower) ||
-      teacher.phone?.toLowerCase().includes(searchLower) ||
-      teacher.city?.toLowerCase().includes(searchLower)
+      teacher.name?.toLowerCase().includes(term) ||
+      teacher.phone?.toLowerCase().includes(term) ||
+      teacher.customerType?.toLowerCase().includes(term) ||
+      teacher.city?.toLowerCase().includes(term)
     );
   });
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-start">
+        {/* 页面标题和操作按钮 */}
+        <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">老师管理</h1>
-            <p className="text-muted-foreground mt-2">管理老师档案和信息</p>
+            <p className="text-muted-foreground mt-1">管理老师信息,支持批量导入导出</p>
           </div>
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            新增老师
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleExport} variant="outline">
+              <Download className="w-4 h-4 mr-2" />
+              导出Excel
+            </Button>
+            <Button onClick={handleImportClick} variant="outline" disabled={importing}>
+              <Upload className="w-4 h-4 mr-2" />
+              {importing ? "导入中..." : "导入Excel"}
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              新增老师
+            </Button>
+          </div>
         </div>
 
-        <Card className="glass-card">
+        {/* 批量操作栏 */}
+        {selectedIds.length > 0 && (
+          <Card className="bg-blue-50 border-blue-200">
+            <CardContent className="pt-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">已选择 {selectedIds.length} 位老师</span>
+                <div className="flex gap-2">
+                  <Button onClick={handleBatchUpdateStatus} variant="outline" size="sm">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    批量修改状态
+                  </Button>
+                  <Button onClick={handleBatchDelete} variant="destructive" size="sm">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    批量删除
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 搜索栏 */}
+        <Card>
           <CardHeader>
-            <CardTitle>老师列表</CardTitle>
+            <div className="flex items-center gap-2">
+              <Search className="w-5 h-5 text-muted-foreground" />
+              <Input
+                placeholder="搜索老师姓名、电话、客户类型、城市..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-md"
+              />
+            </div>
+          </CardHeader>
+        </Card>
+
+        {/* 老师列表 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>老师列表 ({filteredTeachers?.length || 0})</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="搜索老师姓名、花名、电话、城市..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
             {isLoading ? (
-              <div className="text-center py-8 text-muted-foreground">加载中...</div>
-            ) : filteredTeachers && filteredTeachers.length > 0 ? (
+              <div className="text-center py-8">加载中...</div>
+            ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedIds.length === teachers?.length && teachers?.length > 0}
+                        onCheckedChange={handleSelectAll}
+                      />
+                    </TableHead>
                     <TableHead>姓名</TableHead>
-                    <TableHead>花名</TableHead>
-                    <TableHead>联系电话</TableHead>
-                    <TableHead>微信</TableHead>
-                    <TableHead>所在城市</TableHead>
-                    <TableHead>课时费</TableHead>
+                    <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
-                    <TableHead className="text-right">操作</TableHead>
+                    <TableHead>客户类型</TableHead>
+                    <TableHead>分类</TableHead>
+                    <TableHead>城市</TableHead>
+                    <TableHead>备注</TableHead>
+                    <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTeachers.map((teacher) => (
+                  {filteredTeachers?.map((teacher: any) => (
                     <TableRow key={teacher.id}>
-                      <TableCell className="font-medium">{teacher.name}</TableCell>
-                      <TableCell>{teacher.nickname || "-"}</TableCell>
-                      <TableCell>{teacher.phone || "-"}</TableCell>
-                      <TableCell>{teacher.wechat || "-"}</TableCell>
-                      <TableCell>{teacher.city || "-"}</TableCell>
                       <TableCell>
-                        {teacher.hourlyRate ? `¥${parseFloat(teacher.hourlyRate).toFixed(2)}/课时` : "-"}
+                        <Checkbox
+                          checked={selectedIds.includes(teacher.id)}
+                          onCheckedChange={(checked) => handleSelectOne(teacher.id, checked as boolean)}
+                        />
                       </TableCell>
+                      <TableCell className="font-medium">{teacher.name}</TableCell>
+                      <TableCell>{teacher.phone || '-'}</TableCell>
                       <TableCell>
-                        <Badge variant={teacher.isActive ? "default" : "secondary"}>
-                          {teacher.isActive ? "在职" : "离职"}
+                        <Badge variant={teacher.status === '活跃' ? 'default' : 'secondary'}>
+                          {teacher.status || '活跃'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
+                      <TableCell>{teacher.customerType || '-'}</TableCell>
+                      <TableCell>{teacher.category || '-'}</TableCell>
+                      <TableCell>{teacher.city || '-'}</TableCell>
+                      <TableCell className="max-w-xs truncate">{teacher.notes || '-'}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleViewDetail(teacher)}
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="w-4 h-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(teacher)}
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="w-4 h-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -201,82 +447,55 @@ export default function Teachers() {
                   ))}
                 </TableBody>
               </Table>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                {searchTerm ? "没有找到匹配的老师" : "暂无老师数据"}
-              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* 新增老师对话框 */}
+        {/* 创建老师对话框 */}
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>新增老师</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(handleCreate)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>姓名 *</Label>
-                  <Input {...register("name")} placeholder="请输入老师姓名" className="mt-2" />
-                  {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
+                  <Label htmlFor="name">姓名 *</Label>
+                  <Input id="name" {...register("name")} />
+                  {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                 </div>
                 <div>
-                  <Label>花名</Label>
-                  <Input {...register("nickname")} placeholder="请输入花名" className="mt-2" />
+                  <Label htmlFor="phone">电话号码</Label>
+                  <Input id="phone" {...register("phone")} />
+                </div>
+                <div>
+                  <Label htmlFor="status">活跃状态</Label>
+                  <Input id="status" {...register("status")} placeholder="活跃/不活跃" />
+                </div>
+                <div>
+                  <Label htmlFor="category">分类</Label>
+                  <Input id="category" {...register("category")} placeholder="本部老师/合伙店老师" />
+                </div>
+                <div>
+                  <Label htmlFor="city">城市</Label>
+                  <Input id="city" {...register("city")} />
+                </div>
+                <div>
+                  <Label htmlFor="customerType">受众客户类型</Label>
+                  <Input id="customerType" {...register("customerType")} />
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>联系电话</Label>
-                  <Input {...register("phone")} placeholder="请输入联系电话" className="mt-2" />
-                </div>
-                <div>
-                  <Label>微信号</Label>
-                  <Input {...register("wechat")} placeholder="请输入微信号" className="mt-2" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>邮箱</Label>
-                  <Input {...register("email")} type="email" placeholder="请输入邮箱" className="mt-2" />
-                  {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>}
-                </div>
-                <div>
-                  <Label>所在城市</Label>
-                  <Input {...register("city")} placeholder="请输入所在城市" className="mt-2" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>课时费标准</Label>
-                  <Input {...register("hourlyRate")} placeholder="如:200.00" className="mt-2" />
-                </div>
-                <div>
-                  <Label>银行账号</Label>
-                  <Input {...register("bankAccount")} placeholder="请输入银行账号" className="mt-2" />
-                </div>
-              </div>
-
               <div>
-                <Label>开户行</Label>
-                <Input {...register("bankName")} placeholder="请输入开户行" className="mt-2" />
+                <Label htmlFor="notes">备注</Label>
+                <Textarea id="notes" {...register("notes")} rows={3} />
               </div>
-
-              <div>
-                <Label>备注</Label>
-                <Textarea {...register("notes")} placeholder="请输入备注信息" className="mt-2" rows={3} />
-              </div>
-
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
                   取消
                 </Button>
-                <Button type="submit">创建</Button>
+                <Button type="submit" disabled={createTeacher.isPending}>
+                  {createTeacher.isPending ? "创建中..." : "创建"}
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -284,174 +503,129 @@ export default function Teachers() {
 
         {/* 编辑老师对话框 */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>编辑老师信息</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(handleUpdate)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>姓名 *</Label>
-                  <Input {...register("name")} placeholder="请输入老师姓名" className="mt-2" />
-                  {errors.name && <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>}
+                  <Label htmlFor="edit-name">姓名 *</Label>
+                  <Input id="edit-name" {...register("name")} />
+                  {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                 </div>
                 <div>
-                  <Label>花名</Label>
-                  <Input {...register("nickname")} placeholder="请输入花名" className="mt-2" />
+                  <Label htmlFor="edit-phone">电话号码</Label>
+                  <Input id="edit-phone" {...register("phone")} />
+                </div>
+                <div>
+                  <Label htmlFor="edit-status">活跃状态</Label>
+                  <Input id="edit-status" {...register("status")} />
+                </div>
+                <div>
+                  <Label htmlFor="edit-category">分类</Label>
+                  <Input id="edit-category" {...register("category")} />
+                </div>
+                <div>
+                  <Label htmlFor="edit-city">城市</Label>
+                  <Input id="edit-city" {...register("city")} />
+                </div>
+                <div>
+                  <Label htmlFor="edit-customerType">受众客户类型</Label>
+                  <Input id="edit-customerType" {...register("customerType")} />
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>联系电话</Label>
-                  <Input {...register("phone")} placeholder="请输入联系电话" className="mt-2" />
-                </div>
-                <div>
-                  <Label>微信号</Label>
-                  <Input {...register("wechat")} placeholder="请输入微信号" className="mt-2" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>邮箱</Label>
-                  <Input {...register("email")} type="email" placeholder="请输入邮箱" className="mt-2" />
-                  {errors.email && <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>}
-                </div>
-                <div>
-                  <Label>所在城市</Label>
-                  <Input {...register("city")} placeholder="请输入所在城市" className="mt-2" />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>课时费标准</Label>
-                  <Input {...register("hourlyRate")} placeholder="如:200.00" className="mt-2" />
-                </div>
-                <div>
-                  <Label>银行账号</Label>
-                  <Input {...register("bankAccount")} placeholder="请输入银行账号" className="mt-2" />
-                </div>
-              </div>
-
               <div>
-                <Label>开户行</Label>
-                <Input {...register("bankName")} placeholder="请输入开户行" className="mt-2" />
+                <Label htmlFor="edit-notes">备注</Label>
+                <Textarea id="edit-notes" {...register("notes")} rows={3} />
               </div>
-
-              <div>
-                <Label>备注</Label>
-                <Textarea {...register("notes")} placeholder="请输入备注信息" className="mt-2" rows={3} />
-              </div>
-
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
                   取消
                 </Button>
-                <Button type="submit">保存</Button>
+                <Button type="submit" disabled={updateTeacher.isPending}>
+                  {updateTeacher.isPending ? "更新中..." : "更新"}
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
 
-        {/* 老师详情对话框 */}
+        {/* 查看详情对话框 */}
         <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>老师详情</DialogTitle>
             </DialogHeader>
             {selectedTeacher && (
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">基本信息</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">姓名:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.name}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">花名:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.nickname || "-"}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">联系电话:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.phone || "-"}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">微信号:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.wechat || "-"}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">邮箱:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.email || "-"}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">所在城市:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.city || "-"}</p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">状态:</span>
-                      <p className="font-medium mt-1">
-                        <Badge variant={selectedTeacher.isActive ? "default" : "secondary"}>
-                          {selectedTeacher.isActive ? "在职" : "离职"}
-                        </Badge>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">财务信息</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">课时费标准:</span>
-                      <p className="font-medium mt-1 text-green-600">
-                        {selectedTeacher.hourlyRate
-                          ? `¥${parseFloat(selectedTeacher.hourlyRate).toFixed(2)}/课时`
-                          : "-"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">银行账号:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.bankAccount || "-"}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <span className="text-muted-foreground">开户行:</span>
-                      <p className="font-medium mt-1">{selectedTeacher.bankName || "-"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {selectedTeacher.notes && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <h3 className="text-lg font-semibold mb-3">备注</h3>
-                    <p className="text-sm text-muted-foreground">{selectedTeacher.notes}</p>
+                    <Label>姓名</Label>
+                    <p className="text-sm mt-1">{selectedTeacher.name}</p>
                   </div>
-                )}
-
+                  <div>
+                    <Label>电话</Label>
+                    <p className="text-sm mt-1">{selectedTeacher.phone || '-'}</p>
+                  </div>
+                  <div>
+                    <Label>状态</Label>
+                    <p className="text-sm mt-1">
+                      <Badge variant={selectedTeacher.status === '活跃' ? 'default' : 'secondary'}>
+                        {selectedTeacher.status || '活跃'}
+                      </Badge>
+                    </p>
+                  </div>
+                  <div>
+                    <Label>分类</Label>
+                    <p className="text-sm mt-1">{selectedTeacher.category || '-'}</p>
+                  </div>
+                  <div>
+                    <Label>城市</Label>
+                    <p className="text-sm mt-1">{selectedTeacher.city || '-'}</p>
+                  </div>
+                  <div>
+                    <Label>受众客户类型</Label>
+                    <p className="text-sm mt-1">{selectedTeacher.customerType || '-'}</p>
+                  </div>
+                </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-3">其他信息</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">创建时间:</span>
-                      <p className="font-medium mt-1">
-                        {new Date(selectedTeacher.createdAt).toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">更新时间:</span>
-                      <p className="font-medium mt-1">
-                        {new Date(selectedTeacher.updatedAt).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
+                  <Label>备注</Label>
+                  <p className="text-sm mt-1">{selectedTeacher.notes || '-'}</p>
                 </div>
               </div>
             )}
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDetailOpen(false)}>
-                关闭
+              <Button onClick={() => setDetailOpen(false)}>关闭</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 批量修改状态对话框 */}
+        <Dialog open={batchStatusDialogOpen} onOpenChange={setBatchStatusDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>批量修改状态</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>新状态</Label>
+                <Input
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  placeholder="活跃/不活跃"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                将为选中的 {selectedIds.length} 位老师更新状态
+              </p>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBatchStatusDialogOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={confirmBatchUpdateStatus} disabled={batchUpdateStatusMutation.isPending}>
+                {batchUpdateStatusMutation.isPending ? "更新中..." : "确认更新"}
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -162,6 +162,13 @@
       "when": 1766124402473,
       "tag": "0022_lush_iron_lad",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "5",
+      "when": 1766129584857,
+      "tag": "0023_milky_richard_fisk",
+      "breakpoints": true
     }
   ]
 }
