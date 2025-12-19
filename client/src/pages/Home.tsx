@@ -79,10 +79,10 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ¥{stats?.totalFinalAmount?.toLocaleString() || '0'}
+                ¥{stats?.netProfit?.toLocaleString() || '0.00'}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                本月到账金额
+                本月利润金额
               </p>
             </CardContent>
           </Card>

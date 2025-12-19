@@ -401,6 +401,8 @@ export async function getOrderStatsByDateRange(startDate: string, endDate: strin
       totalOtherFee: sql<number>`SUM(${orders.otherFee})`,
       totalPartnerFee: sql<number>`SUM(${orders.partnerFee})`,
       totalFinalAmount: sql<number>`SUM(${orders.finalAmount})`,
+      // 净利润 = 销售额 - 老师费用 - 车费 - 其他费用 - 合伙人费用
+      netProfit: sql<number>`SUM(${orders.paymentAmount}) - SUM(${orders.teacherFee}) - SUM(${orders.transportFee}) - SUM(${orders.otherFee}) - SUM(${orders.partnerFee})`,
     })
     .from(orders)
     .where(
