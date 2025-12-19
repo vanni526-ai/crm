@@ -265,6 +265,7 @@ export default function Teachers() {
         const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { range: skipRows });
         
         jsonData.forEach((row: any) => {
+          console.log('解析行数据:', row);
           const teacher = {
             name: row['姓名'] || row['name'] || '',
             phone: row['电话号码'] || row['phone'] ? String(row['电话号码'] || row['phone']) : '',
@@ -272,8 +273,10 @@ export default function Teachers() {
             customerType: row['受众客户类型'] || row['customerType'] || '',
             notes: row['备注'] || row['notes'] || '',
             category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他',
-            city: sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : '',
+            city: row['地区'] || (sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : ''),
           };
+          
+          console.log('解析后的老师数据:', teacher);
           
           // 只添加有姓名的记录
           if (teacher.name && teacher.name.trim()) {
@@ -379,7 +382,7 @@ export default function Teachers() {
               导出Excel
             </Button>
             <Button 
-              onClick={() => window.open('/老师导入模板.xlsx', '_blank')}
+              onClick={() => window.open('/teacher-import-template.xlsx', '_blank')}
               variant="outline"
             >
               <Download className="w-4 h-4 mr-2" />
