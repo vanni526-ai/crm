@@ -168,11 +168,20 @@ export async function getAllCustomers() {
         .from(orders)
         .where(eq(orders.customerId, customer.id));
       
+      // 获取最新订单的账户余额
+      const latestOrder = await db
+        .select({ accountBalance: orders.accountBalance })
+        .from(orders)
+        .where(eq(orders.customerId, customer.id))
+        .orderBy(desc(orders.createdAt))
+        .limit(1);
+      
       return {
         ...customer,
         totalSpent: customerOrders[0]?.totalAmount || "0.00",
         lastOrderDate: customerOrders[0]?.lastOrderDate || null,
         firstOrderDate: customerOrders[0]?.firstOrderDate || null,
+        accountBalance: latestOrder[0]?.accountBalance || "0.00",
       };
     })
   );

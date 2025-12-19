@@ -74,6 +74,7 @@ export const gmailAutoImportRouter = router({
             finalPayment: z.number(),
             teacherFee: z.number(),
             carFee: z.number(),
+            accountBalance: z.number(),
             notes: z.string(),
             originalText: z.string(),
           })
@@ -120,6 +121,7 @@ export const gmailAutoImportRouter = router({
             trafficSource: orderData.deviceWechat, // 设备微信号作为流量来源
             paymentAmount: orderData.paymentAmount.toString(),
             courseAmount: orderData.courseAmount.toString(),
+            accountBalance: orderData.accountBalance.toString(), // 账户余额
             teacherFee: orderData.teacherFee.toString(),
             transportFee: orderData.carFee.toString(),
             deliveryCity: orderData.city,
