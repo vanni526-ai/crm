@@ -1,5 +1,5 @@
 import { invokeLLM } from "./_core/llm";
-import { getAllGmailImportConfigs } from "./db";
+import { getAllGmailImportConfigs, isTeacherName } from "./db";
 
 /**
  * 解析后的订单信息
@@ -196,14 +196,26 @@ ${emailContent}
       return corrected;
     };
 
-    const orders: ParsedGmailOrder[] = parsed.orders.map((order: any) => ({
-      ...order,
-      salesperson: correctCommonErrors(order.salesperson),
-      deviceWechat: correctCommonErrors(order.deviceWechat),
-      customerName: correctCommonErrors(order.customerName),
-      teacher: correctCommonErrors(order.teacher),
-      originalText: emailContent,
-    }));
+    // 先纠错，然后验证客户名是否为老师名
+    const orders: ParsedGmailOrder[] = [];
+    for (const order of parsed.orders) {
+      let customerName = correctCommonErrors(order.customerName);
+      
+      // 如果客户名是老师名，则留空
+      if (customerName && await isTeacherName(customerName)) {
+        console.log(`[Gmail解析] 检测到客户名"${customerName}"是老师名，已留空`);
+        customerName = '';
+      }
+      
+      orders.push({
+        ...order,
+        salesperson: correctCommonErrors(order.salesperson),
+        deviceWechat: correctCommonErrors(order.deviceWechat),
+        customerName,
+        teacher: correctCommonErrors(order.teacher),
+        originalText: emailContent,
+      });
+    }
 
     return orders;
   } catch (error) {

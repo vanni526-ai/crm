@@ -334,6 +334,13 @@ export async function getAllTeacherNames() {
   return result.map(r => r.name);
 }
 
+// 检查名字是否为老师名
+export async function isTeacherName(name: string | null | undefined): Promise<boolean> {
+  if (!name || name.trim() === '') return false;
+  const teacherNames = await getAllTeacherNames();
+  return teacherNames.includes(name.trim());
+}
+
 // 获取老师统计数据
 export async function getTeacherStats(teacherId: number, startDate?: Date, endDate?: Date) {
   const db = await getDb();
@@ -1555,6 +1562,10 @@ export async function importCustomersFromOrders(createdBy: number) {
   const db = await getDb();
   if (!db) return { success: 0, skipped: 0, failed: 0 };
   
+  // 获取所有老师名
+  const teacherNames = await getAllTeacherNames();
+  const teacherNameSet = new Set(teacherNames);
+  
   // 获取所有订单
   const allOrders = await db.select().from(orders);
   
@@ -1562,7 +1573,10 @@ export async function importCustomersFromOrders(createdBy: number) {
   const uniqueCustomers = new Map<string, { name: string; trafficSource?: string }>();
   
   for (const order of allOrders) {
-    if (order.customerName && !uniqueCustomers.has(order.customerName)) {
+    // 过滤空客户名和老师名
+    if (order.customerName && 
+        !uniqueCustomers.has(order.customerName) && 
+        !teacherNameSet.has(order.customerName)) {
       uniqueCustomers.set(order.customerName, {
         name: order.customerName,
         trafficSource: order.trafficSource || undefined,

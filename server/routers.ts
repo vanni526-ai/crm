@@ -283,7 +283,7 @@ export const appRouter = router({
       .input(z.object({
         orderNo: z.string().optional(),
         customerId: z.number().optional(), // 客户ID(用于余额扣款)
-        customerName: z.string(),
+        customerName: z.string().optional(), // 允许客户名为空
         salespersonId: z.number().optional(), // 销售人员ID(关联salespersons表)
         salesPerson: z.string().optional(),
         trafficSource: z.string().optional(),
@@ -311,13 +311,15 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // 验证客户名不能是老师名
-        const teacherNames = await db.getAllTeacherNames();
-        if (teacherNames.includes(input.customerName)) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `客户名不能使用老师名字: ${input.customerName}`,
-          });
+        // 验证客户名不能是老师名(如果提供了客户名)
+        if (input.customerName && input.customerName.trim() !== '') {
+          const teacherNames = await db.getAllTeacherNames();
+          if (teacherNames.includes(input.customerName.trim())) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `客户名不能使用老师名字: ${input.customerName}`,
+            });
+          }
         }
         
         // 如果没有提供订单号,自动生成

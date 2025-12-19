@@ -20,7 +20,7 @@ import { z } from "zod";
 
 const orderSchema = z.object({
   orderNo: z.string().optional(),
-  customerName: z.string().min(1, "请输入客户姓名"),
+  customerName: z.string().optional(), // 允许客户名为空
   salespersonId: z.number().optional(),
   salesPerson: z.string().optional(),
   trafficSource: z.string().optional(),
@@ -483,11 +483,20 @@ export default function Orders() {
         return;
       }
 
+      // 获取所有老师名列表
+      const teacherNames = await utils.teachers.getAllTeacherNames.fetch() || [];
+      
       // 批量创建订单
       let successCount = 0;
       let failCount = 0;
       for (const order of orders) {
         try {
+          // 如果客户名是老师名，则留空
+          if (order.customerName && teacherNames.includes(order.customerName.trim())) {
+            console.log(`[Excel导入] 检测到客户名"${order.customerName}"是老师名，已留空`);
+            order.customerName = '';
+          }
+          
           await createOrder.mutateAsync(order);
           successCount++;
         } catch (error) {
