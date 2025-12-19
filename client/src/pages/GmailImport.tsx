@@ -273,71 +273,31 @@ export default function GmailImport() {
           </div>
         </div>
 
-        {/* Gmail转发配置说明 */}
-        <Card className="mb-6 border-purple-200 bg-purple-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-purple-800">
-              <Mail className="w-5 h-5" />
-              Gmail转发自动导入（推荐）
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-purple-800 space-y-4">
-            <p className="mb-2">
-              设置一次，永久有效！当您收到包含“打款群”的邮件时，系统会<strong>立即自动导入</strong>订单。
-            </p>
-            
-            <div className="bg-white p-4 rounded-md border">
-              <h4 className="font-semibold mb-2">转发地址：</h4>
-              <div className="flex items-center gap-2">
-                <code className="flex-1 bg-gray-100 px-3 py-2 rounded text-sm font-mono">
-                  {window.location.origin}/api/trpc/gmailWebhook.receiveEmail
-                </code>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/api/trpc/gmailWebhook.receiveEmail`);
-                    toast.success("已复制到剪贴板");
-                  }}
-                >
-                  复制
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-white p-4 rounded-md border space-y-3">
-              <h4 className="font-semibold">设置步骤：</h4>
-              <ol className="list-decimal list-inside space-y-2 text-sm">
-                <li>打开Gmail，点击右上角的设置图标，选择“查看所有设置”</li>
-                <li>点击“过滤器和封锁的地址”标签页</li>
-                <li>点击“创建新过滤器”</li>
-                <li>在“主题”框中输入：<code className="bg-gray-100 px-2 py-1 rounded">打款群</code></li>
-                <li>点击“创建过滤器”，然后勾选“转发到”</li>
-                <li>在转发地址框中粘贴上方的webhook地址</li>
-                <li>点击“创建过滤器”完成设置</li>
-              </ol>
-              <p className="text-xs text-muted-foreground mt-3">
-                注意：Gmail可能会要求您验证转发地址，请按照提示完成验证。
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 定时任务说明 */}
+        {/* 手动导入说明 */}
         <Card className="mb-6 border-green-200 bg-green-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-green-800">
               <AlertCircle className="w-5 h-5" />
-              手动导入说明
+              导入说明
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-green-800">
-            <p className="mb-2">
-              如果您不想设置Gmail转发，也可以点击上方的<strong>“手动导入”</strong>按钮，粘贴邮件内容进行导入。
-            </p>
-            <p className="text-sm">
-              每次收到“打款群”邮件时，需要手动复制邮件内容并粘贴到系统中。
-            </p>
+          <CardContent className="text-green-800 space-y-3">
+            <div>
+              <h4 className="font-semibold mb-2">如何导入订单？</h4>
+              <ol className="list-decimal list-inside space-y-2 text-sm">
+                <li>打开Gmail，找到包含“打款群”的邮件</li>
+                <li>复制邮件正文内容</li>
+                <li>点击上方的<strong>“手动导入”</strong>按钮</li>
+                <li>将复制的内容粘贴到对话框中</li>
+                <li>点击“开始导入”，系统会自动解析并创建订单</li>
+              </ol>
+            </div>
+            
+            <div className="bg-white p-3 rounded-md border">
+              <p className="text-sm">
+                <strong>提示：</strong>系统会自动识别邮件中的订单信息（客户名、上课时间、金额等），无需手动填写。
+              </p>
+            </div>
           </CardContent>
         </Card>
 

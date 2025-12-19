@@ -6,7 +6,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { importRouter } from "./importRouter";
 import { salespersonRouter } from "./salespersonRouter";
 import { gmailAutoImportRouter } from "./gmailAutoImportRouter";
-import { gmailWebhookRouter } from "./gmailWebhookRouter";
+
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
@@ -37,7 +37,7 @@ export const appRouter = router({
   system: systemRouter,
   salespersons: salespersonRouter,
   gmailAutoImport: gmailAutoImportRouter,
-  gmailWebhook: gmailWebhookRouter,
+
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
