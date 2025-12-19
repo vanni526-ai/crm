@@ -89,35 +89,7 @@ export default function GmailImport() {
     },
   });
 
-  // 手动触发导入
-  // 手动导入变更
-  const manualImportMutation = trpc.gmailAutoImport.manualImport.useMutation({
-    onSuccess: (data) => {
-      if (data.success) {
-        toast.success("导入成功", { 
-          description: data.message 
-        });
-        refetchHistory();
-        refetchStats();
-      } else {
-        toast.error("导入失败", { description: data.message });
-      }
-      setIsImporting(false);
-    },
-    onError: (error) => {
-      toast.error("导入失败", { description: error.message });
-      setIsImporting(false);
-    },
-  });
-
-  const handleManualImport = async () => {
-    setIsImporting(true);
-    toast.info("开始导入", { description: "正在搜索Gmail邮件...请稍候" });
-    manualImportMutation.mutate({
-      searchQuery: "打款群",
-      maxResults: 5,
-    });
-  };
+  // 手动导入功能已移除，使用定时任务代替
 
   // 查看详情
   const handleViewDetail = (log: any) => {
@@ -252,12 +224,27 @@ export default function GmailImport() {
               <Download className="w-4 h-4 mr-2" />
               导出报表
             </Button>
-            <Button onClick={handleManualImport} disabled={isImporting}>
-              {isImporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Mail className="w-4 h-4 mr-2" />}
-              手动导入
-            </Button>
+
           </div>
         </div>
+
+        {/* 定时任务说明 */}
+        <Card className="mb-6 border-green-200 bg-green-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-800">
+              <AlertCircle className="w-5 h-5" />
+              自动导入说明
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-green-800">
+            <p className="mb-2">
+              系统已设置每天<strong>早上11点</strong>自动运行导入任务，无需手动触发。
+            </p>
+            <p className="text-sm">
+              导入任务会自动搜索Gmail中包含"打款群"的邮件，解析订单信息并录入系统。您可以在下方查看导入历史记录。
+            </p>
+          </CardContent>
+        </Card>
 
         {/* 邮件格式说明 */}
         <Card className="border-blue-200 bg-blue-50/50">
