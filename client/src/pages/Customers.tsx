@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2, Eye, Phone, Mail } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Phone, Mail, Download } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -68,6 +68,18 @@ export default function Customers() {
     },
     onError: (error) => {
       toast.error(error.message || "批量删除失败");
+    },
+  });
+
+  const importFromOrders = trpc.customers.importFromOrders.useMutation({
+    onSuccess: (data) => {
+      utils.customers.list.invalidate();
+      toast.success(
+        `导入完成！成功: ${data.success} 个，跳过: ${data.skipped} 个，失败: ${data.failed} 个`
+      );
+    },
+    onError: (error) => {
+      toast.error(error.message || "导入失败");
     },
   });
 
@@ -159,6 +171,17 @@ export default function Customers() {
                 批量删除 ({selectedCustomerIds.length})
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (confirm("确定要从订单列表中自动导入客户吗？"))
+                  importFromOrders.mutate();
+              }}
+              disabled={importFromOrders.isPending}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {importFromOrders.isPending ? "导入中..." : "自动导入客户"}
+            </Button>
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               新增客户

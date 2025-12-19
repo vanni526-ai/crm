@@ -201,6 +201,13 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    
+    // 从订单批量导入客户
+    importFromOrders: salesOrAdminProcedure
+      .mutation(async ({ ctx }) => {
+        const result = await db.importCustomersFromOrders(ctx.user.id);
+        return result;
+      }),
   }),
 
   // 订单管理

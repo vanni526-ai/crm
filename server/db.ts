@@ -1432,3 +1432,55 @@ export async function getInactiveCustomers(days: number = 30) {
   
   return customersWithOrders;
 }
+
+// ========== 客户批量导入 ==========
+
+export async function importCustomersFromOrders(createdBy: number) {
+  const db = await getDb();
+  if (!db) return { success: 0, skipped: 0, failed: 0 };
+  
+  // 获取所有订单
+  const allOrders = await db.select().from(orders);
+  
+  // 提取唯一的客户名和流量来源
+  const uniqueCustomers = new Map<string, { name: string; trafficSource?: string }>();
+  
+  for (const order of allOrders) {
+    if (order.customerName && !uniqueCustomers.has(order.customerName)) {
+      uniqueCustomers.set(order.customerName, {
+        name: order.customerName,
+        trafficSource: order.trafficSource || undefined,
+      });
+    }
+  }
+  
+  // 获取现有客户列表
+  const existingCustomers = await db.select({ name: customers.name }).from(customers);
+  const existingNames = new Set(existingCustomers.map(c => c.name));
+  
+  let success = 0;
+  let skipped = 0;
+  let failed = 0;
+  
+  // 批量创建客户
+  for (const customerData of Array.from(uniqueCustomers.values())) {
+    if (existingNames.has(customerData.name)) {
+      skipped++;
+      continue;
+    }
+    
+    try {
+      await db.insert(customers).values({
+        name: customerData.name,
+        trafficSource: customerData.trafficSource,
+        createdBy,
+      });
+      success++;
+    } catch (error) {
+      console.error(`Failed to create customer ${customerData.name}:`, error);
+      failed++;
+    }
+  }
+  
+  return { success, skipped, failed, total: uniqueCustomers.size };
+}
