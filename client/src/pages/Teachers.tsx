@@ -240,6 +240,8 @@ export default function Teachers() {
     if (!file) return;
 
     setImporting(true);
+    toast.info("正在解析Excel文件...");
+    
     try {
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
@@ -249,20 +251,17 @@ export default function Teachers() {
       // 处理每个工作表
       workbook.SheetNames.forEach((sheetName) => {
         const worksheet = workbook.Sheets[sheetName];
-        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+        // 使用range选项跳过前两行(标题行和列名行)
+        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { range: 2 });
         
-        // 跳过标题行,从第二行开始
-        jsonData.forEach((row: any, index: number) => {
-          // 如果是标题行(包含"姓名"字段),跳过
-          if (row['姓名'] === '姓名') return;
-          
+        jsonData.forEach((row: any) => {
           const teacher = {
             name: row['姓名'] || row['name'] || '',
             phone: row['电话号码'] || row['phone'] ? String(row['电话号码'] || row['phone']) : '',
             status: row['活跃状态'] || row['status'] || '活跃',
             customerType: row['受众客户类型'] || row['customerType'] || '',
             notes: row['备注'] || row['notes'] || '',
-            category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '',
+            category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他',
             city: sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : '',
           };
           
@@ -279,9 +278,11 @@ export default function Teachers() {
         return;
       }
       
+      toast.info(`已解析${allTeachers.length}条老师记录,正在导入...`);
       importMutation.mutate({ teachers: allTeachers });
       
     } catch (error: any) {
+      console.error('导入错误:', error);
       toast.error("文件解析失败: " + error.message);
       setImporting(false);
     }
