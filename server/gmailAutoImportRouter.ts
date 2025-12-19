@@ -1,4 +1,8 @@
 import { z } from "zod";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { parseGmailOrderContent } from "./gmailOrderParser";
 import {
@@ -898,4 +902,89 @@ export const gmailAutoImportRouter = router({
       })),
     };
   }),
+
+  /**
+   * 粘贴导入 - 用户手动粘贴邮件内容进行导入
+   */
+  pasteImport: protectedProcedure
+    .input(
+      z.object({
+        emailContent: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        console.log("开始粘贴导入...");
+        
+        // 解析邮件内容
+        const parsedOrders = await parseGmailOrderContent(input.emailContent);
+        console.log(`解析到 ${parsedOrders.length} 个订单`);
+        
+        if (parsedOrders.length === 0) {
+          throw new Error("未找到订单信息，请检查邮件内容格式");
+        }
+        
+        // 创建导入日志
+        const logId = await createGmailImportLog({
+          emailSubject: "手动粘贴导入",
+          emailDate: new Date(),
+          threadId: `manual-${Date.now()}`,
+          totalOrders: parsedOrders.length,
+          successOrders: 0,
+          failedOrders: 0,
+          status: "success",
+          importedBy: ctx.user.id,
+          emailContent: input.emailContent.substring(0, 5000),
+        });
+        
+        // 批量创建订单
+        let successCount = 0;
+        let skippedCount = 0;
+        const errorMessages: string[] = [];
+        
+        for (const orderData of parsedOrders) {
+          try {
+            // 生成订单号
+            const orderNo = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
+            
+            // 检查订单号是否已存在
+            const exists = await checkOrderNoExists(orderNo);
+            if (exists) {
+              skippedCount++;
+              errorMessages.push(`订单号 ${orderNo} 已存在`);
+              continue;
+            }
+            
+            // 创建订单
+            await createOrder({
+              orderNo,
+              customerName: orderData.customerName,
+              salesPerson: orderData.salesperson,
+              classDate: new Date(orderData.classDate),
+              classTime: orderData.classTime,
+              deliveryCourse: orderData.course,
+              paymentAmount: orderData.paymentAmount.toString(),
+              courseAmount: orderData.courseAmount.toString(),
+              salesId: ctx.user.id,
+            });
+            
+            successCount++;
+          } catch (err: any) {
+            errorMessages.push(`订单导入失败: ${err.message}`);
+          }
+        }
+        
+        console.log(`导入完成: 成功 ${successCount}, 跳过 ${skippedCount}`);
+        
+        return {
+          successCount,
+          skippedCount,
+          totalCount: parsedOrders.length,
+          errors: errorMessages,
+        };
+      } catch (error: any) {
+        console.error("粘贴导入失败:", error);
+        throw new Error(error.message || "导入失败");
+      }
+    }),
 });

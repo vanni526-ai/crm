@@ -23,6 +23,8 @@ export default function GmailImport() {
   const [showClearAllDialog, setShowClearAllDialog] = useState(false);
   const [isReprocessing, setIsReprocessing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [showPasteDialog, setShowPasteDialog] = useState(false);
+  const [emailContent, setEmailContent] = useState("");
 
   // 获取导入历史
   const { data: historyData, refetch: refetchHistory } = trpc.gmailAutoImport.getImportHistory.useQuery();
@@ -89,24 +91,37 @@ export default function GmailImport() {
     },
   });
 
-  // 手动导入
-  const manualImportMutation = trpc.gmailAutoImport.manualImport.useMutation({
-    onSuccess: (data) => {
-      toast.success("导入完成", { description: data.message });
+  // 手动导入(粘贴内容)
+  const pasteImportMutation = trpc.gmailAutoImport.pasteImport.useMutation({
+    onSuccess: (data: any) => {
+      toast.success("导入完成", { 
+        description: `成功导入${data.successCount}个订单, 跳过${data.skippedCount}个重复订单` 
+      });
       refetchHistory();
       refetchStats();
       setIsImporting(false);
+      setShowPasteDialog(false);
+      setEmailContent("");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("导入失败", { description: error.message });
       setIsImporting(false);
     },
   });
 
-  // 手加导入处理函数
+  // 手动导入处理函数
   const handleManualImport = () => {
+    setShowPasteDialog(true);
+  };
+
+  // 提交粘贴内容
+  const handlePasteSubmit = () => {
+    if (!emailContent.trim()) {
+      toast.error("请粘贴邮件内容");
+      return;
+    }
     setIsImporting(true);
-    manualImportMutation.mutate();
+    pasteImportMutation.mutate({ emailContent });
   };
 
   // 查看详情
@@ -571,6 +586,50 @@ export default function GmailImport() {
               <Button variant="outline" onClick={() => setShowClearAllDialog(false)}>取消</Button>
               <Button variant="destructive" onClick={() => clearAllMutation.mutate()}>
                 清空全部
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 粘贴邮件内容对话框 */}
+        <Dialog open={showPasteDialog} onOpenChange={setShowPasteDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>粘贴Gmail邮件内容</DialogTitle>
+              <DialogDescription>
+                请打开Gmail,找到包含"打款群"的邮件,复制邮件内容并粘贴到下方文本框中
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <textarea
+                className="w-full h-96 p-4 border rounded-md font-mono text-sm"
+                placeholder="请粘贴邮件内容..."
+                value={emailContent}
+                onChange={(e) => setEmailContent(e.target.value)}
+              />
+              <div className="text-sm text-muted-foreground">
+                <p>提示：系统会自动识别邮件中的订单信息，包括：</p>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>设备微信号：如"澎姬咕咕"、"澎姬小领"</li>
+                  <li>日期时间：格式为MM.DD HH:MM-HH:MM</li>
+                  <li>课程名称：如"sp课"、"sp红色上衣红色下装"</li>
+                  <li>金额信息：包含"元已付"的数字</li>
+                </ul>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowPasteDialog(false)}>
+                取消
+              </Button>
+              <Button onClick={handlePasteSubmit} disabled={isImporting}>
+                {isImporting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    导入中...
+                  </>
+                ) : (
+                  "开始导入"
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>
