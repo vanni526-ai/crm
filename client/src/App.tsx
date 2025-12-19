@@ -17,6 +17,7 @@ import Users from "./pages/Users";
 import Import from "./pages/Import";
 import CustomerOverview from "./pages/CustomerOverview";
 import Sales from "./pages/Sales";
+import GmailImport from "./pages/GmailImport";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function Router() {
       <Route path={"/import"} component={Import} />
       <Route path={"/customer-overview"} component={CustomerOverview} />
       <Route path={"/sales"} component={Sales} />
+      <Route path={"/gmail-import"} component={GmailImport} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -1,7 +1,16 @@
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { parseGmailOrderContent } from "./gmailOrderParser";
-import { createOrder, checkOrderNoExists } from "./db";
+import { 
+  createOrder, 
+  checkOrderNoExists,
+  createGmailImportLog,
+  getAllGmailImportLogs,
+  getGmailImportLogById,
+  getGmailImportStats,
+  checkThreadIdExists,
+} from "./db";
+import { notifyOwner } from "./_core/notification";
 import { orders } from "../drizzle/schema";
 
 /**
@@ -37,11 +46,15 @@ export const gmailAutoImportRouter = router({
     }),
 
   /**
-   * 批量创建订单(从Gmail解析结果)
+   * 批量创建订单(从 Gmail解析结果)
    */
   batchCreateFromGmail: protectedProcedure
     .input(
       z.object({
+        emailSubject: z.string().optional(),
+        emailDate: z.string().optional(),
+        threadId: z.string().optional(),
+        emailContent: z.string().optional(),
         orders: z.array(
           z.object({
             salesperson: z.string(),
@@ -69,6 +82,7 @@ export const gmailAutoImportRouter = router({
       const results = [];
       let successCount = 0;
       let failCount = 0;
+      const errorMessages: string[] = [];
 
       for (const orderData of input.orders) {
         try {
@@ -124,12 +138,48 @@ export const gmailAutoImportRouter = router({
           successCount++;
         } catch (error: any) {
           console.error("创建订单失败:", error);
+          const errorMsg = `客户: ${orderData.customerName}, 错误: ${error.message || "创建失败"}`;
+          errorMessages.push(errorMsg);
           results.push({
             success: false,
             customerName: orderData.customerName,
             error: error.message || "创建失败",
           });
           failCount++;
+        }
+      }
+
+      // 记录导入日志
+      if (input.threadId) {
+        try {
+          const status = failCount === 0 ? "success" : (successCount > 0 ? "partial" : "failed");
+          await createGmailImportLog({
+            emailSubject: input.emailSubject || "未知邮件",
+            emailDate: input.emailDate ? new Date(input.emailDate) : new Date(),
+            threadId: input.threadId,
+            totalOrders: input.orders.length,
+            successOrders: successCount,
+            failedOrders: failCount,
+            status,
+            errorLog: errorMessages.length > 0 ? errorMessages.join("\n") : null,
+            emailContent: input.emailContent || null,
+            parsedData: input.orders as any,
+            importedBy: ctx.user.id,
+          });
+        } catch (error) {
+          console.error("记录导入日志失败:", error);
+        }
+      }
+
+      // 如果有失败订单,通知管理员
+      if (failCount > 0) {
+        try {
+          await notifyOwner({
+            title: "Gmail订单导入异常",
+            content: `邮件: ${input.emailSubject || "未知"}\n总订单数: ${input.orders.length}\n成功: ${successCount}\n失败: ${failCount}\n\n错误详情:\n${errorMessages.join("\n")}`,
+          });
+        } catch (error) {
+          console.error("发送通知失败:", error);
         }
       }
 
@@ -143,19 +193,37 @@ export const gmailAutoImportRouter = router({
     }),
 
   /**
-   * 获取最近的Gmail导入历史
+   * 获取所有Gmail导入历史
    */
-  getImportHistory: protectedProcedure
-    .input(
-      z.object({
-        limit: z.number().optional().default(10),
-      })
-    )
+  getImportHistory: protectedProcedure.query(async () => {
+    const logs = await getAllGmailImportLogs();
+    return {
+      logs,
+      total: logs.length,
+    };
+  }),
+
+  /**
+   * 获取Gmail导入统计数据
+   */
+  getImportStats: protectedProcedure.query(async () => {
+    const stats = await getGmailImportStats();
+    return stats || {
+      totalImports: 0,
+      totalOrders: 0,
+      successOrders: 0,
+      failedOrders: 0,
+      successRate: 0,
+    };
+  }),
+
+  /**
+   * 获取单条导入记录详情
+   */
+  getImportLogDetail: protectedProcedure
+    .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
-      // TODO: 实现导入历史记录功能
-      return {
-        history: [],
-        total: 0,
-      };
+      const log = await getGmailImportLogById(input.id);
+      return log;
     }),
 });

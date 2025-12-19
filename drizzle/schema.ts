@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time, json } from "drizzle-orm/mysql-core";
 
 /**
  * 用户表 - 支持管理员、销售、财务三种角色
@@ -223,6 +223,29 @@ export const reconciliations = mysqlTable("reconciliations", {
 }));
 
 /**
+ * Gmail导入记录表
+ */
+export const gmailImportLogs = mysqlTable("gmailImportLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  emailSubject: varchar("emailSubject", { length: 255 }).notNull(), // 邮件主题
+  emailDate: timestamp("emailDate").notNull(), // 邮件日期
+  threadId: varchar("threadId", { length: 100 }).notNull(), // Gmail线程ID
+  totalOrders: int("totalOrders").notNull(), // 解析出的订单数
+  successOrders: int("successOrders").notNull(), // 成功录入的订单数
+  failedOrders: int("failedOrders").notNull(), // 失败的订单数
+  status: mysqlEnum("status", ["success", "partial", "failed"]).notNull(), // 导入状态
+  errorLog: text("errorLog"), // 错误日志
+  emailContent: text("emailContent"), // 邮件内容(用于查看原始数据)
+  parsedData: json("parsedData"), // 解析后的订单数据(JSON)
+  importedBy: int("importedBy").notNull(), // 导入人(0表示系统自动)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  threadIdIdx: index("thread_id_idx").on(table.threadId),
+  statusIdx: index("status_idx").on(table.status),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+/**
  * 数据导入记录表
  */
 export const importLogs = mysqlTable("importLogs", {
@@ -255,6 +278,8 @@ export type Reconciliation = typeof reconciliations.$inferSelect;
 export type InsertReconciliation = typeof reconciliations.$inferInsert;
 export type ImportLog = typeof importLogs.$inferSelect;
 export type InsertImportLog = typeof importLogs.$inferInsert;
+export type GmailImportLog = typeof gmailImportLogs.$inferSelect;
+export type InsertGmailImportLog = typeof gmailImportLogs.$inferInsert;
 export type Salesperson = typeof salespersons.$inferSelect;
 export type InsertSalesperson = typeof salespersons.$inferInsert;
 

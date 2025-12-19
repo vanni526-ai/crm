@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `gmailImportLogs` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`emailSubject` varchar(255) NOT NULL,\n\t`emailDate` timestamp NOT NULL,\n\t`threadId` varchar(100) NOT NULL,\n\t`totalOrders` int NOT NULL,\n\t`successOrders` int NOT NULL,\n\t`failedOrders` int NOT NULL,\n\t`status` enum('success','partial','failed') NOT NULL,\n\t`errorLog` text,\n\t`emailContent` text,\n\t`parsedData` json,\n\t`importedBy` int NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `gmailImportLogs_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX IF NOT EXISTS `thread_id_idx` ON `gmailImportLogs` (`threadId`);\nCREATE INDEX IF NOT EXISTS `status_idx` ON `gmailImportLogs` (`status`);\nCREATE INDEX IF NOT EXISTS `created_at_idx` ON `gmailImportLogs` (`createdAt`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `gmailImportLogs` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`emailSubject` varchar(255) NOT NULL,\n\t`emailDate` timestamp NOT NULL,\n\t`threadId` varchar(100) NOT NULL,\n\t`totalOrders` int NOT NULL,\n\t`successOrders` int NOT NULL,\n\t`failedOrders` int NOT NULL,\n\t`status` enum('success','partial','failed') NOT NULL,\n\t`errorLog` text,\n\t`emailContent` text,\n\t`parsedData` json,\n\t`importedBy` int NOT NULL,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `gmailImportLogs_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX IF NOT EXISTS `thread_id_idx` ON `gmailImportLogs` (`threadId`);\nCREATE INDEX IF NOT EXISTS `status_idx` ON `gmailImportLogs` (`status`);\nCREATE INDEX IF NOT EXISTS `created_at_idx` ON `gmailImportLogs` (`createdAt`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4413
+}

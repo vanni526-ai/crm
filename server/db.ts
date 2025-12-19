@@ -23,6 +23,8 @@ import {
   InsertSmartRegisterHistory,
   salespersons,
   InsertSalesperson,
+  gmailImportLogs,
+  InsertGmailImportLog,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1249,4 +1251,69 @@ export async function getYearlySales(
   }
   
   return yearlySales;
+}
+
+// ========== Gmail导入日志管理 ==========
+
+export async function createGmailImportLog(log: InsertGmailImportLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(gmailImportLogs).values(log);
+  return result[0].insertId;
+}
+
+export async function getAllGmailImportLogs() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(gmailImportLogs).orderBy(desc(gmailImportLogs.createdAt));
+}
+
+export async function getGmailImportLogById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(gmailImportLogs).where(eq(gmailImportLogs.id, id)).limit(1);
+  return result[0] || null;
+}
+
+export async function getGmailImportLogsByDateRange(startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(gmailImportLogs)
+    .where(
+      and(
+        gte(gmailImportLogs.createdAt, startDate),
+        lte(gmailImportLogs.createdAt, endDate)
+      )
+    )
+    .orderBy(desc(gmailImportLogs.createdAt));
+}
+
+export async function getGmailImportStats() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db
+    .select({
+      totalImports: sql<number>`COUNT(*)`,
+      totalOrders: sql<number>`SUM(${gmailImportLogs.totalOrders})`,
+      successOrders: sql<number>`SUM(${gmailImportLogs.successOrders})`,
+      failedOrders: sql<number>`SUM(${gmailImportLogs.failedOrders})`,
+      successRate: sql<number>`ROUND(SUM(${gmailImportLogs.successOrders}) * 100.0 / NULLIF(SUM(${gmailImportLogs.totalOrders}), 0), 2)`,
+    })
+    .from(gmailImportLogs);
+    
+  return result[0] || null;
+}
+
+export async function checkThreadIdExists(threadId: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  const result = await db
+    .select()
+    .from(gmailImportLogs)
+    .where(eq(gmailImportLogs.threadId, threadId))
+    .limit(1);
+  return result.length > 0;
 }
