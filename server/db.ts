@@ -166,13 +166,13 @@ export async function getAllCustomers() {
           firstOrderDate: sql<Date>`MIN(${orders.createdAt})`,
         })
         .from(orders)
-        .where(eq(orders.customerId, customer.id));
+        .where(eq(orders.customerName, customer.name));
       
       // 获取最新订单的账户余额
       const latestOrder = await db
         .select({ accountBalance: orders.accountBalance })
         .from(orders)
-        .where(eq(orders.customerId, customer.id))
+        .where(eq(orders.customerName, customer.name))
         .orderBy(desc(orders.createdAt))
         .limit(1);
       

@@ -1,0 +1,110 @@
+{
+  "query": "SELECT customerId, customerName, COUNT(*) as count FROM orders GROUP BY customerId, customerName LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT customerId, customerName, COUNT(*) as count FROM orders GROUP BY customerId, customerName LIMIT 20",
+  "rows": [
+    {
+      "customerId": "NULL",
+      "customerName": "猛虎下山",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "蔡二麻",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "修丶休",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "yy",
+      "count": "2"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "gfg",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "Tohsaka Rin",
+      "count": "2"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "bearbear",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "韩开银",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "小朋友堆雪人",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "薄荷糖重度依赖",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "足球专家",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "小鱼7676",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "404",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "shroud",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "哎呦 不错哦🇨🇳",
+      "count": "2"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "Sunson",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "Zheng",
+      "count": "2"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "安静",
+      "count": "1"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "左左右右",
+      "count": "2"
+    },
+    {
+      "customerId": "NULL",
+      "customerName": "Hank",
+      "count": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "customerId\tcustomerName\tcount\nNULL\t猛虎下山\t1\nNULL\t蔡二麻\t1\nNULL\t修丶休\t1\nNULL\tyy\t2\nNULL\tgfg\t1\nNULL\tTohsaka Rin\t2\nNULL\tbearbear\t1\nNULL\t韩开银\t1\nNULL\t小朋友堆雪人\t1\nNULL\t薄荷糖重度依赖\t1\nNULL\t足球专家\t1\nNULL\t小鱼7676\t1\nNULL\t404\t1\nNULL\tshroud\t1\nNULL\t哎呦 不错哦🇨🇳\t2\nNULL\tSunson\t1\nNULL\tZheng\t2\nNULL\t安静\t1\nNULL\t左左右右\t2\nNULL\tHank\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1635
+}
