@@ -404,7 +404,7 @@ export async function getOrderStatsByDateRange(startDate: string, endDate: strin
     })
     .from(orders)
     .where(
-      sql`${orders.paymentDate} >= ${startDate} AND ${orders.paymentDate} <= ${endDate}`
+      sql`${orders.classDate} >= ${startDate} AND ${orders.classDate} <= ${endDate}`
     );
 
   return result[0];
