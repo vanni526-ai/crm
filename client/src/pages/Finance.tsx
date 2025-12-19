@@ -35,15 +35,15 @@ export default function Finance() {
     let filteredOrders = orders;
     if (dateRange === "thisMonth") {
       filteredOrders = orders.filter((order) => {
-        if (!order.paymentDate) return false;
-        const paymentDate = new Date(order.paymentDate);
-        return paymentDate >= startOfMonth && paymentDate <= endOfMonth;
+        if (!order.classDate) return false;
+        const classDate = new Date(order.classDate);
+        return classDate >= startOfMonth && classDate <= endOfMonth;
       });
     } else if (dateRange === "lastMonth") {
       filteredOrders = orders.filter((order) => {
-        if (!order.paymentDate) return false;
-        const paymentDate = new Date(order.paymentDate);
-        return paymentDate >= startOfLastMonth && paymentDate <= endOfLastMonth;
+        if (!order.classDate) return false;
+        const classDate = new Date(order.classDate);
+        return classDate >= startOfLastMonth && classDate <= endOfLastMonth;
       });
     }
 
