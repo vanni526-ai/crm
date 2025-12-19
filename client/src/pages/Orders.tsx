@@ -23,8 +23,8 @@ const orderSchema = z.object({
   salespersonId: z.number().optional(),
   salesPerson: z.string().optional(),
   trafficSource: z.string().optional(),
-  paymentAmount: z.string().min(1, "支付金额不能为空"),
-  courseAmount: z.string().min(1, "课程金额不能为空"),
+  paymentAmount: z.string(),
+  courseAmount: z.string(),
   accountBalance: z.string().optional(),
   paymentCity: z.string().optional(),
   paymentChannel: z.string().optional(),
@@ -171,7 +171,11 @@ export default function Orders() {
   };
 
   const onEditSubmit = (data: OrderFormData) => {
-    if (!selectedOrder) return;
+    console.log('编辑表单提交:', data);
+    if (!selectedOrder) {
+      toast.error('未选择订单');
+      return;
+    }
     updateOrder.mutate({
       id: selectedOrder.id,
       orderNo: data.orderNo,
@@ -1403,7 +1407,10 @@ export default function Orders() {
             <DialogHeader>
               <DialogTitle>编辑订单</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleSubmit(onEditSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmit(onEditSubmit, (errors) => {
+              console.log('表单验证错误:', errors);
+              toast.error('请检查表单填写是否完整');
+            })} className="space-y-4">
               <Tabs defaultValue="basic">
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="basic">基本信息</TabsTrigger>
