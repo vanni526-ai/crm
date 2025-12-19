@@ -436,22 +436,170 @@ export const gmailAutoImportRouter = router({
    */
   manualImport: protectedProcedure.mutation(async ({ ctx }) => {
     try {
-      // 调用服务器端脚本执行导入
       const { execSync } = await import("child_process");
-      const { join } = await import("path");
       
-      const scriptPath = join(process.cwd(), "scripts/gmail-auto-import.mjs");
+      // 1. 搜索包含"打款群"的邮件
+      console.log("步骤1: 搜索Gmail邮件...");
+      const searchResult = execSync(
+        `manus-mcp-cli tool call gmail_search_messages --server gmail --input '{"q": "打款群", "max_results": 10}'`,
+        { encoding: "utf-8", timeout: 60000 }
+      );
       
-      // 异步执行脚本,不阻塞响应
-      execSync(`node ${scriptPath}`, {
-        encoding: "utf-8",
-        stdio: "inherit",
-        timeout: 120000, // 2分钟超时
-      });
+      // 2. 解析搜索结果
+      const resultMatch = searchResult.match(/MCP tool invocation result saved to:\s*(.+\.json)/);
+      if (!resultMatch) {
+        return {
+          success: true,
+          message: "未找到新邮件",
+          importedCount: 0,
+        };
+      }
+      
+      const { readFileSync } = await import("fs");
+      const resultFile = resultMatch[1].trim();
+      const searchData = JSON.parse(readFileSync(resultFile, "utf-8"));
+      const threads = searchData.result?.threads || [];
+      
+      if (threads.length === 0) {
+        return {
+          success: true,
+          message: "未找到包含'打款群'的邮件",
+          importedCount: 0,
+        };
+      }
+      
+      console.log(`找到 ${threads.length} 封邮件`);
+      
+      let totalImported = 0;
+      let totalSkipped = 0;
+      
+      // 3. 处理每封邮件
+      for (const thread of threads.slice(0, 5)) { // 最多处理55封
+        try {
+          // 检查threadId是否已导入
+          const exists = await checkThreadIdExists(thread.id);
+          if (exists) {
+            console.log(`邮件 ${thread.id} 已导入,跳过`);
+            totalSkipped++;
+            continue;
+          }
+          
+          // 读取邮件完整内容
+          const readResult = execSync(
+            `manus-mcp-cli tool call gmail_read_threads --server gmail --input '{"thread_ids": ["${thread.id}"], "include_full_messages": true}'`,
+            { encoding: "utf-8", timeout: 30000 }
+          );
+          
+          const readResultMatch = readResult.match(/MCP tool invocation result saved to:\s*(.+\.json)/);
+          if (!readResultMatch) {
+            console.log(`无法读取邮件 ${thread.id} 内容,跳过`);
+            continue;
+          }
+          
+          const readResultFile = readResultMatch[1].trim();
+          const readData = JSON.parse(readFileSync(readResultFile, "utf-8"));
+          const threadData = readData.result?.threads?.[0];
+          
+          if (!threadData) {
+            console.log(`邮件 ${thread.id} 数据为空,跳过`);
+            continue;
+          }
+          
+          // 提取邮件文本内容
+          let emailContent = "";
+          for (const msg of threadData.messages || []) {
+            if (msg.body?.text) {
+              emailContent += msg.body.text + "\n\n";
+            }
+          }
+          
+          if (!emailContent.trim()) {
+            console.log(`邮件 ${thread.id} 内容为空,跳过`);
+            continue;
+          }
+          
+          // 解析订单信息
+          const parsedOrders = await parseGmailOrderContent(emailContent);
+          
+          if (parsedOrders.length === 0) {
+            console.log(`邮件 ${thread.id} 未解析到订单,跳过`);
+            continue;
+          }
+          
+          // 创建导入日志
+          const logId = await createGmailImportLog({
+            emailSubject: threadData.subject || "无主题",
+            emailDate: new Date(threadData.date || new Date().toISOString()),
+            threadId: thread.id,
+            totalOrders: parsedOrders.length,
+            successOrders: 0,
+            failedOrders: 0,
+            status: "success",
+            importedBy: ctx.user.id,
+            emailContent: emailContent.substring(0, 5000),
+          });
+          
+          // 批量创建订单
+          let importedCount = 0;
+          const errorMessages: string[] = [];
+          
+          for (const orderData of parsedOrders) {
+            try {
+              const cityAreaCodes: Record<string, string> = {
+                "上海": "021",
+                "北京": "010",
+                "天津": "022",
+                "成都": "028",
+                "泉州": "0595",
+                "无锡": "0510",
+                "武汉": "027",
+              };
+              
+              const areaCode = cityAreaCodes[orderData.city] || "000";
+              const timestamp = Date.now().toString().slice(-8);
+              const orderNo = `${areaCode}${timestamp}`;
+              
+              // 检查订单号是否已存在
+              const orderExists = await checkOrderNoExists(orderNo);
+              if (orderExists) {
+                errorMessages.push(`订单号 ${orderNo} 已存在`);
+                continue;
+              }
+              
+              // 创建订单
+              await createOrder({
+                orderNo,
+                customerName: orderData.customerName,
+                salesPerson: orderData.salesperson,
+                classDate: new Date(orderData.classDate),
+                classTime: orderData.classTime,
+                deliveryCourse: orderData.course,
+                paymentAmount: orderData.paymentAmount.toString(),
+                courseAmount: orderData.courseAmount.toString(),
+                salesId: ctx.user.id,
+              });
+              
+              importedCount++;
+            } catch (err: any) {
+              errorMessages.push(`订单导入失败: ${err.message}`);
+            }
+          }
+          
+          // 更新导入日志
+          // TODO: 添加updateGmailImportLog函数
+          
+          totalImported += importedCount;
+          
+        } catch (err: any) {
+          console.error(`处理邮件 ${thread.id} 失败:`, err);
+        }
+      }
       
       return {
         success: true,
-        message: "导入任务已完成",
+        message: `导入完成: 成功 ${totalImported} 个订单, 跳过 ${totalSkipped} 封已导入的邮件`,
+        importedCount: totalImported,
+        skippedCount: totalSkipped,
       };
     } catch (error: any) {
       console.error("手动导入失败:", error);
