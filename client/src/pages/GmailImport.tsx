@@ -89,7 +89,25 @@ export default function GmailImport() {
     },
   });
 
-  // 手动导入功能已移除，使用定时任务代替
+  // 手动导入
+  const manualImportMutation = trpc.gmailAutoImport.manualImport.useMutation({
+    onSuccess: (data) => {
+      toast.success("导入完成", { description: data.message });
+      refetchHistory();
+      refetchStats();
+      setIsImporting(false);
+    },
+    onError: (error) => {
+      toast.error("导入失败", { description: error.message });
+      setIsImporting(false);
+    },
+  });
+
+  // 手加导入处理函数
+  const handleManualImport = () => {
+    setIsImporting(true);
+    manualImportMutation.mutate();
+  };
 
   // 查看详情
   const handleViewDetail = (log: any) => {
@@ -224,7 +242,19 @@ export default function GmailImport() {
               <Download className="w-4 h-4 mr-2" />
               导出报表
             </Button>
-
+            <Button onClick={handleManualImport} disabled={isImporting}>
+              {isImporting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  导入中...
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4 mr-2" />
+                  手动导入
+                </>
+              )}
+            </Button>
           </div>
         </div>
 

@@ -432,6 +432,34 @@ export const gmailAutoImportRouter = router({
     }),
 
   /**
+   * 手动触发Gmail导入
+   */
+  manualImport: protectedProcedure.mutation(async ({ ctx }) => {
+    try {
+      // 调用服务器端脚本执行导入
+      const { execSync } = await import("child_process");
+      const { join } = await import("path");
+      
+      const scriptPath = join(process.cwd(), "scripts/gmail-auto-import.mjs");
+      
+      // 异步执行脚本,不阻塞响应
+      execSync(`node ${scriptPath}`, {
+        encoding: "utf-8",
+        stdio: "inherit",
+        timeout: 120000, // 2分钟超时
+      });
+      
+      return {
+        success: true,
+        message: "导入任务已完成",
+      };
+    } catch (error: any) {
+      console.error("手动导入失败:", error);
+      throw new Error(`导入失败: ${error.message}`);
+    }
+  }),
+
+  /**
    * 获取失败原因统计
    */
   getFailureStats: protectedProcedure.query(async () => {
@@ -519,9 +547,10 @@ export const gmailAutoImportRouter = router({
     }),
 
   /**
-   * 手动触发Gmail导入
+   * 手动触发Gmail导入(旧版本,已废弃)
+   * 使用上面的execSync版本代替
    */
-  manualImport: protectedProcedure
+  manualImportOld: protectedProcedure
     .input(z.object({
       searchQuery: z.string().optional().default("打款群"),
       maxResults: z.number().optional().default(5),
