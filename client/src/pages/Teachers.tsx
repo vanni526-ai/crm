@@ -178,9 +178,19 @@ export default function Teachers() {
 
   const handleUpdate = (data: TeacherFormData) => {
     if (!selectedTeacher) return;
+    // 只提交编辑对话框中存在的字段
+    const updateData = {
+      name: data.name,
+      phone: data.phone,
+      status: data.status,
+      category: data.category,
+      city: data.city,
+      customerType: data.customerType,
+      notes: data.notes,
+    };
     updateTeacher.mutate({
       id: selectedTeacher.id,
-      data,
+      data: updateData,
     });
   };
 
