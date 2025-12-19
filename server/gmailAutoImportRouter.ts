@@ -467,4 +467,52 @@ export const gmailAutoImportRouter = router({
       failureReasons,
     };
   }),
+
+  /**
+   * 编辑导入记录中的订单数据
+   */
+  updateImportLogData: protectedProcedure
+    .input(z.object({
+      logId: z.number(),
+      orderIndex: z.number(),
+      updatedOrder: z.object({
+        salesperson: z.string().optional(),
+        deviceWechat: z.string().optional(),
+        customerName: z.string().optional(),
+        classDate: z.string().optional(),
+        classTime: z.string().optional(),
+        course: z.string().optional(),
+        teacher: z.string().optional(),
+        city: z.string().optional(),
+        classroom: z.string().optional(),
+        paymentAmount: z.number().optional(),
+        courseAmount: z.number().optional(),
+        teacherFee: z.number().optional(),
+        carFee: z.number().optional(),
+        notes: z.string().optional(),
+      }),
+    }))
+    .mutation(async ({ input }) => {
+      const { logId, orderIndex, updatedOrder } = input;
+      
+      // 获取导入日志
+      const log = await getGmailImportLogById(logId);
+      if (!log) {
+        throw new Error("导入记录不存在");
+      }
+
+      // 解析parsedData
+      const parsedData = log.parsedData as any[];
+      if (!parsedData || orderIndex >= parsedData.length) {
+        throw new Error("订单索引无效");
+      }
+
+      // 更新订单数据
+      const oldOrder = parsedData[orderIndex];
+      const newOrder = { ...oldOrder, ...updatedOrder };
+      parsedData[orderIndex] = newOrder;
+
+      // TODO: 实现编辑功能需要更复杂的数据库操作，暂时返回提示
+      return { success: false, message: "编辑功能开发中，请使用重新解析功能" };
+    }),
 });

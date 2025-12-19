@@ -1,4 +1,5 @@
 import { invokeLLM } from "./_core/llm";
+import { getAllGmailImportConfigs } from "./db";
 
 /**
  * 解析后的订单信息
@@ -29,7 +30,25 @@ export interface ParsedGmailOrder {
 export async function parseGmailOrderContent(
   emailContent: string
 ): Promise<ParsedGmailOrder[]> {
-  const prompt = `你是一个专业的订单信息提取助手。请从以下微信群聊天记录中提取所有订单信息。
+  // 读取配置规则
+  const configs = await getAllGmailImportConfigs();
+  const cityAreaCodes = configs.find(c => c.configKey === "city_area_codes")?.configValue as Record<string, string> || {};
+  const salesAliases = configs.find(c => c.configKey === "sales_aliases")?.configValue as Record<string, string> || {};
+  const defaultFees = configs.find(c => c.configKey === "default_fees")?.configValue as { teacherFeeRate: number; transportFeeDefault: number } || { teacherFeeRate: 0.5, transportFeeDefault: 200 };
+
+  // 构建配置提示
+  const configHints = [];
+  if (Object.keys(cityAreaCodes).length > 0) {
+    configHints.push(`城市区号映射: ${JSON.stringify(cityAreaCodes)}`);
+  }
+  if (Object.keys(salesAliases).length > 0) {
+    configHints.push(`销售人员别名映射: ${JSON.stringify(salesAliases)} - 如果遇到别名，请转换为正式名称`);
+  }
+  configHints.push(`默认老师费用比例: ${defaultFees.teacherFeeRate * 100}%, 默认车费: ¥${defaultFees.transportFeeDefault}`);
+  
+  const configPrompt = configHints.length > 0 ? `\n\n参考配置规则（用于提高解析准确率）:\n${configHints.join('\n')}` : '';
+
+  const prompt = `你是一个专业的订单信息提取助手。请从以下微信群聊天记录中提取所有订单信息。${configPrompt}
 
 聊天记录:
 ${emailContent}

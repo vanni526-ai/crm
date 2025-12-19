@@ -243,6 +243,50 @@ export default function GmailImport() {
           </div>
         </div>
 
+        {/* 邮件格式说明 */}
+        <Card className="border-blue-200 bg-blue-50/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-blue-600" />
+              邮件格式说明
+            </CardTitle>
+            <CardDescription>
+              为了提高解析准确率，请按照以下格式发送邮件
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="font-semibold text-sm mb-2">标准格式示例：</h4>
+              <div className="bg-white p-4 rounded-md border font-mono text-sm space-y-2">
+                <div className="text-muted-foreground">—————  2025-12-17  —————</div>
+                <div className="text-blue-600">瀑姬喵喵11:00-20:00  17:34</div>
+                <div>昭昭 12.17 20:30-21:30 sp课 云云上(无锡单)全款1500已付 无锡教室第三次使用</div>
+                <div className="text-blue-600 mt-3">瀑姬小领16:00-23:00  19:09</div>
+                <div>嘅嘅 12.17 18:00-20:00  裸足丝袜+埃及艳后  皮皮上(济南)  ，韩开银1600定金已付   1600尾款已付➕报销老师200车费 (济南教室第二次使用)</div>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold text-sm mb-2">关键字段说明：</h4>
+              <ul className="text-sm space-y-1 text-muted-foreground">
+                <li>• <span className="text-blue-600 font-medium">设备微信号</span>：发送消息的微信账号（如“瀑姬喵喵11:00-20:00”）</li>
+                <li>• <span className="font-medium">销售人员</span>：订单信息第一个词（如“昭昭”、“嘅嘅”）</li>
+                <li>• <span className="font-medium">日期时间</span>：格式为 MM.DD HH:MM-HH:MM（如“12.17 20:30-21:30”）</li>
+                <li>• <span className="font-medium">课程名称</span>：课程内容（如“sp课”、“裸足丝袜+埃及艳后”）</li>
+                <li>• <span className="font-medium">老师名称</span>：格式为“XX上”（如“云云上”、“皮皮上”）</li>
+                <li>• <span className="font-medium">城市信息</span>：括号中的城市（如“(无锡单)”、“(济南)”）</li>
+                <li>• <span className="font-medium">支付金额</span>：全款/定金/尾款格式（如“全款1500已付”、“1600定金已付 1600尾款已付”）</li>
+                <li>• <span className="font-medium">客户名</span>：可选，通常在金额信息中（如“韩开银1600定金已付”）</li>
+                <li>• <span className="font-medium">车费</span>：可选，格式为“报销老师XX车费”</li>
+              </ul>
+            </div>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+              <p className="text-sm text-yellow-800">
+                <strong>提示：</strong>您可以在<Link href="/gmail-import/config" className="underline">配置页面</Link>设置城市区号、销售人员别名等规则，提高解析准确率。
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* 统计卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
