@@ -670,4 +670,53 @@ export const gmailAutoImportRouter = router({
         };
       }
     }),
+
+  /**
+   * 获取上周导入统计数据(用于周报)
+   */
+  getWeeklyStats: publicProcedure.query(async () => {
+    // 计算上周的开始和结束时间(周一00:00到周日23:59)
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0=周日, 1=周一, ...
+    const daysToLastMonday = dayOfWeek === 0 ? 6 : dayOfWeek + 6; // 距离上周一的天数
+    const lastMonday = new Date(now);
+    lastMonday.setDate(now.getDate() - daysToLastMonday);
+    lastMonday.setHours(0, 0, 0, 0);
+    
+    const lastSunday = new Date(lastMonday);
+    lastSunday.setDate(lastMonday.getDate() + 6);
+    lastSunday.setHours(23, 59, 59, 999);
+
+    // 查询上周的导入记录
+    const allLogs = await getAllGmailImportLogs();
+    const logs = allLogs.filter(log => {
+      const logTime = new Date(log.emailDate).getTime();
+      return logTime >= lastMonday.getTime() && logTime <= lastSunday.getTime();
+    });
+
+    // 统计数据
+    const totalImports = logs.length;
+    const successfulImports = logs.filter(log => log.status === 'success').length;
+    const failedImports = logs.filter(log => log.status === 'failed').length;
+    const totalOrders = logs.reduce((sum, log) => sum + (log.successOrders || 0), 0);
+    const successRate = totalImports > 0 
+      ? ((successfulImports / totalImports) * 100).toFixed(1) 
+      : '0.0';
+
+    return {
+      weekStart: lastMonday.toISOString().split('T')[0],
+      weekEnd: lastSunday.toISOString().split('T')[0],
+      totalImports,
+      successfulImports,
+      failedImports,
+      totalOrders,
+      successRate: `${successRate}%`,
+      logs: logs.map(log => ({
+        timestamp: new Date(log.emailDate).toLocaleString('zh-CN'),
+        status: log.status,
+        ordersCreated: log.successOrders || 0,
+        errorMessage: log.errorLog,
+      })),
+    };
+  }),
 });
