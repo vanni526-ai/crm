@@ -35,6 +35,7 @@ export async function parseGmailOrderContent(
   const cityAreaCodes = configs.find(c => c.configKey === "city_area_codes")?.configValue as Record<string, string> || {};
   const salesAliases = configs.find(c => c.configKey === "sales_aliases")?.configValue as Record<string, string> || {};
   const defaultFees = configs.find(c => c.configKey === "default_fees")?.configValue as { teacherFeeRate: number; transportFeeDefault: number } || { teacherFeeRate: 0.5, transportFeeDefault: 200 };
+  const errorMappings = configs.find(c => c.configKey === "error_mappings")?.configValue as Record<string, string> || {};
 
   // 构建配置提示
   const configHints = [];
@@ -171,11 +172,19 @@ ${emailContent}
     // 后处理纠错：修正常见同音字错误
     const correctCommonErrors = (text: string): string => {
       if (!text) return text;
-      return text
+      let corrected = text
         .replace(/瀑姬/g, "瀛姬")  // 瀑姬 → 瀛姬
         .replace(/嘅嘅/g, "嘟嘟")  // 嘅嘅 → 嘟嘟
         .replace(/赵赵/g, "昭昭")  // 赵赵 → 昭昭
         .replace(/朝朝/g, "昭昭"); // 朝朝 → 昭昭
+      
+      // 应用用户配置的错误映射
+      for (const [wrongValue, correctValue] of Object.entries(errorMappings)) {
+        const regex = new RegExp(wrongValue, 'g');
+        corrected = corrected.replace(regex, correctValue);
+      }
+      
+      return corrected;
     };
 
     const orders: ParsedGmailOrder[] = parsed.orders.map((order: any) => ({

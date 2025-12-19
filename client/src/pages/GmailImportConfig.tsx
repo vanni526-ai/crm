@@ -28,6 +28,11 @@ export default function GmailImportConfig() {
     transportFeeDefault: 200,
   });
 
+  // 常见错误映射
+  const [errorMappings, setErrorMappings] = useState<Record<string, string>>({});
+  const [newWrongValue, setNewWrongValue] = useState("");
+  const [newCorrectValue, setNewCorrectValue] = useState("");
+
   // 获取所有配置
   const { data: configs, refetch } = trpc.gmailAutoImport.getAllConfigs.useQuery();
 
@@ -58,6 +63,11 @@ export default function GmailImportConfig() {
       const feeConfig = configs.find((c: any) => c.configKey === "default_fees");
       if (feeConfig && typeof feeConfig.configValue === 'object') {
         setDefaultFees(feeConfig.configValue as { teacherFeeRate: number; transportFeeDefault: number });
+      }
+
+      const errorConfig = configs.find((c: any) => c.configKey === "error_mappings");
+      if (errorConfig && typeof errorConfig.configValue === 'object') {
+        setErrorMappings(errorConfig.configValue as Record<string, string>);
       }
     }
   }, [configs]);
@@ -143,10 +153,11 @@ export default function GmailImportConfig() {
         </div>
 
         <Tabs defaultValue="city" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="city">城市区号</TabsTrigger>
             <TabsTrigger value="sales">销售人员别名</TabsTrigger>
             <TabsTrigger value="fees">默认费用</TabsTrigger>
+            <TabsTrigger value="errors">错误映射</TabsTrigger>
           </TabsList>
 
           {/* 城市区号配置 */}
@@ -357,6 +368,107 @@ export default function GmailImportConfig() {
                     ) : (
                       <Save className="w-4 h-4 mr-2" />
                     )}
+                    保存配置
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* 常见错误映射配置 */}
+          <TabsContent value="errors">
+            <Card>
+              <CardHeader>
+                <CardTitle>常见错误映射</CardTitle>
+                <CardDescription>
+                  配置常见的同音字错误映射，系统会自动纠正。例如：瀑姬 → 瀛姬
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* 现有映射列表 */}
+                <div className="space-y-2">
+                  {Object.entries(errorMappings).map(([wrongValue, correctValue]) => (
+                    <div key={wrongValue} className="flex items-center gap-2 p-2 border rounded-md">
+                      <div className="flex-1 grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-sm font-medium text-red-600">{wrongValue}</span>
+                          <span className="text-xs text-muted-foreground ml-2">(错误)</span>
+                        </div>
+                        <div>
+                          <span className="text-sm text-green-600">{correctValue}</span>
+                          <span className="text-xs text-muted-foreground ml-2">(正确)</span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const updated = { ...errorMappings };
+                          delete updated[wrongValue];
+                          setErrorMappings(updated);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </div>
+                  ))}
+                  {Object.keys(errorMappings).length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      还没有配置错误映射，请添加常见的错误字和正确字的对应关系
+                    </p>
+                  )}
+                </div>
+
+                {/* 添加新映射 */}
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Label htmlFor="newWrongValue">错误的字</Label>
+                    <Input
+                      id="newWrongValue"
+                      placeholder="例如：瀑姬"
+                      value={newWrongValue}
+                      onChange={(e) => setNewWrongValue(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Label htmlFor="newCorrectValue">正确的字</Label>
+                    <Input
+                      id="newCorrectValue"
+                      placeholder="例如：瀛姬"
+                      value={newCorrectValue}
+                      onChange={(e) => setNewCorrectValue(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      onClick={() => {
+                        if (newWrongValue && newCorrectValue) {
+                          setErrorMappings({ ...errorMappings, [newWrongValue]: newCorrectValue });
+                          setNewWrongValue("");
+                          setNewCorrectValue("");
+                        }
+                      }}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      添加
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 保存按钮 */}
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => {
+                      upsertConfigMutation.mutate({
+                        configKey: "error_mappings",
+                        configValue: errorMappings,
+                        description: "常见错误字映射表，用于自动纠正同音字错误",
+                      });
+                    }}
+                    disabled={upsertConfigMutation.isPending}
+                  >
+                    {upsertConfigMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    <Save className="w-4 h-4 mr-2" />
                     保存配置
                   </Button>
                 </div>

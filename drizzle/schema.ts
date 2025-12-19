@@ -224,15 +224,26 @@ export const reconciliations = mysqlTable("reconciliations", {
 
 /**
  * Gmail导入记录表
- */// Gmail导入配置表
-export const gmailImportConfig = mysqlTable("gmailImportConfig", (table) => ({
+ */// Gmail导入配// Gmail错误反馈记录表
+export const gmailErrorFeedback = mysqlTable("gmail_error_feedback", {
+  id: int("id").autoincrement().primaryKey(),
+  importLogId: int("import_log_id").notNull(), // 关联的导入记录ID
+  fieldName: varchar("field_name", { length: 100 }).notNull(), // 错误字段名
+  wrongValue: text("wrong_value").notNull(), // 错误的值
+  correctValue: text("correct_value").notNull(), // 正确的值
+  feedbackType: varchar("feedback_type", { length: 20 }).notNull(), // 反馈类型: manual(手动标记), auto(自动学习)
+  isLearned: boolean("is_learned").default(false), // 是否已学习应用
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const gmailImportConfig = mysqlTable("gmail_import_config", {
   id: int("id").primaryKey().autoincrement(),
   configKey: varchar("configKey", { length: 100 }).notNull().unique(), // 配置键
   configValue: json("configValue").notNull(), // 配置值(JSON)
   description: text("description"), // 配置说明
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
-}));
+});
 
 // Gmail导入日志表
 export const gmailImportLogs = mysqlTable("gmailImportLogs", (table) => ({
