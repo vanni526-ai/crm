@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, Search, Eye, Edit, Trash2, Download, Upload, UserPlus } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -804,7 +805,22 @@ export default function Orders() {
                           <TableCell className="max-w-[150px] truncate">{order.deliveryCourse || "-"}</TableCell>
                           <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : new Date(order.classDate).toLocaleDateString()) : "-"}</TableCell>
                           <TableCell>{order.classTime || "-"}</TableCell>
-                          <TableCell className="max-w-[150px] truncate">{order.notes || "-"}</TableCell>
+                          <TableCell className="max-w-[150px]">
+                            {order.notes ? (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="truncate block cursor-help">{order.notes}</span>
+                                  </TooltipTrigger>
+                                  <TooltipContent className="max-w-md">
+                                    <p className="whitespace-pre-wrap">{order.notes}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
                           <TableCell>{getStatusBadge(order.status)}</TableCell>
                           <TableCell>
                             {order.createdAt instanceof Date 
