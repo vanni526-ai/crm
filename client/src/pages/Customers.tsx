@@ -507,7 +507,9 @@ function CustomerDetailDialog({
 
   if (!customer) return null;
 
-  const customerOrders = orders?.filter((order) => order.customerId === customer.id) || [];
+  const customerOrders = orders?.filter((order) => 
+    order.customerId === customer.id || order.customerName === customer.name
+  ) || [];
   const customerSchedules = schedules?.filter((schedule) => schedule.customerId === customer.id) || [];
 
   const totalSpent = customerOrders.reduce(
