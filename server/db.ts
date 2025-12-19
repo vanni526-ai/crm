@@ -334,6 +334,75 @@ export async function getAllTeacherNames() {
   return result.map(r => r.name);
 }
 
+// 获取老师统计数据
+export async function getTeacherStats(teacherId: number, startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // 统计授课次数和总课时
+  const scheduleConditions = startDate && endDate
+    ? and(
+        eq(schedules.teacherId, teacherId),
+        gte(schedules.startTime, startDate),
+        lte(schedules.startTime, endDate)
+      )
+    : eq(schedules.teacherId, teacherId);
+
+  const scheduleStats = await db
+    .select({
+      count: sql<number>`COUNT(*)`,
+      totalHours: sql<number>`SUM(TIMESTAMPDIFF(HOUR, ${schedules.startTime}, ${schedules.endTime}))`,
+    })
+    .from(schedules)
+    .where(scheduleConditions);
+
+  // 统计总收入(已支付)
+  const paymentConditions = startDate && endDate
+    ? and(
+        eq(teacherPayments.teacherId, teacherId),
+        eq(teacherPayments.status, "paid"),
+        gte(teacherPayments.paymentTime, startDate),
+        lte(teacherPayments.paymentTime, endDate)
+      )
+    : and(
+        eq(teacherPayments.teacherId, teacherId),
+        eq(teacherPayments.status, "paid")
+      );
+
+  const paymentStats = await db
+    .select({
+      totalIncome: sql<number>`SUM(${teacherPayments.amount})`,
+    })
+    .from(teacherPayments)
+    .where(paymentConditions);
+
+  return {
+    classCount: Number(scheduleStats[0]?.count) || 0,
+    totalHours: Number(scheduleStats[0]?.totalHours) || 0,
+    totalIncome: Number(paymentStats[0]?.totalIncome) || 0,
+  };
+}
+
+// 获取所有老师的统计数据
+export async function getAllTeachersStats(startDate?: Date, endDate?: Date) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const allTeachers = await getAllTeachers();
+  const stats = await Promise.all(
+    allTeachers.map(async (teacher) => {
+      const teacherStats = await getTeacherStats(teacher.id, startDate, endDate);
+      return {
+        teacherId: teacher.id,
+        teacherName: teacher.name,
+        ...teacherStats,
+      };
+    })
+  );
+
+  return stats;
+}
+
 // ========== 课程排课 ==========
 
 export async function createSchedule(schedule: InsertSchedule) {

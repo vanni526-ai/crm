@@ -41,6 +41,16 @@ export default function Teachers() {
   const { data: teachers, isLoading } = trpc.teachers.list.useQuery();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // 统计数据查询
+  const [dateRange, setDateRange] = useState<'all' | 'month' | 'quarter' | 'year'>('all');
+  const [statsStartDate, setStatsStartDate] = useState<Date | undefined>();
+  const [statsEndDate, setStatsEndDate] = useState<Date | undefined>();
+  
+  const { data: allStats, isLoading: statsLoading } = trpc.teachers.getAllStats.useQuery({
+    startDate: statsStartDate,
+    endDate: statsEndDate,
+  });
+  
   const createTeacher = trpc.teachers.create.useMutation({
     onSuccess: () => {
       utils.teachers.list.invalidate();
@@ -109,6 +119,30 @@ export default function Teachers() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [importing, setImporting] = useState(false);
   const [newStatus, setNewStatus] = useState("活跃");
+  
+  // 处理时间范围切换
+  const handleDateRangeChange = (range: 'all' | 'month' | 'quarter' | 'year') => {
+    setDateRange(range);
+    const now = new Date();
+    
+    if (range === 'all') {
+      setStatsStartDate(undefined);
+      setStatsEndDate(undefined);
+    } else if (range === 'month') {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      setStatsStartDate(startOfMonth);
+      setStatsEndDate(now);
+    } else if (range === 'quarter') {
+      const currentQuarter = Math.floor(now.getMonth() / 3);
+      const startOfQuarter = new Date(now.getFullYear(), currentQuarter * 3, 1);
+      setStatsStartDate(startOfQuarter);
+      setStatsEndDate(now);
+    } else if (range === 'year') {
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      setStatsStartDate(startOfYear);
+      setStatsEndDate(now);
+    }
+  };
 
   const {
     register,
@@ -309,6 +343,16 @@ export default function Teachers() {
     );
   });
 
+  // 计算总体统计数据
+  const totalStats = allStats?.reduce(
+    (acc, stat) => ({
+      classCount: acc.classCount + (stat.classCount || 0),
+      totalHours: acc.totalHours + (stat.totalHours || 0),
+      totalIncome: acc.totalIncome + (stat.totalIncome || 0),
+    }),
+    { classCount: 0, totalHours: 0, totalIncome: 0 }
+  );
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -338,6 +382,92 @@ export default function Teachers() {
               <Plus className="w-4 h-4 mr-2" />
               新增老师
             </Button>
+          </div>
+        </div>
+
+        {/* 统计卡片 */}
+        <div className="space-y-4">
+          {/* 时间范围切换 */}
+          <div className="flex gap-2">
+            <Button
+              variant={dateRange === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleDateRangeChange('all')}
+            >
+              全部
+            </Button>
+            <Button
+              variant={dateRange === 'month' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleDateRangeChange('month')}
+            >
+              本月
+            </Button>
+            <Button
+              variant={dateRange === 'quarter' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleDateRangeChange('quarter')}
+            >
+              本季度
+            </Button>
+            <Button
+              variant={dateRange === 'year' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleDateRangeChange('year')}
+            >
+              本年
+            </Button>
+          </div>
+
+          {/* 总体统计卡片 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  总授课次数
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {statsLoading ? '-' : totalStats?.classCount || 0}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dateRange === 'all' ? '全部时间' : dateRange === 'month' ? '本月' : dateRange === 'quarter' ? '本季度' : '本年'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  总课时
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {statsLoading ? '-' : `${totalStats?.totalHours || 0}h`}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dateRange === 'all' ? '全部时间' : dateRange === 'month' ? '本月' : dateRange === 'quarter' ? '本季度' : '本年'}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  总收入
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {statsLoading ? '-' : `￥${(totalStats?.totalIncome || 0).toFixed(2)}`}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {dateRange === 'all' ? '全部时间' : dateRange === 'month' ? '本月' : dateRange === 'quarter' ? '本季度' : '本年'}
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -398,10 +528,10 @@ export default function Teachers() {
                     <TableHead>姓名</TableHead>
                     <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
-                    <TableHead>客户类型</TableHead>
                     <TableHead>分类</TableHead>
-                    <TableHead>城市</TableHead>
-                    <TableHead>备注</TableHead>
+                    <TableHead>授课次数</TableHead>
+                    <TableHead>总课时</TableHead>
+                    <TableHead>总收入</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -421,10 +551,16 @@ export default function Teachers() {
                           {teacher.status || '活跃'}
                         </Badge>
                       </TableCell>
-                      <TableCell>{teacher.customerType || '-'}</TableCell>
                       <TableCell>{teacher.category || '-'}</TableCell>
-                      <TableCell>{teacher.city || '-'}</TableCell>
-                      <TableCell className="max-w-xs truncate">{teacher.notes || '-'}</TableCell>
+                      <TableCell>
+                        {allStats?.find(s => s.teacherId === teacher.id)?.classCount || 0}
+                      </TableCell>
+                      <TableCell>
+                        {allStats?.find(s => s.teacherId === teacher.id)?.totalHours || 0}h
+                      </TableCell>
+                      <TableCell>
+                        ￥{(allStats?.find(s => s.teacherId === teacher.id)?.totalIncome || 0).toFixed(2)}
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Button

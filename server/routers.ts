@@ -641,6 +641,27 @@ export const appRouter = router({
     getAllTeacherNames: protectedProcedure.query(async () => {
       return db.getAllTeacherNames();
     }),
+
+    // 获取单个老师统计数据
+    getStats: protectedProcedure
+      .input(z.object({
+        teacherId: z.number(),
+        startDate: z.date().optional(),
+        endDate: z.date().optional(),
+      }))
+      .query(async ({ input }) => {
+        return db.getTeacherStats(input.teacherId, input.startDate, input.endDate);
+      }),
+
+    // 获取所有老师统计数据
+    getAllStats: protectedProcedure
+      .input(z.object({
+        startDate: z.date().optional(),
+        endDate: z.date().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getAllTeachersStats(input?.startDate, input?.endDate);
+      }),
   }),
 
   // 课程排课
