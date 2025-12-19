@@ -251,8 +251,18 @@ export default function Teachers() {
       // 处理每个工作表
       workbook.SheetNames.forEach((sheetName) => {
         const worksheet = workbook.Sheets[sheetName];
-        // 使用range选项跳过前两行(标题行和列名行)
-        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { range: 2 });
+        
+        // 智能识别格式:检查第一行是否是标题行(非列名)
+        const allRows: any[] = XLSX.utils.sheet_to_json(worksheet, { range: 0, header: 1 });
+        const firstRow: any[] = allRows[0] || [];
+        const hasExtraTitle = firstRow.length > 0 && 
+          !firstRow.includes('姓名') && 
+          !firstRow.includes('name') &&
+          (firstRow[0]?.toString().includes('老师') || firstRow[0]?.toString().includes('合伙'));
+        
+        // 根据是否有额外标题行决定跳过的行数
+        const skipRows = hasExtraTitle ? 2 : 1;
+        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { range: skipRows });
         
         jsonData.forEach((row: any) => {
           const teacher = {
@@ -367,6 +377,13 @@ export default function Teachers() {
             <Button onClick={handleExport} variant="outline">
               <Download className="w-4 h-4 mr-2" />
               导出Excel
+            </Button>
+            <Button 
+              onClick={() => window.open('/老师导入模板.xlsx', '_blank')}
+              variant="outline"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              下载模板
             </Button>
             <Button onClick={handleImportClick} variant="outline" disabled={importing}>
               <Upload className="w-4 h-4 mr-2" />
