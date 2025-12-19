@@ -1317,3 +1317,17 @@ export async function checkThreadIdExists(threadId: string): Promise<boolean> {
     .limit(1);
   return result.length > 0;
 }
+
+export async function deleteGmailImportLog(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(gmailImportLogs).where(eq(gmailImportLogs.id, id));
+  return true;
+}
+
+export async function deleteAllGmailImportLogs() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(gmailImportLogs);
+  return true;
+}

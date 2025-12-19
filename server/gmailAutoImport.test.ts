@@ -125,3 +125,46 @@ describe("订单号生成和查重", () => {
     expect(orderNo).toMatch(/^\d{14}0510$/);
   });
 });
+
+describe("删除和清空功能", () => {
+  let testLogId: number;
+
+  beforeAll(async () => {
+    // 创建测试数据
+    testLogId = await createGmailImportLog({
+      emailSubject: "测试删除邮件",
+      emailDate: new Date("2025-12-19"),
+      threadId: "test_delete_thread_456",
+      totalOrders: 1,
+      successOrders: 1,
+      failedOrders: 0,
+      status: "success",
+      errorLog: null,
+      emailContent: "测试内容",
+      parsedData: [] as any,
+      importedBy: 0,
+    });
+  });
+
+  it("应该能删除单条记录", async () => {
+    const { deleteGmailImportLog, getGmailImportLogById: getLog } = await import("./db");
+    const result = await deleteGmailImportLog(testLogId);
+    expect(result).toBe(true);
+
+    // 验证已删除
+    const log = await getLog(testLogId);
+    expect(log).toBeNull();
+  });
+});
+
+describe("邮件去重机制", () => {
+  it("应该能检测重复的threadId", async () => {
+    const exists = await checkThreadIdExists("test_thread_123");
+    expect(exists).toBe(true);
+  });
+
+  it("应该返回false对于不存在的threadId", async () => {
+    const exists = await checkThreadIdExists("non_existent_thread_999");
+    expect(exists).toBe(false);
+  });
+});

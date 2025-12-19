@@ -9,6 +9,8 @@ import {
   getGmailImportLogById,
   getGmailImportStats,
   checkThreadIdExists,
+  deleteGmailImportLog,
+  deleteAllGmailImportLogs,
 } from "./db";
 import { notifyOwner } from "./_core/notification";
 import { orders } from "../drizzle/schema";
@@ -225,5 +227,144 @@ export const gmailAutoImportRouter = router({
     .query(async ({ input }) => {
       const log = await getGmailImportLogById(input.id);
       return log;
+    }),
+
+  /**
+   * 删除单条导入记录
+   */
+  deleteImportLog: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await deleteGmailImportLog(input.id);
+      return { success: true };
+    }),
+
+  /**
+   * 清空所有导入记录
+   */
+  deleteAllImportLogs: protectedProcedure
+    .mutation(async () => {
+      await deleteAllGmailImportLogs();
+      return { success: true };
+    }),
+
+  /**
+   * 检查邮件是否已处理
+   */
+  checkEmailProcessed: protectedProcedure
+    .input(z.object({ threadId: z.string() }))
+    .query(async ({ input }) => {
+      const exists = await checkThreadIdExists(input.threadId);
+      return { processed: exists };
+    }),
+
+  /**
+   * 重新解析邮件并导入订单
+   */
+  reprocessEmail: protectedProcedure
+    .input(z.object({ 
+      logId: z.number(),
+      emailContent: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      // 获取原始记录
+      const originalLog = await getGmailImportLogById(input.logId);
+      if (!originalLog) {
+        throw new Error("导入记录不存在");
+      }
+
+      // 重新解析
+      const parsedOrders = await parseGmailOrderContent(input.emailContent);
+
+      // 批量创建订单
+      const results = [];
+      let successCount = 0;
+      let failCount = 0;
+      const errorMessages: string[] = [];
+
+      for (const orderData of parsedOrders) {
+        try {
+          const cityAreaCodes: Record<string, string> = {
+            "上海": "021", "北京": "010", "天津": "022", "重庆": "023",
+            "武汉": "027", "成都": "028", "西安": "029", "南京": "025",
+            "杭州": "0571", "苏州": "0512", "无锡": "0510", "宁波": "0574",
+            "温州": "0577", "嘉兴": "0573", "金华": "0579", "绍兴": "0575",
+            "济南": "0531", "青岛": "0532", "烟台": "0535", "潍坊": "0536",
+          };
+
+          const areaCode = cityAreaCodes[orderData.city] || "000";
+          const now = new Date();
+          const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
+          const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, "");
+          let orderNo = `${dateStr}${timeStr}${areaCode}`;
+
+          let attempts = 0;
+          while (await checkOrderNoExists(orderNo) && attempts < 10) {
+            const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
+            orderNo = `${dateStr}${timeStr}${areaCode}${randomSuffix}`;
+            attempts++;
+          }
+
+          await createOrder({
+            orderNo,
+            customerName: orderData.customerName,
+            salesPerson: orderData.salesperson,
+            salesId: ctx.user.id,
+            trafficSource: orderData.deviceWechat,
+            paymentAmount: orderData.paymentAmount.toString(),
+            courseAmount: orderData.courseAmount.toString(),
+            teacherFee: orderData.teacherFee.toString(),
+            transportFee: orderData.carFee.toString(),
+            classDate: orderData.classDate ? new Date(orderData.classDate) : undefined,
+            classTime: orderData.classTime,
+            deliveryCity: orderData.city,
+            deliveryRoom: orderData.classroom,
+            deliveryTeacher: orderData.teacher,
+            deliveryCourse: orderData.course,
+            notes: orderData.notes,
+            status: "paid",
+          });
+
+          results.push({
+            success: true,
+            orderNo,
+            customerName: orderData.customerName,
+          });
+          successCount++;
+        } catch (error: any) {
+          const errorMsg = `客户: ${orderData.customerName}, 错误: ${error.message || "创建失败"}`;
+          errorMessages.push(errorMsg);
+          results.push({
+            success: false,
+            customerName: orderData.customerName,
+            error: error.message || "创建失败",
+          });
+          failCount++;
+        }
+      }
+
+      // 更新导入记录
+      const status = failCount === 0 ? "success" : (successCount > 0 ? "partial" : "failed");
+      await createGmailImportLog({
+        emailSubject: originalLog.emailSubject + " (重新解析)",
+        emailDate: originalLog.emailDate,
+        threadId: originalLog.threadId + "_reprocess_" + Date.now(),
+        totalOrders: parsedOrders.length,
+        successOrders: successCount,
+        failedOrders: failCount,
+        status,
+        errorLog: errorMessages.length > 0 ? errorMessages.join("\n") : null,
+        emailContent: input.emailContent,
+        parsedData: parsedOrders as any,
+        importedBy: ctx.user.id,
+      });
+
+      return {
+        success: true,
+        successCount,
+        failCount,
+        total: parsedOrders.length,
+        results,
+      };
     }),
 });
