@@ -223,7 +223,7 @@ export default function Customers() {
                     <TableHead>客户名</TableHead>
                     <TableHead>流量来源</TableHead>
                     <TableHead>账户余额</TableHead>
-                    <TableHead>创建时间</TableHead>
+                    <TableHead>首次上课时间</TableHead>
                     <TableHead>累计消费</TableHead>
                     <TableHead>最后消费</TableHead>
                     <TableHead>操作</TableHead>
@@ -282,7 +282,11 @@ export default function Customers() {
                         <TableCell className="font-medium text-green-600">
                           ¥{Number(customer.accountBalance || 0).toFixed(2)}
                         </TableCell>
-                        <TableCell>{new Date(customer.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {customer.firstOrderDate 
+                            ? new Date(customer.firstOrderDate).toLocaleDateString() 
+                            : "-"}
+                        </TableCell>
                         <TableCell className="font-medium text-blue-600">
                           ¥{Number(customer.totalSpent || 0).toFixed(2)}
                         </TableCell>
