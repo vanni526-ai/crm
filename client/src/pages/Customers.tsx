@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Edit, Trash2, Eye, Phone, Mail } from "lucide-react";
 import { useState } from "react";
@@ -59,11 +60,23 @@ export default function Customers() {
     },
   });
 
+  const batchDeleteCustomers = trpc.customers.batchDelete.useMutation({
+    onSuccess: (data) => {
+      utils.customers.list.invalidate();
+      toast.success(`批量删除成功，共删除 ${data.count} 个客户`);
+      setSelectedCustomerIds([]);
+    },
+    onError: (error) => {
+      toast.error(error.message || "批量删除失败");
+    },
+  });
+
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<number[]>([]);
 
   const {
     register,
@@ -133,10 +146,24 @@ export default function Customers() {
             <h1 className="text-3xl font-bold">客户管理</h1>
             <p className="text-muted-foreground mt-2">管理客户档案和消费记录</p>
           </div>
-          <Button onClick={() => setCreateOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            新增客户
-          </Button>
+          <div className="flex gap-2">
+            {selectedCustomerIds.length > 0 && (
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (confirm(`确定要删除选中的 ${selectedCustomerIds.length} 个客户吗？`))
+                    batchDeleteCustomers.mutate({ ids: selectedCustomerIds });
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                批量删除 ({selectedCustomerIds.length})
+              </Button>
+            )}
+            <Button onClick={() => setCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              新增客户
+            </Button>
+          </div>
         </div>
 
         <Card className="glass-card">
@@ -156,6 +183,20 @@ export default function Customers() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-12">
+                      <input
+                        type="checkbox"
+                        checked={selectedCustomerIds.length === (filteredCustomers?.length || 0) && filteredCustomers && filteredCustomers.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedCustomerIds(filteredCustomers?.map((c: any) => c.id) || []);
+                          } else {
+                            setSelectedCustomerIds([]);
+                          }
+                        }}
+                        className="cursor-pointer"
+                      />
+                    </TableHead>
                     <TableHead>客户名</TableHead>
                     <TableHead>流量来源</TableHead>
                     <TableHead>账户余额</TableHead>
@@ -168,14 +209,46 @@ export default function Customers() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={8} className="text-center py-8">
                         加载中...
                       </TableCell>
                     </TableRow>
                   ) : filteredCustomers && filteredCustomers.length > 0 ? (
                     filteredCustomers.map((customer: any) => (
                       <TableRow key={customer.id}>
-                        <TableCell className="font-medium">{customer.name}</TableCell>
+                        <TableCell>
+                          <input
+                            type="checkbox"
+                            checked={selectedCustomerIds.includes(customer.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedCustomerIds([...selectedCustomerIds, customer.id]);
+                              } else {
+                                setSelectedCustomerIds(selectedCustomerIds.filter(id => id !== customer.id));
+                              }
+                            }}
+                            className="cursor-pointer"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            <span className="font-medium">{customer.name}</span>
+                            {customer.allTags && customer.allTags.length > 0 && (
+                              <div className="flex flex-wrap gap-1">
+                                {customer.autoTags?.map((tag: string, idx: number) => (
+                                  <Badge key={`auto-${idx}`} variant="default" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                                {customer.manualTags?.map((tag: string, idx: number) => (
+                                  <Badge key={`manual-${idx}`} variant="secondary" className="text-xs">
+                                    {tag}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell>
                           {customer.trafficSource ? (
                             <Badge variant="outline">{customer.trafficSource}</Badge>
@@ -355,11 +428,19 @@ function CustomerDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>客户详情</DialogTitle>
+          <DialogTitle>客户详情 - {customer.name}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">概览</TabsTrigger>
+            <TabsTrigger value="orders">关联订单</TabsTrigger>
+            <TabsTrigger value="analysis">消费分析</TabsTrigger>
+            <TabsTrigger value="tags">标签管理</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-6">
           {/* 基本信息 */}
           <Card className="glass-card">
             <CardHeader>
@@ -542,7 +623,68 @@ function CustomerDetailDialog({
               )}
             </CardContent>
           </Card>
-        </div>
+          </TabsContent>
+          
+          <TabsContent value="orders" className="space-y-4">
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-lg">关联订单列表</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {customerOrders.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>订单号</TableHead>
+                        <TableHead>支付金额</TableHead>
+                        <TableHead>订单状态</TableHead>
+                        <TableHead>创建时间</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {customerOrders.map((order) => (
+                        <TableRow key={order.id}>
+                          <TableCell className="font-medium">{order.orderNo}</TableCell>
+                          <TableCell className="text-green-600">¥{Number(order.paymentAmount).toFixed(2)}</TableCell>
+                          <TableCell>
+                            <Badge variant={order.status === "completed" ? "default" : "secondary"}>
+                              {order.status === "completed" ? "已完成" : "进行中"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <p className="text-center py-8 text-muted-foreground">暂无订单记录</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="analysis" className="space-y-4">
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-lg">RFM分析</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">消费分析功能开发中...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="tags" className="space-y-4">
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="text-lg">标签管理</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">标签管理功能开发中...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

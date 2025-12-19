@@ -88,6 +88,9 @@ export default function Home() {
           </Card>
         </div>
 
+        {/* 客户生命周期预警 */}
+        <InactiveCustomersAlert />
+
         {/* 快捷操作和系统说明 */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* 左侧:快捷操作 */}
@@ -177,5 +180,45 @@ export default function Home() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+// 不活跃客户预警组件
+function InactiveCustomersAlert() {
+  const { data: inactiveCustomers } = trpc.analytics.inactiveCustomers.useQuery({ days: 30 });
+  
+  if (!inactiveCustomers || inactiveCustomers.length === 0) {
+    return null;
+  }
+  
+  return (
+    <Card className="glass-card border-orange-500/50 bg-orange-50/50 dark:bg-orange-950/20">
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-orange-600" />
+          客户生命周期预警
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground mb-4">
+          以下 {inactiveCustomers.length} 位客户超过30天未消费，建议及时跟进维护客户关系
+        </p>
+        <div className="space-y-2">
+          {inactiveCustomers.slice(0, 5).map((customer: any) => (
+            <div key={customer.customerId} className="flex justify-between items-center p-2 rounded bg-background/50">
+              <span className="font-medium">{customer.customerName}</span>
+              <span className="text-sm text-muted-foreground">
+                最后消费: {new Date(customer.lastOrderDate).toLocaleDateString()}
+              </span>
+            </div>
+          ))}
+          {inactiveCustomers.length > 5 && (
+            <p className="text-sm text-muted-foreground text-center pt-2">
+              还有 {inactiveCustomers.length - 5} 位客户...
+            </p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

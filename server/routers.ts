@@ -129,6 +129,17 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    batchDelete: salesOrAdminProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ input }) => {
+        let count = 0;
+        for (const id of input.ids) {
+          await db.deleteCustomer(id);
+          count++;
+        }
+        return { success: true, count };
+      }),
+    
     // 获取客户账户流水
     getTransactions: protectedProcedure
       .input(z.object({ customerId: z.number() }))
@@ -176,6 +187,19 @@ export const appRouter = router({
           createdBy: ctx.user.id,
         });
         return { id, success: true };
+      }),
+    
+    // 更新客户标签
+    updateTags: salesOrAdminProcedure
+      .input(z.object({
+        customerId: z.number(),
+        tags: z.array(z.string()),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateCustomer(input.customerId, {
+          tags: JSON.stringify(input.tags),
+        });
+        return { success: true };
       }),
   }),
 
@@ -756,6 +780,12 @@ export const appRouter = router({
     churnRiskCustomers: protectedProcedure.query(async () => {
       return db.getChurnRiskCustomers();
     }),
+    
+    inactiveCustomers: protectedProcedure
+      .input(z.object({ days: z.number().default(30) }))
+      .query(async ({ input }) => {
+        return db.getInactiveCustomers(input.days);
+      }),
   }),
 
   // 数据导入

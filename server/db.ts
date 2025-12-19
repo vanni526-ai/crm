@@ -1408,3 +1408,27 @@ export async function deleteGmailImportConfig(configKey: string) {
     .where(eq(gmailImportConfig.configKey, configKey));
   return true;
 }
+
+// ========== 客户生命周期 ==========
+
+export async function getInactiveCustomers(days: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+  
+  // 获取所有有订单记录的客户
+  const customersWithOrders = await db
+    .select({
+      customerId: orders.customerId,
+      lastOrderDate: sql<Date>`MAX(${orders.createdAt})`,
+      customerName: sql<string>`(SELECT name FROM customers WHERE id = ${orders.customerId})`,
+    })
+    .from(orders)
+    .where(sql`${orders.customerId} IS NOT NULL`)
+    .groupBy(orders.customerId)
+    .having(sql`MAX(${orders.createdAt}) < ${cutoffDate}`);
+  
+  return customersWithOrders;
+}

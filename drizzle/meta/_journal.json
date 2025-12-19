@@ -155,6 +155,13 @@
       "when": 1766122003983,
       "tag": "0021_handy_lyja",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1766124402473,
+      "tag": "0022_lush_iron_lad",
+      "breakpoints": true
     }
   ]
 }
