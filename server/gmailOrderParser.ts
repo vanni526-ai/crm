@@ -50,6 +50,12 @@ export async function parseGmailOrderContent(
 
   const prompt = `你是一个专业的订单信息提取助手。请从以下微信群聊天记录中提取所有订单信息。${configPrompt}
 
+⚠️ 重要：常见同音字错误纠正（必须使用正确的字）：
+- "瀛姬" 是正确的，不要写成 "瀑姬"
+- "嘟嘟" 是正确的，不要写成 "嘅嘅" 或其他同音字
+- "昭昭" 是正确的，不要写成 "赵赵" 或 "朝朝"
+- 设备微信号中包含 "瀛姬" 的，一定要使用 "瀛" 字，不是 "瀑" 字
+
 聊天记录:
 ${emailContent}
 
@@ -162,8 +168,22 @@ ${emailContent}
     // 确保content是字符串类型
     const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
     const parsed = JSON.parse(contentStr);
+    // 后处理纠错：修正常见同音字错误
+    const correctCommonErrors = (text: string): string => {
+      if (!text) return text;
+      return text
+        .replace(/瀑姬/g, "瀛姬")  // 瀑姬 → 瀛姬
+        .replace(/嘅嘅/g, "嘟嘟")  // 嘅嘅 → 嘟嘟
+        .replace(/赵赵/g, "昭昭")  // 赵赵 → 昭昭
+        .replace(/朝朝/g, "昭昭"); // 朝朝 → 昭昭
+    };
+
     const orders: ParsedGmailOrder[] = parsed.orders.map((order: any) => ({
       ...order,
+      salesperson: correctCommonErrors(order.salesperson),
+      deviceWechat: correctCommonErrors(order.deviceWechat),
+      customerName: correctCommonErrors(order.customerName),
+      teacher: correctCommonErrors(order.teacher),
       originalText: emailContent,
     }));
 
