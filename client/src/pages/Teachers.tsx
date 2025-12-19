@@ -550,6 +550,7 @@ export default function Teachers() {
                     <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>分类</TableHead>
+                    <TableHead>城市</TableHead>
                     <TableHead>授课次数</TableHead>
                     <TableHead>总课时</TableHead>
                     <TableHead>总收入</TableHead>
@@ -573,6 +574,7 @@ export default function Teachers() {
                         </Badge>
                       </TableCell>
                       <TableCell>{teacher.category || '-'}</TableCell>
+                      <TableCell>{teacher.city || '-'}</TableCell>
                       <TableCell>
                         {allStats?.find(s => s.teacherId === teacher.id)?.classCount || 0}
                       </TableCell>
