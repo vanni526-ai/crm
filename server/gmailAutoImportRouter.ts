@@ -80,6 +80,7 @@ export const gmailAutoImportRouter = router({
             teacherFee: z.number(),
             carFee: z.number(),
             accountBalance: z.number(),
+            paymentMethod: z.string(),
             notes: z.string(),
             originalText: z.string(),
           })
@@ -95,12 +96,12 @@ export const gmailAutoImportRouter = router({
       for (const orderData of input.orders) {
         try {
           // 生成订单号
-          let orderNo = generateOrderId(orderData.city);
+          let orderNo = generateOrderId(orderData.city, undefined, orderData.paymentMethod);
           
           // 检查订单号是否已存在,如果存在则重新生成
           let attempts = 0;
           while (await checkOrderNoExists(orderNo) && attempts < 10) {
-            orderNo = generateOrderId(orderData.city);
+            orderNo = generateOrderId(orderData.city, undefined, orderData.paymentMethod);
             attempts++;
           }
 

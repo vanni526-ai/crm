@@ -21,6 +21,7 @@ export interface ParsedGmailOrder {
   teacherFee: number; // 老师费用
   carFee: number; // 车费
   accountBalance: number; // 账户余额
+  paymentMethod: string; // 支付方式(支付宝/富掌柜/现金)
   notes: string; // 备注
   originalText: string; // 原始文本
 }
@@ -77,8 +78,9 @@ ${emailContent}
 13. 尾款金额 - 尾款金额
 14. 老师费用 - 老师的费用(如果有)
 15. 车费 - 报销的车费(如果有)
-16. 账户余额 - 从文本中提取余额信息,如"余额 6200抵扣 2400剩 3800"提取3800,"余额 9200-3600=5600"提取5600,如果没有提及余额则填0
-17. 备注 - 其他重要信息(如"无锡教室第三次使用")
+16. 账户余额 - 从文本中提取余额信息,如"余额 6200抵扣 2400剩 3800"提取3800,"余额 9200-3600=5600"提取5600,如果没有提及余额则塡0
+17. 支付方式 - 支付渠道(如"支付宝收款"、"富掌柜收款"、"现金",如果没有明确提及则留空)
+18. 备注 - 其他重要信息(如"无锡教室第三次使用")
 
 注意事项:
 - 如果某个字段没有明确提到,请填写空字符串或0
@@ -139,6 +141,8 @@ ${emailContent}
                     finalPayment: { type: "number" },
                     teacherFee: { type: "number" },
                     carFee: { type: "number" },
+                    accountBalance: { type: "number" },
+                    paymentMethod: { type: "string" },
                     notes: { type: "string" },
                   },
                   required: [
@@ -157,6 +161,8 @@ ${emailContent}
                     "finalPayment",
                     "teacherFee",
                     "carFee",
+                    "accountBalance",
+                    "paymentMethod",
                     "notes",
                   ],
                   additionalProperties: false,

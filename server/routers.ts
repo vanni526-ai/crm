@@ -419,6 +419,7 @@ export const appRouter = router({
           classDate: z.string().optional(),
           classTime: z.string().optional(),
           paymentAmount: z.string(),
+          paymentMethod: z.string().optional(),
           courseAmount: z.string().optional(),
           teacherFee: z.string().optional(),
           notes: z.string().optional(),
@@ -431,7 +432,11 @@ export const appRouter = router({
         for (const orderData of input.orders) {
           try {
             // 生成订单号
-            const orderNo = generateOrderId(orderData.deliveryCity);
+            const orderNo = generateOrderId(
+              orderData.deliveryCity, 
+              undefined, 
+              orderData.paymentMethod || undefined
+            );
             
             // 辅助函数:过滤无效值
             const filterValue = (val: string | undefined) => {

@@ -74,11 +74,15 @@ function generateRandomChars(): string {
 
 /**
  * 生成订单号
+ * 格式: {支付方式前缀}ORD + 日期时间(YYYYMMDDHHmmss) + 3位随机字符 + 城市区号(3位)
+ * 示例: payORD20251220143022ABC021 (支付宝 + 2024年12月20日14:30:22 + 随机ABC + 上海区号021)
+ * 
  * @param city 城市名称(可选)
  * @param date 日期时间(可选,默认当前时间)
+ * @param paymentMethod 支付方式(可选,'支付宝'|'富掌柜'|'现金'|其他)
  * @returns 格式化的订单号
  */
-export function generateOrderId(city?: string | null, date?: Date): string {
+export function generateOrderId(city?: string | null, date?: Date, paymentMethod?: string | null): string {
   // 1. 获取日期时间
   const now = date || new Date();
   const year = now.getFullYear();
@@ -96,8 +100,20 @@ export function generateOrderId(city?: string | null, date?: Date): string {
   // 3. 获取城市区号
   const areaCode = getCityAreaCode(city);
   
-  // 4. 组合订单号
-  return `ORD${dateTime}${random}${areaCode}`;
+  // 4. 生成支付方式前缀
+  let paymentPrefix = '';
+  if (paymentMethod) {
+    if (paymentMethod.includes('支付宝')) {
+      paymentPrefix = 'pay';
+    } else if (paymentMethod.includes('富掌柜') || paymentMethod.includes('微信')) {
+      paymentPrefix = 'we';
+    } else if (paymentMethod.includes('现金')) {
+      paymentPrefix = 'xj';
+    }
+  }
+  
+  // 5. 组合订单号: {支付方式前缀}ORD + 日期时间 + 随机字符 + 城市区号
+  return `${paymentPrefix}ORD${dateTime}${random}${areaCode}`;
 }
 
 /**
