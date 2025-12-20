@@ -275,6 +275,76 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                               placeholder="只填数字"
                             />
                           </div>
+                          <div>
+                            <Label className="text-xs">其他费用</Label>
+                            <Input
+                              value={editingData.otherFee || ""}
+                              onChange={(e) => updateEditingField("otherFee", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="只填数字"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">合伙人费</Label>
+                            <Input
+                              value={editingData.partnerFee || ""}
+                              onChange={(e) => updateEditingField("partnerFee", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="只填数字"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">流量来源</Label>
+                            <Input
+                              value={editingData.trafficSource || ""}
+                              onChange={(e) => updateEditingField("trafficSource", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">账户余额</Label>
+                            <Input
+                              value={editingData.accountBalance || ""}
+                              onChange={(e) => updateEditingField("accountBalance", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="只填数字"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">支付城市</Label>
+                            <Input
+                              value={editingData.paymentCity || ""}
+                              onChange={(e) => updateEditingField("paymentCity", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">支付日期</Label>
+                            <Input
+                              value={editingData.paymentDate || ""}
+                              onChange={(e) => updateEditingField("paymentDate", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="2024-12-25"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">支付时间</Label>
+                            <Input
+                              value={editingData.paymentTime || ""}
+                              onChange={(e) => updateEditingField("paymentTime", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="14:00:00"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">金串到账金额</Label>
+                            <Input
+                              value={editingData.jinchuanAmount || ""}
+                              onChange={(e) => updateEditingField("jinchuanAmount", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="只填数字"
+                            />
+                          </div>
                           <div className="col-span-2">
                             <Label className="text-xs">备注</Label>
                             <Input
@@ -328,6 +398,33 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                           )}
                           {item.transportFee && (
                             <div><span className="text-muted-foreground">车费:</span> ¥{item.transportFee}</div>
+                          )}
+                          {item.otherFee && (
+                            <div><span className="text-muted-foreground">其他费用:</span> ¥{item.otherFee}</div>
+                          )}
+                          {item.partnerFee && (
+                            <div><span className="text-muted-foreground">合伙人费:</span> ¥{item.partnerFee}</div>
+                          )}
+                          {item.trafficSource && (
+                            <div><span className="text-muted-foreground">流量来源:</span> {item.trafficSource}</div>
+                          )}
+                          {item.accountBalance && (
+                            <div><span className="text-muted-foreground">账户余额:</span> ¥{item.accountBalance}</div>
+                          )}
+                          {item.paymentCity && (
+                            <div><span className="text-muted-foreground">支付城市:</span> {item.paymentCity}</div>
+                          )}
+                          {item.paymentDate && (
+                            <div><span className="text-muted-foreground">支付日期:</span> {item.paymentDate}</div>
+                          )}
+                          {item.paymentTime && (
+                            <div><span className="text-muted-foreground">支付时间:</span> {item.paymentTime}</div>
+                          )}
+                          {item.courseAmount && (
+                            <div><span className="text-muted-foreground">课程金额:</span> ¥{item.courseAmount}</div>
+                          )}
+                          {item.jinchuanAmount && (
+                            <div><span className="text-muted-foreground">金串到账金额:</span> ¥{item.jinchuanAmount}</div>
                           )}
                           {item.notes && (
                             <div className="col-span-2"><span className="text-muted-foreground">备注:</span> {item.notes}</div>
