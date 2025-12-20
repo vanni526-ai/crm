@@ -46,6 +46,11 @@ describe("智能登记字段提取测试", () => {
 
     // 验证上课时间
     expect(order.classTime).toBe("20:00-21:30");
+
+    // 验证备注字段包含原始文本
+    expect(order.notes).toContain("[原始文本]");
+    expect(order.notes).toContain("山竹");
+    expect(order.notes).toContain("情趣变装课");
   }, 15000);
 
   it("应该正确处理带车费的订单", async () => {

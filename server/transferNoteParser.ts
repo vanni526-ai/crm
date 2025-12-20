@@ -186,10 +186,20 @@ ${lines.join('\n')}
     const parsed = JSON.parse(content);
     const orders = parsed.orders || [];
     
-    // 将别名转换为真实姓名
-    orders.forEach((order: any) => {
+    // 将别名转换为真实姓名,并添加原始文本到备注
+    orders.forEach((order: any, index: number) => {
       if (order.salesperson && salespersonMapping.has(order.salesperson)) {
         order.salesperson = salespersonMapping.get(order.salesperson);
+      }
+      // 将对应的原始文本保存到备注字段
+      if (lines[index]) {
+        const originalText = lines[index].trim();
+        // 如果已经有备注,则追加原始文本;否则直接设置
+        if (order.notes && order.notes.trim()) {
+          order.notes = `${order.notes}\n\n[原始文本] ${originalText}`;
+        } else {
+          order.notes = `[原始文本] ${originalText}`;
+        }
       }
     });
     
