@@ -25,6 +25,7 @@ const teacherSchema = z.object({
   notes: z.string().optional(),
   category: z.string().optional(),
   city: z.string().optional(),
+  aliases: z.string().optional(), // 别名(逗号分隔)
   // 兼容旧字段
   nickname: z.string().optional(),
   email: z.string().email("请输入有效的邮箱地址").optional().or(z.literal("")),
@@ -167,6 +168,11 @@ export default function Teachers() {
     setValue("notes", teacher.notes || "");
     setValue("category", teacher.category || "");
     setValue("city", teacher.city || "");
+    // 将aliases数组转换为逗号分隔的字符串
+    const aliasesStr = teacher.aliases ? 
+      (typeof teacher.aliases === 'string' ? teacher.aliases : JSON.parse(teacher.aliases).join(', ')) : 
+      '';
+    setValue("aliases", aliasesStr);
     setValue("nickname", teacher.nickname || "");
     setValue("email", teacher.email || "");
     setValue("wechat", teacher.wechat || "");
@@ -186,6 +192,7 @@ export default function Teachers() {
       category: data.category,
       city: data.city,
       customerType: data.customerType,
+      aliases: data.aliases,
       notes: data.notes,
     };
     updateTeacher.mutate({
@@ -703,6 +710,17 @@ export default function Teachers() {
                   <Label htmlFor="edit-customerType">受众客户类型</Label>
                   <Input id="edit-customerType" {...register("customerType")} />
                 </div>
+              </div>
+              <div>
+                <Label htmlFor="edit-aliases">别名(逗号分隔)</Label>
+                <Input 
+                  id="edit-aliases" 
+                  {...register("aliases")} 
+                  placeholder="例如: 橘子,小橘,橘子老师"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  设置别名后，智能登记和Gmail导入可以通过别名识别老师
+                </p>
               </div>
               <div>
                 <Label htmlFor="edit-notes">备注</Label>

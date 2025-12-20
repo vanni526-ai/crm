@@ -303,10 +303,23 @@ export async function getAllTeachers() {
   return db.select().from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
 }
 
-export async function updateTeacher(id: number, data: Partial<InsertTeacher>) {
+export async function updateTeacher(id: number, data: Partial<InsertTeacher> & { aliases?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(teachers).set(data).where(eq(teachers.id, id));
+  
+  // 将aliases字符串转换为JSON数组
+  const updateData: any = { ...data };
+  if (data.aliases !== undefined) {
+    if (data.aliases && data.aliases.trim() !== '') {
+      // 将逗号分隔的字符串转换为数组
+      const aliasesArray = data.aliases.split(',').map(a => a.trim()).filter(a => a !== '');
+      updateData.aliases = JSON.stringify(aliasesArray);
+    } else {
+      updateData.aliases = null;
+    }
+  }
+  
+  await db.update(teachers).set(updateData).where(eq(teachers.id, id));
 }
 
 // 批量删除老师
@@ -339,8 +352,25 @@ export async function batchCreateTeachers(teacherList: InsertTeacher[]) {
 export async function getAllTeacherNames() {
   const db = await getDb();
   if (!db) return [];
-  const result = await db.select({ name: teachers.name }).from(teachers).where(eq(teachers.isActive, true));
-  return result.map(r => r.name);
+  const result = await db.select({ name: teachers.name, aliases: teachers.aliases }).from(teachers).where(eq(teachers.isActive, true));
+  
+  // 收集所有名字(包括真实名和别名)
+  const allNames: string[] = [];
+  result.forEach(r => {
+    allNames.push(r.name);
+    if (r.aliases) {
+      try {
+        const aliases = JSON.parse(r.aliases);
+        if (Array.isArray(aliases)) {
+          allNames.push(...aliases);
+        }
+      } catch (e) {
+        // 忽略JSON解析错误
+      }
+    }
+  });
+  
+  return allNames;
 }
 
 // 检查名字是否为老师名

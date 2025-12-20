@@ -23,9 +23,9 @@ export default function Finance() {
   const [selectedSales, setSelectedSales] = useState<string>("all");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("all");
 
-  // 计算财务统计数据
-  const financialStats = useMemo(() => {
-    if (!orders) return { totalIncome: 0, totalExpense: 0, profit: 0, orderCount: 0, profitMargin: 0 };
+  // 根据日期范围过滤订单
+  const filteredOrders = useMemo(() => {
+    if (!orders) return [];
 
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -33,20 +33,26 @@ export default function Finance() {
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
-    let filteredOrders = orders;
     if (dateRange === "thisMonth") {
-      filteredOrders = orders.filter((order) => {
+      return orders.filter((order) => {
         if (!order.classDate) return false;
         const classDate = new Date(order.classDate);
         return classDate >= startOfMonth && classDate <= endOfMonth;
       });
     } else if (dateRange === "lastMonth") {
-      filteredOrders = orders.filter((order) => {
+      return orders.filter((order) => {
         if (!order.classDate) return false;
         const classDate = new Date(order.classDate);
         return classDate >= startOfLastMonth && classDate <= endOfLastMonth;
       });
     }
+
+    return orders;
+  }, [orders, dateRange]);
+
+  // 计算财务统计数据
+  const financialStats = useMemo(() => {
+    if (!filteredOrders || filteredOrders.length === 0) return { totalIncome: 0, totalExpense: 0, profit: 0, orderCount: 0, profitMargin: 0 };
 
     const totalIncome = filteredOrders.reduce(
       (sum, order) => sum + parseFloat(order.paymentAmount || "0"),
@@ -73,7 +79,7 @@ export default function Finance() {
       orderCount: filteredOrders.length,
       profitMargin,
     };
-  }, [orders, dateRange]);
+  }, [filteredOrders]);
 
   // 按销售人员统计
   const salesStats = useMemo(() => {
@@ -760,9 +766,10 @@ export default function Finance() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="income">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="income">收入明细</TabsTrigger>
                 <TabsTrigger value="expense">支出明细</TabsTrigger>
+                <TabsTrigger value="feeAnalysis">费用分析</TabsTrigger>
               </TabsList>
 
               <TabsContent value="income" className="mt-4">
@@ -844,6 +851,141 @@ export default function Finance() {
                       )}
                     </TableBody>
                   </Table>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="feeAnalysis" className="mt-4">
+                <div className="space-y-6">
+                  {/* 费用占比饼图 */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>费用占比分析</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: '老师费用', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.teacherFee || '0'), 0) },
+                              { name: '车费', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.transportFee || '0'), 0) },
+                              { name: '合伙人费用', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.partnerFee || '0'), 0) },
+                              { name: '其他费用', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.otherFee || '0'), 0) },
+                            ].filter(item => item.value > 0)}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={(entry) => `${entry.name}: ¥${entry.value.toFixed(2)}`}
+                            outerRadius={100}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {[
+                              { name: '老师费用', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.teacherFee || '0'), 0) },
+                              { name: '车费', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.transportFee || '0'), 0) },
+                              { name: '合伙人费用', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.partnerFee || '0'), 0) },
+                              { name: '其他费用', value: filteredOrders.reduce((sum, order) => sum + parseFloat(order.otherFee || '0'), 0) },
+                            ].filter(item => item.value > 0).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={['#0088FE', '#00C49F', '#FFBB28', '#FF8042'][index % 4]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* 老师费用统计 */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>老师费用统计</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>老师名称</TableHead>
+                              <TableHead className="text-right">订单数</TableHead>
+                              <TableHead className="text-right">总费用</TableHead>
+                              <TableHead className="text-right">平均费用</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {Object.entries(
+                              filteredOrders.reduce((acc, order) => {
+                                const teacher = order.deliveryTeacher || '未指定';
+                                const fee = parseFloat(order.teacherFee || '0');
+                                if (!acc[teacher]) {
+                                  acc[teacher] = { count: 0, total: 0 };
+                                }
+                                if (fee > 0) {
+                                  acc[teacher].count++;
+                                  acc[teacher].total += fee;
+                                }
+                                return acc;
+                              }, {} as Record<string, { count: number; total: number }>)
+                            )
+                              .sort(([, a], [, b]) => b.total - a.total)
+                              .map(([teacher, stats]) => (
+                                <TableRow key={teacher}>
+                                  <TableCell className="font-medium">{teacher}</TableCell>
+                                  <TableCell className="text-right">{stats.count}</TableCell>
+                                  <TableCell className="text-right">¥{stats.total.toFixed(2)}</TableCell>
+                                  <TableCell className="text-right">¥{(stats.total / stats.count).toFixed(2)}</TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* 车费统计 */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>车费统计</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>城市</TableHead>
+                              <TableHead className="text-right">订单数</TableHead>
+                              <TableHead className="text-right">总车费</TableHead>
+                              <TableHead className="text-right">平均车费</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {Object.entries(
+                              filteredOrders.reduce((acc, order) => {
+                                const city = order.deliveryCity || '未指定';
+                                const fee = parseFloat(order.transportFee || '0');
+                                if (!acc[city]) {
+                                  acc[city] = { count: 0, total: 0 };
+                                }
+                                if (fee > 0) {
+                                  acc[city].count++;
+                                  acc[city].total += fee;
+                                }
+                                return acc;
+                              }, {} as Record<string, { count: number; total: number }>)
+                            )
+                              .sort(([, a], [, b]) => b.total - a.total)
+                              .map(([city, stats]) => (
+                                <TableRow key={city}>
+                                  <TableCell className="font-medium">{city}</TableCell>
+                                  <TableCell className="text-right">{stats.count}</TableCell>
+                                  <TableCell className="text-right">¥{stats.total.toFixed(2)}</TableCell>
+                                  <TableCell className="text-right">¥{(stats.total / stats.count).toFixed(2)}</TableCell>
+                                </TableRow>
+                              ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
             </Tabs>

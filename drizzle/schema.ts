@@ -109,6 +109,7 @@ export const teachers = mysqlTable("teachers", {
   hourlyRate: decimal("hourlyRate", { precision: 10, scale: 2 }), // 课时费标准
   bankAccount: varchar("bankAccount", { length: 100 }), // 银行账号
   bankName: varchar("bankName", { length: 100 }), // 开户行
+  aliases: text("aliases"), // 别名列表(JSON数组)
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
