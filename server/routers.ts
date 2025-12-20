@@ -546,6 +546,41 @@ export const appRouter = router({
         return { success: true, count: input.ids.length };
       }),
     
+    // 批量更新订单号（添加支付方式前缀）
+    batchUpdateOrderIds: adminProcedure
+      .mutation(async () => {
+        const orders = await db.getAllOrders();
+        let updatedCount = 0;
+        
+        for (const order of orders) {
+          // 跳过已经有前缀的订单号
+          if (order.orderNo && (order.orderNo.startsWith('pay') || order.orderNo.startsWith('we') || order.orderNo.startsWith('xj'))) {
+            continue;
+          }
+          
+          // 根据支付渠道确定前缀
+          let prefix = '';
+          const channel = order.paymentChannel?.toLowerCase() || '';
+          
+          if (channel.includes('支付宝') || channel.includes('alipay')) {
+            prefix = 'pay';
+          } else if (channel.includes('富掌柜') || channel.includes('微信') || channel.includes('wechat')) {
+            prefix = 'we';
+          } else if (channel.includes('现金') || channel.includes('cash')) {
+            prefix = 'xj';
+          } else {
+            // 未知支付方式，保持原样
+            continue;
+          }
+          
+          // 更新订单号
+          const newOrderNo = prefix + order.orderNo;
+          await db.updateOrderNo(order.id, newOrderNo);
+          updatedCount++;
+        }
+        
+        return { success: true, updatedCount };
+      }),
     
     getByDateRange: protectedProcedure
       .input(z.object({

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { notifyOwner } from "./notification";
 import { adminProcedure, publicProcedure, router } from "./trpc";
+import * as db from "../db";
 
 export const systemRouter = router({
   health: publicProcedure
@@ -25,5 +26,14 @@ export const systemRouter = router({
       return {
         success: delivered,
       } as const;
+    }),
+
+  batchUpdateOrderNumbers: adminProcedure
+    .mutation(async () => {
+      const updatedCount = await db.batchUpdateOrderNumbers();
+      return {
+        success: true,
+        updatedCount,
+      };
     }),
 });

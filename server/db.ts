@@ -269,6 +269,12 @@ export async function updateOrder(id: number, data: Partial<InsertOrder>) {
   await db.update(orders).set(data).where(eq(orders.id, id));
 }
 
+export async function updateOrderNo(id: number, orderNo: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(orders).set({ orderNo }).where(eq(orders.id, id));
+}
+
 export async function deleteOrder(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -1731,4 +1737,58 @@ export async function deleteCustomersWithTeacherNames(): Promise<number> {
   
   // 返回删除的记录数
   return teacherNames.length;
+}
+
+
+/**
+ * 批量更新历史订单号,添加支付方式前缀
+ * @returns 更新的订单数量
+ */
+export async function batchUpdateOrderNumbers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  // 获取所有订单
+  const allOrders = await db.select().from(orders);
+  
+  let updatedCount = 0;
+  
+  for (const order of allOrders) {
+    // 跳过已经有支付方式前缀的订单号
+    if (order.orderNo.startsWith('pay') || order.orderNo.startsWith('we') || order.orderNo.startsWith('xj')) {
+      continue;
+    }
+    
+    // 根据备注推断支付方式
+    let paymentMethod: string | undefined;
+    if (order.notes) {
+      const notesLower = order.notes.toLowerCase();
+      if (notesLower.includes('支付宝') || notesLower.includes('alipay')) {
+        paymentMethod = 'alipay';
+      } else if (notesLower.includes('富掌柜') || notesLower.includes('微信') || notesLower.includes('wechat')) {
+        paymentMethod = 'wechat';
+      } else if (notesLower.includes('现金') || notesLower.includes('cash')) {
+        paymentMethod = 'cash';
+      }
+    }
+    
+    // 生成新订单号
+    const { generateOrderId } = await import('./orderIdGenerator');
+    const newOrderNo = generateOrderId(
+      order.deliveryCity || undefined,
+      order.classDate || undefined,
+      paymentMethod
+    );
+    
+    // 更新订单号
+    const dbInstance = await getDb();
+    if (!dbInstance) throw new Error("Database not initialized");
+    await dbInstance.update(orders)
+      .set({ orderNo: newOrderNo })
+      .where(eq(orders.id, order.id));
+    
+    updatedCount++;
+  }
+  
+  return updatedCount;
 }

@@ -1,0 +1,14 @@
+{
+  "query": "SELECT paymentChannel, COUNT(*) as count FROM orders GROUP BY paymentChannel ORDER BY count DESC",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT paymentChannel, COUNT(*) as count FROM orders GROUP BY paymentChannel ORDER BY count DESC",
+  "rows": [
+    {
+      "paymentChannel": "NULL",
+      "count": "293"
+    }
+  ],
+  "messages": [],
+  "stdout": "paymentChannel\tcount\nNULL\t293\n",
+  "stderr": "",
+  "execution_time_ms": 1605
+}

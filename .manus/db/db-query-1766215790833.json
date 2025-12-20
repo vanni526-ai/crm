@@ -1,0 +1,14 @@
+{
+  "query": "SELECT id, name FROM salespersons WHERE name IN ('好好', 'ivy', '李嘉乐') ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name FROM salespersons WHERE name IN ('好好', 'ivy', '李嘉乐') ORDER BY name;",
+  "rows": [
+    {
+      "id": "13",
+      "name": "李嘉乐"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n13\t李嘉乐\n",
+  "stderr": "",
+  "execution_time_ms": 1574
+}

@@ -21,6 +21,7 @@ export default function Finance() {
   const [dateRange, setDateRange] = useState("thisMonth");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSales, setSelectedSales] = useState<string>("all");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("all");
 
   // 计算财务统计数据
   const financialStats = useMemo(() => {
@@ -253,11 +254,42 @@ export default function Finance() {
     return records;
   }, [orders]);
 
+  // 按支付方式统计
+  const paymentMethodStats = useMemo(() => {
+    if (!orders) return [];
+
+    const stats: Record<string, { method: string; income: number; orderCount: number }> = {};
+
+    orders.forEach((order) => {
+      const paymentMethod = order.orderNo.startsWith('pay') ? '支付宝' :
+                           order.orderNo.startsWith('we') ? '富掌柜' :
+                           order.orderNo.startsWith('xj') ? '现金' : '未知';
+
+      if (!stats[paymentMethod]) {
+        stats[paymentMethod] = {
+          method: paymentMethod,
+          income: 0,
+          orderCount: 0,
+        };
+      }
+
+      stats[paymentMethod].income += parseFloat(order.paymentAmount || "0");
+      stats[paymentMethod].orderCount++;
+    });
+
+    return Object.values(stats).sort((a, b) => b.income - a.income);
+  }, [orders]);
+
   const filteredIncomeRecords = incomeRecords.filter(
-    (record) =>
-      (record.orderNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (record) => {
+      const paymentMethod = record.orderNo.startsWith('pay') ? 'alipay' :
+                           record.orderNo.startsWith('we') ? 'wechat' :
+                           record.orderNo.startsWith('xj') ? 'cash' : 'unknown';
+      return (record.orderNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
       record.description.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedSales === "all" || record.salesId.toString() === selectedSales)
+      (selectedSales === "all" || record.salesId.toString() === selectedSales) &&
+      (selectedPaymentMethod === "all" || paymentMethod === selectedPaymentMethod);
+    }
   );
 
   const filteredExpenseRecords = expenseRecords.filter(
@@ -267,6 +299,21 @@ export default function Finance() {
       (selectedSales === "all" || record.salesId.toString() === selectedSales)
   );
 
+  // 批量更新订单号
+  const batchUpdateMutation = trpc.orders.batchUpdateOrderIds.useMutation();
+  
+  const handleBatchUpdateOrderIds = async () => {
+    try {
+      const result = await batchUpdateMutation.mutateAsync();
+      toast.success(`成功更新 ${result.updatedCount} 个订单的订单号`);
+      // 刷新订单列表
+      window.location.reload();
+    } catch (error) {
+      console.error('批量更新订单号失败:', error);
+      toast.error('批量更新订单号失败');
+    }
+  };
+  
   // 导出Excel
   const handleExport = async () => {
     try {
@@ -372,10 +419,16 @@ export default function Finance() {
             <h1 className="text-3xl font-bold">财务对账</h1>
             <p className="text-muted-foreground mt-2">查看收支明细和利润分析</p>
           </div>
-          <Button onClick={handleExport}>
-            <Download className="mr-2 h-4 w-4" />
-            导出报表
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleBatchUpdateOrderIds} variant="outline">
+              <AlertCircle className="mr-2 h-4 w-4" />
+              批量更新订单号
+            </Button>
+            <Button onClick={handleExport}>
+              <Download className="mr-2 h-4 w-4" />
+              导出报表
+            </Button>
+          </div>
         </div>
 
         {/* 城市收益统计和趋势 */}
@@ -614,6 +667,46 @@ export default function Finance() {
           </CardContent>
         </Card>
 
+        {/* 支付方式统计 */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle>支付方式统计</CardTitle>
+            <p className="text-sm text-muted-foreground">按支付方式分类的收入统计</p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {paymentMethodStats.map((stat) => (
+                <div key={stat.method} className="flex items-center justify-between p-3 rounded-lg border">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{
+                      backgroundColor: stat.method === '支付宝' ? '#1677ff' :
+                                     stat.method === '富掌柜' ? '#07c160' :
+                                     stat.method === '现金' ? '#faad14' : '#d9d9d9'
+                    }}>
+                      <span className="text-white font-bold">
+                        {stat.method === '支付宝' ? 'A' :
+                         stat.method === '富掌柜' ? 'W' :
+                         stat.method === '现金' ? '￥' : '?'}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="font-medium">{stat.method}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {stat.orderCount} 个订单
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-green-600">
+                      ￥{stat.income.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* 筛选工具栏 */}
         <Card className="glass-card">
           <CardHeader>
@@ -642,6 +735,18 @@ export default function Finance() {
                         {user.name}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+                <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="筛选支付方式" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部支付方式</SelectItem>
+                    <SelectItem value="alipay">支付宝</SelectItem>
+                    <SelectItem value="wechat">富掌柜</SelectItem>
+                    <SelectItem value="cash">现金</SelectItem>
+                    <SelectItem value="unknown">未知</SelectItem>
                   </SelectContent>
                 </Select>
                 <Input

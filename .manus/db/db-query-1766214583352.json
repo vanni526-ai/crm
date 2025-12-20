@@ -1,0 +1,90 @@
+{
+  "query": "SELECT orderNo, paymentChannel FROM orders LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT orderNo, paymentChannel FROM orders LIMIT 20",
+  "rows": [
+    {
+      "orderNo": "ORD1766211428181UBQ3W",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061221877",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD176621206125599",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061277957",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061297790",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061324662",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061345459",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD176621206137163",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061393725",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061413509",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061436850",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061455364",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061481404",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061501913",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061523974",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061549666",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061571436",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061591601",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061613325",
+      "paymentChannel": "NULL"
+    },
+    {
+      "orderNo": "ORD1766212061633876",
+      "paymentChannel": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tpaymentChannel\nORD1766211428181UBQ3W\tNULL\nORD1766212061221877\tNULL\nORD176621206125599\tNULL\nORD1766212061277957\tNULL\nORD1766212061297790\tNULL\nORD1766212061324662\tNULL\nORD1766212061345459\tNULL\nORD176621206137163\tNULL\nORD1766212061393725\tNULL\nORD1766212061413509\tNULL\nORD1766212061436850\tNULL\nORD1766212061455364\tNULL\nORD1766212061481404\tNULL\nORD1766212061501913\tNULL\nORD1766212061523974\tNULL\nORD1766212061549666\tNULL\nORD1766212061571436\tNULL\nORD1766212061591601\tNULL\nORD1766212061613325\tNULL\nORD1766212061633876\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1509
+}

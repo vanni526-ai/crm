@@ -1,0 +1,85 @@
+{
+  "query": "SELECT id, name, phone FROM salespersons ORDER BY createdAt DESC LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone FROM salespersons ORDER BY createdAt DESC LIMIT 20",
+  "rows": [
+    {
+      "id": "15",
+      "name": "夏鑫",
+      "phone": "18121031392"
+    },
+    {
+      "id": "14",
+      "name": "黄昕怡",
+      "phone": "17621386494"
+    },
+    {
+      "id": "13",
+      "name": "李嘉乐",
+      "phone": "18750823676"
+    },
+    {
+      "id": "12",
+      "name": "谢欣颖",
+      "phone": "15160066822"
+    },
+    {
+      "id": "11",
+      "name": "李会凌",
+      "phone": "17620122978"
+    },
+    {
+      "id": "10",
+      "name": "柴宇",
+      "phone": "18193655357"
+    },
+    {
+      "id": "9",
+      "name": "顾思颖",
+      "phone": "18861300495"
+    },
+    {
+      "id": "8",
+      "name": "郭佳瑶",
+      "phone": "15080589606"
+    },
+    {
+      "id": "7",
+      "name": "王舒婷",
+      "phone": "15000045719"
+    },
+    {
+      "id": "6",
+      "name": "覃涓",
+      "phone": "19169108403"
+    },
+    {
+      "id": "5",
+      "name": "刘安迪",
+      "phone": "15688637179"
+    },
+    {
+      "id": "4",
+      "name": "杨敏",
+      "phone": "18362721868"
+    },
+    {
+      "id": "3",
+      "name": "崔晓静",
+      "phone": "15209863480"
+    },
+    {
+      "id": "2",
+      "name": "刘丽雯",
+      "phone": "13977712346"
+    },
+    {
+      "id": "1",
+      "name": "谢碧欣",
+      "phone": "18529130242"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\n15\t夏鑫\t18121031392\n14\t黄昕怡\t17621386494\n13\t李嘉乐\t18750823676\n12\t谢欣颖\t15160066822\n11\t李会凌\t17620122978\n10\t柴宇\t18193655357\n9\t顾思颖\t18861300495\n8\t郭佳瑶\t15080589606\n7\t王舒婷\t15000045719\n6\t覃涓\t19169108403\n5\t刘安迪\t15688637179\n4\t杨敏\t18362721868\n3\t崔晓静\t15209863480\n2\t刘丽雯\t13977712346\n1\t谢碧欣\t18529130242\n",
+  "stderr": "",
+  "execution_time_ms": 1542
+}

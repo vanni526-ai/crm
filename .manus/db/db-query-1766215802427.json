@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, name FROM salespersons ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name FROM salespersons ORDER BY name;",
+  "rows": [
+    {
+      "id": "2",
+      "name": "刘丽雯"
+    },
+    {
+      "id": "5",
+      "name": "刘安迪"
+    },
+    {
+      "id": "15",
+      "name": "夏鑫"
+    },
+    {
+      "id": "3",
+      "name": "崔晓静"
+    },
+    {
+      "id": "11",
+      "name": "李会凌"
+    },
+    {
+      "id": "13",
+      "name": "李嘉乐"
+    },
+    {
+      "id": "4",
+      "name": "杨敏"
+    },
+    {
+      "id": "10",
+      "name": "柴宇"
+    },
+    {
+      "id": "7",
+      "name": "王舒婷"
+    },
+    {
+      "id": "6",
+      "name": "覃涓"
+    },
+    {
+      "id": "12",
+      "name": "谢欣颖"
+    },
+    {
+      "id": "1",
+      "name": "谢碧欣"
+    },
+    {
+      "id": "8",
+      "name": "郭佳瑶"
+    },
+    {
+      "id": "9",
+      "name": "顾思颖"
+    },
+    {
+      "id": "14",
+      "name": "黄昕怡"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n2\t刘丽雯\n5\t刘安迪\n15\t夏鑫\n3\t崔晓静\n11\t李会凌\n13\t李嘉乐\n4\t杨敏\n10\t柴宇\n7\t王舒婷\n6\t覃涓\n12\t谢欣颖\n1\t谢碧欣\n8\t郭佳瑶\n9\t顾思颖\n14\t黄昕怡\n",
+  "stderr": "",
+  "execution_time_ms": 1565
+}
