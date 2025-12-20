@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `gmailImportHistory` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`messageId` varchar(255) NOT NULL,\n\t`threadId` varchar(255) NOT NULL,\n\t`subject` text,\n\t`fromEmail` varchar(255),\n\t`orderId` int,\n\t`importStatus` enum('success','failed','skipped') NOT NULL,\n\t`errorMessage` text,\n\t`operatorId` int NOT NULL,\n\t`operatorName` varchar(100),\n\t`importedAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `gmailImportHistory_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `gmailImportHistory_messageId_unique` UNIQUE(`messageId`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `gmailImportHistory` (\n\t`id` int AUTO_INCREMENT NOT NULL,\n\t`messageId` varchar(255) NOT NULL,\n\t`threadId` varchar(255) NOT NULL,\n\t`subject` text,\n\t`fromEmail` varchar(255),\n\t`orderId` int,\n\t`importStatus` enum('success','failed','skipped') NOT NULL,\n\t`errorMessage` text,\n\t`operatorId` int NOT NULL,\n\t`operatorName` varchar(100),\n\t`importedAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `gmailImportHistory_id` PRIMARY KEY(`id`),\n\tCONSTRAINT `gmailImportHistory_messageId_unique` UNIQUE(`messageId`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2497
+}

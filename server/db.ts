@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, sql, between, isNotNull, ne, like, or, inArray } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, between, isNotNull, ne, like, or, inArray, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -26,6 +26,9 @@ import {
   gmailImportLogs,
   InsertGmailImportLog,
   gmailImportConfig,
+  gmailImportHistory,
+  InsertGmailImportHistory,
+  GmailImportHistory,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -1613,4 +1616,96 @@ export async function importCustomersFromOrders(createdBy: number) {
   }
   
   return { success, skipped, failed, total: uniqueCustomers.size };
+}
+
+// ========== Gmail导入历史管理 ==========
+
+/**
+ * 创建Gmail导入历史记录
+ */
+export async function createGmailImportHistory(data: InsertGmailImportHistory) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const [result] = await db.insert(gmailImportHistory).values(data);
+  return result.insertId;
+}
+
+/**
+ * 检查Message ID是否已导入
+ */
+export async function checkMessageIdExists(messageId: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const result = await db
+    .select({ id: gmailImportHistory.id })
+    .from(gmailImportHistory)
+    .where(eq(gmailImportHistory.messageId, messageId))
+    .limit(1);
+  
+  return result.length > 0;
+}
+
+/**
+ * 获取所有Gmail导入历史记录
+ */
+export async function getAllGmailImportHistory(limit: number = 100, offset: number = 0) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return await db
+    .select()
+    .from(gmailImportHistory)
+    .orderBy(desc(gmailImportHistory.importedAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+/**
+ * 获取Gmail导入统计
+ */
+export async function getGmailImportHistoryStats() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const stats = await db
+    .select({
+      totalImports: count(),
+      successCount: sql<number>`SUM(CASE WHEN ${gmailImportHistory.importStatus} = 'success' THEN 1 ELSE 0 END)`,
+      failedCount: sql<number>`SUM(CASE WHEN ${gmailImportHistory.importStatus} = 'failed' THEN 1 ELSE 0 END)`,
+      skippedCount: sql<number>`SUM(CASE WHEN ${gmailImportHistory.importStatus} = 'skipped' THEN 1 ELSE 0 END)`,
+    })
+    .from(gmailImportHistory);
+  
+  return stats[0] || { totalImports: 0, successCount: 0, failedCount: 0, skippedCount: 0 };
+}
+
+/**
+ * 按日期范围获取Gmail导入历史
+ */
+export async function getGmailImportHistoryByDateRange(startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return await db
+    .select()
+    .from(gmailImportHistory)
+    .where(
+      and(
+        gte(gmailImportHistory.importedAt, startDate),
+        lte(gmailImportHistory.importedAt, endDate)
+      )
+    )
+    .orderBy(desc(gmailImportHistory.importedAt));
+}
+
+/**
+ * 删除Gmail导入历史记录
+ */
+export async function deleteGmailImportHistory(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  await db.delete(gmailImportHistory).where(eq(gmailImportHistory.id, id));
 }

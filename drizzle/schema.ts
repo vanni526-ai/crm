@@ -378,3 +378,28 @@ export const smartRegisterHistory = mysqlTable("smartRegisterHistory", {
 
 export type SmartRegisterHistory = typeof smartRegisterHistory.$inferSelect;
 export type InsertSmartRegisterHistory = typeof smartRegisterHistory.$inferInsert;
+
+/**
+ * Gmail导入历史表 - 记录从 Gmail 自动导入的邮件和订单
+ */
+export const gmailImportHistory = mysqlTable("gmailImportHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  messageId: varchar("messageId", { length: 255 }).notNull().unique(), // Gmail Message-ID
+  threadId: varchar("threadId", { length: 255 }).notNull(), // Gmail Thread-ID
+  subject: text("subject"), // 邮件标题
+  fromEmail: varchar("fromEmail", { length: 255 }), // 发件人邮箱
+  orderId: int("orderId"), // 关联的订单ID
+  importStatus: mysqlEnum("importStatus", ["success", "failed", "skipped"]).notNull(), // 导入状态
+  errorMessage: text("errorMessage"), // 失败原因
+  operatorId: int("operatorId").notNull(), // 操作人 ID
+  operatorName: varchar("operatorName", { length: 100 }), // 操作人姓名
+  importedAt: timestamp("importedAt").defaultNow().notNull(), // 导入时间
+}, (table) => ({
+  messageIdIdx: index("message_id_idx").on(table.messageId),
+  threadIdIdx: index("thread_id_idx").on(table.threadId),
+  importedAtIdx: index("imported_at_idx").on(table.importedAt),
+  operatorIdx: index("operator_idx").on(table.operatorId),
+}));
+
+export type GmailImportHistory = typeof gmailImportHistory.$inferSelect;
+export type InsertGmailImportHistory = typeof gmailImportHistory.$inferInsert;

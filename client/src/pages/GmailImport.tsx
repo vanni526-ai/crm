@@ -91,6 +91,28 @@ export default function GmailImport() {
     },
   });
 
+  // 自动导入(Gmail自动拉取)
+  const autoImportMutation = trpc.gmailAutoImport.manualImport.useMutation({
+    onSuccess: (data: any) => {
+      if (data.importedCount > 0) {
+        toast.success("自动导入完成", { 
+          description: `成功导入${data.importedCount}个订单` 
+        });
+      } else {
+        toast.info("未找到新邮件", { 
+          description: data.message || "没有需要导入的邮件" 
+        });
+      }
+      refetchHistory();
+      refetchStats();
+      setIsImporting(false);
+    },
+    onError: (error: any) => {
+      toast.error("自动导入失败", { description: error.message });
+      setIsImporting(false);
+    },
+  });
+
   // 手动导入(粘贴内容)
   const pasteImportMutation = trpc.gmailAutoImport.pasteImport.useMutation({
     onSuccess: (data: any) => {
@@ -108,6 +130,12 @@ export default function GmailImport() {
       setIsImporting(false);
     },
   });
+
+  // 自动导入处理函数
+  const handleAutoImport = () => {
+    setIsImporting(true);
+    autoImportMutation.mutate();
+  };
 
   // 手动导入处理函数
   const handleManualImport = () => {
@@ -257,7 +285,11 @@ export default function GmailImport() {
               <Download className="w-4 h-4 mr-2" />
               导出报表
             </Button>
-            <Button onClick={handleManualImport} disabled={isImporting}>
+            <Button onClick={handleManualImport} variant="outline" disabled={isImporting}>
+              <Mail className="w-4 h-4 mr-2" />
+              手动导入
+            </Button>
+            <Button onClick={handleAutoImport} disabled={isImporting}>
               {isImporting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -265,15 +297,15 @@ export default function GmailImport() {
                 </>
               ) : (
                 <>
-                  <Mail className="w-4 h-4 mr-2" />
-                  手动导入
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  自动导入
                 </>
               )}
             </Button>
           </div>
         </div>
 
-        {/* 手动导入说明 */}
+        {/* 导入说明 */}
         <Card className="mb-6 border-green-200 bg-green-50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-green-800">
@@ -281,21 +313,36 @@ export default function GmailImport() {
               导入说明
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-green-800 space-y-3">
+          <CardContent className="text-green-800 space-y-4">
             <div>
-              <h4 className="font-semibold mb-2">如何导入订单？</h4>
-              <ol className="list-decimal list-inside space-y-2 text-sm">
-                <li>打开Gmail，找到包含“打款群”的邮件</li>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <RefreshCw className="w-4 h-4" />
+                方式一：自动导入（推荐）
+              </h4>
+              <ol className="list-decimal list-inside space-y-2 text-sm ml-4">
+                <li>点击上方的<strong>“自动导入”</strong>按钮</li>
+                <li>系统会自动从您的Gmail邮箱中搜索包含“打款群”的邮件</li>
+                <li>自动解析邮件内容并创建订单</li>
+                <li>已导入的邮件会自动跳过，避免重复</li>
+              </ol>
+            </div>
+            
+            <div>
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                方式二：手动导入
+              </h4>
+              <ol className="list-decimal list-inside space-y-2 text-sm ml-4">
+                <li>打开Gmail，找到包含订单信息的邮件</li>
                 <li>复制邮件正文内容</li>
-                <li>点击上方的<strong>“手动导入”</strong>按钮</li>
-                <li>将复制的内容粘贴到对话框中</li>
-                <li>点击“开始导入”，系统会自动解析并创建订单</li>
+                <li>点击<strong>“手动导入”</strong>按钮</li>
+                <li>将内容粘贴到对话框中并点击“开始导入”</li>
               </ol>
             </div>
             
             <div className="bg-white p-3 rounded-md border">
               <p className="text-sm">
-                <strong>提示：</strong>系统会自动识别邮件中的订单信息（客户名、上课时间、金额等），无需手动填写。
+                <strong>提示：</strong>系统会自动识别邮件中的订单信息（客户名、上课时间、金额等），无需手动填写。如果解析失败，请检查邮件格式是否符合要求。
               </p>
             </div>
           </CardContent>

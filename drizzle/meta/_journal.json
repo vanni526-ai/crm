@@ -169,6 +169,13 @@
       "when": 1766129584857,
       "tag": "0023_milky_richard_fisk",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "5",
+      "when": 1766207502716,
+      "tag": "0024_oval_reavers",
+      "breakpoints": true
     }
   ]
 }
