@@ -411,6 +411,7 @@ export const appRouter = router({
       .input(z.object({
         template: z.enum(["wechat", "alipay", "custom"]),
         orders: z.array(z.object({
+          salesperson: z.string().optional(),
           customerName: z.string(),
           deliveryTeacher: z.string().optional(),
           deliveryCourse: z.string().optional(),
@@ -431,6 +432,9 @@ export const appRouter = router({
         let successCount = 0;
         let failCount = 0;
         
+        // 获取所有销售人员用于查找ID
+        const allSalespersons = await db.getAllSalespersons();
+        
         for (const orderData of input.orders) {
           try {
             // 生成订单号
@@ -446,10 +450,30 @@ export const appRouter = router({
               return val;
             };
             
+            // 查找销售人员ID
+            let salespersonId: number | undefined = ctx.user.id; // 默认使用当前用户
+            let salesPerson: string | undefined = undefined;
+            
+            if (orderData.salesperson) {
+              // 根据销售人员名字(花名或真实姓名)查找ID
+              const sp = allSalespersons.find(s => 
+                s.nickname === orderData.salesperson || 
+                s.name === orderData.salesperson
+              );
+              if (sp) {
+                salespersonId = sp.id;
+                salesPerson = sp.nickname || sp.name; // 优先使用花名
+              } else {
+                // 如果找不到匹配的销售人员,仍然保存名字
+                salesPerson = orderData.salesperson;
+              }
+            }
+            
             await db.createOrder({
               orderNo,
               customerName: orderData.customerName,
-              salesId: ctx.user.id, // 使用当前用户作为销售人
+              salesId: salespersonId,
+              salesPerson: salesPerson,
               deliveryTeacher: filterValue(orderData.deliveryTeacher),
               deliveryCourse: filterValue(orderData.deliveryCourse),
               deliveryCity: filterValue(orderData.deliveryCity),
