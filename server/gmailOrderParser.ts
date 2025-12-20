@@ -76,8 +76,18 @@ ${emailContent}
 11. 课程金额 - 课程总价
 12. 首付金额 - 定金金额
 13. 尾款金额 - 尾款金额
-14. 老师费用 - 老师的费用(如果有)
-15. 车费 - 报销的车费(如果有)
+14. 老师费用 - 老师的费用,常见表达:
+   * "给老师XXX" (如"给老师1260"、"给橘子1300")
+   * "给老师XXX+XXX" (如"给老师1260+240+100=1600")
+   * "已给老师XXX再给老师XXX" (如"已给老师4210再给老师450",总计4660)
+   * "课时费XXX" (如"课时费4660")
+   * 如果没有明确提到老师费用,则填0
+15. 车费 - 报销的车费/交通费,常见表达:
+   * "报销老师XXX车费" (如"报销老师100车费")
+   * "老师打车XXX" (如"100老师打车")
+   * "酒店车费XXX" (如"酒店车费加课时费4660"中的车费部分)
+   * "客户报销酒店XXX" (如"客户报销酒店250")
+   * 如果没有明确提到车费,则填0
 16. 账户余额 - 从文本中提取余额信息,如"余额 6200抵扣 2400剩 3800"提取3800,"余额 9200-3600=5600"提取5600,如果没有提及余额则塡0
 17. 支付方式 - 支付渠道(如"支付宝收款"、"富掌柜收款"、"现金",如果没有明确提及则留空)
 18. 备注 - 其他重要信息(如"无锡教室第三次使用")
@@ -100,6 +110,15 @@ ${emailContent}
   * 例3: "余额 8000-3000-3500=1500" → accountBalance=1500
   * 例4: "余额 9712-2400=7312" → accountBalance=7312
   * 如果没有提及余额,则accountBalance=0
+- 老师费用提取规则:
+  * 查找"给老师"、"给XXX(老师名)"、"课时费"等关键词
+  * 如果有多次给老师费用,需要相加(如"已给老师4210再给老师450" = 4660)
+  * 如果有加号表达式,需要计算总和(如"给老师1260+240+100" = 1600)
+  * 注意区分老师费用和车费:如"给橘子1300酒店车费加课时费4660",老师费用=4660,车费=1300
+- 车费提取规则:
+  * 查找"报销"、"车费"、"打车"、"酒店"等关键词
+  * 如果同时提到酒店和车费,需要相加(如"240酒店+100老师打车" = 340)
+  * 注意区分车费和老师费用:如"给老师1260+240+100=1600",其中240和100可能是酒店和打车,需要根据上下文判断
 
 请以JSON数组格式返回所有订单,每个订单包含以上所有字段。`;
 
@@ -202,6 +221,54 @@ ${emailContent}
       return corrected;
     };
 
+    // 费用后处理函数:从原始文本中提取老师费用和车费
+    const extractFees = (text: string): { teacherFee: number; carFee: number } => {
+      let teacherFee = 0;
+      let carFee = 0;
+      
+      // 老师费用识别规则
+      // 1. "给老师XXX" 或 "给XXX(老师名)"
+      const teacherFeePattern1 = /给(?:老师|橘子|[\u4e00-\u9fa5]{2})\s*(\d+(?:\.\d+)?)/g;
+      let match;
+      while ((match = teacherFeePattern1.exec(text)) !== null) {
+        teacherFee += parseFloat(match[1]);
+      }
+      
+      // 2. "课时费XXX"
+      const teacherFeePattern2 = /课时费\s*(\d+(?:\.\d+)?)/g;
+      while ((match = teacherFeePattern2.exec(text)) !== null) {
+        teacherFee += parseFloat(match[1]);
+      }
+      
+      // 3. "给老师XXX+XXX+XXX=XXX" 形式(使用等号后的总数)
+      const teacherFeePattern3 = /给老师[\s\d+.]+=(\d+(?:\.\d+)?)/g;
+      while ((match = teacherFeePattern3.exec(text)) !== null) {
+        // 如果有等号形式,使用等号后的总数替换之前的累加
+        teacherFee = parseFloat(match[1]);
+      }
+      
+      // 车费识别规则
+      // 1. "报销老师XXX车费" 或 "老师打车XXX"
+      const carFeePattern1 = /(?:报销老师|老师打车|车费)\s*(\d+(?:\.\d+)?)/g;
+      while ((match = carFeePattern1.exec(text)) !== null) {
+        carFee += parseFloat(match[1]);
+      }
+      
+      // 2. "XXX酒店" 或 "客户报销酒店XXX"
+      const carFeePattern2 = /(?:(\d+(?:\.\d+)?)酒店|客户报销酒店\s*(\d+(?:\.\d+)?))/g;
+      while ((match = carFeePattern2.exec(text)) !== null) {
+        carFee += parseFloat(match[1] || match[2]);
+      }
+      
+      // 3. "酒店车费XXX"
+      const carFeePattern3 = /酒店车费\s*(\d+(?:\.\d+)?)/g;
+      while ((match = carFeePattern3.exec(text)) !== null) {
+        carFee += parseFloat(match[1]);
+      }
+      
+      return { teacherFee, carFee };
+    };
+    
     // 先纠错，然后验证客户名是否为老师名
     const orders: ParsedGmailOrder[] = [];
     for (const order of parsed.orders) {
@@ -213,12 +280,37 @@ ${emailContent}
         customerName = '';
       }
       
+      // 从原始文本中提取费用信息(作为LLM解析的补充)
+      // 尝试通过销售人员名和日期在原始文本中定位订单
+      let orderText = emailContent;
+      if (order.salesperson && order.classDate) {
+        // 提取日期的MM.DD部分
+        const dateMatch = order.classDate.match(/(\d{1,2})\.(\d{1,2})/);
+        if (dateMatch) {
+          const [, month, day] = dateMatch;
+          // 在邮件内容中查找包含销售人员名和日期的行
+          const lines = emailContent.split('\n');
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line.includes(order.salesperson) && line.includes(`${month}.${day}`)) {
+              // 找到匹配的行,使用这行作为订单文本
+              orderText = line;
+              break;
+            }
+          }
+        }
+      }
+      const extractedFees = extractFees(orderText);
+      
       orders.push({
         ...order,
         salesperson: correctCommonErrors(order.salesperson),
         deviceWechat: correctCommonErrors(order.deviceWechat),
         customerName,
         teacher: correctCommonErrors(order.teacher),
+        // 如果LLM返回的费用为0,使用正则提取的费用
+        teacherFee: order.teacherFee > 0 ? order.teacherFee : extractedFees.teacherFee,
+        carFee: order.carFee > 0 ? order.carFee : extractedFees.carFee,
         originalText: emailContent,
       });
     }

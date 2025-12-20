@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, orderNo, customerName, teacherFee, transportFee, createdAt FROM orders ORDER BY createdAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, orderNo, customerName, teacherFee, transportFee, createdAt FROM orders ORDER BY createdAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "750160",
+      "orderNo": "ORD1766220011451647",
+      "customerName": "",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "createdAt": "2025-12-20 08:40:11"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNo\tcustomerName\tteacherFee\ttransportFee\tcreatedAt\n750160\tORD1766220011451647\t\t0.00\t0.00\t2025-12-20 08:40:11\n",
+  "stderr": "",
+  "execution_time_ms": 1588
+}

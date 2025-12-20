@@ -1,0 +1,55 @@
+{
+  "query": "SELECT orderNo, salesPerson, deliveryCourse, paymentAmount, teacherFee, transportFee, createdAt \nFROM orders \nWHERE DATE(createdAt) = '2025-12-20' \nORDER BY createdAt DESC \nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT orderNo, salesPerson, deliveryCourse, paymentAmount, teacherFee, transportFee, createdAt \nFROM orders \nWHERE DATE(createdAt) = '2025-12-20' \nORDER BY createdAt DESC \nLIMIT 5;",
+  "rows": [
+    {
+      "orderNo": "ORD1766219339824229",
+      "salesPerson": "好好",
+      "deliveryCourse": "师生剧本(含电击肛塞)➕丝袜课",
+      "paymentAmount": "7000.00",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "createdAt": "2025-12-20 08:29:00"
+    },
+    {
+      "orderNo": "ORD1766219339375676",
+      "salesPerson": "山竹",
+      "deliveryCourse": "基础局+裸足丝袜课",
+      "paymentAmount": "21600.00",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "createdAt": "2025-12-20 08:28:59"
+    },
+    {
+      "orderNo": "ORD1766219338924152",
+      "salesPerson": "山竹",
+      "deliveryCourse": "师生+下坠剧本+基础局+裸足丝袜课",
+      "paymentAmount": "5000.00",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "createdAt": "2025-12-20 08:28:59"
+    },
+    {
+      "orderNo": "ORD1766219338477198",
+      "salesPerson": "ivy",
+      "deliveryCourse": "反转2h",
+      "paymentAmount": "4200.00",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "createdAt": "2025-12-20 08:28:58"
+    },
+    {
+      "orderNo": "ORD1766218904046922",
+      "salesPerson": "ivy",
+      "deliveryCourse": "反转2h",
+      "paymentAmount": "4540.00",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "createdAt": "2025-12-20 08:21:44"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tsalesPerson\tdeliveryCourse\tpaymentAmount\tteacherFee\ttransportFee\tcreatedAt\nORD1766219339824229\t好好\t师生剧本(含电击肛塞)➕丝袜课\t7000.00\t0.00\t0.00\t2025-12-20 08:29:00\nORD1766219339375676\t山竹\t基础局+裸足丝袜课\t21600.00\t0.00\t0.00\t2025-12-20 08:28:59\nORD1766219338924152\t山竹\t师生+下坠剧本+基础局+裸足丝袜课\t5000.00\t0.00\t0.00\t2025-12-20 08:28:59\nORD1766219338477198\tivy\t反转2h\t4200.00\t0.00\t0.00\t2025-12-20 08:28:58\nORD1766218904046922\tivy\t反转2h\t4540.00\t0.00\t0.00\t2025-12-20 08:21:44\n",
+  "stderr": "",
+  "execution_time_ms": 1651
+}
