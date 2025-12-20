@@ -806,12 +806,23 @@ export const gmailAutoImportRouter = router({
               orderNo,
               customerName: orderData.customerName,
               salesPerson: orderData.salesperson,
-              classDate: new Date(orderData.classDate),
-              classTime: orderData.classTime,
-              deliveryCourse: orderData.course,
+              salesId: ctx.user.id,
+              trafficSource: orderData.deviceWechat || "",
               paymentAmount: orderData.paymentAmount.toString(),
               courseAmount: orderData.courseAmount.toString(),
-              salesId: ctx.user.id,
+              accountBalance: orderData.accountBalance?.toString() || "0",
+              teacherFee: orderData.teacherFee?.toString() || "0",
+              transportFee: orderData.carFee?.toString() || "0",
+              deliveryCity: orderData.city || "",
+              deliveryRoom: orderData.classroom || "",
+              deliveryTeacher: orderData.teacher || "",
+              deliveryCourse: orderData.course || "",
+              classDate: new Date(orderData.classDate),
+              classTime: orderData.classTime || "",
+              notes: `${orderData.notes || ""}
+
+原始文本: ${orderData.originalText || ""}`,
+              status: "paid",
             });
             
             successCount++;

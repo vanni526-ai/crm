@@ -20,17 +20,22 @@ export async function parseTransferNotes(text: string) {
   
   // 构建销售人员名字列表(包括真实姓名、花名和别名)
   const salespersonNamesList: string[] = [];
-  const salespersonMapping: Map<string, string> = new Map(); // 别名 -> 真实姓名的映射
+  const salespersonMapping: Map<string, string> = new Map(); // 别名/真实姓名 -> 花名(或真实姓名)的映射
+  const nicknameMapping: Map<string, string> = new Map(); // 真实姓名 -> 花名的映射
   
   salespersons.forEach(sp => {
+    // 优先使用花名,如果没有花名则使用真实姓名
+    const displayName = sp.nickname || sp.name;
+    
     // 添加真实姓名
     salespersonNamesList.push(sp.name);
-    salespersonMapping.set(sp.name, sp.name);
+    salespersonMapping.set(sp.name, displayName);
     
     // 添加花名
     if (sp.nickname) {
       salespersonNamesList.push(sp.nickname);
-      salespersonMapping.set(sp.nickname, sp.name);
+      salespersonMapping.set(sp.nickname, displayName);
+      nicknameMapping.set(sp.name, sp.nickname);
     }
     
     // 添加别名
@@ -40,7 +45,7 @@ export async function parseTransferNotes(text: string) {
         if (Array.isArray(aliases)) {
           aliases.forEach(alias => {
             salespersonNamesList.push(alias);
-            salespersonMapping.set(alias, sp.name);
+            salespersonMapping.set(alias, displayName);
           });
         }
       } catch (e) {
@@ -74,7 +79,7 @@ export async function parseTransferNotes(text: string) {
    - 系统中的销售人员有: ${salespersonNames}${aliasInfo}
    - **必须从这个列表中精确匹配**,如果第一个词不在列表中则留空
    - 特别注意:"好好"、"ivy"都是销售人员名,不是副词或其他词性
-   - **如果识别到别名,请直接返回别名**(例如识别到"妖渊",就返回"妖渊",不要转换为真实姓名)
+   - **请直接返回识别到的名字**(例如识别到"山竹",就返回"山竹";识别到"妖渊",就返回"妖渊")
 2. **老师名识别**: 系统中的老师有: ${teacherNamesList}。老师名可能带有"老师"后缀或"上"后缀。
 3. **客户名识别规则** - 客户名**不能**是以下任何一种:
    - 老师名(${teacherNamesList})
@@ -186,9 +191,10 @@ ${lines.join('\n')}
     const parsed = JSON.parse(content);
     const orders = parsed.orders || [];
     
-    // 将别名转换为真实姓名,并添加原始文本到备注
+    // 将别名/真实姓名转换为花名(或真实姓名),并添加原始文本到备注
     orders.forEach((order: any, index: number) => {
       if (order.salesperson && salespersonMapping.has(order.salesperson)) {
+        // 优先使用花名显示
         order.salesperson = salespersonMapping.get(order.salesperson);
       }
       // 将对应的原始文本保存到备注字段

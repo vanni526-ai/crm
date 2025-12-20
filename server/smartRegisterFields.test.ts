@@ -11,8 +11,8 @@ describe("智能登记字段提取测试", () => {
 
     const order = orders[0];
 
-    // 验证销售人(花名"山竹"应该转换为真实姓名"王舒婷")
-    expect(order.salesperson).toBe("王舒婷");
+    // 验证销售人(应该显示花名"山竹"而非真实姓名)
+    expect(order.salesperson).toBe("山竹");
 
     // 验证客户名
     expect(order.customerName).toBe("晓曦东晨");
@@ -78,8 +78,8 @@ describe("智能登记字段提取测试", () => {
 
     const order = orders[0];
 
-    // 验证销售人(花名"山竹"应该转换为真实姓名"王舒婷")
-    expect(order.salesperson).toBe("王舒婷");
+    // 验证销售人(应该显示花名"山竹"而非真实姓名)
+    expect(order.salesperson).toBe("山竹");
 
     // 验证客户名为空或不是老师名/城市名
     if (order.customerName) {
