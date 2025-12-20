@@ -73,6 +73,8 @@ export async function parseTransferNotes(text: string) {
 
   const prompt = `你是一个专业的数据解析助手。请解析以下转账备注,提取订单信息。
 
+**重要:如果输入是聊天记录格式(包含发送者名字和时间戳,例如"树莓啵啵 14:04"),请忽略这些元数据行,只解析真正的订单内容行。**
+
 重要提示:
 1. **销售人员识别(必须精确匹配)**: 
    - 销售人员**通常是每行文本的第一个词**(例如"山竹 12.7..."中的"山竹","妖渊 12.6..."中的"妖渊","好好 12.5..."中的"好好","ivy 12.6..."中的"ivy")
@@ -129,7 +131,7 @@ export async function parseTransferNotes(text: string) {
 - transportFee: 车费(从"报销车费XXX"、"老师打车XXX"中提取数字,如果没有则留空)
 - deliveryCity: 上课城市(例如:上海、北京)
 - deliveryRoom: 上课教室/房间号(例如:404、大兴)
-- notes: 其他备注信息
+- notes: 其他备注信息(不要包含聊天记录的发送者名字和时间戳,例如"树莓啵啵 14:04"这样的元数据)
 
 转账备注数据:
 ${lines.join('\n')}
@@ -191,22 +193,13 @@ ${lines.join('\n')}
     const parsed = JSON.parse(content);
     const orders = parsed.orders || [];
     
-    // 将别名/真实姓名转换为花名(或真实姓名),并添加原始文本到备注
-    orders.forEach((order: any, index: number) => {
+    // 将别名/真实姓名转换为花名(或真实姓名)
+    orders.forEach((order: any) => {
       if (order.salesperson && salespersonMapping.has(order.salesperson)) {
         // 优先使用花名显示
         order.salesperson = salespersonMapping.get(order.salesperson);
       }
-      // 将对应的原始文本保存到备注字段
-      if (lines[index]) {
-        const originalText = lines[index].trim();
-        // 如果已经有备注,则追加原始文本;否则直接设置
-        if (order.notes && order.notes.trim()) {
-          order.notes = `${order.notes}\n\n[原始文本] ${originalText}`;
-        } else {
-          order.notes = `[原始文本] ${originalText}`;
-        }
-      }
+      // LLM已经在notes字段中保存了备注信息,不需要再添加原始文本
     });
     
     return orders;
