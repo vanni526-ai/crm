@@ -18,17 +18,63 @@ export async function parseTransferNotes(text: string) {
   const salespersons = await getAllSalespersons();
   const teacherNames = await getAllTeacherNames();
   
-  const salespersonNames = salespersons.map(s => s.name).join("、");
+  // 构建销售人员名字列表(包括真实姓名、花名和别名)
+  const salespersonNamesList: string[] = [];
+  const salespersonMapping: Map<string, string> = new Map(); // 别名 -> 真实姓名的映射
+  
+  salespersons.forEach(sp => {
+    // 添加真实姓名
+    salespersonNamesList.push(sp.name);
+    salespersonMapping.set(sp.name, sp.name);
+    
+    // 添加花名
+    if (sp.nickname) {
+      salespersonNamesList.push(sp.nickname);
+      salespersonMapping.set(sp.nickname, sp.name);
+    }
+    
+    // 添加别名
+    if (sp.aliases) {
+      try {
+        const aliases = JSON.parse(sp.aliases);
+        if (Array.isArray(aliases)) {
+          aliases.forEach(alias => {
+            salespersonNamesList.push(alias);
+            salespersonMapping.set(alias, sp.name);
+          });
+        }
+      } catch (e) {
+        // 忽略JSON解析错误
+      }
+    }
+  });
+  
+  const salespersonNames = salespersonNamesList.join("、");
   const teacherNamesList = teacherNames.join("、");
+  
+  // 构建别名说明
+  const aliasExplanations: string[] = [];
+  salespersons.forEach(sp => {
+    if (sp.aliases && sp.aliases.length > 0) {
+      const aliases = JSON.parse(sp.aliases);
+      if (aliases.length > 0) {
+        aliasExplanations.push(`${aliases.join("/")} 是 ${sp.name} 的别名`);
+      }
+    }
+  });
+  const aliasInfo = aliasExplanations.length > 0 
+    ? `\n\n别名说明:\n${aliasExplanations.join("\n")}` 
+    : "";
 
   const prompt = `你是一个专业的数据解析助手。请解析以下转账备注,提取订单信息。
 
 重要提示:
 1. **销售人员识别(必须精确匹配)**: 
    - 销售人员**通常是每行文本的第一个词**(例如"山竹 12.7..."中的"山竹","妖渊 12.6..."中的"妖渊","好好 12.5..."中的"好好","ivy 12.6..."中的"ivy")
-   - 系统中的销售人员有: ${salespersonNames}
+   - 系统中的销售人员有: ${salespersonNames}${aliasInfo}
    - **必须从这个列表中精确匹配**,如果第一个词不在列表中则留空
    - 特别注意:"好好"、"ivy"都是销售人员名,不是副词或其他词性
+   - **如果识别到别名,请直接返回别名**(例如识别到"妖渊",就返回"妖渊",不要转换为真实姓名)
 2. **老师名识别**: 系统中的老师有: ${teacherNamesList}。老师名可能带有"老师"后缀或"上"后缀。
 3. **客户名识别规则** - 客户名**不能**是以下任何一种:
    - 老师名(${teacherNamesList})
@@ -132,7 +178,16 @@ ${lines.join('\n')}
     }
 
     const parsed = JSON.parse(content);
-    return parsed.orders || [];
+    const orders = parsed.orders || [];
+    
+    // 将别名转换为真实姓名
+    orders.forEach((order: any) => {
+      if (order.salesperson && salespersonMapping.has(order.salesperson)) {
+        order.salesperson = salespersonMapping.get(order.salesperson);
+      }
+    });
+    
+    return orders;
   } catch (error: any) {
     console.error("解析转账备注失败:", error);
     throw new Error(`解析失败: ${error.message}`);

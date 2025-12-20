@@ -319,6 +319,7 @@ export const salespersons = mysqlTable("salespersons", {
   userId: int("userId"), // 关联用户表(可选)
   name: varchar("name", { length: 100 }).notNull(), // 真实姓名
   nickname: varchar("nickname", { length: 50 }), // 花名/昵称
+  aliases: text("aliases"), // 别名列表(JSON数组存储,如["ivy","山竹","妖渊"])
   phone: varchar("phone", { length: 20 }),
   email: varchar("email", { length: 320 }),
   wechat: varchar("wechat", { length: 100 }), // 微信号

@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, nickname, aliases FROM salespersons WHERE name LIKE '%妍渊%' OR nickname LIKE '%妍渊%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, aliases FROM salespersons WHERE name LIKE '%妍渊%' OR nickname LIKE '%妍渊%';",
+  "rows": [
+    {
+      "id": "1",
+      "name": "谢碧欣",
+      "nickname": "妍渊",
+      "aliases": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\taliases\n1\t谢碧欣\t妍渊\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1595
+}

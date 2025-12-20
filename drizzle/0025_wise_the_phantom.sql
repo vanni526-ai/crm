@@ -1,0 +1,1 @@
+ALTER TABLE `salespersons` ADD `aliases` text;

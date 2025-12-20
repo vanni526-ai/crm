@@ -87,9 +87,17 @@ export default function Sales() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    
+    // 处理别名字段，将逗号分隔的字符串转换为JSON数组
+    const aliasesInput = formData.get("aliases") as string;
+    const aliasesArray = aliasesInput
+      ? aliasesInput.split(',').map(a => a.trim()).filter(a => a.length > 0)
+      : [];
+    
     const data = {
       name: formData.get("name") as string,
       nickname: formData.get("nickname") as string || undefined,
+      aliases: aliasesArray.length > 0 ? JSON.stringify(aliasesArray) : undefined,
       phone: formData.get("phone") as string || undefined,
       email: formData.get("email") as string || undefined,
       wechat: formData.get("wechat") as string || undefined,
@@ -371,6 +379,18 @@ export default function Sales() {
                   name="nickname"
                   defaultValue={editingSalesperson?.nickname}
                 />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="aliases">别名（多个别名用逗号分隔）</Label>
+                <Input
+                  id="aliases"
+                  name="aliases"
+                  placeholder="例如：ivy,山竹,妖渊"
+                  defaultValue={editingSalesperson?.aliases ? JSON.parse(editingSalesperson.aliases).join(',') : ''}
+                />
+                <p className="text-xs text-muted-foreground">
+                  别名用于智能登记时识别销售人员，多个别名用逗号分隔
+                </p>
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone">电话</Label>

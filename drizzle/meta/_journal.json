@@ -176,6 +176,13 @@
       "when": 1766207502716,
       "tag": "0024_oval_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1766216869340,
+      "tag": "0025_wise_the_phantom",
+      "breakpoints": true
     }
   ]
 }
