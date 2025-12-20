@@ -1,0 +1,100 @@
+{
+  "query": "SELECT name FROM teachers LIMIT 30;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT name FROM teachers LIMIT 30;",
+  "rows": [
+    {
+      "name": "CC"
+    },
+    {
+      "name": "Nemo"
+    },
+    {
+      "name": "nicy"
+    },
+    {
+      "name": "RIYA "
+    },
+    {
+      "name": "Sherry"
+    },
+    {
+      "name": "yy"
+    },
+    {
+      "name": "云云"
+    },
+    {
+      "name": "井盖"
+    },
+    {
+      "name": "依一"
+    },
+    {
+      "name": "兔子"
+    },
+    {
+      "name": "兮灵"
+    },
+    {
+      "name": "冷月"
+    },
+    {
+      "name": "唐泽"
+    },
+    {
+      "name": "嘟嘟"
+    },
+    {
+      "name": "声声"
+    },
+    {
+      "name": "奚敏"
+    },
+    {
+      "name": "姜一"
+    },
+    {
+      "name": "安雅"
+    },
+    {
+      "name": "宥香"
+    },
+    {
+      "name": "小凡"
+    },
+    {
+      "name": "小夜"
+    },
+    {
+      "name": "小小"
+    },
+    {
+      "name": "小梨"
+    },
+    {
+      "name": "小米"
+    },
+    {
+      "name": "小羊"
+    },
+    {
+      "name": "巳月"
+    },
+    {
+      "name": "无浪"
+    },
+    {
+      "name": "木木"
+    },
+    {
+      "name": "枝"
+    },
+    {
+      "name": "橘子"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\nCC\nNemo\nnicy\nRIYA \nSherry\nyy\n云云\n井盖\n依一\n兔子\n兮灵\n冷月\n唐泽\n嘟嘟\n声声\n奚敏\n姜一\n安雅\n宥香\n小凡\n小夜\n小小\n小梨\n小米\n小羊\n巳月\n无浪\n木木\n枝\n橘子\n",
+  "stderr": "",
+  "execution_time_ms": 1585
+}

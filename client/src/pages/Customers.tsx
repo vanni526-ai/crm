@@ -83,6 +83,16 @@ export default function Customers() {
     },
   });
 
+  const cleanupTeacherNames = trpc.customers.cleanupTeacherNames.useMutation({
+    onSuccess: (data) => {
+      utils.customers.list.invalidate();
+      toast.success(data.message || `已清理${data.deletedCount}个老师名客户记录`);
+    },
+    onError: (error) => {
+      toast.error(error.message || "清理失败");
+    },
+  });
+
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -225,6 +235,14 @@ export default function Customers() {
                 批量删除 ({selectedCustomerIds.length})
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={() => cleanupTeacherNames.mutate()}
+              disabled={cleanupTeacherNames.isPending}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              {cleanupTeacherNames.isPending ? "清理中..." : "清理老师名"}
+            </Button>
             <Button
               variant="outline"
               onClick={() => {

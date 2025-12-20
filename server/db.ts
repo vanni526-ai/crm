@@ -1709,3 +1709,26 @@ export async function deleteGmailImportHistory(id: number) {
   
   await db.delete(gmailImportHistory).where(eq(gmailImportHistory.id, id));
 }
+
+/**
+ * 批量删除客户表中所有客户名为老师名的记录
+ * @returns 删除的记录数
+ */
+export async function deleteCustomersWithTeacherNames(): Promise<number> {
+  const teacherNames = await getAllTeacherNames();
+  
+  if (teacherNames.length === 0) {
+    return 0;
+  }
+  
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+  
+  // 删除所有客户名在老师名列表中的客户记录
+  await db
+    .delete(customers)
+    .where(inArray(customers.name, teacherNames));
+  
+  // 返回删除的记录数
+  return teacherNames.length;
+}

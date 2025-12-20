@@ -1,0 +1,40 @@
+{
+  "query": "SELECT name FROM customers WHERE name IN ('小凡上', '林檎上', 'yy老师上', '雨凝上', '云云上', '山竹', '汤铴老师', '宥香老师', 'yy和声声老师', '韦德上', '宥香上', '雨凝老师', '奚敏老师', '小羊老师') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT name FROM customers WHERE name IN ('小凡上', '林檎上', 'yy老师上', '雨凝上', '云云上', '山竹', '汤铴老师', '宥香老师', 'yy和声声老师', '韦德上', '宥香上', '雨凝老师', '奚敏老师', '小羊老师') LIMIT 10;",
+  "rows": [
+    {
+      "name": "小羊老师"
+    },
+    {
+      "name": "奚敏老师"
+    },
+    {
+      "name": "雨凝老师"
+    },
+    {
+      "name": "宥香上"
+    },
+    {
+      "name": "韦德上"
+    },
+    {
+      "name": "yy和声声老师"
+    },
+    {
+      "name": "山竹"
+    },
+    {
+      "name": "宥香老师"
+    },
+    {
+      "name": "汤铴老师"
+    },
+    {
+      "name": "林檎上"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\n小羊老师\n奚敏老师\n雨凝老师\n宥香上\n韦德上\nyy和声声老师\n山竹\n宥香老师\n汤铴老师\n林檎上\n",
+  "stderr": "",
+  "execution_time_ms": 1529
+}

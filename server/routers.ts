@@ -228,6 +228,17 @@ export const appRouter = router({
         const result = await db.importCustomersFromOrders(ctx.user.id);
         return result;
       }),
+    
+    // 清理客户表中的老师名
+    cleanupTeacherNames: protectedProcedure
+      .mutation(async () => {
+        const deletedCount = await db.deleteCustomersWithTeacherNames();
+        return { 
+          success: true, 
+          deletedCount,
+          message: `已清理${deletedCount}个老师名客户记录`
+        };
+      }),
   }),
 
   // 订单管理
