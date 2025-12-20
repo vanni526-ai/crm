@@ -1,4 +1,5 @@
 import { invokeLLM } from "./_core/llm";
+import { extractNotesInfo } from "./notesExtractor";
 
 /**
  * 解析转账备注文本,提取订单信息
@@ -193,13 +194,23 @@ ${lines.join('\n')}
     const parsed = JSON.parse(content);
     const orders = parsed.orders || [];
     
-    // 将别名/真实姓名转换为花名(或真实姓名)
+    // 将别名/真实姓名转换为花名(或真实姓名),并提取结构化备注信息
     orders.forEach((order: any) => {
       if (order.salesperson && salespersonMapping.has(order.salesperson)) {
         // 优先使用花名显示
         order.salesperson = salespersonMapping.get(order.salesperson);
       }
-      // LLM已经在notes字段中保存了备注信息,不需要再添加原始文本
+      
+      // 提取结构化备注信息
+      if (order.notes) {
+        const extracted = extractNotesInfo(order.notes);
+        order.noteTags = extracted.tags.length > 0 ? JSON.stringify(extracted.tags) : null;
+        order.discountInfo = extracted.discountInfo ? JSON.stringify(extracted.discountInfo) : null;
+        order.couponInfo = extracted.couponInfo ? JSON.stringify(extracted.couponInfo) : null;
+        order.membershipInfo = extracted.membershipInfo ? JSON.stringify(extracted.membershipInfo) : null;
+        order.paymentStatus = extracted.paymentStatus || null;
+        order.specialNotes = extracted.specialNotes || null;
+      }
     });
     
     return orders;

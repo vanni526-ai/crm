@@ -80,6 +80,14 @@ export const orders = mysqlTable("orders", {
   status: mysqlEnum("status", ["pending", "paid", "completed", "cancelled", "refunded"]).default("pending").notNull(),
   notes: text("notes"), // 备注
   
+  // 结构化备注字段
+  noteTags: text("noteTags"), // 备注标签(JSON数组)
+  discountInfo: text("discountInfo"), // 折扣信息(JSON对象)
+  couponInfo: text("couponInfo"), // 优惠券信息(JSON对象)
+  membershipInfo: text("membershipInfo"), // 会员信息(JSON对象)
+  paymentStatus: varchar("paymentStatus", { length: 50 }), // 支付状态标签
+  specialNotes: text("specialNotes"), // 特殊要求/备注
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

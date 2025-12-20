@@ -1156,10 +1156,120 @@ export default function Orders() {
                   </div>
                 </div>
 
+                {/* 结构化备注信息 */}
+                {(selectedOrder.noteTags || selectedOrder.discountInfo || selectedOrder.couponInfo || selectedOrder.membershipInfo || selectedOrder.paymentStatus || selectedOrder.specialNotes) && (
+                  <div>
+                    <h3 className="font-semibold mb-3 text-lg">智能提取信息</h3>
+                    <div className="space-y-4">
+                      {/* 标签 */}
+                      {selectedOrder.noteTags && (() => {
+                        try {
+                          const tags = JSON.parse(selectedOrder.noteTags);
+                          return tags.length > 0 && (
+                            <div>
+                              <p className="text-sm text-muted-foreground mb-2">标签</p>
+                              <div className="flex flex-wrap gap-2">
+                                {tags.map((tag: string, idx: number) => (
+                                  <Badge key={idx} variant="secondary">{tag}</Badge>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        } catch (e) {
+                          return null;
+                        }
+                      })()}
+                      
+                      {/* 折扣信息 */}
+                      {selectedOrder.discountInfo && (() => {
+                        try {
+                          const discount = JSON.parse(selectedOrder.discountInfo);
+                          return (
+                            <div className="p-3 bg-orange-50 dark:bg-orange-950 rounded-lg border border-orange-200 dark:border-orange-800">
+                              <p className="text-sm font-medium text-orange-900 dark:text-orange-100 mb-1">
+                                🎉 {discount.type}
+                              </p>
+                              <p className="text-sm text-orange-700 dark:text-orange-300">
+                                {discount.description}
+                                {discount.rate && ` (折扣率: ${(discount.rate * 100).toFixed(0)}%)`}
+                              </p>
+                            </div>
+                          );
+                        } catch (e) {
+                          return null;
+                        }
+                      })()}
+                      
+                      {/* 优惠券信息 */}
+                      {selectedOrder.couponInfo && (() => {
+                        try {
+                          const coupon = JSON.parse(selectedOrder.couponInfo);
+                          return (
+                            <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                              <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                                🎫 {coupon.source}
+                              </p>
+                              <p className="text-sm text-blue-700 dark:text-blue-300">
+                                {coupon.description}
+                                {coupon.amount > 0 && ` - 抵扣￥${coupon.amount}`}
+                              </p>
+                            </div>
+                          );
+                        } catch (e) {
+                          return null;
+                        }
+                      })()}
+                      
+                      {/* 会员信息 */}
+                      {selectedOrder.membershipInfo && (() => {
+                        try {
+                          const membership = JSON.parse(selectedOrder.membershipInfo);
+                          return (
+                            <div className="p-3 bg-purple-50 dark:bg-purple-950 rounded-lg border border-purple-200 dark:border-purple-800">
+                              <p className="text-sm font-medium text-purple-900 dark:text-purple-100 mb-1">
+                                👑 {membership.type}
+                              </p>
+                              <p className="text-sm text-purple-700 dark:text-purple-300">
+                                {membership.description}
+                                {membership.balance !== undefined && ` - 余额￥${membership.balance}`}
+                                {membership.deduction !== undefined && membership.deduction > 0 && ` (本次扣款￥${membership.deduction})`}
+                              </p>
+                            </div>
+                          );
+                        } catch (e) {
+                          return null;
+                        }
+                      })()}
+                      
+                      {/* 支付状态 */}
+                      {selectedOrder.paymentStatus && (
+                        <div className="p-3 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                          <p className="text-sm font-medium text-green-900 dark:text-green-100">
+                            💳 {selectedOrder.paymentStatus}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* 特殊备注 */}
+                      {selectedOrder.specialNotes && (
+                        <div className="p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                          <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-1">
+                            ⚠️ 特殊备注
+                          </p>
+                          <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                            {selectedOrder.specialNotes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* 原始备注 */}
                 {selectedOrder.notes && (
                   <div>
-                    <h3 className="font-semibold mb-3 text-lg">备注</h3>
-                    <p className="text-sm">{selectedOrder.notes}</p>
+                    <h3 className="font-semibold mb-3 text-lg">原始备注</h3>
+                    <p className="text-sm text-muted-foreground">{selectedOrder.notes}</p>
                   </div>
                 )}
               </div>

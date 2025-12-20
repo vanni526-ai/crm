@@ -90,6 +90,9 @@ export default function Home() {
 
         {/* 客户生命周期预警 */}
         <InactiveCustomersAlert />
+        
+        {/* 优惠活动统计 */}
+        <PromotionStatsCards />
 
         {/* 快捷操作和系统说明 */}
         <div className="grid gap-6 lg:grid-cols-3">
@@ -180,6 +183,138 @@ export default function Home() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+// 优惠活动统计组件
+function PromotionStatsCards() {
+  const { data: orders } = trpc.orders.list.useQuery();
+  
+  if (!orders || orders.length === 0) {
+    return null;
+  }
+  
+  // 统计优惠券使用情况
+  const couponStats = orders.reduce((acc: any, order: any) => {
+    if (order.couponInfo) {
+      try {
+        const coupon = JSON.parse(order.couponInfo);
+        if (!acc[coupon.source]) {
+          acc[coupon.source] = { count: 0, totalAmount: 0 };
+        }
+        acc[coupon.source].count++;
+        acc[coupon.source].totalAmount += coupon.amount || 0;
+      } catch (e) {
+        // 忽略解析错误
+      }
+    }
+    return acc;
+  }, {});
+  
+  // 统计折扣活动
+  const discountStats = orders.reduce((acc: any, order: any) => {
+    if (order.discountInfo) {
+      try {
+        const discount = JSON.parse(order.discountInfo);
+        if (!acc[discount.type]) {
+          acc[discount.type] = { count: 0, descriptions: new Set() };
+        }
+        acc[discount.type].count++;
+        acc[discount.type].descriptions.add(discount.description);
+      } catch (e) {
+        // 忽略解析错误
+      }
+    }
+    return acc;
+  }, {});
+  
+  // 统计会员消费
+  const membershipCount = orders.filter((order: any) => order.membershipInfo).length;
+  
+  const hasCoupons = Object.keys(couponStats).length > 0;
+  const hasDiscounts = Object.keys(discountStats).length > 0;
+  const hasMembers = membershipCount > 0;
+  
+  if (!hasCoupons && !hasDiscounts && !hasMembers) {
+    return null;
+  }
+  
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      {/* 优惠券统计 */}
+      {hasCoupons && (
+        <Card className="glass-card border-blue-500/50 bg-blue-50/50 dark:bg-blue-950/20">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              🎫 优惠券使用
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Object.entries(couponStats).map(([source, data]: [string, any]) => (
+                <div key={source} className="flex justify-between items-center p-2 rounded bg-background/50">
+                  <div>
+                    <p className="font-medium">{source}</p>
+                    <p className="text-sm text-muted-foreground">使用 {data.count} 次</p>
+                  </div>
+                  <p className="text-lg font-semibold text-blue-600">
+                    ￥{data.totalAmount.toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* 折扣活动统计 */}
+      {hasDiscounts && (
+        <Card className="glass-card border-orange-500/50 bg-orange-50/50 dark:bg-orange-950/20">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              🎉 折扣活动
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Object.entries(discountStats).map(([type, data]: [string, any]) => (
+                <div key={type} className="p-2 rounded bg-background/50">
+                  <p className="font-medium">{type}</p>
+                  <p className="text-sm text-muted-foreground">参与 {data.count} 次</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {Array.from(data.descriptions).slice(0, 3).map((desc: any, idx: number) => (
+                      <span key={idx} className="text-xs bg-orange-100 dark:bg-orange-900 px-2 py-0.5 rounded">
+                        {desc}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {/* 会员消费统计 */}
+      {hasMembers && (
+        <Card className="glass-card border-purple-500/50 bg-purple-50/50 dark:bg-purple-950/20">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              👑 会员消费
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-4">
+              <p className="text-4xl font-bold text-purple-600">{membershipCount}</p>
+              <p className="text-sm text-muted-foreground mt-2">会员订单数</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                占总订单 {((membershipCount / orders.length) * 100).toFixed(1)}%
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }
 

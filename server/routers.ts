@@ -426,6 +426,13 @@ export const appRouter = router({
           teacherFee: z.string().optional(),
           transportFee: z.string().optional(),
           notes: z.string().optional(),
+          // 结构化备注字段
+          noteTags: z.string().optional(),
+          discountInfo: z.string().optional(),
+          couponInfo: z.string().optional(),
+          membershipInfo: z.string().optional(),
+          paymentStatus: z.string().optional(),
+          specialNotes: z.string().optional(),
         })),
       }))
       .mutation(async ({ input, ctx }) => {
@@ -486,6 +493,13 @@ export const appRouter = router({
               teacherFee: filterValue(orderData.teacherFee),
               transportFee: filterValue(orderData.transportFee),
               notes: filterValue(orderData.notes),
+              // 结构化备注字段
+              noteTags: filterValue(orderData.noteTags),
+              discountInfo: filterValue(orderData.discountInfo),
+              couponInfo: filterValue(orderData.couponInfo),
+              membershipInfo: filterValue(orderData.membershipInfo),
+              paymentStatus: filterValue(orderData.paymentStatus),
+              specialNotes: filterValue(orderData.specialNotes),
             });
             successCount++;
           } catch (error) {
