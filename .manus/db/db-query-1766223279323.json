@@ -1,0 +1,100 @@
+{
+  "query": "SELECT id, name, nickname, aliases FROM salespersons",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, aliases FROM salespersons",
+  "rows": [
+    {
+      "id": "1",
+      "name": "谢碧欣",
+      "nickname": "妍渊",
+      "aliases": "NULL"
+    },
+    {
+      "id": "2",
+      "name": "刘丽雯",
+      "nickname": "好好",
+      "aliases": "NULL"
+    },
+    {
+      "id": "3",
+      "name": "崔晓静",
+      "nickname": "大崎",
+      "aliases": "NULL"
+    },
+    {
+      "id": "4",
+      "name": "杨敏",
+      "nickname": "yamy",
+      "aliases": "NULL"
+    },
+    {
+      "id": "5",
+      "name": "刘安迪",
+      "nickname": "ivy",
+      "aliases": "NULL"
+    },
+    {
+      "id": "6",
+      "name": "覃涓",
+      "nickname": "峯灵",
+      "aliases": "NULL"
+    },
+    {
+      "id": "7",
+      "name": "王舒婷",
+      "nickname": "山竹",
+      "aliases": "NULL"
+    },
+    {
+      "id": "8",
+      "name": "郭佳瑶",
+      "nickname": "瑶瑶",
+      "aliases": "NULL"
+    },
+    {
+      "id": "9",
+      "name": "顾思颖",
+      "nickname": "昭昭",
+      "aliases": "NULL"
+    },
+    {
+      "id": "10",
+      "name": "柴宇",
+      "nickname": "十一",
+      "aliases": "NULL"
+    },
+    {
+      "id": "11",
+      "name": "李会凌",
+      "nickname": "洛璃",
+      "aliases": "NULL"
+    },
+    {
+      "id": "12",
+      "name": "谢欣颖",
+      "nickname": "七七",
+      "aliases": "NULL"
+    },
+    {
+      "id": "13",
+      "name": "李嘉乐",
+      "nickname": "纪黎",
+      "aliases": "NULL"
+    },
+    {
+      "id": "14",
+      "name": "黄昕怡",
+      "nickname": "晚晚",
+      "aliases": "NULL"
+    },
+    {
+      "id": "15",
+      "name": "夏鑫",
+      "nickname": "夏主任",
+      "aliases": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\taliases\n1\t谢碧欣\t妍渊\tNULL\n2\t刘丽雯\t好好\tNULL\n3\t崔晓静\t大崎\tNULL\n4\t杨敏\tyamy\tNULL\n5\t刘安迪\tivy\tNULL\n6\t覃涓\t峯灵\tNULL\n7\t王舒婷\t山竹\tNULL\n8\t郭佳瑶\t瑶瑶\tNULL\n9\t顾思颖\t昭昭\tNULL\n10\t柴宇\t十一\tNULL\n11\t李会凌\t洛璃\tNULL\n12\t谢欣颖\t七七\tNULL\n13\t李嘉乐\t纪黎\tNULL\n14\t黄昕怡\t晚晚\tNULL\n15\t夏鑫\t夏主任\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1549
+}

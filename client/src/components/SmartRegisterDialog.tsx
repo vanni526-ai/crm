@@ -240,6 +240,41 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                               className="h-8 text-sm"
                             />
                           </div>
+                          <div>
+                            <Label className="text-xs">支付方式</Label>
+                            <Input
+                              value={editingData.paymentMethod || ""}
+                              onChange={(e) => updateEditingField("paymentMethod", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="微信/支付宝/富掌柜"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">渠道订单号</Label>
+                            <Input
+                              value={editingData.channelOrderNo || ""}
+                              onChange={(e) => updateEditingField("channelOrderNo", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">老师费用</Label>
+                            <Input
+                              value={editingData.teacherFee || ""}
+                              onChange={(e) => updateEditingField("teacherFee", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="只填数字"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">车费</Label>
+                            <Input
+                              value={editingData.transportFee || ""}
+                              onChange={(e) => updateEditingField("transportFee", e.target.value)}
+                              className="h-8 text-sm"
+                              placeholder="只填数字"
+                            />
+                          </div>
                           <div className="col-span-2">
                             <Label className="text-xs">备注</Label>
                             <Input
@@ -281,6 +316,18 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                           <div><span className="text-muted-foreground">地点:</span> {item.deliveryCity}</div>
                           {item.deliveryRoom && (
                             <div><span className="text-muted-foreground">教室:</span> {item.deliveryRoom}</div>
+                          )}
+                          {item.paymentMethod && (
+                            <div><span className="text-muted-foreground">支付方式:</span> {item.paymentMethod}</div>
+                          )}
+                          {item.channelOrderNo && (
+                            <div className="col-span-2"><span className="text-muted-foreground">渠道订单号:</span> {item.channelOrderNo}</div>
+                          )}
+                          {item.teacherFee && (
+                            <div><span className="text-muted-foreground">老师费用:</span> ¥{item.teacherFee}</div>
+                          )}
+                          {item.transportFee && (
+                            <div><span className="text-muted-foreground">车费:</span> ¥{item.transportFee}</div>
                           )}
                           {item.notes && (
                             <div className="col-span-2"><span className="text-muted-foreground">备注:</span> {item.notes}</div>

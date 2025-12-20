@@ -117,8 +117,11 @@ export async function parseTransferNotes(text: string) {
 - deliveryTeacher: 老师名字(包含"老师"后缀如果有)
 - customerName: 客户名字(必须严格遵守上述客户名识别规则,如果无法确定客户名则留空)
 - paymentAmount: 支付金额(只提取数字,不包含"已付"、"未付"等文字)
-- paymentMethod: 支付方式(如"支付宝收款"、"富掌柜收款"、"现金",如果没有明确提及则留空)
+- paymentMethod: 支付方式(如"支付宝收款"、"富掌柜收款"、"现金"、"微信",如果没有明确提及则留空)
 - courseAmount: 课程总金额(如果有"未付"金额,计算总额)
+- channelOrderNo: 渠道订单号/交易单号(例如:4200002912202512208697791196,如果没有则留空)
+- teacherFee: 老师费用(从"给老师XXX"中提取数字,如果没有则留空)
+- transportFee: 车费(从"报销车费XXX"、"老师打车XXX"中提取数字,如果没有则留空)
 - deliveryCity: 上课城市(例如:上海、北京)
 - deliveryRoom: 上课教室/房间号(例如:404、大兴)
 - notes: 其他备注信息
@@ -156,6 +159,9 @@ ${lines.join('\n')}
                     paymentAmount: { type: "string" },
                     paymentMethod: { type: "string" },
                     courseAmount: { type: "string" },
+                    channelOrderNo: { type: "string" },
+                    teacherFee: { type: "string" },
+                    transportFee: { type: "string" },
                     deliveryCity: { type: "string" },
                     deliveryRoom: { type: "string" },
                     notes: { type: "string" }

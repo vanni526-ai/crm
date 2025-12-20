@@ -421,7 +421,9 @@ export const appRouter = router({
           paymentAmount: z.string(),
           paymentMethod: z.string().optional(),
           courseAmount: z.string().optional(),
+          channelOrderNo: z.string().optional(),
           teacherFee: z.string().optional(),
+          transportFee: z.string().optional(),
           notes: z.string().optional(),
         })),
       }))
@@ -456,7 +458,9 @@ export const appRouter = router({
               classTime: filterValue(orderData.classTime),
               paymentAmount: orderData.paymentAmount,
               courseAmount: orderData.courseAmount || orderData.paymentAmount,
+              channelOrderNo: filterValue(orderData.channelOrderNo),
               teacherFee: filterValue(orderData.teacherFee),
+              transportFee: filterValue(orderData.transportFee),
               notes: filterValue(orderData.notes),
             });
             successCount++;
