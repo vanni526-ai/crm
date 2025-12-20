@@ -10,6 +10,7 @@ import { gmailAutoImportRouter } from "./gmailAutoImportRouter";
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
+import { generateOrderId } from "./orderIdGenerator";
 
 // 权限检查中间件
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -430,7 +431,7 @@ export const appRouter = router({
         for (const orderData of input.orders) {
           try {
             // 生成订单号
-            const orderNo = `ORD${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+            const orderNo = generateOrderId(orderData.deliveryCity);
             
             // 辅助函数:过滤无效值
             const filterValue = (val: string | undefined) => {

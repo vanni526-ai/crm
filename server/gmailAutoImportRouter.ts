@@ -5,6 +5,7 @@ import { promisify } from "util";
 const execAsync = promisify(exec);
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { parseGmailOrderContent } from "./gmailOrderParser";
+import { generateOrderId } from "./orderIdGenerator";
 import {
   createGmailImportLog,
   getAllGmailImportLogs,
@@ -93,27 +94,14 @@ export const gmailAutoImportRouter = router({
 
       for (const orderData of input.orders) {
         try {
-          // 生成唯一订单号
-          const cityAreaCodes: Record<string, string> = {
-            "上海": "021",
-            "北京": "010",
-            "天津": "022",
-            "成都": "028",
-            "泉州": "0595",
-            "无锡": "0510",
-            "武汉": "027",
-            "济南": "0531",
-          };
-          const areaCode = cityAreaCodes[orderData.city] || "000";
-          const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, "").slice(0, 14);
-          let orderNo = `${timestamp}-${areaCode}`;
+          // 生成订单号
+          let orderNo = generateOrderId(orderData.city);
           
-          // 检查订单号是否已存在
-          let suffix = 1;
-          while (await checkOrderNoExists(orderNo)) {
-            orderNo = `${timestamp}-${areaCode}-${String(suffix).padStart(3, "0")}`;
-            suffix++;
-            if (suffix > 999) break;
+          // 检查订单号是否已存在,如果存在则重新生成
+          let attempts = 0;
+          while (await checkOrderNoExists(orderNo) && attempts < 10) {
+            orderNo = generateOrderId(orderData.city);
+            attempts++;
           }
 
           // 创建订单
