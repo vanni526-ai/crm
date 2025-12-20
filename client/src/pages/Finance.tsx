@@ -23,6 +23,47 @@ export default function Finance() {
   const [selectedSales, setSelectedSales] = useState<string>("all");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("all");
 
+  // 月度费用趋势数据
+  const monthlyFeeTrend = useMemo(() => {
+    if (!orders) return [];
+
+    // 获取最近6个月的数据
+    const now = new Date();
+    const monthsData: Record<string, { month: string; teacherFee: number; transportFee: number; totalFee: number }> = {};
+
+    // 生成最近6个月的月份标签
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthsData[monthKey] = {
+        month: `${date.getMonth() + 1}月`,
+        teacherFee: 0,
+        transportFee: 0,
+        totalFee: 0,
+      };
+    }
+
+    // 聚合订单数据
+    orders.forEach((order) => {
+      if (!order.classDate) return;
+      const classDate = new Date(order.classDate);
+      const monthKey = `${classDate.getFullYear()}-${String(classDate.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (monthsData[monthKey]) {
+        const teacherFee = parseFloat(order.teacherFee || '0');
+        const transportFee = parseFloat(order.transportFee || '0');
+        const partnerFee = parseFloat(order.partnerFee || '0');
+        const otherFee = parseFloat(order.otherFee || '0');
+        
+        monthsData[monthKey].teacherFee += teacherFee;
+        monthsData[monthKey].transportFee += transportFee;
+        monthsData[monthKey].totalFee += teacherFee + transportFee + partnerFee + otherFee;
+      }
+    });
+
+    return Object.values(monthsData);
+  }, [orders]);
+
   // 根据日期范围过滤订单
   const filteredOrders = useMemo(() => {
     if (!orders) return [];
@@ -856,6 +897,54 @@ export default function Finance() {
 
               <TabsContent value="feeAnalysis" className="mt-4">
                 <div className="space-y-6">
+                  {/* 月度费用趋势 */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>月度费用趋势</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={350}>
+                        <LineChart data={monthlyFeeTrend}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip 
+                            formatter={(value: number) => `¥${value.toFixed(2)}`}
+                            labelStyle={{ color: '#000' }}
+                          />
+                          <Legend />
+                          <Line 
+                            type="monotone" 
+                            dataKey="teacherFee" 
+                            name="老师费用" 
+                            stroke="#0088FE" 
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="transportFee" 
+                            name="车费" 
+                            stroke="#00C49F" 
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="totalFee" 
+                            name="总费用" 
+                            stroke="#FF8042" 
+                            strokeWidth={2}
+                            dot={{ r: 4 }}
+                            activeDot={{ r: 6 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
                   {/* 费用占比饼图 */}
                   <Card>
                     <CardHeader>
