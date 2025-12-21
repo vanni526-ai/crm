@@ -641,6 +641,30 @@ export const appRouter = router({
         const result = await batchFixOrderFees();
         return result;
       }),
+    
+    // 批量补全渠道订单号
+    batchFillChannelOrderNo: adminProcedure
+      .input(z.object({
+        onlyMissing: z.boolean().optional(),
+        validateFormat: z.boolean().optional(),
+        autoIdentifyChannel: z.boolean().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { batchFillChannelOrderNo } = await import("./channelOrderNoBatchFill");
+        const result = await batchFillChannelOrderNo(input);
+        return result;
+      }),
+    
+    // 预览批量补全结果
+    previewBatchFillChannelOrderNo: adminProcedure
+      .input(z.object({
+        onlyMissing: z.boolean().optional(),
+      }))
+      .query(async ({ input }) => {
+        const { previewBatchFillChannelOrderNo } = await import("./channelOrderNoBatchFill");
+        const result = await previewBatchFillChannelOrderNo(input);
+        return result;
+      }),
   }),
 
   // 老师管理

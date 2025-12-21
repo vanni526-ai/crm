@@ -72,3 +72,13 @@
 - [x] 修夏字段映射逻辑 - 添加channelOrderNo和paymentChannel字段
 - [x] 测试验证 - 5个测试全部通过
 - [x] 保存检查点
+
+### 20. 渠道订单号增强功能
+- [x] 设计实现方案
+- [x] 实现渠道订单号格式验证工具函数 - validateChannelOrderNo
+- [x] 实现支付渠道智能识别工具函数 - identifyPaymentChannel
+- [x] 集成到Gmail导入流程 - gmailAutoImportRouter.ts
+- [x] 实现历史订单批量补全API - batchFillChannelOrderNo
+- [x] 创建前端管理界面 - ChannelOrderNoManagement.tsx
+- [x] 编写单元测试 - 14个测试全部通过
+- [x] 保存检查点
