@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `fieldMappings` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `type` enum('salesperson_alias', 'city_code', 'teacher_alias', 'course_alias') NOT NULL,\n  `sourceValue` varchar(100) NOT NULL,\n  `targetValue` varchar(100) NOT NULL,\n  `description` text,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `type_idx` (`type`),\n  INDEX `source_idx` (`sourceValue`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `fieldMappings` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `type` enum('salesperson_alias', 'city_code', 'teacher_alias', 'course_alias') NOT NULL,\n  `sourceValue` varchar(100) NOT NULL,\n  `targetValue` varchar(100) NOT NULL,\n  `description` text,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  INDEX `type_idx` (`type`),\n  INDEX `source_idx` (`sourceValue`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1724
+}

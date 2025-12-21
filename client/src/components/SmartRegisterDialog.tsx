@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Edit, Trash2, Save, X } from "lucide-react";
+import { Edit, Trash2, Save, X, AlertCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { evaluateFieldCompleteness, getCompletenessColor, getCompletenessBgColor, getCompletenessLabel, getImportanceColor } from "@/lib/fieldCompleteness";
 
 interface SmartRegisterDialogProps {
   open: boolean;
@@ -150,7 +151,12 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
 
           {parsedData.length > 0 && (
             <div className="border rounded-lg p-4">
-              <h3 className="font-medium mb-3">解析结果预览 ({parsedData.length} 条)</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium">解析结果预览 ({parsedData.length} 条)</h3>
+                <div className="text-sm text-muted-foreground">
+                  平均完整度: {Math.round(parsedData.reduce((sum, item) => sum + evaluateFieldCompleteness(item).score, 0) / parsedData.length)}%
+                </div>
+              </div>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {parsedData.map((item, index) => (
                   <div key={index} className="border rounded-lg p-3 mb-3">
@@ -386,7 +392,55 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                     ) : (
                       // 预览模式
                       <div>
-                        {item.isVoided && (
+                        {(() => {
+                          const completeness = evaluateFieldCompleteness(item);
+                          return (
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCompletenessBgColor(completeness.level)} ${getCompletenessColor(completeness.level)}`}>
+                                  完整度: {completeness.score}% ({getCompletenessLabel(completeness.level)})
+                                </span>
+                                {completeness.missingFields.length > 0 && (
+                                  <span className="text-xs text-muted-foreground">
+                                    缺失 {completeness.missingFields.length} 个字段
+                                  </span>
+                                )}
+                              </div>
+                              {item.isVoided && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                  已作废
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+                        {(() => {
+                          const completeness = evaluateFieldCompleteness(item);
+                          return completeness.missingFields.length > 0 && (
+                            <div className="mb-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-800">
+                              <div className="flex items-start gap-2">
+                                <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                                <div className="flex-1">
+                                  <div className="text-xs font-medium text-yellow-800 dark:text-yellow-200 mb-1">
+                                    建议补充以下字段:
+                                  </div>
+                                  <div className="flex flex-wrap gap-1">
+                                    {completeness.missingFields.map((field, idx) => (
+                                      <span
+                                        key={idx}
+                                        className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs ${getImportanceColor(field.importance)}`}
+                                      >
+                                        {field.label}
+                                        {field.importance === "high" && " *"}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+                        {item.isVoided && false && (
                           <div className="mb-2">
                             <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
                               已作废
