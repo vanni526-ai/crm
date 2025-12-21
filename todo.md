@@ -65,3 +65,10 @@
 - [ ] 创建前端配置管理页面
 - [ ] 集成到智能登记解析逻辑
 - [ ] 测试验证
+
+### 19. 修复Gmail手动导入渠道订单号
+- [x] 诊断问题原因 - pasteImport中缺少channelOrderNo字段映射
+- [x] 修夏LLM提取逻辑 - LLM已正确提取，无需修改
+- [x] 修夏字段映射逻辑 - 添加channelOrderNo和paymentChannel字段
+- [x] 测试验证 - 5个测试全部通过
+- [x] 保存检查点

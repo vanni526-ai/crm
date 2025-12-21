@@ -813,6 +813,8 @@ export const gmailAutoImportRouter = router({
               accountBalance: orderData.accountBalance?.toString() || "0",
               teacherFee: orderData.teacherFee?.toString() || "0",
               transportFee: orderData.carFee?.toString() || "0",
+              channelOrderNo: orderData.channelOrderNo || "",
+              paymentChannel: orderData.paymentMethod || "",
               deliveryCity: orderData.city || "",
               deliveryRoom: orderData.classroom || "",
               deliveryTeacher: orderData.teacher || "",
