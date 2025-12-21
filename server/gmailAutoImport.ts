@@ -154,8 +154,17 @@ export async function executeGmailAutoImport(
           deliveryCourse: orderData.course,
           classDate: orderData.classDate ? new Date(orderData.classDate) : undefined,
           classTime: orderData.classTime,
+          channelOrderNo: orderData.channelOrderNo || undefined,
           notes: orderData.notes,
           status: "pending",
+          // 结构化备注字段(默认为undefined)
+          noteTags: undefined,
+          discountInfo: undefined,
+          couponInfo: undefined,
+          membershipInfo: undefined,
+          paymentStatus: undefined,
+          specialNotes: undefined,
+          isVoided: false,
         });
 
         // 记录导入成功

@@ -426,14 +426,14 @@ export const appRouter = router({
           teacherFee: z.string().optional(),
           transportFee: z.string().optional(),
           notes: z.string().optional(),
-          // 结构化备注字段
-          noteTags: z.string().optional(),
-          discountInfo: z.string().optional(),
-          couponInfo: z.string().optional(),
-          membershipInfo: z.string().optional(),
-          paymentStatus: z.string().optional(),
-          specialNotes: z.string().optional(),
-          isVoided: z.boolean().optional(),
+          // 结构化备注字段(使用nullish()同时允许null和undefined)
+          noteTags: z.string().nullish(),
+          discountInfo: z.string().nullish(),
+          couponInfo: z.string().nullish(),
+          membershipInfo: z.string().nullish(),
+          paymentStatus: z.string().nullish(),
+          specialNotes: z.string().nullish(),
+          isVoided: z.boolean().nullish(),
         })),
       }))
       .mutation(async ({ input, ctx }) => {
@@ -452,8 +452,8 @@ export const appRouter = router({
               orderData.paymentMethod || undefined
             );
             
-            // 辅助函数:过滤无效值
-            const filterValue = (val: string | undefined) => {
+            // 辅助函数:过滤无效值(将null转换为undefined)
+            const filterValue = (val: string | null | undefined) => {
               if (!val || val === "?" || val.trim() === "") return undefined;
               return val;
             };
