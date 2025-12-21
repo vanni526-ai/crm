@@ -102,7 +102,7 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
     toast.success("已删除");
   };
 
-  const updateEditingField = (field: string, value: string) => {
+  const updateEditingField = (field: string, value: string | boolean) => {
     setEditingData({ ...editingData, [field]: value });
   };
 
@@ -353,6 +353,17 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                               className="h-8 text-sm"
                             />
                           </div>
+                          <div className="col-span-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={editingData.isVoided || false}
+                                onChange={(e) => updateEditingField("isVoided", e.target.checked)}
+                                className="w-4 h-4 rounded border-gray-300"
+                              />
+                              <span className="text-sm text-red-600">标记为作废订单</span>
+                            </label>
+                          </div>
                         </div>
                         <div className="flex gap-2 justify-end">
                           <Button
@@ -375,6 +386,13 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                     ) : (
                       // 预览模式
                       <div>
+                        {item.isVoided && (
+                          <div className="mb-2">
+                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                              已作废
+                            </span>
+                          </div>
+                        )}
                         <div className="grid grid-cols-2 gap-2 text-sm mb-2">
                           <div><span className="text-muted-foreground">销售:</span> {item.salesperson}</div>
                           <div><span className="text-muted-foreground">客户:</span> {item.customerName}</div>
