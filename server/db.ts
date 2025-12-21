@@ -228,8 +228,21 @@ export async function checkOrderNoExists(orderNo: string): Promise<boolean> {
 export async function createOrder(order: InsertOrder) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // 检查渠道订单号是否重复
+  if (order.channelOrderNo && order.channelOrderNo.trim() !== '') {
+    const exists = await checkChannelOrderNoExists(order.channelOrderNo);
+    if (exists) {
+      const existingOrder = await getOrderByChannelOrderNo(order.channelOrderNo);
+      throw new Error(
+        `渠道订单号已存在: ${order.channelOrderNo}\n` +
+        `关联订单: ${existingOrder?.orderNo || '未知'} (客户: ${existingOrder?.customerName || '未知'})`
+      );
+    }
+  }
+  
   const result = await db.insert(orders).values(order);
-  return result[0].insertId;
+  return { id: result[0].insertId, ...order };
 }
 
 export async function getOrderById(id: number) {
@@ -1821,4 +1834,97 @@ export async function batchUpdateOrderNumbers() {
   }
   
   return updatedCount;
+}
+
+
+// ========== 渠道订单号管理 ==========
+
+/**
+ * 检查渠道订单号是否已存在
+ * @param channelOrderNo 渠道订单号
+ * @returns 是否存在
+ */
+export async function checkChannelOrderNoExists(channelOrderNo: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const result = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.channelOrderNo, channelOrderNo))
+    .limit(1);
+  
+  return result.length > 0;
+}
+
+/**
+ * 根据渠道订单号查找订单
+ * @param channelOrderNo 渠道订单号
+ * @returns 订单信息
+ */
+export async function getOrderByChannelOrderNo(channelOrderNo: string) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.channelOrderNo, channelOrderNo))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * 按支付渠道筛选订单
+ * @param paymentChannel 支付渠道
+ * @returns 订单列表
+ */
+export async function getOrdersByPaymentChannel(paymentChannel: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(orders)
+    .where(eq(orders.paymentChannel, paymentChannel))
+    .orderBy(desc(orders.createdAt));
+}
+
+/**
+ * 搜索渠道订单号(模糊匹配)
+ * @param keyword 搜索关键词
+ * @returns 订单列表
+ */
+export async function searchOrdersByChannelOrderNo(keyword: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(orders)
+    .where(sql`${orders.channelOrderNo} LIKE ${`%${keyword}%`}`)
+    .orderBy(desc(orders.createdAt));
+}
+
+/**
+ * 获取对账报表数据(按支付渠道分组)
+ * @param startDate 开始日期
+ * @param endDate 结束日期
+ * @returns 对账报表数据
+ */
+export async function getReconciliationReport(startDate: string, endDate: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(orders)
+    .where(
+      and(
+        gte(orders.classDate, new Date(startDate)),
+        lte(orders.classDate, new Date(endDate))
+      )
+    )
+    .orderBy(orders.paymentChannel, desc(orders.createdAt));
 }

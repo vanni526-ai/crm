@@ -50,7 +50,14 @@ type OrderFormData = z.infer<typeof orderSchema>;
 
 export default function Orders() {
   const utils = trpc.useUtils();
-  const { data: orders, isLoading } = trpc.orders.list.useQuery();
+  const [paymentChannelFilter, setPaymentChannelFilter] = useState<string>("all");
+  const [channelOrderNoSearch, setChannelOrderNoSearch] = useState<string>("");
+  const [searchInput, setSearchInput] = useState<string>("");
+  
+  const { data: orders, isLoading } = trpc.orders.list.useQuery({
+    paymentChannel: paymentChannelFilter !== "all" ? paymentChannelFilter : undefined,
+    channelOrderNo: channelOrderNoSearch || undefined,
+  });
   const { data: users } = trpc.users.list.useQuery();
   const { data: salespersons } = trpc.salespersons.list.useQuery();
   
@@ -714,6 +721,53 @@ export default function Orders() {
                     <SelectItem value="refunded">已退款</SelectItem>
                   </SelectContent>
                 </Select>
+                
+                <Select value={paymentChannelFilter} onValueChange={setPaymentChannelFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="支付渠道" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部渠道</SelectItem>
+                    <SelectItem value="支付宝">支付宝</SelectItem>
+                    <SelectItem value="微信支付">微信支付</SelectItem>
+                    <SelectItem value="富掌柜">富掌柜</SelectItem>
+                    <SelectItem value="现金">现金</SelectItem>
+                    <SelectItem value="银行转账">银行转账</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <div className="flex gap-2 items-center">
+                  <Input
+                    placeholder="搜索渠道订单号..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setChannelOrderNoSearch(searchInput);
+                      }
+                    }}
+                    className="w-[240px]"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setChannelOrderNoSearch(searchInput)}
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                  {channelOrderNoSearch && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setChannelOrderNoSearch("");
+                        setSearchInput("");
+                      }}
+                    >
+                      清除
+                    </Button>
+                  )}
+                </div>
 
                 <Select value={salesFilter} onValueChange={setSalesFilter}>
                   <SelectTrigger className="w-[180px]">

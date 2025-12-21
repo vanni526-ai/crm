@@ -20,6 +20,7 @@ import Sales from "./pages/Sales";
 import GmailImport from "./pages/GmailImport";
 import GmailImportConfig from "./pages/GmailImportConfig";
 import ChannelOrderNoManagement from "./pages/ChannelOrderNoManagement";
+import ReconciliationExport from "./pages/ReconciliationExport";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path={"/gmail-import"} component={GmailImport} />
       <Route path={"/gmail-import/config"} component={GmailImportConfig} />
       <Route path={"/channel-orderno-management"} component={ChannelOrderNoManagement} />
+      <Route path={"/reconciliation-export"} component={ReconciliationExport} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

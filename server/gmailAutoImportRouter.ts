@@ -7,6 +7,8 @@ import {
   getGmailImportLogById,
   createOrder,
   checkOrderNoExists,
+  checkChannelOrderNoExists,
+  getOrderByChannelOrderNo,
 } from "./db";
 import { validateChannelOrderNo, identifyPaymentChannel } from "./channelOrderNoUtils";
 
@@ -85,6 +87,20 @@ export const gmailAutoImportRouter = router({
             let channelOrderNo = orderData.channelOrderNo || "";
             let paymentChannel = orderData.paymentMethod || "";
             let validationWarning = "";
+            
+            // 检查渠道订单号是否重复
+            if (channelOrderNo && channelOrderNo.trim() !== '') {
+              const channelOrderExists = await checkChannelOrderNoExists(channelOrderNo);
+              if (channelOrderExists) {
+                const existingOrder = await getOrderByChannelOrderNo(channelOrderNo);
+                skippedCount++;
+                errorMessages.push(
+                  `渠道订单号已存在: ${channelOrderNo} ` +
+                  `(关联订单: ${existingOrder?.orderNo || '未知'}, 客户: ${existingOrder?.customerName || '未知'})`
+                );
+                continue;
+              }
+            }
             
             if (channelOrderNo) {
               const validation = validateChannelOrderNo(channelOrderNo);

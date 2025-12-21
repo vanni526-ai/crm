@@ -244,13 +244,28 @@ export const appRouter = router({
 
   // 订单管理
   orders: router({
-    list: protectedProcedure.query(async ({ ctx }) => {
-      // 销售只能看自己的订单
-      if (ctx.user.role === "sales") {
-        return db.getOrdersBySales(ctx.user.id);
-      }
-      return db.getAllOrders();
-    }),
+    list: protectedProcedure
+      .input(z.object({
+        paymentChannel: z.string().optional(),
+        channelOrderNo: z.string().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        // 如果有渠道订单号搜索
+        if (input?.channelOrderNo && input.channelOrderNo.trim() !== '') {
+          return db.searchOrdersByChannelOrderNo(input.channelOrderNo);
+        }
+        
+        // 如果有支付渠道筛选
+        if (input?.paymentChannel && input.paymentChannel !== 'all') {
+          return db.getOrdersByPaymentChannel(input.paymentChannel);
+        }
+        
+        // 销售只能看自己的订单
+        if (ctx.user.role === "sales") {
+          return db.getOrdersBySales(ctx.user.id);
+        }
+        return db.getAllOrders();
+      }),
     
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
@@ -330,6 +345,18 @@ export const appRouter = router({
             throw new TRPCError({
               code: "BAD_REQUEST",
               message: `客户名不能使用老师名字: ${input.customerName}`,
+            });
+          }
+        }
+        
+        // 检查渠道订单号是否重复
+        if (input.channelOrderNo && input.channelOrderNo.trim() !== '') {
+          const exists = await db.checkChannelOrderNoExists(input.channelOrderNo);
+          if (exists) {
+            const existingOrder = await db.getOrderByChannelOrderNo(input.channelOrderNo);
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `渠道订单号已存在: ${input.channelOrderNo}\n关联订单: ${existingOrder?.orderNo || '未知'} (客户: ${existingOrder?.customerName || '未知'})`,
             });
           }
         }
@@ -664,6 +691,55 @@ export const appRouter = router({
         const { previewBatchFillChannelOrderNo } = await import("./channelOrderNoBatchFill");
         const result = await previewBatchFillChannelOrderNo(input);
         return result;
+      }),
+    
+    // 导出对账报表
+    exportReconciliationReport: protectedProcedure
+      .input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+        paymentChannel: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        let orders = await db.getReconciliationReport(input.startDate, input.endDate);
+        
+        // 如果指定了支付渠道,进行筛选
+        if (input.paymentChannel && input.paymentChannel !== 'all') {
+          orders = orders.filter(order => order.paymentChannel === input.paymentChannel);
+        }
+        
+        // 按支付渠道分组统计
+        const groupedByChannel: Record<string, any> = {};
+        let totalAmount = 0;
+        let totalCount = 0;
+        
+        for (const order of orders) {
+          const channel = order.paymentChannel || '未知';
+          if (!groupedByChannel[channel]) {
+            groupedByChannel[channel] = {
+              channel,
+              orders: [],
+              totalAmount: 0,
+              count: 0,
+            };
+          }
+          
+          const amount = parseFloat(order.paymentAmount || '0');
+          groupedByChannel[channel].orders.push(order);
+          groupedByChannel[channel].totalAmount += amount;
+          groupedByChannel[channel].count++;
+          totalAmount += amount;
+          totalCount++;
+        }
+        
+        return {
+          startDate: input.startDate,
+          endDate: input.endDate,
+          totalAmount,
+          totalCount,
+          groupedByChannel: Object.values(groupedByChannel),
+          allOrders: orders,
+        };
       }),
   }),
 

@@ -138,7 +138,7 @@ export async function executeGmailAutoImport(
 
         // 创建订单(只处理第一个解析出的订单)
         const orderData = parsedOrders[0];
-        const orderId = await db.createOrder({
+        const createdOrder = await db.createOrder({
           orderNo: `ORD${Date.now()}${Math.floor(Math.random() * 10000)}`,
           customerName: orderData.customerName,
           salesId: config.operatorId, // 使用操作人作为销售ID
@@ -173,7 +173,7 @@ export async function executeGmailAutoImport(
           threadId: thread.id,
           subject,
           fromEmail,
-          orderId,
+          orderId: createdOrder.id,
           importStatus: "success",
           operatorId: config.operatorId,
           operatorName: config.operatorName,
@@ -184,7 +184,7 @@ export async function executeGmailAutoImport(
           messageId,
           subject,
           status: "success",
-          orderId,
+          orderId: createdOrder.id,
         });
       } catch (error) {
         // 处理失败,记录错误

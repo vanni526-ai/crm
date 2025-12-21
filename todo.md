@@ -82,3 +82,14 @@
 - [x] 创建前端管理界面 - ChannelOrderNoManagement.tsx
 - [x] 编写单元测试 - 14个测试全部通过
 - [x] 保存检查点
+
+### 21. 渠道订单号管理增强
+- [x] 添加渠道订单号重复检测API - checkChannelOrderNoExists
+- [x] 集成重复检测到订单创建流程 - routers.ts和db.ts
+- [x] 集成重复检测到Gmail导入流程 - gmailAutoImportRouter.ts
+- [x] 实现订单列表按支付渠道筛选 - Orders.tsx
+- [x] 实现订单列表渠道订单号搜索 - Orders.tsx
+- [x] 实现对账报表导出API - exportReconciliationReport
+- [x] 创建对账报表导出界面 - ReconciliationExport.tsx
+- [x] 编写单元测试 - 5个测试全部通过
+- [x] 保存检查点
