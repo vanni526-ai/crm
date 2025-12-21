@@ -74,7 +74,9 @@ export async function parseTransferNotes(text: string) {
 
   const prompt = `你是一个专业的数据解析助手。请解析以下转账备注,提取订单信息。
 
-**重要:如果输入是聊天记录格式(包含发送者名字和时间戳,例如"树莓啵啵 14:04"),请忽略这些元数据行,只解析真正的订单内容行。**
+**重要:如果输入是聊天记录格式(包含发送者名字和时间戳,例如"树莓啤啤 14:04"),请忽略这些元数据行,只解析真正的订单内容行。**
+
+**流量来源识别:如果输入文本中包含微信群名称(例如"微信群\'本部及巡游打款群\'的聊天记录如下"),请将群名称提取到trafficSource字段。**
 
 **作废订单识别:如果记录以"作废"开头(例如"作废 山竹 12.22..."),则将isVoided设置true,否则设置false。**
 
@@ -136,7 +138,8 @@ export async function parseTransferNotes(text: string) {
 - transportFee: 车费(从"报销老师XXX车费"、"报销车费XXX"、"老师打车XXX"中提取数字,**车费和老师费用是分开的**,如果没有则留空)
 - deliveryCity: 上课城市(例如:上海、北京)
 - deliveryRoom: 上课教室/房间号(例如:404、大兴)
-- notes: 其他备注信息(不要包含聊天记录的发送者名字和时间戳,例如"树莓啵啵 14:04"这样的元数据)
+- trafficSource: 流量来源(如果输入文本中包含微信群名称、渠道来源、推广渠道等信息,则提取到此字段。例如:"微信群\'本部及巡游打款群\'的聊天记录如下" -> trafficSource="本部及巡游打款群"。如果没有则留空)
+- notes: 其他备注信息(不要包含聊天记录的发送者名字和时间戳,例如"树莓啤啤 14:04"这样的元数据)
 - isVoided: 是否作废(如果记录以"作废"开头则为true,否则为false)
 
 转账备注数据:
@@ -177,6 +180,7 @@ ${lines.join('\n')}
                     transportFee: { type: "string" },
                     deliveryCity: { type: "string" },
                     deliveryRoom: { type: "string" },
+                    trafficSource: { type: "string" },
                     notes: { type: "string" },
                     isVoided: { type: "boolean", description: "是否作废(如果记录以'作废'开头则为true,否则为false)" }
                   },

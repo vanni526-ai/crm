@@ -93,3 +93,10 @@
 - [x] 创建对账报表导出界面 - ReconciliationExport.tsx
 - [x] 编写单元测试 - 5个测试全部通过
 - [x] 保存检查点
+
+### 22. 修复智能登记流量来源和渠道订单号显示
+- [x] 诊断SmartRegisterDialog组件 - 字段已存在,问题在LLM解析器
+- [x] 添加流量来源字段 - transferNoteParser.ts
+- [x] 添加渠道订单号字段 - 已存在,无需修改
+- [x] 测试验证 - 5个测试全部通过
+- [x] 保存检查点
