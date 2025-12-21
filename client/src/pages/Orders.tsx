@@ -353,8 +353,11 @@ export default function Orders() {
       
       const matchesStatus = statusFilter === "all" || order.status === statusFilter;
       const matchesSales = salesFilter === "all" || order.salesPerson === salesFilter;
+      
+      // 默认不显示作废订单(除非用户选择显示)
+      const matchesVoided = !order.isVoided; // TODO: 添加作废订单筛选器
 
-      return matchesSearch && matchesStatus && matchesSales;
+      return matchesSearch && matchesStatus && matchesSales && matchesVoided;
     });
 
     filtered.sort((a, b) => {

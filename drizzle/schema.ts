@@ -78,6 +78,7 @@ export const orders = mysqlTable("orders", {
   classTime: varchar("classTime", { length: 50 }), // 上课时间(支持时间范围如"14:00-16:00")
   
   status: mysqlEnum("status", ["pending", "paid", "completed", "cancelled", "refunded"]).default("pending").notNull(),
+  isVoided: boolean("isVoided").default(false).notNull(), // 是否作废
   notes: text("notes"), // 备注
   
   // 结构化备注字段

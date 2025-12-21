@@ -76,6 +76,8 @@ export async function parseTransferNotes(text: string) {
 
 **重要:如果输入是聊天记录格式(包含发送者名字和时间戳,例如"树莓啵啵 14:04"),请忽略这些元数据行,只解析真正的订单内容行。**
 
+**作废订单识别:如果记录以"作废"开头(例如"作废 山竹 12.22..."),则将isVoided设置true,否则设置false。**
+
 重要提示:
 1. **销售人员识别(必须精确匹配)**: 
    - 销售人员**通常是每行文本的第一个词**(例如"山竹 12.7..."中的"山竹","妖渊 12.6..."中的"妖渊","好好 12.5..."中的"好好","ivy 12.6..."中的"ivy")
@@ -111,6 +113,8 @@ export async function parseTransferNotes(text: string) {
 - 示例4: 妖渊 12.6 18:30~20:00 2v2 yy和声声老师 天津单 850 (销售:如果系统中有"妖渊"则填写,否则留空;天津是城市,2v2是课程,无客户名)
 - 示例5: 好好 12.5 18:30-21:30 丝袜课➕两节基础课 yy上 天津单 1000 (销售:好好,不是副词)
 - 示例6: ivy 12.6 14.30-15.30 女慕课一节 yy 行之 3000 (销售:ivy,客户名:行之)
+- 示例7: 山竹 12.20 16:10-17:10基础局 韦德上 阿Q 1200全款微信已付 (上海404) 给老师300 交易单号4200002971202512209215930344 (销售:山竹,客户:阿Q,老师费用:300,渠道订单号:4200002971202512209215930344)
+- 示例8: 山竹 12.20 21:30-23:30 基础局+线下乳首课 唐泽上 JoeGong 1200定金已付 1600尾款未付(上海404)报销老师100车费 给老师600 支付宝收款 (销售:山竹,客户:JoeGong,车费:100,老师费用:600,**车费和老师费用是分开的**)
 - 日期格式: MM.DD 或 MM月DD日
 - 时间格式: HH:MM-HH:MM 或 HH:MM~HH:MM
 - 金额可能包含"已付"、"未付"、"定金"、"全款"等关键词
@@ -127,12 +131,13 @@ export async function parseTransferNotes(text: string) {
 - paymentAmount: 支付金额(只提取数字,不包含"已付"、"未付"等文字)
 - paymentMethod: 支付方式(如"支付宝收款"、"富掌柜收款"、"现金"、"微信",如果没有明确提及则留空)
 - courseAmount: 课程总金额(如果有"未付"金额,计算总额)
-- channelOrderNo: 渠道订单号/交易单号(例如:4200002912202512208697791196,如果没有则留空)
-- teacherFee: 老师费用(从"给老师XXX"中提取数字,如果没有则留空)
-- transportFee: 车费(从"报销车费XXX"、"老师打车XXX"中提取数字,如果没有则留空)
+- channelOrderNo: 渠道订单号/交易单号(从"交易单号XXXXX"中提取数字,例如:4200002912202512208697791196,如果没有则留空)
+- teacherFee: 老师费用(从"给老师XXX"中提取数字,**不包括车费**,如果没有则留空)
+- transportFee: 车费(从"报销老师XXX车费"、"报销车费XXX"、"老师打车XXX"中提取数字,**车费和老师费用是分开的**,如果没有则留空)
 - deliveryCity: 上课城市(例如:上海、北京)
 - deliveryRoom: 上课教室/房间号(例如:404、大兴)
 - notes: 其他备注信息(不要包含聊天记录的发送者名字和时间戳,例如"树莓啵啵 14:04"这样的元数据)
+- isVoided: 是否作废(如果记录以"作废"开头则为true,否则为false)
 
 转账备注数据:
 ${lines.join('\n')}
@@ -172,7 +177,8 @@ ${lines.join('\n')}
                     transportFee: { type: "string" },
                     deliveryCity: { type: "string" },
                     deliveryRoom: { type: "string" },
-                    notes: { type: "string" }
+                    notes: { type: "string" },
+                    isVoided: { type: "boolean", description: "是否作废(如果记录以'作废'开头则为true,否则为false)" }
                   },
                   required: ["paymentAmount"],
                   additionalProperties: false

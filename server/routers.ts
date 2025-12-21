@@ -433,6 +433,7 @@ export const appRouter = router({
           membershipInfo: z.string().optional(),
           paymentStatus: z.string().optional(),
           specialNotes: z.string().optional(),
+          isVoided: z.boolean().optional(),
         })),
       }))
       .mutation(async ({ input, ctx }) => {
@@ -500,6 +501,7 @@ export const appRouter = router({
               membershipInfo: filterValue(orderData.membershipInfo),
               paymentStatus: filterValue(orderData.paymentStatus),
               specialNotes: filterValue(orderData.specialNotes),
+              isVoided: orderData.isVoided || false,
             });
             successCount++;
           } catch (error) {

@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD `isVoided` boolean DEFAULT false NOT NULL;
