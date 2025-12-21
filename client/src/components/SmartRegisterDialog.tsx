@@ -459,27 +459,17 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                           {item.deliveryRoom && (
                             <div><span className="text-muted-foreground">教室:</span> {item.deliveryRoom}</div>
                           )}
-                          {item.paymentMethod && (
-                            <div><span className="text-muted-foreground">支付方式:</span> {item.paymentMethod}</div>
-                          )}
-                          {item.channelOrderNo && (
-                            <div className="col-span-2"><span className="text-muted-foreground">渠道订单号:</span> {item.channelOrderNo}</div>
-                          )}
-                          {item.teacherFee && (
-                            <div><span className="text-muted-foreground">老师费用:</span> ¥{item.teacherFee}</div>
-                          )}
-                          {item.transportFee && (
-                            <div><span className="text-muted-foreground">车费:</span> ¥{item.transportFee}</div>
-                          )}
+                          <div><span className="text-muted-foreground">支付方式:</span> {item.paymentMethod || <span className="text-muted-foreground/50">未填写</span>}</div>
+                          <div className="col-span-2"><span className="text-muted-foreground">渠道订单号:</span> {item.channelOrderNo || <span className="text-muted-foreground/50">未填写</span>}</div>
+                          <div><span className="text-muted-foreground">老师费用:</span> {item.teacherFee ? `¥${item.teacherFee}` : <span className="text-muted-foreground/50">未填写</span>}</div>
+                          <div><span className="text-muted-foreground">车费:</span> {item.transportFee ? `¥${item.transportFee}` : <span className="text-muted-foreground/50">未填写</span>}</div>
                           {item.otherFee && (
                             <div><span className="text-muted-foreground">其他费用:</span> ¥{item.otherFee}</div>
                           )}
                           {item.partnerFee && (
                             <div><span className="text-muted-foreground">合伙人费:</span> ¥{item.partnerFee}</div>
                           )}
-                          {item.trafficSource && (
-                            <div><span className="text-muted-foreground">流量来源:</span> {item.trafficSource}</div>
-                          )}
+                          <div><span className="text-muted-foreground">流量来源:</span> {item.trafficSource || <span className="text-muted-foreground/50">未填写</span>}</div>
                           {item.accountBalance && (
                             <div><span className="text-muted-foreground">账户余额:</span> ¥{item.accountBalance}</div>
                           )}
@@ -498,9 +488,7 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                           {item.jinchuanAmount && (
                             <div><span className="text-muted-foreground">金串到账金额:</span> ¥{item.jinchuanAmount}</div>
                           )}
-                          {item.notes && (
-                            <div className="col-span-2"><span className="text-muted-foreground">备注:</span> {item.notes}</div>
-                          )}
+                          <div className="col-span-2"><span className="text-muted-foreground">备注:</span> {item.notes || <span className="text-muted-foreground/50">无</span>}</div>
                         </div>
                         <div className="flex gap-2 justify-end">
                           <Button
