@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, Home, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Mail, PanelLeft } from "lucide-react";
+import { LayoutDashboard, LogOut, Home, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Mail, PanelLeft, Brain } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -37,6 +37,7 @@ const menuItems = [
   { icon: DollarSign, label: "财务管理", path: "/finance" },
   { icon: Upload, label: "数据导入", path: "/import" },
   { icon: Mail, label: "Gmail导入", path: "/gmail-import" },
+  { icon: Brain, label: "解析学习", path: "/parsing-learning" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

@@ -82,11 +82,61 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
     setEditingData({ ...parsedData[index] });
   };
 
+  // 记录修正数据
+  const recordCorrection = trpc.parsingLearning.recordCorrection.useMutation();
+
   const handleSaveEdit = () => {
     if (editingIndex !== null && editingData) {
+      const originalData = parsedData[editingIndex];
       const newData = [...parsedData];
       newData[editingIndex] = editingData;
       setParsedData(newData);
+
+      // 比较原始解析结果和用户修改后的值,记录修正数据
+      const fieldsToCheck = [
+        'salesperson', 'customerName', 'deliveryCourse', 'deliveryTeacher',
+        'classDate', 'classTime', 'paymentAmount', 'courseAmount',
+        'deliveryCity', 'deliveryRoom', 'paymentMethod', 'channelOrderNo',
+        'teacherFee', 'transportFee', 'otherFee', 'partnerFee',
+        'trafficSource', 'accountBalance', 'paymentCity', 'paymentDate',
+        'paymentTime', 'jinchuanAmount', 'notes'
+      ];
+
+      fieldsToCheck.forEach((field) => {
+        const originalValue = originalData[field];
+        const correctedValue = editingData[field];
+
+        // 如果用户修改了字段值,记录修正数据
+        if (originalValue !== correctedValue) {
+          // 判断修正类型
+          let correctionType: 'field_missing' | 'field_wrong' | 'format_error' | 'logic_error';
+          if (!originalValue && correctedValue) {
+            correctionType = 'field_missing'; // LLM没有提取到,用户填写了
+          } else if (originalValue && !correctedValue) {
+            correctionType = 'field_wrong'; // LLM提取错误,用户删除了
+          } else if (originalValue && correctedValue) {
+            // 判断是格式错误还是逻辑错误
+            const isFormatError = (
+              field.includes('Date') || field.includes('Time') ||
+              field.includes('Amount') || field.includes('Fee')
+            );
+            correctionType = isFormatError ? 'format_error' : 'field_wrong';
+          } else {
+            correctionType = 'field_wrong';
+          }
+
+          // 记录修正数据
+          recordCorrection.mutate({
+            originalText: rawText,
+            fieldName: field,
+            llmValue: originalValue?.toString() || null,
+            correctedValue: correctedValue?.toString() || '',
+            correctionType,
+            context: originalData, // 其他字段的值作为上下文
+          });
+        }
+      });
+
       setEditingIndex(null);
       setEditingData(null);
       toast.success("修改已保存");

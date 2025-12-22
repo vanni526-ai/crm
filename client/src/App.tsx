@@ -24,6 +24,7 @@ import ReconciliationExport from "./pages/ReconciliationExport";
 import TransportFeeFixTool from "./pages/TransportFeeFixTool";
 import TrafficSourceConfig from "./pages/TrafficSourceConfig";
 import TrafficSourceDashboard from "./pages/TrafficSourceDashboard";
+import ParsingLearning from "./pages/ParsingLearning";
 
 function Router() {
   return (
@@ -48,6 +49,7 @@ function Router() {
       <Route path={"/transport-fee-fix"} component={TransportFeeFixTool} />
       <Route path={"/traffic-source-config"} component={TrafficSourceConfig} />
       <Route path={"/traffic-source-dashboard"} component={TrafficSourceDashboard} />
+      <Route path={"/parsing-learning"} component={ParsingLearning} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
