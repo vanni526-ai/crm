@@ -2,6 +2,112 @@ import { invokeLLM } from "./_core/llm";
 import { extractNotesInfo } from "./notesExtractor";
 
 /**
+ * 智能纠错功能 - 自动修正常见错误
+ */
+function smartCorrection(order: any): any {
+  // 1. 日期格式纠错
+  if (order.classDate) {
+    // 处理MM.DD格式,补充年份
+    const dateMatch = order.classDate.match(/^(\d{1,2})\.(\d{1,2})$/);
+    if (dateMatch) {
+      const month = parseInt(dateMatch[1]);
+      const day = parseInt(dateMatch[2]);
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      
+      // 如果月份小于当前月份,则判定为下一年
+      const year = month < currentMonth ? currentYear + 1 : currentYear;
+      order.classDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+    
+    // 处理MM月DD日格式
+    const dateMatch2 = order.classDate.match(/^(\d{1,2})月(\d{1,2})日$/);
+    if (dateMatch2) {
+      const month = parseInt(dateMatch2[1]);
+      const day = parseInt(dateMatch2[2]);
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      
+      const year = month < currentMonth ? currentYear + 1 : currentYear;
+      order.classDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+  }
+  
+  // 2. 金额格式纠错 - 全角数字转半角
+  const amountFields = ['paymentAmount', 'courseAmount', 'teacherFee', 'transportFee', 'otherFee', 'partnerFee'];
+  amountFields.forEach(field => {
+    if (order[field] && typeof order[field] === 'string') {
+      // 全角数字转半角
+      order[field] = order[field].replace(/[０-９]/g, (char: string) => {
+        return String.fromCharCode(char.charCodeAt(0) - 0xFEE0);
+      });
+      // 移除非数字字符(保留数字、小数点和负号)
+      order[field] = order[field].replace(/[^\d.-]/g, '');
+    }
+  });
+  
+  // 3. 时间格式纠错 - 统一为HH:MM-HH:MM格式
+  if (order.classTime && typeof order.classTime === 'string') {
+    // 将全角凒号、波浪号等替换为半角连接符
+    order.classTime = order.classTime
+      .replace(/[～〜~]/g, '-')  // 各种波浪号转为连接符
+      .replace(/\./g, ':');  // 点号转为冒号
+  }
+  
+  // 4. 老师名格式纠错 - 移除多余的"老师“后缀
+  if (order.deliveryTeacher && typeof order.deliveryTeacher === 'string') {
+    // 如果已经包含"老师“后缀,不再重复添加
+    if (order.deliveryTeacher.includes('老师') && order.deliveryTeacher.endsWith('上')) {
+      order.deliveryTeacher = order.deliveryTeacher.replace(/上$/, '');
+    }
+  }
+  
+  // 5. 地点格式纠错 - 提取城市和教室
+  if (order.deliveryCity && typeof order.deliveryCity === 'string') {
+    // 移除括号
+    order.deliveryCity = order.deliveryCity.replace(/[\(\)（）]/g, '');
+    
+    // 如果包含数字(如“上海404”),分离城市和教室
+    const cityRoomMatch = order.deliveryCity.match(/^([一-龥]+)(\d+.*)$/);
+    if (cityRoomMatch) {
+      order.deliveryCity = cityRoomMatch[1];
+      if (!order.deliveryRoom) {
+        order.deliveryRoom = cityRoomMatch[2];
+      }
+    }
+    
+    // 移除“单”后缀
+    order.deliveryCity = order.deliveryCity.replace(/单$/, '');
+  }
+  
+  // 6. 多个交易单号处理 - 用逗号分隔
+  if (order.channelOrderNo && typeof order.channelOrderNo === 'string') {
+    // 如果包含多个数字串(用空格分隔),用逗号连接
+    const orderNos = order.channelOrderNo.split(/\s+/).filter((no: string) => no.length > 10);
+    if (orderNos.length > 1) {
+      order.channelOrderNo = orderNos.join(',');
+    }
+  }
+  
+  // 7. 退款场景处理 - 确保金额为负数
+  if (order.deliveryCourse && typeof order.deliveryCourse === 'string') {
+    if (order.deliveryCourse.includes('退款') || order.deliveryCourse.includes('退费')) {
+      // 确保金额为负数
+      if (order.paymentAmount && !order.paymentAmount.startsWith('-')) {
+        order.paymentAmount = '-' + order.paymentAmount;
+      }
+      if (order.courseAmount && !order.courseAmount.startsWith('-')) {
+        order.courseAmount = '-' + order.courseAmount;
+      }
+    }
+  }
+  
+  return order;
+}
+
+/**
  * 解析转账备注文本,提取订单信息
  * 
  * 格式: 销售名 日期 时间 课程 老师 客户 金额 备注 地点 教室
@@ -72,7 +178,7 @@ export async function parseTransferNotes(text: string) {
     ? `\n\n别名说明:\n${aliasExplanations.join("\n")}` 
     : "";
 
-  const prompt = `你是一个专业的数据解析助手。请解析以下转账备注,提取订单信息。
+  const prompt = `你是一个专业的数据解析助手,擅长从非结构化文本中精准提取订单信息。请仔细阅读以下规则和示例,然后解析转账备注。
 
 **重要:如果输入是聊天记录格式(包含发送者名字和时间戳,例如"树莓啤啤 14:04"),请忽略这些元数据行,只解析真正的订单内容行。**
 
@@ -100,8 +206,16 @@ export async function parseTransferNotes(text: string) {
    - **"面销"是一种课程类型**,不是费用记录
    - 其他课程包括:2v2、基础局、女王局、丝袜课、裸足丝袜、问罪、臣服、反转、sp课、埃及艳后等
 6. **费用记录过滤**: 以下类型的文本**不应该**创建订单,应该跳过:
-   - **纯费用支付记录**:只包含"报销"、"车费"、"辛苦费"、"提成"等词,且没有课程名和上课时间
-   - **注意**:如果包含"面销"作为课程名,并有收款金额,则应该创建订单
+   - **纯费用支付记录**:只包含"报销“、“车费“、“辛苦费“、“提成“等词,且没有课程名和上课时间
+   - **注意**:如果包含"面销“作为课程名,并有收款金额,则应该创建订单
+7. **特殊场景识别**:
+   - **退款**: 课程名包含"退款“或"退费“,金额应为负数(paymentAmount和courseAmount都为负数)
+   - **补课**: 课程名包含"补课“或"补计时“,正常处理
+   - **存课**: 课程名包含"存“字(如"存一节裸足丝袜课“),正常处理,在notes中标注"存课“
+   - **多人拼课**: 客户名包含"和“或逗号(如"客户A和客户B“),正常处理
+   - **促销计算**: 如果包含“9送2“、“第二节课半价“等促销信息,请在notes中保留
+   - **多个交易单号**: 如果有多个交易单号,用逗号分隔存储到channelOrderNo字段
+   - **教室使用备注**: 如果包含"教室第一次使用“等信息,请在notes中保留
 
 转账备注格式说明:
 - 每行一条转账记录
@@ -118,11 +232,26 @@ export async function parseTransferNotes(text: string) {
 - 示例7: 山竹 12.20 16:10-17:10基础局 韦德上 阿Q 1200全款微信已付 (上海404) 给老师300 交易单号4200002971202512209215930344 (销售:山竹,客户:阿Q,老师费用:300,渠道订单号:4200002971202512209215930344)
 - 示例8: 山竹 12.20 21:30-23:30 基础局+线下乳首课 唐泽上 JoeGong 1200定金已付 1600尾款未付(上海404)报销老师100车费 给老师600 支付宝收款 (销售:山竹,客户:JoeGong,**transportFee:100**,**teacherFee:600**,**车费和老师费用必须严格区分,不能混淆!**)
 - 示例9: 山竹 12.20 23:30-0:30 问罪 淼淼上 John 600定金已付 1500尾款未付(上海1101)报销老师100车费 给老师400 (销售:山竹,客户:John,**transportFee:100**,**teacherFee:400**,**"报销老师100车费"中的100是车费,不是老师费用!**)
-- 日期格式: MM.DD 或 MM月DD日
-- 时间格式: HH:MM-HH:MM 或 HH:MM~HH:MM
-- 金额可能包含"已付"、"未付"、"定金"、"全款"等关键词
-- 地点可能在括号中,例如: (北京大兴)
-- 有些字段可能缺失
+- 示例10: 山竹 12.25 退款 客户名 退款1000 (销售:山竹,课程:退款,金额:-1000,**退款金额应该为负数**)
+- 示例11: 山竹 12.26 补课 声声上 客户A 500已付 (销售:山竹,课程:补课,老师:声声,客户:客户A,金额:500)
+- 示例12: 山竹 12.27 基础局 yy上yaya上 客户B和客户C 3000已付 (销售:山竹,课程:基础局,老师:yy和yaya,客户:客户B和客户C,金额:3000,**多人拼课场景**)
+- 示例13: 山竹 12.28 14:00-16:00 基础局 声声上 客户D 2000已付 给声声500 车费50 (销售:山竹,老师费用:500,车费:50,**注意区分“给老师”和“车费”**)
+- 示例14: 夏鑫 1月21日 14:00~17:00 3个小时基础女王局 歪歪老师上 天津单 全款3000（第三节课半价）Augustin.W 给老师600 (销售:夏鑫,课程:3个小时基础女王局,老师:歪歪,客户:Augustin.W,金额:3000,老师费用:600,notes:第三节课半价)
+- 示例15: 山竹 12.23 20:30-21:30 tk 昭昭上 （大连）从不服输 750定金已付 750未付 给老师300 （大连教室第一次使用）4200002887202512219062635765 (销售:山竹,课程:tk,老师:昭昭,地点:大连,客户:从不服输,支付:750,总额:1500,老师费用:300,notes:大连教室第一次使用)
+- 示例16: 夏鑫 12月21日 存一节裸足丝袜课+流放剧本 YY老师面销 5000 给老师500 望山全款5000 4200002984202512216346104594 4200002991202512210344645644 (销售:夏鑫,课程:存一节裸足丝袜课+流放剧本,老师:YY,客户:望山,金额:5000,老师费用:500,channelOrderNo:两个交易单号用逗号分隔,notes:存课)
+- 示例17: 嘅嘅 12.21 13:00-15:00 臣服剧本课 姜一上 长风404 涛涛10800 全款已付 9送2=13200-6500=6700 给老师600 (销售:嘅嘅,课程:臣服剧本课,老师:姜一,地点:上海,教室:长风404,客户:涛涛,金额:10800,老师费用:600,notes:9送2促销)
+**格式容错规则:**
+- 日期格式: MM.DD 或 MM月DD日 或 MM-DD 或 MM/DD 或 YYYY-MM-DD
+- 时间格式: HH:MM-HH:MM 或 HH:MM~HH:MM 或 HH:MM～HH:MM 或 HH.MM-HH.MM
+- 金额格式: 
+  * 可能包含"已付“、“未付“、“定金“、“全款“、“尾款“等关键词
+  * 可能包含全角/半角数字混合(2400、2４００)
+  * 可能包含错别字(全款写成“全欮“)
+- 地点格式: 可能在括号中(北京大兴) 或 直接写(上海404) 或 带后缀(天津单)
+- 老师名格式: 可能带“老师”后缀 或 “上”后缀 或 无后缀
+- 课程名格式: 可能包含特殊符号(丝袜课➕基础课) 或 加号(基础局+裸足丝袜)
+- 客户名格式: 可能是中文、英文、数字混合,可能包含特殊字符
+- **缺失字段处理**: 如果某些字段缺失(如客户名、时间、地点),请留空,不要用其他字段填充
 
 请将以下转账备注解析为JSON数组,每个对象包含以下字段:
 - salesperson: 销售人员名字(花名),必须从系统销售人员列表(${salespersonNames})中匹配,如果找不到匹配的销售人员则留空
@@ -211,6 +340,9 @@ ${lines.join('\n')}
         // 优先使用花名显示
         order.salesperson = salespersonMapping.get(order.salesperson);
       }
+      
+      // 智能纠错功能
+      order = smartCorrection(order);
       
       // 提取结构化备注信息
       if (order.notes) {
