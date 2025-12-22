@@ -435,3 +435,51 @@ export const fieldMappings = mysqlTable("fieldMappings", {
 
 export type FieldMapping = typeof fieldMappings.$inferSelect;
 export type InsertFieldMapping = typeof fieldMappings.$inferInsert;
+
+/**
+ * 解析修正记录表 - 记录用户对LLM解析结果的修正,用于学习优化
+ */
+export const parsingCorrections = mysqlTable("parsingCorrections", {
+  id: int("id").autoincrement().primaryKey(),
+  originalText: text("originalText").notNull(), // 原始输入文本
+  fieldName: varchar("fieldName", { length: 50 }).notNull(), // 被修正的字段名
+  llmValue: text("llmValue"), // LLM解析的值
+  correctedValue: text("correctedValue").notNull(), // 用户修正后的值
+  correctionType: mysqlEnum("correctionType", ["field_missing", "field_wrong", "format_error", "logic_error"]).notNull(), // 修正类型
+  context: text("context"), // 上下文信息(JSON格式,包含其他字段的值)
+  userId: int("userId").notNull(), // 修正人ID
+  userName: varchar("userName", { length: 100 }), // 修正人姓名
+  isLearned: boolean("isLearned").default(false).notNull(), // 是否已用于学习
+  learnedAt: timestamp("learnedAt"), // 学习时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  fieldIdx: index("field_idx").on(table.fieldName),
+  userIdx: index("user_idx").on(table.userId),
+  learnedIdx: index("learned_idx").on(table.isLearned),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type ParsingCorrection = typeof parsingCorrections.$inferSelect;
+export type InsertParsingCorrection = typeof parsingCorrections.$inferInsert;
+
+/**
+ * Prompt优化历史表 - 记录自动优化的prompt变更
+ */
+export const promptOptimizationHistory = mysqlTable("promptOptimizationHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  version: varchar("version", { length: 50 }).notNull(), // 版本号(如"v1.0.1")
+  optimizationType: mysqlEnum("optimizationType", ["add_example", "update_rule", "fix_error_pattern"]).notNull(), // 优化类型
+  changeDescription: text("changeDescription").notNull(), // 变更描述
+  newExamples: text("newExamples"), // 新增的示例(JSON数组)
+  correctionCount: int("correctionCount").default(0).notNull(), // 基于多少条修正记录优化
+  isActive: boolean("isActive").default(true).notNull(), // 是否启用
+  createdBy: int("createdBy").notNull(), // 创建人(系统自动=0)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  versionIdx: index("version_idx").on(table.version),
+  activeIdx: index("active_idx").on(table.isActive),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type PromptOptimizationHistory = typeof promptOptimizationHistory.$inferSelect;
+export type InsertPromptOptimizationHistory = typeof promptOptimizationHistory.$inferInsert;

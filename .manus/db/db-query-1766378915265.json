@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `promptOptimizationHistory` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `version` varchar(50) NOT NULL,\n  `optimizationType` enum('add_example', 'update_rule', 'fix_error_pattern') NOT NULL,\n  `changeDescription` text NOT NULL,\n  `newExamples` text,\n  `correctionCount` int NOT NULL DEFAULT 0,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `version_idx` (`version`),\n  INDEX `active_idx` (`isActive`),\n  INDEX `created_at_idx` (`createdAt`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `promptOptimizationHistory` (\n  `id` int AUTO_INCREMENT PRIMARY KEY,\n  `version` varchar(50) NOT NULL,\n  `optimizationType` enum('add_example', 'update_rule', 'fix_error_pattern') NOT NULL,\n  `changeDescription` text NOT NULL,\n  `newExamples` text,\n  `correctionCount` int NOT NULL DEFAULT 0,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX `version_idx` (`version`),\n  INDEX `active_idx` (`isActive`),\n  INDEX `created_at_idx` (`createdAt`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1673
+}

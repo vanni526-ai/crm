@@ -204,3 +204,15 @@
 - [x] 添加更多真实场景示例 - 17个示例覆盖各种场景
 - [x] 编写测试验证优化效果 - transferNoteParser.enhanced.test.ts(10个测试用例)
 - [x] 保存检查点
+
+### 31. 实现解析规则学习功能(后端API完成)
+- [x] 设计实现方案 - 收集修正数据、分析模式、自动优化prompt
+- [x] 创建数据库表 - parsingCorrections, promptOptimizationHistory
+- [x] 实现修正数据收集API - recordCorrection, getUnlearnedCorrections, markAsLearned, getCorrectionStats
+- [x] 实现修正模式分析功能 - analyzeCorrectionPatterns(使用LLM分析错误模式)
+- [x] 实现prompt自动优化功能 - autoOptimizePrompt, generatePromptExamples
+- [x] 创建优化API - triggerAutoOptimization, analyzePatterns, getOptimizationHistory
+- [ ] 在智能登记预览中集成修正数据收集
+- [ ] 创建管理界面 - 查看修正统计、触发自动优化、查看优化历史
+- [ ] 编写测试验证功能
+- [ ] 保存检查点
