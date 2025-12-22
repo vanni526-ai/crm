@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `parsingCorrections` ADD `annotationType` enum('typical_error','edge_case','common_pattern','none') DEFAULT 'none';\nALTER TABLE `parsingCorrections` ADD `annotationNote` text;\nALTER TABLE `parsingCorrections` ADD `annotatedBy` int;\nALTER TABLE `parsingCorrections` ADD `annotatedAt` timestamp;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE `parsingCorrections` ADD `annotationType` enum('typical_error','edge_case','common_pattern','none') DEFAULT 'none';\nALTER TABLE `parsingCorrections` ADD `annotationNote` text;\nALTER TABLE `parsingCorrections` ADD `annotatedBy` int;\nALTER TABLE `parsingCorrections` ADD `annotatedAt` timestamp;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3720
+}

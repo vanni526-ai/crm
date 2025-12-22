@@ -244,4 +244,92 @@ describe("Parsing Learning API", () => {
       expect(result.correctionCount).toBeGreaterThan(0);
     }, 60000); // 增加超时时间,因为LLM调用可能较慢
   });
+
+  describe("getConfig", () => {
+    it("应该成功获取配置", async () => {
+      // 先设置配置
+      await caller.parsingLearning.setConfig({
+        configKey: "test_config",
+        configValue: { value: 123 },
+        description: "测试配置",
+      });
+
+      // 获取配置
+      const config = await caller.parsingLearning.getConfig({
+        configKey: "test_config",
+      });
+
+      expect(config).not.toBeNull();
+      expect(config?.configKey).toBe("test_config");
+      expect(config?.configValue.value).toBe(123);
+    });
+  });
+
+  describe("setConfig", () => {
+    it("应该成功设置配置", async () => {
+      const result = await caller.parsingLearning.setConfig({
+        configKey: "auto_optimize_threshold",
+        configValue: { threshold: 15 },
+        description: "自动优化阈值",
+      });
+
+      expect(result.success).toBe(true);
+
+      // 验证配置是否保存
+      const config = await caller.parsingLearning.getConfig({
+        configKey: "auto_optimize_threshold",
+      });
+
+      expect(config).not.toBeNull();
+      expect(config?.configValue.threshold).toBe(15);
+    });
+  });
+
+  describe("batchAnnotate", () => {
+    it("应该成功批量标注修正记录", async () => {
+      // 先创建一些修正记录
+      const ids: number[] = [];
+      for (let i = 0; i < 3; i++) {
+        await caller.parsingLearning.recordCorrection({
+          originalText: `测试数据${i}`,
+          fieldName: "testField",
+          llmValue: `oldValue${i}`,
+          correctedValue: `newValue${i}`,
+          correctionType: "field_wrong",
+        });
+      }
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const corrections = await db
+        .select()
+        .from(parsingCorrections)
+        .where(eq(parsingCorrections.fieldName, "testField"))
+        .limit(3);
+
+      ids.push(...corrections.map(c => c.id));
+
+      // 批量标注
+      const result = await caller.parsingLearning.batchAnnotate({
+        correctionIds: ids,
+        annotationType: "typical_error",
+        annotationNote: "这是一个典型错误",
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.count).toBe(3);
+
+      // 验证标注是否保存
+      const annotatedCorrections = await db
+        .select()
+        .from(parsingCorrections)
+        .where(eq(parsingCorrections.id, ids[0]));
+
+      expect(annotatedCorrections.length).toBe(1);
+      expect(annotatedCorrections[0].annotationType).toBe("typical_error");
+      expect(annotatedCorrections[0].annotationNote).toBe("这是一个典型错误");
+      expect(annotatedCorrections[0].annotatedBy).toBe(1);
+      expect(annotatedCorrections[0].annotatedAt).not.toBeNull();
+    });
+  });
 });

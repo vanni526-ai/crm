@@ -1,6 +1,6 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import { parsingCorrections, promptOptimizationHistory } from "../drizzle/schema";
+import { parsingCorrections, promptOptimizationHistory, parsingLearningConfig } from "../drizzle/schema";
 import { getDb } from "./db";
 import { desc, eq, and } from "drizzle-orm";
 
@@ -199,6 +199,105 @@ export const parsingLearningRouter = router({
       return {
         corrections: corrections.length,
         ...analysis,
+      };
+    }),
+
+  /**
+   * 获取配置
+   */
+  getConfig: protectedProcedure
+    .input(z.object({
+      configKey: z.string(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      const configs = await db
+        .select()
+        .from(parsingLearningConfig)
+        .where(eq(parsingLearningConfig.configKey, input.configKey));
+
+      if (configs.length === 0) {
+        return null;
+      }
+
+      return {
+        ...configs[0],
+        configValue: JSON.parse(configs[0].configValue),
+      };
+    }),
+
+  /**
+   * 设置配置
+   */
+  setConfig: protectedProcedure
+    .input(z.object({
+      configKey: z.string(),
+      configValue: z.any(),
+      description: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
+      // 检查配置是否存在
+      const existing = await db
+        .select()
+        .from(parsingLearningConfig)
+        .where(eq(parsingLearningConfig.configKey, input.configKey));
+
+      if (existing.length > 0) {
+        // 更新配置
+        await db
+          .update(parsingLearningConfig)
+          .set({
+            configValue: JSON.stringify(input.configValue),
+            description: input.description,
+            updatedBy: ctx.user.id,
+          })
+          .where(eq(parsingLearningConfig.configKey, input.configKey));
+      } else {
+        // 创建配置
+        await db.insert(parsingLearningConfig).values([{
+          configKey: input.configKey,
+          configValue: JSON.stringify(input.configValue),
+          description: input.description,
+          updatedBy: ctx.user.id,
+        }]);
+      }
+
+      return { success: true };
+    }),
+
+  /**
+   * 批量标注修正记录
+   */
+  batchAnnotate: protectedProcedure
+    .input(z.object({
+      correctionIds: z.array(z.number()),
+      annotationType: z.enum(["typical_error", "edge_case", "common_pattern", "none"]),
+      annotationNote: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
+      // 批量更新标注
+      for (const id of input.correctionIds) {
+        await db
+          .update(parsingCorrections)
+          .set({
+            annotationType: input.annotationType,
+            annotationNote: input.annotationNote,
+            annotatedBy: ctx.user.id,
+            annotatedAt: new Date(),
+          })
+          .where(eq(parsingCorrections.id, id));
+      }
+
+      return {
+        success: true,
+        count: input.correctionIds.length,
       };
     }),
 });

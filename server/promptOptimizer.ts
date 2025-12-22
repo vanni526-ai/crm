@@ -199,10 +199,27 @@ ${JSON.stringify(highPriorityRecs, null, 2)}
 /**
  * 自动优化prompt(主函数)
  */
-export async function autoOptimizePrompt(minCorrections: number = 10) {
+export async function autoOptimizePrompt(minCorrections?: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
+  }
+
+  // 如果没有指定minCorrections,从配置中读取
+  if (minCorrections === undefined) {
+    const { parsingLearningConfig } = await import("../drizzle/schema");
+    const { eq } = await import("drizzle-orm");
+    const configs = await db
+      .select()
+      .from(parsingLearningConfig)
+      .where(eq(parsingLearningConfig.configKey, "auto_optimize_threshold"));
+
+    if (configs.length > 0) {
+      const configValue = JSON.parse(configs[0].configValue);
+      minCorrections = configValue.threshold || 10;
+    } else {
+      minCorrections = 10; // 默认值
+    }
   }
 
   // 获取未学习的修正记录
@@ -211,7 +228,7 @@ export async function autoOptimizePrompt(minCorrections: number = 10) {
     .from(parsingCorrections)
     .where(eq(parsingCorrections.isLearned, false));
 
-  if (corrections.length < minCorrections) {
+  if (corrections.length < minCorrections!) {
     return {
       success: false,
       message: `修正记录不足(当前${corrections.length}条,需要至少${minCorrections}条)`,

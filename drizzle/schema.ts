@@ -451,6 +451,10 @@ export const parsingCorrections = mysqlTable("parsingCorrections", {
   userName: varchar("userName", { length: 100 }), // 修正人姓名
   isLearned: boolean("isLearned").default(false).notNull(), // 是否已用于学习
   learnedAt: timestamp("learnedAt"), // 学习时间
+  annotationType: mysqlEnum("annotationType", ["typical_error", "edge_case", "common_pattern", "none"]).default("none"), // 标注类型
+  annotationNote: text("annotationNote"), // 标注备注
+  annotatedBy: int("annotatedBy"), // 标注人 ID
+  annotatedAt: timestamp("annotatedAt"), // 标注时间
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, (table) => ({
   fieldIdx: index("field_idx").on(table.fieldName),
@@ -483,3 +487,19 @@ export const promptOptimizationHistory = mysqlTable("promptOptimizationHistory",
 
 export type PromptOptimizationHistory = typeof promptOptimizationHistory.$inferSelect;
 export type InsertPromptOptimizationHistory = typeof promptOptimizationHistory.$inferInsert;
+
+/**
+ * 解析学习配置表 - 存储解析学习相关的配置参数
+ */
+export const parsingLearningConfig = mysqlTable("parsingLearningConfig", {
+  id: int("id").autoincrement().primaryKey(),
+  configKey: varchar("configKey", { length: 50 }).notNull().unique(), // 配置键(如"auto_optimize_threshold")
+  configValue: text("configValue").notNull(), // 配置值(JSON格式)
+  description: text("description"), // 配置说明
+  updatedBy: int("updatedBy").notNull(), // 更新人ID
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ParsingLearningConfig = typeof parsingLearningConfig.$inferSelect;
+export type InsertParsingLearningConfig = typeof parsingLearningConfig.$inferInsert;

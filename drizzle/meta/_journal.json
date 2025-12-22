@@ -218,6 +218,20 @@
       "when": 1766378752628,
       "tag": "0030_handy_rafael_vega",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1766382144528,
+      "tag": "0031_brown_jack_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "5",
+      "when": 1766382334517,
+      "tag": "0032_awesome_terror",
+      "breakpoints": true
     }
   ]
 }
