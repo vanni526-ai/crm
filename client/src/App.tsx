@@ -21,6 +21,9 @@ import GmailImport from "./pages/GmailImport";
 import GmailImportConfig from "./pages/GmailImportConfig";
 import ChannelOrderNoManagement from "./pages/ChannelOrderNoManagement";
 import ReconciliationExport from "./pages/ReconciliationExport";
+import TransportFeeFixTool from "./pages/TransportFeeFixTool";
+import TrafficSourceConfig from "./pages/TrafficSourceConfig";
+import TrafficSourceDashboard from "./pages/TrafficSourceDashboard";
 
 function Router() {
   return (
@@ -42,6 +45,9 @@ function Router() {
       <Route path={"/gmail-import/config"} component={GmailImportConfig} />
       <Route path={"/channel-orderno-management"} component={ChannelOrderNoManagement} />
       <Route path={"/reconciliation-export"} component={ReconciliationExport} />
+      <Route path={"/transport-fee-fix"} component={TransportFeeFixTool} />
+      <Route path={"/traffic-source-config"} component={TrafficSourceConfig} />
+      <Route path={"/traffic-source-dashboard"} component={TrafficSourceDashboard} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

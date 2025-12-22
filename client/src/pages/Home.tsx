@@ -150,6 +150,26 @@ export default function Home() {
                 </CardContent>
               </Card>
             </Link>
+
+            {/* 车费修复工具 */}
+            <Link href="/transport-fee-fix">
+              <Card className="glass-card cursor-pointer hover:shadow-lg transition-all">
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold mb-2">🔧 车费修复工具</h3>
+                  <p className="text-sm text-muted-foreground">检测和修复历史订单中的车费识别错误</p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            {/* 流量来源统计 */}
+            <Link href="/traffic-source-dashboard">
+              <Card className="glass-card cursor-pointer hover:shadow-lg transition-all">
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold mb-2">📊 流量来源统计</h3>
+                  <p className="text-sm text-muted-foreground">查看各流量来源的订单和金额统计</p>
+                </CardContent>
+              </Card>
+            </Link>
             </div>
           </div>
 

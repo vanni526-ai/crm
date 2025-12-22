@@ -8,6 +8,7 @@ import { Edit, Trash2, Save, X, AlertCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { evaluateFieldCompleteness, getCompletenessColor, getCompletenessBgColor, getCompletenessLabel, getImportanceColor } from "@/lib/fieldCompleteness";
+import { validateOrderFields, getFieldLabel, ValidationWarning } from "@/lib/orderFieldValidator";
 
 interface SmartRegisterDialogProps {
   open: boolean;
@@ -461,8 +462,40 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                           )}
                           <div><span className="text-muted-foreground">支付方式:</span> {item.paymentMethod || <span className="text-muted-foreground/50">未填写</span>}</div>
                           <div className="col-span-2"><span className="text-muted-foreground">渠道订单号:</span> {item.channelOrderNo || <span className="text-muted-foreground/50">未填写</span>}</div>
-                          <div><span className="text-muted-foreground">老师费用:</span> {item.teacherFee ? `¥${item.teacherFee}` : <span className="text-muted-foreground/50">未填写</span>}</div>
-                          <div><span className="text-muted-foreground">车费:</span> {item.transportFee ? `¥${item.transportFee}` : <span className="text-muted-foreground/50">未填写</span>}</div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">老师费用:</span>
+                            {item.teacherFee ? (
+                              <>
+                                <span>¥{item.teacherFee}</span>
+                                {(() => {
+                                  const validation = validateOrderFields(item);
+                                  const warning = validation.warnings.find(w => w.field === 'teacherFee');
+                                  return warning ? (
+                                    <span className="text-yellow-600 text-xs" title={warning.message}>⚠️</span>
+                                  ) : null;
+                                })()}
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground/50">未填写</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-muted-foreground">车费:</span>
+                            {item.transportFee ? (
+                              <>
+                                <span>¥{item.transportFee}</span>
+                                {(() => {
+                                  const validation = validateOrderFields(item);
+                                  const warning = validation.warnings.find(w => w.field === 'transportFee');
+                                  return warning ? (
+                                    <span className="text-yellow-600 text-xs" title={warning.message}>⚠️</span>
+                                  ) : null;
+                                })()}
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground/50">未填写</span>
+                            )}
+                          </div>
                           {item.otherFee && (
                             <div><span className="text-muted-foreground">其他费用:</span> ¥{item.otherFee}</div>
                           )}

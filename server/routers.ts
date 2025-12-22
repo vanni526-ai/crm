@@ -7,6 +7,7 @@ import { importRouter } from "./importRouter";
 import { salespersonRouter } from "./salespersonRouter";
 import { gmailAutoImportRouter } from "./gmailAutoImportRouter";
 import { trafficSourceConfigRouter } from "./trafficSourceConfigRouter";
+import { transportFeeFixRouter } from "./transportFeeFixRouter";
 
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
@@ -40,6 +41,7 @@ export const appRouter = router({
   salespersons: salespersonRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
+  transportFeeFix: transportFeeFixRouter,
 
   
   auth: router({

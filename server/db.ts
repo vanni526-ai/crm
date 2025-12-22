@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, sql, between, isNotNull, ne, like, or, inArray, count } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, between, isNotNull, isNull, ne, like, or, inArray, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -1927,4 +1927,156 @@ export async function getReconciliationReport(startDate: string, endDate: string
       )
     )
     .orderBy(orders.paymentChannel, desc(orders.createdAt));
+}
+
+/**
+ * 检测可能存在车费识别问题的订单
+ * 查找备注中包含"车费"但transportFee为0的订单
+ * @returns 问题订单列表
+ */
+export async function detectTransportFeeIssues() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // 查找备注中包含"车费"关键词,但transportFee为0或null的订单
+  const issueOrders = await db
+    .select()
+    .from(orders)
+    .where(
+      and(
+        sql`${orders.notes} LIKE '%车费%'`,
+        or(
+          eq(orders.transportFee, "0.00"),
+          isNull(orders.transportFee)
+        )
+      )
+    )
+    .orderBy(desc(orders.createdAt));
+  
+  return issueOrders;
+}
+
+/**
+ * 批量修复车费识别问题
+ * 重新解析备注并更新transportFee和teacherFee字段
+ * @param orderIds 订单ID列表
+ * @returns 修复结果统计
+ */
+export async function batchFixTransportFee(orderIds: number[]) {
+  const db = await getDb();
+  if (!db) return { success: 0, failed: 0, errors: [] as string[] };
+  
+  let successCount = 0;
+  let failedCount = 0;
+  const errors: string[] = [];
+  
+  for (const orderId of orderIds) {
+    try {
+      // 获取订单详情
+      const order = await getOrderById(orderId);
+      if (!order || !order.notes) {
+        errors.push(`订单 ${orderId}: 未找到或没有备注`);
+        failedCount++;
+        continue;
+      }
+      
+      // 使用正则表达式从备注中提取车费和老师费用
+      const notes = order.notes;
+      
+      // 提取车费: "报销老师100车费" -> 100
+      const transportFeeMatch = notes.match(/报销(?:老师)?(\d+)(?:元)?车费|车费(\d+)(?:元)?/);
+      const transportFee = transportFeeMatch ? (transportFeeMatch[1] || transportFeeMatch[2]) : null;
+      
+      // 提取老师费用: "给老师600" -> 600
+      const teacherFeeMatch = notes.match(/给老师(\d+)(?:元)?/);
+      const teacherFee = teacherFeeMatch ? teacherFeeMatch[1] : null;
+      
+      // 更新订单
+      const updateData: any = {};
+      if (transportFee) {
+        updateData.transportFee = transportFee;
+      }
+      if (teacherFee) {
+        updateData.teacherFee = teacherFee;
+      }
+      
+      if (Object.keys(updateData).length > 0) {
+        await db
+          .update(orders)
+          .set(updateData)
+          .where(eq(orders.id, orderId));
+        successCount++;
+      } else {
+        errors.push(`订单 ${orderId}: 未能从备注中提取车费或老师费用`);
+        failedCount++;
+      }
+    } catch (error) {
+      errors.push(`订单 ${orderId}: ${error instanceof Error ? error.message : '未知错误'}`);
+      failedCount++;
+    }
+  }
+  
+  return {
+    success: successCount,
+    failed: failedCount,
+    errors,
+  };
+}
+
+/**
+ * 获取流量来源统计数据
+ * @param startDate 开始日期(可选)
+ * @param endDate 结束日期(可选)
+ * @returns 流量来源统计数据
+ */
+export async function getTrafficSourceStats(startDate?: string, endDate?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let query = db
+    .select({
+      trafficSource: orders.trafficSource,
+      orderCount: count(orders.id),
+      totalAmount: sql<number>`SUM(${orders.paymentAmount})`,
+    })
+    .from(orders)
+    .where(
+      and(
+        isNotNull(orders.trafficSource),
+        ne(orders.trafficSource, ""),
+        eq(orders.isVoided, false)
+      )
+    )
+    .groupBy(orders.trafficSource)
+    .orderBy(sql`SUM(${orders.paymentAmount}) DESC`);
+  
+  // 如果提供了日期范围,添加日期过滤
+  if (startDate && endDate) {
+    query = db
+      .select({
+        trafficSource: orders.trafficSource,
+        orderCount: count(orders.id),
+        totalAmount: sql<number>`SUM(${orders.paymentAmount})`,
+      })
+      .from(orders)
+      .where(
+        and(
+          isNotNull(orders.trafficSource),
+          ne(orders.trafficSource, ""),
+          eq(orders.isVoided, false),
+          gte(orders.classDate, new Date(startDate)),
+          lte(orders.classDate, new Date(endDate))
+        )
+      )
+      .groupBy(orders.trafficSource)
+      .orderBy(sql`SUM(${orders.paymentAmount}) DESC`);
+  }
+  
+  const results = await query;
+  
+  return results.map(row => ({
+    trafficSource: row.trafficSource,
+    orderCount: Number(row.orderCount),
+    totalAmount: Number(row.totalAmount) || 0,
+  }));
 }

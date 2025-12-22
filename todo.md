@@ -158,3 +158,39 @@
 - [x] 添加详细示例 - 示例8和示例9明确标注transportFee和teacherFee的区分
 - [x] 编写测试用例 - 5个测试全部通过
 - [x] 保存检查点
+
+### 27. 批量修复历史数据中的车费识别错误(已完成)
+- [x] 设计检测逻辑 - 查找备注中包含"车费"但transportFee为空的订单
+- [x] 实现数据检测API - detectTransportFeeIssues
+- [x] 实现批量修复API - batchFixTransportFee
+- [x] 创建前端管理界面 - TransportFeeFixTool.tsx
+- [x] 显示检测结果列表(订单ID、客户名、备注、当前teacherFee)
+- [x] 提供批量修复按钮(重新解析备注并更新字段)
+- [x] 编写单元测试
+- [x] 保存检查点
+
+### 28. 智能登记字段合理性验证(已完成)
+- [x] 设计验证规则 - 车费通常不超过200元,老师费用通常在50-3000元
+- [x] 实现验证工具函数 - orderFieldValidator.ts(前后端两个版本)
+- [x] 在SmartRegisterDialog中集成验证
+- [x] 显示警告标识(黄色感叹号)对于异常值
+- [x] 添加验证说明提示(hover显示)
+- [x] 编写单元测试
+- [x] 保存检查点
+
+### 29. 流量来源管理功能完善(已完成)
+- [x] 创建流量来源配置管理页面 - TrafficSourceConfig.tsx
+- [x] 显示当前所有别名映射规则
+- [x] 实现添加/编辑/删除别名规则功能
+- [x] 支持正则表达式匹配
+- [x] 实时预览标准化效果
+- [x] 集成数据清洗到Gmail导入流程(已存在trafficSourceUtils.ts)
+- [x] 集成数据清洗到智能登记流程(已存在trafficSourceUtils.ts)
+- [x] 实现流量来源统计API - getTrafficSourceStats
+- [x] 创建流量来源统计仪表板 - TrafficSourceDashboard.tsx
+- [x] 显示按流量来源分组的订单数量、成交额
+- [x] 显示流量来源排行榜(按金额降序)
+- [x] 支持按日期筛选功能
+- [x] 在首页添加入口
+- [x] 编写单元测试
+- [x] 保存检查点

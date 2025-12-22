@@ -71,4 +71,22 @@ export const trafficSourceConfigRouter = router({
 
       return { success: true };
     }),
+
+  /**
+   * 获取流量来源统计数据
+   */
+  getTrafficSourceStats: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const { getTrafficSourceStats } = await import("./db");
+      return getTrafficSourceStats(input?.startDate, input?.endDate);
+    }),
 });
