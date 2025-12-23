@@ -280,3 +280,17 @@
 - [x] 修复所有Date对象直接渲染问题 - 修复pattern.description、rec.description、example对象渲染
 - [x] 测试验证页面正常加载 - 页面完全正常，所有功能显示正常
 - [x] 保存检查点
+
+### 37. 订单事后学习系统(重新设计)
+- [x] 设计系统架构 - 复用parsingCorrections表,扩展correctionType支持manual_edit
+- [x] 实现后端API - recordOrderEdit记录订单修改
+- [x] 数据库schema更新 - correctionType枚举添加manual_edit
+- [x] 移除编辑时的学习对话框 - 清理旧代码
+- [x] 在订单详情页添加“记录学习”按钮
+- [x] 实现学习记录对话框 - 选择字段和输入原因
+- [x] 集成到解析学习流程 - 手动修改也参与自动优化(通过recordOrderEdit API)
+- [x] 测试验证功能 - 成功记录2个字段到学习系统
+- [x] 验证数据保存 - 解析学习页面显示2条新记录,类型为manual_edit
+- [x] 验证错误模式分析 - 系统自动识别客户名和城市提取问题
+- [x] 验证优化建议生成 - 系统生成4条针对性优化建议
+- [x] 保存检查点

@@ -445,7 +445,7 @@ export const parsingCorrections = mysqlTable("parsingCorrections", {
   fieldName: varchar("fieldName", { length: 50 }).notNull(), // 被修正的字段名
   llmValue: text("llmValue"), // LLM解析的值
   correctedValue: text("correctedValue").notNull(), // 用户修正后的值
-  correctionType: mysqlEnum("correctionType", ["field_missing", "field_wrong", "format_error", "logic_error"]).notNull(), // 修正类型
+  correctionType: mysqlEnum("correctionType", ["field_missing", "field_wrong", "format_error", "logic_error", "manual_edit"]).notNull(), // 修正类型
   context: text("context"), // 上下文信息(JSON格式,包含其他字段的值)
   userId: int("userId").notNull(), // 修正人ID
   userName: varchar("userName", { length: 100 }), // 修正人姓名

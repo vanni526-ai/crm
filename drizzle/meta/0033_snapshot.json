@@ -1,0 +1,2652 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "id": "b6b0a1eb-8cb5-4349-acbd-16e64028b32d",
+  "prevId": "66bdcec4-33c7-4eaa-8f44-cfd1567bdfe2",
+  "tables": {
+    "accountTransactions": {
+      "name": "accountTransactions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customerName": {
+          "name": "customerName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "enum('recharge','consume','refund')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "balanceBefore": {
+          "name": "balanceBefore",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "balanceAfter": {
+          "name": "balanceAfter",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "relatedOrderId": {
+          "name": "relatedOrderId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "relatedOrderNo": {
+          "name": "relatedOrderNo",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "operatorId": {
+          "name": "operatorId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "operatorName": {
+          "name": "operatorName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "customer_idx": {
+          "name": "customer_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "type_idx": {
+          "name": "type_idx",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        },
+        "order_idx": {
+          "name": "order_idx",
+          "columns": [
+            "relatedOrderId"
+          ],
+          "isUnique": false
+        },
+        "created_at_idx": {
+          "name": "created_at_idx",
+          "columns": [
+            "createdAt"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "accountTransactions_id": {
+          "name": "accountTransactions_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "customers": {
+      "name": "customers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "wechatId": {
+          "name": "wechatId",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "trafficSource": {
+          "name": "trafficSource",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "accountBalance": {
+          "name": "accountBalance",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "tags": {
+          "name": "tags",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "wechat_idx": {
+          "name": "wechat_idx",
+          "columns": [
+            "wechatId"
+          ],
+          "isUnique": false
+        },
+        "created_by_idx": {
+          "name": "created_by_idx",
+          "columns": [
+            "createdBy"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "customers_id": {
+          "name": "customers_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "fieldMappings": {
+      "name": "fieldMappings",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "type": {
+          "name": "type",
+          "type": "enum('salesperson_alias','city_code','teacher_alias','course_alias')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "sourceValue": {
+          "name": "sourceValue",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "targetValue": {
+          "name": "targetValue",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "type_idx": {
+          "name": "type_idx",
+          "columns": [
+            "type"
+          ],
+          "isUnique": false
+        },
+        "source_idx": {
+          "name": "source_idx",
+          "columns": [
+            "sourceValue"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "fieldMappings_id": {
+          "name": "fieldMappings_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "gmail_error_feedback": {
+      "name": "gmail_error_feedback",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "import_log_id": {
+          "name": "import_log_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "field_name": {
+          "name": "field_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "wrong_value": {
+          "name": "wrong_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correct_value": {
+          "name": "correct_value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "feedback_type": {
+          "name": "feedback_type",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_learned": {
+          "name": "is_learned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "gmail_error_feedback_id": {
+          "name": "gmail_error_feedback_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "gmail_import_config": {
+      "name": "gmail_import_config",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "configKey": {
+          "name": "configKey",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "configValue": {
+          "name": "configValue",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "gmail_import_config_id": {
+          "name": "gmail_import_config_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "gmail_import_config_configKey_unique": {
+          "name": "gmail_import_config_configKey_unique",
+          "columns": [
+            "configKey"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "gmailImportHistory": {
+      "name": "gmailImportHistory",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "messageId": {
+          "name": "messageId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "threadId": {
+          "name": "threadId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subject": {
+          "name": "subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "fromEmail": {
+          "name": "fromEmail",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "orderId": {
+          "name": "orderId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "importStatus": {
+          "name": "importStatus",
+          "type": "enum('success','failed','skipped')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "errorMessage": {
+          "name": "errorMessage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "operatorId": {
+          "name": "operatorId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "operatorName": {
+          "name": "operatorName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "importedAt": {
+          "name": "importedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "message_id_idx": {
+          "name": "message_id_idx",
+          "columns": [
+            "messageId"
+          ],
+          "isUnique": false
+        },
+        "thread_id_idx": {
+          "name": "thread_id_idx",
+          "columns": [
+            "threadId"
+          ],
+          "isUnique": false
+        },
+        "imported_at_idx": {
+          "name": "imported_at_idx",
+          "columns": [
+            "importedAt"
+          ],
+          "isUnique": false
+        },
+        "operator_idx": {
+          "name": "operator_idx",
+          "columns": [
+            "operatorId"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "gmailImportHistory_id": {
+          "name": "gmailImportHistory_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "gmailImportHistory_messageId_unique": {
+          "name": "gmailImportHistory_messageId_unique",
+          "columns": [
+            "messageId"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "gmailImportLogs": {
+      "name": "gmailImportLogs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "emailSubject": {
+          "name": "emailSubject",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "emailDate": {
+          "name": "emailDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "threadId": {
+          "name": "threadId",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalOrders": {
+          "name": "totalOrders",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "successOrders": {
+          "name": "successOrders",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "failedOrders": {
+          "name": "failedOrders",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('success','partial','failed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "errorLog": {
+          "name": "errorLog",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "emailContent": {
+          "name": "emailContent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "parsedData": {
+          "name": "parsedData",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "importedBy": {
+          "name": "importedBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "thread_id_idx": {
+          "name": "thread_id_idx",
+          "columns": [
+            "threadId"
+          ],
+          "isUnique": false
+        },
+        "status_idx": {
+          "name": "status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        },
+        "created_at_idx": {
+          "name": "created_at_idx",
+          "columns": [
+            "createdAt"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "gmailImportLogs_id": {
+          "name": "gmailImportLogs_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "importLogs": {
+      "name": "importLogs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "fileName": {
+          "name": "fileName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fileType": {
+          "name": "fileType",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dataType": {
+          "name": "dataType",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalRows": {
+          "name": "totalRows",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "successRows": {
+          "name": "successRows",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "failedRows": {
+          "name": "failedRows",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "errorLog": {
+          "name": "errorLog",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "importedBy": {
+          "name": "importedBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "importLogs_id": {
+          "name": "importLogs_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "orders": {
+      "name": "orders",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "orderNo": {
+          "name": "orderNo",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerName": {
+          "name": "customerName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "salespersonId": {
+          "name": "salespersonId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "salesId": {
+          "name": "salesId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "salesPerson": {
+          "name": "salesPerson",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "trafficSource": {
+          "name": "trafficSource",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentAmount": {
+          "name": "paymentAmount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "courseAmount": {
+          "name": "courseAmount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "accountBalance": {
+          "name": "accountBalance",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "paymentCity": {
+          "name": "paymentCity",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentChannel": {
+          "name": "paymentChannel",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "channelOrderNo": {
+          "name": "channelOrderNo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentDate": {
+          "name": "paymentDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentTime": {
+          "name": "paymentTime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "teacherFee": {
+          "name": "teacherFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "transportFee": {
+          "name": "transportFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "otherFee": {
+          "name": "otherFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "partnerFee": {
+          "name": "partnerFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "finalAmount": {
+          "name": "finalAmount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "deliveryCity": {
+          "name": "deliveryCity",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deliveryRoom": {
+          "name": "deliveryRoom",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deliveryTeacher": {
+          "name": "deliveryTeacher",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deliveryCourse": {
+          "name": "deliveryCourse",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "classDate": {
+          "name": "classDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "classTime": {
+          "name": "classTime",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('pending','paid','completed','cancelled','refunded')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "isVoided": {
+          "name": "isVoided",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "noteTags": {
+          "name": "noteTags",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "discountInfo": {
+          "name": "discountInfo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "couponInfo": {
+          "name": "couponInfo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "membershipInfo": {
+          "name": "membershipInfo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentStatus": {
+          "name": "paymentStatus",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "specialNotes": {
+          "name": "specialNotes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "customer_idx": {
+          "name": "customer_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "sales_idx": {
+          "name": "sales_idx",
+          "columns": [
+            "salesId"
+          ],
+          "isUnique": false
+        },
+        "status_idx": {
+          "name": "status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        },
+        "payment_date_idx": {
+          "name": "payment_date_idx",
+          "columns": [
+            "paymentDate"
+          ],
+          "isUnique": false
+        },
+        "class_date_idx": {
+          "name": "class_date_idx",
+          "columns": [
+            "classDate"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "orders_id": {
+          "name": "orders_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "orders_orderNo_unique": {
+          "name": "orders_orderNo_unique",
+          "columns": [
+            "orderNo"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "parsingCorrections": {
+      "name": "parsingCorrections",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "originalText": {
+          "name": "originalText",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "fieldName": {
+          "name": "fieldName",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "llmValue": {
+          "name": "llmValue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "correctedValue": {
+          "name": "correctedValue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "correctionType": {
+          "name": "correctionType",
+          "type": "enum('field_missing','field_wrong','format_error','logic_error','manual_edit')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "context": {
+          "name": "context",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "userId": {
+          "name": "userId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "userName": {
+          "name": "userName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isLearned": {
+          "name": "isLearned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "learnedAt": {
+          "name": "learnedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "annotationType": {
+          "name": "annotationType",
+          "type": "enum('typical_error','edge_case','common_pattern','none')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'none'"
+        },
+        "annotationNote": {
+          "name": "annotationNote",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "annotatedBy": {
+          "name": "annotatedBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "annotatedAt": {
+          "name": "annotatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "field_idx": {
+          "name": "field_idx",
+          "columns": [
+            "fieldName"
+          ],
+          "isUnique": false
+        },
+        "user_idx": {
+          "name": "user_idx",
+          "columns": [
+            "userId"
+          ],
+          "isUnique": false
+        },
+        "learned_idx": {
+          "name": "learned_idx",
+          "columns": [
+            "isLearned"
+          ],
+          "isUnique": false
+        },
+        "created_at_idx": {
+          "name": "created_at_idx",
+          "columns": [
+            "createdAt"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "parsingCorrections_id": {
+          "name": "parsingCorrections_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "parsingLearningConfig": {
+      "name": "parsingLearningConfig",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "configKey": {
+          "name": "configKey",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "configValue": {
+          "name": "configValue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "updatedBy": {
+          "name": "updatedBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "parsingLearningConfig_id": {
+          "name": "parsingLearningConfig_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "parsingLearningConfig_configKey_unique": {
+          "name": "parsingLearningConfig_configKey_unique",
+          "columns": [
+            "configKey"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "promptOptimizationHistory": {
+      "name": "promptOptimizationHistory",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "version": {
+          "name": "version",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "optimizationType": {
+          "name": "optimizationType",
+          "type": "enum('add_example','update_rule','fix_error_pattern')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "changeDescription": {
+          "name": "changeDescription",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "newExamples": {
+          "name": "newExamples",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "correctionCount": {
+          "name": "correctionCount",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "version_idx": {
+          "name": "version_idx",
+          "columns": [
+            "version"
+          ],
+          "isUnique": false
+        },
+        "active_idx": {
+          "name": "active_idx",
+          "columns": [
+            "isActive"
+          ],
+          "isUnique": false
+        },
+        "created_at_idx": {
+          "name": "created_at_idx",
+          "columns": [
+            "createdAt"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "promptOptimizationHistory_id": {
+          "name": "promptOptimizationHistory_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "reconciliations": {
+      "name": "reconciliations",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "periodStart": {
+          "name": "periodStart",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "periodEnd": {
+          "name": "periodEnd",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalIncome": {
+          "name": "totalIncome",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalExpense": {
+          "name": "totalExpense",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teacherFeeTotal": {
+          "name": "teacherFeeTotal",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "transportFeeTotal": {
+          "name": "transportFeeTotal",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "otherFeeTotal": {
+          "name": "otherFeeTotal",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "partnerFeeTotal": {
+          "name": "partnerFeeTotal",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "profit": {
+          "name": "profit",
+          "type": "decimal(12,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('draft','confirmed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'draft'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdBy": {
+          "name": "createdBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "period_idx": {
+          "name": "period_idx",
+          "columns": [
+            "periodStart",
+            "periodEnd"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "reconciliations_id": {
+          "name": "reconciliations_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "salespersons": {
+      "name": "salespersons",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "aliases": {
+          "name": "aliases",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "wechat": {
+          "name": "wechat",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "commissionRate": {
+          "name": "commissionRate",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "'0.00'"
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "sales_user_idx": {
+          "name": "sales_user_idx",
+          "columns": [
+            "userId"
+          ],
+          "isUnique": false
+        },
+        "sales_phone_idx": {
+          "name": "sales_phone_idx",
+          "columns": [
+            "phone"
+          ],
+          "isUnique": false
+        },
+        "sales_city_idx": {
+          "name": "sales_city_idx",
+          "columns": [
+            "city"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "salespersons_id": {
+          "name": "salespersons_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "schedules": {
+      "name": "schedules",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "orderId": {
+          "name": "orderId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerId": {
+          "name": "customerId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customerName": {
+          "name": "customerName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "wechatId": {
+          "name": "wechatId",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "salesName": {
+          "name": "salesName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "trafficSource": {
+          "name": "trafficSource",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentAmount": {
+          "name": "paymentAmount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "courseAmount": {
+          "name": "courseAmount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "accountBalance": {
+          "name": "accountBalance",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentCity": {
+          "name": "paymentCity",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "channelOrderNo": {
+          "name": "channelOrderNo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "overflowOrderNo": {
+          "name": "overflowOrderNo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "refundNo": {
+          "name": "refundNo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentDate": {
+          "name": "paymentDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentTime": {
+          "name": "paymentTime",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "teacherFee": {
+          "name": "teacherFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "transportFee": {
+          "name": "transportFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "otherFee": {
+          "name": "otherFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "partnerFee": {
+          "name": "partnerFee",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "receivedAmount": {
+          "name": "receivedAmount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deliveryCity": {
+          "name": "deliveryCity",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deliveryClassroom": {
+          "name": "deliveryClassroom",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deliveryTeacher": {
+          "name": "deliveryTeacher",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deliveryCourse": {
+          "name": "deliveryCourse",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "teacherId": {
+          "name": "teacherId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "teacherName": {
+          "name": "teacherName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "courseType": {
+          "name": "courseType",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "classDate": {
+          "name": "classDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "classTime": {
+          "name": "classTime",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "startTime": {
+          "name": "startTime",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "endTime": {
+          "name": "endTime",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "location": {
+          "name": "location",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('scheduled','completed','cancelled')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'scheduled'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "teacher_idx": {
+          "name": "teacher_idx",
+          "columns": [
+            "teacherId"
+          ],
+          "isUnique": false
+        },
+        "schedule_customer_idx": {
+          "name": "schedule_customer_idx",
+          "columns": [
+            "customerId"
+          ],
+          "isUnique": false
+        },
+        "start_time_idx": {
+          "name": "start_time_idx",
+          "columns": [
+            "startTime"
+          ],
+          "isUnique": false
+        },
+        "schedule_city_idx": {
+          "name": "schedule_city_idx",
+          "columns": [
+            "city"
+          ],
+          "isUnique": false
+        },
+        "sales_idx": {
+          "name": "sales_idx",
+          "columns": [
+            "salesName"
+          ],
+          "isUnique": false
+        },
+        "payment_date_idx": {
+          "name": "payment_date_idx",
+          "columns": [
+            "paymentDate"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "schedules_id": {
+          "name": "schedules_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "smartRegisterHistory": {
+      "name": "smartRegisterHistory",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "template": {
+          "name": "template",
+          "type": "enum('wechat','alipay','custom')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "totalRows": {
+          "name": "totalRows",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "successCount": {
+          "name": "successCount",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "failCount": {
+          "name": "failCount",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "operatorId": {
+          "name": "operatorId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "operatorName": {
+          "name": "operatorName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "operator_idx": {
+          "name": "operator_idx",
+          "columns": [
+            "operatorId"
+          ],
+          "isUnique": false
+        },
+        "created_at_idx": {
+          "name": "created_at_idx",
+          "columns": [
+            "createdAt"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "smartRegisterHistory_id": {
+          "name": "smartRegisterHistory_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "teacherPayments": {
+      "name": "teacherPayments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "teacherId": {
+          "name": "teacherId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "orderId": {
+          "name": "orderId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "scheduleId": {
+          "name": "scheduleId",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "paymentMethod": {
+          "name": "paymentMethod",
+          "type": "enum('wechat','alipay','bank','cash','other')",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "transactionNo": {
+          "name": "transactionNo",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "paymentTime": {
+          "name": "paymentTime",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('pending','paid')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "recordedBy": {
+          "name": "recordedBy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "teacher_payment_idx": {
+          "name": "teacher_payment_idx",
+          "columns": [
+            "teacherId"
+          ],
+          "isUnique": false
+        },
+        "order_payment_idx": {
+          "name": "order_payment_idx",
+          "columns": [
+            "orderId"
+          ],
+          "isUnique": false
+        },
+        "payment_status_idx": {
+          "name": "payment_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "teacherPayments_id": {
+          "name": "teacherPayments_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "teachers": {
+      "name": "teachers",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'活跃'"
+        },
+        "customerType": {
+          "name": "customerType",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "city": {
+          "name": "city",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "wechat": {
+          "name": "wechat",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "hourlyRate": {
+          "name": "hourlyRate",
+          "type": "decimal(10,2)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "bankAccount": {
+          "name": "bankAccount",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "bankName": {
+          "name": "bankName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "aliases": {
+          "name": "aliases",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "teacher_phone_idx": {
+          "name": "teacher_phone_idx",
+          "columns": [
+            "phone"
+          ],
+          "isUnique": false
+        },
+        "teacher_city_idx": {
+          "name": "teacher_city_idx",
+          "columns": [
+            "city"
+          ],
+          "isUnique": false
+        },
+        "teacher_name_idx": {
+          "name": "teacher_name_idx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "teachers_id": {
+          "name": "teachers_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "users": {
+      "name": "users",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "openId": {
+          "name": "openId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "loginMethod": {
+          "name": "loginMethod",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "enum('admin','sales','finance','user')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'user'"
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        },
+        "lastSignedIn": {
+          "name": "lastSignedIn",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "users_id": {
+          "name": "users_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "users_openId_unique": {
+          "name": "users_openId_unique",
+          "columns": [
+            "openId"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    }
+  },
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {},
+    "indexes": {}
+  }
+}

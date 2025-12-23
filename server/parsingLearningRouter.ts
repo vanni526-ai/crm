@@ -18,7 +18,7 @@ export const parsingLearningRouter = router({
       fieldName: z.string(),
       llmValue: z.string().nullable(),
       correctedValue: z.string(),
-      correctionType: z.enum(['field_missing', 'field_wrong', 'format_error', 'logic_error']),
+      correctionType: z.enum(['field_missing', 'field_wrong', 'format_error', 'logic_error', 'manual_edit']),
       context: z.record(z.string(), z.any()).optional(), // 其他字段的值作为上下文
     }))
     .mutation(async ({ input, ctx }) => {
@@ -30,6 +30,44 @@ export const parsingLearningRouter = router({
         llmValue: input.llmValue,
         correctedValue: input.correctedValue,
         correctionType: input.correctionType,
+        context: input.context ? JSON.stringify(input.context) : null,
+        userId: ctx.user.id,
+        userName: ctx.user.name || ctx.user.nickname || '未知用户',
+        isLearned: false,
+      }]);
+
+      return { success: true };
+    }),
+
+  /**
+   * 记录订单编辑修正(用于手动编辑订单的学习)
+   */
+  recordOrderEdit: protectedProcedure
+    .input(z.object({
+      orderId: z.number(),
+      originalText: z.string(), // 订单的原始文本(备注或原始数据来源)
+      fieldName: z.string(), // 修改的字段名
+      oldValue: z.string().nullable(), // 修改前的值
+      newValue: z.string(), // 修改后的值
+      reason: z.string().optional(), // 修改原因(用户输入)
+      context: z.record(z.string(), z.any()).optional(), // 订单其他字段作为上下文
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      
+      // 构造originalText: 包含修改原因和上下文
+      let originalText = input.originalText;
+      if (input.reason) {
+        originalText += `\n\n修改原因: ${input.reason}`;
+      }
+      
+      await db.insert(parsingCorrections).values([{
+        originalText,
+        fieldName: input.fieldName,
+        llmValue: input.oldValue,
+        correctedValue: input.newValue,
+        correctionType: 'manual_edit',
         context: input.context ? JSON.stringify(input.context) : null,
         userId: ctx.user.id,
         userName: ctx.user.name || ctx.user.nickname || '未知用户',

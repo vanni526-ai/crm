@@ -24,8 +24,8 @@ const orderSchema = z.object({
   salespersonId: z.number().optional(),
   salesPerson: z.string().optional(),
   trafficSource: z.string().optional(),
-  paymentAmount: z.string(),
-  courseAmount: z.string(),
+  paymentAmount: z.string().optional(),
+  courseAmount: z.string().optional(),
   accountBalance: z.string().optional(),
   paymentCity: z.string().optional(),
   paymentChannel: z.string().optional(),
@@ -95,6 +95,15 @@ export default function Orders() {
     },
   });
 
+  const recordOrderEdit = trpc.parsingLearning.recordOrderEdit.useMutation({
+    onSuccess: () => {
+      toast.success("修改记录已保存到学习系统");
+    },
+    onError: (error) => {
+      toast.error(error.message || "记录失败");
+    },
+  });
+
   const batchDeleteOrders = trpc.orders.batchDelete.useMutation({
     onSuccess: (data) => {
       utils.orders.list.invalidate();
@@ -156,6 +165,10 @@ export default function Orders() {
   const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
   const [batchStatusOpen, setBatchStatusOpen] = useState(false);
   const [batchStatus, setBatchStatus] = useState<"pending" | "paid" | "completed" | "cancelled" | "refunded">("paid");
+  const [learnRecordOpen, setLearnRecordOpen] = useState(false);
+  const [selectedFields, setSelectedFields] = useState<string[]>([]);
+  const [learnReason, setLearnReason] = useState("");
+
 
   const {
     register,
@@ -175,8 +188,8 @@ export default function Orders() {
       salespersonId: data.salespersonId,
       salesPerson: data.salesPerson,
       trafficSource: data.trafficSource,
-      paymentAmount: data.paymentAmount,
-      courseAmount: data.courseAmount,
+      paymentAmount: data.paymentAmount || '',
+      courseAmount: data.courseAmount || '',
       accountBalance: data.accountBalance,
       paymentCity: data.paymentCity,
       paymentChannel: data.paymentChannel,
@@ -204,34 +217,36 @@ export default function Orders() {
       toast.error('未选择订单');
       return;
     }
+
+    // 直接提交订单更新
     updateOrder.mutate({
-      id: selectedOrder.id,
-      orderNo: data.orderNo,
-      customerName: data.customerName,
-      salespersonId: data.salespersonId,
-      salesPerson: data.salesPerson,
-      trafficSource: data.trafficSource,
-      paymentAmount: data.paymentAmount,
-      courseAmount: data.courseAmount,
-      accountBalance: data.accountBalance,
-      paymentCity: data.paymentCity,
-      paymentChannel: data.paymentChannel,
-      channelOrderNo: data.channelOrderNo,
-      paymentDate: data.paymentDate,
-      paymentTime: data.paymentTime,
-      teacherFee: data.teacherFee,
-      transportFee: data.transportFee,
-      otherFee: data.otherFee,
-      partnerFee: data.partnerFee,
-      finalAmount: data.finalAmount,
-      deliveryCity: data.deliveryCity,
-      deliveryRoom: data.deliveryRoom,
-      deliveryTeacher: data.deliveryTeacher,
-      deliveryCourse: data.deliveryCourse,
-      classDate: data.classDate,
-      classTime: data.classTime,
-      notes: data.notes,
-    });
+        id: selectedOrder.id,
+        orderNo: data.orderNo,
+        customerName: data.customerName,
+        salespersonId: data.salespersonId,
+        salesPerson: data.salesPerson,
+        trafficSource: data.trafficSource,
+        paymentAmount: data.paymentAmount,
+        courseAmount: data.courseAmount,
+        accountBalance: data.accountBalance,
+        paymentCity: data.paymentCity,
+        paymentChannel: data.paymentChannel,
+        channelOrderNo: data.channelOrderNo,
+        paymentDate: data.paymentDate,
+        paymentTime: data.paymentTime,
+        teacherFee: data.teacherFee,
+        transportFee: data.transportFee,
+        otherFee: data.otherFee,
+        partnerFee: data.partnerFee,
+        finalAmount: data.finalAmount,
+        deliveryCity: data.deliveryCity,
+        deliveryRoom: data.deliveryRoom,
+        deliveryTeacher: data.deliveryTeacher,
+        deliveryCourse: data.deliveryCourse,
+        classDate: data.classDate,
+        classTime: data.classTime,
+        notes: data.notes,
+      });
   };
 
   const handleEdit = (order: any) => {
@@ -1335,6 +1350,14 @@ export default function Orders() {
               <Button variant="outline" onClick={() => setDetailOpen(false)}>
                 关闭
               </Button>
+              <Button 
+                variant="default"
+                onClick={() => {
+                  setLearnRecordOpen(true);
+                }}
+              >
+                记录学习
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -1888,6 +1911,158 @@ export default function Orders() {
             setSmartRegisterOpen(false);
           }}
         />
+
+        {/* 学习记录对话框 */}
+        <Dialog open={learnRecordOpen} onOpenChange={setLearnRecordOpen}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>记录订单学习</DialogTitle>
+            </DialogHeader>
+            {selectedOrder && (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  选择您希望系统学习的字段，并说明为什么这些字段应该是这样的值。
+                </p>
+
+                <div className="border rounded-lg p-4 space-y-3">
+                  <p className="font-semibold text-sm">订单字段：</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { key: 'customerName', label: '客户名' },
+                      { key: 'salesPerson', label: '销售人员' },
+                      { key: 'trafficSource', label: '流量来源' },
+                      { key: 'paymentAmount', label: '实付金额' },
+                      { key: 'courseAmount', label: '课程金额' },
+                      { key: 'paymentCity', label: '支付城市' },
+                      { key: 'paymentChannel', label: '支付渠道' },
+                      { key: 'channelOrderNo', label: '渠道订单号' },
+                      { key: 'paymentDate', label: '支付日期' },
+                      { key: 'paymentTime', label: '支付时间' },
+                      { key: 'teacherFee', label: '老师费用' },
+                      { key: 'transportFee', label: '车费' },
+                      { key: 'deliveryCity', label: '交付城市' },
+                      { key: 'deliveryTeacher', label: '交付老师' },
+                      { key: 'deliveryCourse', label: '交付课程' },
+                      { key: 'classDate', label: '上课日期' },
+                      { key: 'classTime', label: '上课时间' },
+                    ].map((field) => {
+                      const value = selectedOrder[field.key];
+                      const isSelected = selectedFields.includes(field.key);
+                      return (
+                        <div 
+                          key={field.key}
+                          className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                            isSelected ? 'bg-primary/10 border-primary' : 'hover:bg-muted'
+                          }`}
+                          onClick={() => {
+                            if (isSelected) {
+                              setSelectedFields(selectedFields.filter(f => f !== field.key));
+                            } else {
+                              setSelectedFields([...selectedFields, field.key]);
+                            }
+                          }}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{field.label}</p>
+                              <p className="text-xs text-muted-foreground mt-1 truncate">
+                                {value instanceof Date 
+                                  ? value.toLocaleDateString()
+                                  : (value || '(空)')}
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <div className="ml-2 text-primary">✓</div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="learn-reason-input">学习原因(可选)</Label>
+                  <Input 
+                    id="learn-reason-input"
+                    value={learnReason}
+                    onChange={(e) => setLearnReason(e.target.value)}
+                    placeholder="例如：客户名应该是全名，不是昵称"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    说明为什么这些字段应该是这样的值，帮助系统更好地学习
+                  </p>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setLearnRecordOpen(false);
+                  setSelectedFields([]);
+                  setLearnReason("");
+                }}
+              >
+                取消
+              </Button>
+              <Button 
+                onClick={() => {
+                  if (selectedFields.length === 0) {
+                    toast.error("请至少选择一个字段");
+                    return;
+                  }
+                  if (!selectedOrder) return;
+
+                  // 记录每个选中字段的学习
+                  selectedFields.forEach((fieldKey) => {
+                    const fieldMap: Record<string, string> = {
+                      customerName: '客户名',
+                      salesPerson: '销售人员',
+                      trafficSource: '流量来源',
+                      paymentAmount: '实付金额',
+                      courseAmount: '课程金额',
+                      paymentCity: '支付城市',
+                      paymentChannel: '支付渠道',
+                      channelOrderNo: '渠道订单号',
+                      paymentDate: '支付日期',
+                      paymentTime: '支付时间',
+                      teacherFee: '老师费用',
+                      transportFee: '车费',
+                      deliveryCity: '交付城市',
+                      deliveryTeacher: '交付老师',
+                      deliveryCourse: '交付课程',
+                      classDate: '上课日期',
+                      classTime: '上课时间',
+                    };
+
+                    recordOrderEdit.mutate({
+                      orderId: selectedOrder.id,
+                      originalText: selectedOrder.notes || `订单号: ${selectedOrder.orderNo}`,
+                      fieldName: fieldKey,
+                      oldValue: null, // 事后学习不知道旧值
+                      newValue: String(selectedOrder[fieldKey] || ''),
+                      reason: learnReason || `记录${fieldMap[fieldKey]}字段的正确值`,
+                      context: {
+                        orderNo: selectedOrder.orderNo,
+                        customerName: selectedOrder.customerName,
+                        learnType: 'manual_record', // 标记为手动记录
+                      },
+                    });
+                  });
+
+                  toast.success(`已记录 ${selectedFields.length} 个字段到学习系统`);
+                  setLearnRecordOpen(false);
+                  setSelectedFields([]);
+                  setLearnReason("");
+                }}
+              >
+                保存学习
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
       </div>
     </DashboardLayout>
   );

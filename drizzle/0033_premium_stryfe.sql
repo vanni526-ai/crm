@@ -1,0 +1,1 @@
+ALTER TABLE `parsingCorrections` MODIFY COLUMN `correctionType` enum('field_missing','field_wrong','format_error','logic_error','manual_edit') NOT NULL;
