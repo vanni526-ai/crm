@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { Link } from "wouter";
 
-export default function GmailImport() {
+export default function () {
   const [isImporting, setIsImporting] = useState(false);
   const [selectedLog, setSelectedLog] = useState<any>(null);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
@@ -43,20 +43,20 @@ export default function GmailImport() {
       refetchStats();
       setShowDeleteDialog(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("删除失败", { description: error.message });
     },
   });
 
   // 批量删除记录
   const batchDeleteMutation = trpc.gmailAutoImport.batchDeleteImportLogs.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast.success(`成功删除${data.deletedCount}条记录`);
       refetchHistory();
       refetchStats();
       setSelectedIds([]);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("批量删除失败", { description: error.message });
     },
   });
@@ -69,14 +69,14 @@ export default function GmailImport() {
       refetchStats();
       setShowClearAllDialog(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("清空失败", { description: error.message });
     },
   });
 
   // 重新解析
   const reprocessMutation = trpc.gmailAutoImport.reprocessEmail.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast.success("重新解析完成", { 
         description: `成功: ${data.successCount}, 失败: ${data.failCount}` 
       });
@@ -85,14 +85,14 @@ export default function GmailImport() {
       setShowDetailDialog(false);
       setIsReprocessing(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error("重新解析失败", { description: error.message });
       setIsReprocessing(false);
     },
   });
 
   // 自动导入(Gmail自动拉取)
-  const autoImportMutation = trpc.gmailAutoImport.manualImport.useMutation({
+  const autoImportMutation = trpc.gmailAutoImport.pasteImport.useMutation({
     onSuccess: (data: any) => {
       if (data.importedCount > 0) {
         toast.success("自动导入完成", { 
@@ -133,8 +133,9 @@ export default function GmailImport() {
 
   // 自动导入处理函数
   const handleAutoImport = () => {
-    setIsImporting(true);
-    autoImportMutation.mutate();
+    // 自动导入功能暂时未实现,使用手动导入代替
+    toast.info("请使用手动导入功能");
+    setShowPasteDialog(true);
   };
 
   // 手动导入处理函数
@@ -179,13 +180,13 @@ export default function GmailImport() {
 
   // 导出Excel报表
   const handleExport = () => {
-    if (!historyData?.logs || historyData.logs.length === 0) {
+    if (!historyData || historyData.length === 0) {
       toast.error("无数据可导出");
       return;
     }
 
     // 准备导出数据
-    const exportData = historyData.logs.map((log: any) => ({
+    const exportData = historyData.map((log: any) => ({
       "邮件主题": log.emailSubject,
       "邮件日期": format(new Date(log.emailDate), "yyyy-MM-dd HH:mm", { locale: zhCN }),
       "订单总数": log.totalOrders,
@@ -221,8 +222,8 @@ export default function GmailImport() {
 
   // 批量选择
   const handleSelectAll = (checked: boolean) => {
-    if (checked && historyData?.logs) {
-      setSelectedIds(historyData.logs.map((log: any) => log.id));
+    if (checked && historyData) {
+      setSelectedIds(historyData.map((log) => log.id));
     } else {
       setSelectedIds([]);
     }
@@ -258,10 +259,8 @@ export default function GmailImport() {
     }
   };
 
-  // 失败原因图表数据
-  const failureChartData = failureStats?.failureReasons 
-    ? Object.entries(failureStats.failureReasons).map(([name, value]) => ({ name, value }))
-    : [];
+  // 失败原因图表数据(暂时空数据)
+  const failureChartData: any[] = [];
 
   const COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#10b981', '#8b5cf6'];
 
@@ -434,14 +433,14 @@ export default function GmailImport() {
         </div>
 
         {/* 失败原因分析 */}
-        {failureStats && failureStats.totalFailed > 0 && (
+        {failureStats && failureStats.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-yellow-500" />
                 失败原因分析
               </CardTitle>
-              <CardDescription>共 {failureStats.totalFailed} 次导入失败</CardDescription>
+              <CardDescription>失败原因统计</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-64">
@@ -500,7 +499,7 @@ export default function GmailImport() {
                 <TableRow>
                   <TableHead className="w-12">
                     <Checkbox
-                      checked={selectedIds.length === historyData?.logs?.length && historyData?.logs?.length > 0}
+                      checked={selectedIds.length === historyData?.length && historyData?.length > 0}
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
@@ -514,8 +513,8 @@ export default function GmailImport() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {historyData?.logs && historyData.logs.length > 0 ? (
-                  historyData.logs.map((log: any) => (
+                {historyData && historyData.length > 0 ? (
+                  historyData.map((log: any) => (
                     <TableRow key={log.id}>
                       <TableCell>
                         <Checkbox
@@ -623,7 +622,7 @@ export default function GmailImport() {
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>取消</Button>
-              <Button variant="destructive" onClick={() => selectedLog && deleteLogMutation.mutate({ id: selectedLog.id })}>
+              <Button variant="destructive" onClick={() => selectedLog && deleteLogMutation.mutate({ logId: selectedLog.id })}>
                 删除
               </Button>
             </DialogFooter>

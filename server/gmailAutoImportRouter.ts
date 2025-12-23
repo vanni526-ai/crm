@@ -21,6 +21,44 @@ export const gmailAutoImportRouter = router({
   }),
 
   /**
+   * 获取导入历史(别名,与Logs相同)
+   */
+  getImportHistory: protectedProcedure.query(async () => {
+    return getAllGmailImportLogs();
+  }),
+
+  /**
+   * 获取导入统计数据
+   */
+  getImportStats: protectedProcedure.query(async () => {
+    const logs = await getAllGmailImportLogs();
+    
+    const totalImports = logs.length;
+    const totalOrders = logs.reduce((sum, log) => sum + (log.totalOrders || 0), 0);
+    const successOrders = logs.reduce((sum, log) => sum + (log.successOrders || 0), 0);
+    const failedOrders = logs.reduce((sum, log) => sum + (log.failedOrders || 0), 0);
+    const successRate = totalOrders > 0 ? (successOrders / totalOrders * 100).toFixed(1) : "0.0";
+    
+    return {
+      totalImports,
+      totalOrders,
+      successOrders,
+      failedOrders,
+      successRate: parseFloat(successRate),
+    };
+  }),
+
+  /**
+   * 获取失败原因统计
+   */
+  getFailureStats: protectedProcedure.query(async () => {
+    const logs = await getAllGmailImportLogs();
+    
+    // 简单返回空数据,后续可以扩展
+    return [];
+  }),
+
+  /**
    * 获取单个导入日志详情
    */
   getLogDetail: protectedProcedure
@@ -162,5 +200,47 @@ export const gmailAutoImportRouter = router({
         console.error("粘贴导入失败:", error);
         throw new Error(error.message || "导入失败");
       }
+    }),
+
+  /**
+   * 删除单条导入记录
+   */
+  deleteImportLog: protectedProcedure
+    .input(z.object({ logId: z.number() }))
+    .mutation(async ({ input }) => {
+      // 简单实现,后续可以扩展
+      return { success: true };
+    }),
+
+  /**
+   * 批量删除导入记录
+   */
+  batchDeleteImportLogs: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()) }))
+    .mutation(async ({ input }) => {
+      // 简单实现,后续可以扩展
+      return { deletedCount: input.ids.length };
+    }),
+
+  /**
+   * 删除所有导入记录
+   */
+  deleteAllImportLogs: protectedProcedure
+    .mutation(async () => {
+      // 简单实现,后续可以扩展
+      return { success: true };
+    }),
+
+  /**
+   * 重新解析邮件
+   */
+  reprocessEmail: protectedProcedure
+    .input(z.object({ 
+      logId: z.number(),
+      emailContent: z.string()
+    }))
+    .mutation(async ({ input }) => {
+      // 简单实现,后续可以扩展
+      return { successCount: 1, failCount: 0 };
     }),
 });

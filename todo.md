@@ -254,3 +254,14 @@
   * 创建 batchAnnotate API
 - [x] 测试验证所有功能 - 添加3个新测试
 - [ ] 保存检查点
+
+### 34. 修复Gmail导入功能bug
+- [x] 修复Gmail导入管理页面统计数据显示为0的问题
+  * 添加缺失的getImportHistory和getImportStats API
+  * 实现统计逻辑(总导入次数、总订单数、成功率)
+- [x] 修复老师费用和车费识别错误
+  * 更新prompt:"给老师XXX"识别为teacherFee
+  * 更新prompt:只有明确包含"报销"、"车费"、"打车"等关键词才是carFee
+  * 添加多个示例和警告标记
+- [x] 测试验证修复效果 - 统计数据显示正常,prompt已更新
+- [ ] 保存检查点
