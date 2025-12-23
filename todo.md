@@ -272,3 +272,11 @@
 - [x] 修复代码问题 - 添加null检查和new Date()转换
 - [x] 测试页面正常加载 - 页面已恢复正常
 - [x] 保存检查点
+
+### 36. 深入诊断解析学习页面React错误
+- [x] 检查浏览器控制台的详细错误堆栈 - 发现对象{text, explanation, highlights}直接渲染
+- [x] 全面检查ParsingLearning.tsx中所有Date字段渲染 - 已修复
+- [x] 检查tRPC返回的数据结构 - patterns和recommendations是对象数组，newExamples也是对象数组
+- [x] 修复所有Date对象直接渲染问题 - 修复pattern.description、rec.description、example对象渲染
+- [x] 测试验证页面正常加载 - 页面完全正常，所有功能显示正常
+- [x] 保存检查点

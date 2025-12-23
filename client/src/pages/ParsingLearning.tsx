@@ -206,10 +206,10 @@ export default function ParsingLearning() {
                 <div>
                   <h3 className="font-semibold mb-2">识别到的错误模式:</h3>
                   <ul className="space-y-2">
-                    {patternAnalysis.patterns.map((pattern: string, index: number) => (
+                    {patternAnalysis.patterns.map((pattern: any, index: number) => (
                       <li key={index} className="flex items-start gap-2">
                         <Badge variant="outline" className="mt-0.5">模式{index + 1}</Badge>
-                        <span className="text-sm">{pattern}</span>
+                        <span className="text-sm">{typeof pattern === 'string' ? pattern : pattern.description}</span>
                       </li>
                     ))}
                   </ul>
@@ -220,10 +220,10 @@ export default function ParsingLearning() {
                 <div>
                   <h3 className="font-semibold mb-2">优化建议:</h3>
                   <ul className="space-y-2">
-                    {patternAnalysis.recommendations.map((rec: string, index: number) => (
+                    {patternAnalysis.recommendations.map((rec: any, index: number) => (
                       <li key={index} className="flex items-start gap-2">
                         <Badge variant="secondary" className="mt-0.5">建议{index + 1}</Badge>
-                        <span className="text-sm">{rec}</span>
+                        <span className="text-sm">{typeof rec === 'string' ? rec : rec.description}</span>
                       </li>
                     ))}
                   </ul>
@@ -479,11 +479,20 @@ export default function ParsingLearning() {
                     {history.newExamples && (
                       <div>
                         <p className="font-semibold text-sm">新增示例:</p>
-                        <div className="mt-1 space-y-1">
-                          {JSON.parse(history.newExamples).map((example: string, index: number) => (
-                            <p key={index} className="text-sm text-muted-foreground pl-4">
-                              • {example}
-                            </p>
+                        <div className="mt-1 space-y-2">
+                          {JSON.parse(history.newExamples).map((example: any, index: number) => (
+                            <div key={index} className="text-sm text-muted-foreground pl-4 border-l-2 border-primary/20">
+                              {typeof example === 'string' ? (
+                                <p>• {example}</p>
+                              ) : (
+                                <div className="space-y-1">
+                                  <p className="font-medium text-foreground">示例 {index + 1}:</p>
+                                  {example.text && <p><span className="font-semibold">文本:</span> {example.text}</p>}
+                                  {example.explanation && <p><span className="font-semibold">说明:</span> {example.explanation}</p>}
+                                  {example.highlights && <p><span className="font-semibold">重点:</span> {example.highlights}</p>}
+                                </div>
+                              )}
+                            </div>
                           ))}
                         </div>
                       </div>
