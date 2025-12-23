@@ -414,7 +414,7 @@ export default function ParsingLearning() {
                           <Badge variant="outline">{correction.correctionType}</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          修正人: {correction.userName} · {new Date(correction.createdAt).toLocaleString()}
+                          修正人: {correction.userName} · {correction.createdAt ? new Date(correction.createdAt).toLocaleString() : '未知时间'}
                         </p>
                       </div>
                     </div>
@@ -466,7 +466,7 @@ export default function ParsingLearning() {
                           {history.isActive && <Badge variant="default">当前版本</Badge>}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(history.createdAt).toLocaleString()} · 基于{history.correctionCount}条修正记录
+                          {history.createdAt ? new Date(history.createdAt).toLocaleString() : '未知时间'} · 基于{history.correctionCount}条修正记录
                         </p>
                       </div>
                     </div>
