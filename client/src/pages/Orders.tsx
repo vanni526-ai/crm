@@ -897,7 +897,17 @@ export default function Orders() {
                           <TableCell>{order.paymentCity || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.channelOrderNo || "-"}</TableCell>
                           <TableCell>¥{order.teacherFee || "0.00"}</TableCell>
-                          <TableCell>¥{order.transportFee || "0.00"}</TableCell>
+                          <TableCell>
+                            {order.transportFee === null || order.transportFee === undefined || order.transportFee === "" ? (
+                              <span className="text-muted-foreground" title="未填写车费">-</span>
+                            ) : order.transportFee === "0" || order.transportFee === "0.00" || parseFloat(order.transportFee) === 0 ? (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200" title="已明确设置为0元车费">
+                                ¥0.00
+                              </Badge>
+                            ) : (
+                              <span>¥{order.transportFee}</span>
+                            )}
+                          </TableCell>
                           <TableCell>¥{order.otherFee || "0.00"}</TableCell>
                           <TableCell>¥{order.partnerFee || "0.00"}</TableCell>
                           <TableCell>¥{order.finalAmount || "0.00"}</TableCell>
