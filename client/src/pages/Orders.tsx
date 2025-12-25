@@ -896,7 +896,17 @@ export default function Orders() {
                           <TableCell>¥{order.accountBalance || "0.00"}</TableCell>
                           <TableCell>{order.paymentCity || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.channelOrderNo || "-"}</TableCell>
-                          <TableCell>¥{order.teacherFee || "0.00"}</TableCell>
+                          <TableCell>
+                            {order.teacherFee === null || order.teacherFee === undefined || order.teacherFee === "" ? (
+                              <span className="text-muted-foreground" title="未填写老师费用">-</span>
+                            ) : order.teacherFee === "0" || order.teacherFee === "0.00" || parseFloat(order.teacherFee) === 0 ? (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200" title="已明确设置为0元老师费用">
+                                ¥0.00
+                              </Badge>
+                            ) : (
+                              <span>¥{order.teacherFee}</span>
+                            )}
+                          </TableCell>
                           <TableCell>
                             {order.transportFee === null || order.transportFee === undefined || order.transportFee === "" ? (
                               <span className="text-muted-foreground" title="未填写车费">-</span>
@@ -908,7 +918,17 @@ export default function Orders() {
                               <span>¥{order.transportFee}</span>
                             )}
                           </TableCell>
-                          <TableCell>¥{order.otherFee || "0.00"}</TableCell>
+                          <TableCell>
+                            {order.otherFee === null || order.otherFee === undefined || order.otherFee === "" ? (
+                              <span className="text-muted-foreground" title="未填写其他费用">-</span>
+                            ) : order.otherFee === "0" || order.otherFee === "0.00" || parseFloat(order.otherFee) === 0 ? (
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200" title="已明确设置为0元其他费用">
+                                ¥0.00
+                              </Badge>
+                            ) : (
+                              <span>¥{order.otherFee}</span>
+                            )}
+                          </TableCell>
                           <TableCell>¥{order.partnerFee || "0.00"}</TableCell>
                           <TableCell>¥{order.finalAmount || "0.00"}</TableCell>
                           <TableCell>{order.paymentDate ? (typeof order.paymentDate === 'string' ? order.paymentDate : new Date(order.paymentDate).toLocaleDateString()) : "-"}</TableCell>
