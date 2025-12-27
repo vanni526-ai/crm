@@ -1096,6 +1096,14 @@ export const appRouter = router({
     customerBalanceRanking: publicProcedure
       .query(async () => {
         return db.getCustomerBalanceRanking();
+      }),
+    
+    cityFinancialStats: protectedProcedure
+      .input(z.object({
+        dateRange: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        return db.getCityFinancialStats(input?.dateRange);
       }),   customerStats: protectedProcedure.query(async () => {
       return db.getCustomerStats();
     }),

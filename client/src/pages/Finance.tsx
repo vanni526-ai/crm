@@ -18,6 +18,12 @@ export default function Finance() {
   const { data: cityRevenue } = trpc.analytics.cityRevenue.useQuery();
   const { data: cityRevenueTrend } = trpc.analytics.cityRevenueTrend.useQuery();
   
+  // 城市财务统计
+  const [cityStatsDateRange, setCityStatsDateRange] = useState<string>("all");
+  const { data: cityFinancialStats } = trpc.analytics.cityFinancialStats.useQuery({ 
+    dateRange: cityStatsDateRange 
+  });
+  
   const [dateRange, setDateRange] = useState("thisMonth");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSales, setSelectedSales] = useState<string>("all");
@@ -477,6 +483,133 @@ export default function Finance() {
             </Button>
           </div>
         </div>
+
+        {/* 城市订单财务统计 */}
+        <Card className="glass-card">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>城市订单财务统计</CardTitle>
+                <p className="text-sm text-muted-foreground">按交付城市统计订单数据、销售额、费用和利润</p>
+              </div>
+              <Select value={cityStatsDateRange} onValueChange={setCityStatsDateRange}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="选择时间范围" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部时间</SelectItem>
+                  <SelectItem value="thisMonth">本月</SelectItem>
+                  <SelectItem value="thisQuarter">本季度</SelectItem>
+                  <SelectItem value="thisYear">本年</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {cityFinancialStats && cityFinancialStats.length > 0 ? (
+              <div className="space-y-4">
+                {/* 统计表格 */}
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>城市</TableHead>
+                        <TableHead className="text-right">订单数</TableHead>
+                        <TableHead className="text-right">销售额</TableHead>
+                        <TableHead className="text-right">老师费用</TableHead>
+                        <TableHead className="text-right">车费</TableHead>
+                        <TableHead className="text-right">其他费用</TableHead>
+                        <TableHead className="text-right">总费用</TableHead>
+                        <TableHead className="text-right">净利润</TableHead>
+                        <TableHead className="text-right">利润率</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {cityFinancialStats.map((stat) => (
+                        <TableRow key={stat.city}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground" />
+                              {stat.city}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">{stat.orderCount}</TableCell>
+                          <TableCell className="text-right text-green-600 font-medium">
+                            ￥{stat.totalRevenue.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.teacherFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.transportFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{(stat.otherFee + stat.partnerFee).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right text-red-600">
+                            ￥{stat.totalExpense.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right font-medium">
+                            <span className={stat.profit >= 0 ? "text-blue-600" : "text-red-600"}>
+                              ￥{stat.profit.toFixed(2)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant={stat.profitMargin >= 30 ? "default" : stat.profitMargin >= 10 ? "secondary" : "destructive"}>
+                              {stat.profitMargin.toFixed(1)}%
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                
+                {/* 城市销售额对比图 */}
+                <div className="mt-6">
+                  <h3 className="text-sm font-medium mb-3">城市销售额对比</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={cityFinancialStats.slice(0, 10)}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="city" />
+                      <YAxis />
+                      <Tooltip formatter={(value: number) => `￥${value.toLocaleString()}`} />
+                      <Legend />
+                      <Bar dataKey="totalRevenue" fill="#10b981" name="销售额" />
+                      <Bar dataKey="totalExpense" fill="#ef4444" name="总费用" />
+                      <Bar dataKey="profit" fill="#3b82f6" name="净利润" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* 城市利润率对比图 */}
+                <div className="mt-6">
+                  <h3 className="text-sm font-medium mb-3">城市利润率对比</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={cityFinancialStats.slice(0, 10)}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="city" />
+                      <YAxis />
+                      <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} />
+                      <Bar dataKey="profitMargin" fill="#8b5cf6" name="利润率">
+                        {cityFinancialStats.slice(0, 10).map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.profitMargin >= 30 ? '#10b981' : entry.profitMargin >= 10 ? '#f59e0b' : '#ef4444'} 
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground py-8">
+                暂无数据
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* 城市收益统计和趋势 */}
         <div className="grid gap-4 lg:grid-cols-2">

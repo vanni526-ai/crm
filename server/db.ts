@@ -296,6 +296,103 @@ export async function deleteOrder(id: number) {
   await db.delete(orders).where(eq(orders.id, id));
 }
 
+// ========== 城市财务统计 ==========
+
+export async function getCityFinancialStats(dateRange?: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  // 根据时间范围过滤订单
+  let query = db.select().from(orders);
+  
+  if (dateRange) {
+    const now = new Date();
+    let startDate: Date;
+    let endDate: Date = now;
+
+    switch (dateRange) {
+      case 'thisMonth':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
+      case 'thisQuarter':
+        const currentQuarter = Math.floor(now.getMonth() / 3);
+        startDate = new Date(now.getFullYear(), currentQuarter * 3, 1);
+        break;
+      case 'thisYear':
+        startDate = new Date(now.getFullYear(), 0, 1);
+        break;
+      default:
+        startDate = new Date(0); // 全部
+    }
+
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    query = query.where(
+      sql`${orders.classDate} >= ${startDateStr} AND ${orders.classDate} <= ${endDateStr}`
+    ) as any;
+  }
+
+  const allOrders = await query;
+
+  // 按城市聚合统计
+  const cityStats: Record<string, {
+    city: string;
+    orderCount: number;
+    totalRevenue: number;
+    teacherFee: number;
+    transportFee: number;
+    otherFee: number;
+    partnerFee: number;
+    totalExpense: number;
+    profit: number;
+    profitMargin: number;
+  }> = {};
+
+  allOrders.forEach((order) => {
+    const city = order.deliveryCity || '未知城市';
+    
+    if (!cityStats[city]) {
+      cityStats[city] = {
+        city,
+        orderCount: 0,
+        totalRevenue: 0,
+        teacherFee: 0,
+        transportFee: 0,
+        otherFee: 0,
+        partnerFee: 0,
+        totalExpense: 0,
+        profit: 0,
+        profitMargin: 0,
+      };
+    }
+
+    const revenue = parseFloat(order.paymentAmount || '0');
+    const teacherFee = parseFloat(order.teacherFee || '0');
+    const transportFee = parseFloat(order.transportFee || '0');
+    const otherFee = parseFloat(order.otherFee || '0');
+    const partnerFee = parseFloat(order.partnerFee || '0');
+    const totalExpense = teacherFee + transportFee + otherFee + partnerFee;
+
+    cityStats[city].orderCount += 1;
+    cityStats[city].totalRevenue += revenue;
+    cityStats[city].teacherFee += teacherFee;
+    cityStats[city].transportFee += transportFee;
+    cityStats[city].otherFee += otherFee;
+    cityStats[city].partnerFee += partnerFee;
+    cityStats[city].totalExpense += totalExpense;
+    cityStats[city].profit += revenue - totalExpense;
+  });
+
+  // 计算利润率
+  Object.values(cityStats).forEach((stat) => {
+    stat.profitMargin = stat.totalRevenue > 0 ? (stat.profit / stat.totalRevenue) * 100 : 0;
+  });
+
+  // 按销售额降序排列
+  return Object.values(cityStats).sort((a, b) => b.totalRevenue - a.totalRevenue);
+}
+
 // ========== 老师管理 ==========
 
 export async function createTeacher(teacher: InsertTeacher) {
