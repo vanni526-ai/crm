@@ -565,20 +565,28 @@ export default function Finance() {
                   </Table>
                 </div>
                 
-                {/* 城市销售额对比图 */}
+                {/* 城市销售额占比饼图 */}
                 <div className="mt-6">
-                  <h3 className="text-sm font-medium mb-3">城市销售额对比</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={cityFinancialStats.slice(0, 10)}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="city" />
-                      <YAxis />
+                  <h3 className="text-sm font-medium mb-3">城市销售额占比</h3>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <PieChart>
+                      <Pie
+                        data={cityFinancialStats.slice(0, 8)}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={true}
+                        label={(entry) => `${entry.city}: ￥${entry.totalRevenue.toLocaleString()}`}
+                        outerRadius={120}
+                        fill="#8884d8"
+                        dataKey="totalRevenue"
+                      >
+                        {cityFinancialStats.slice(0, 8).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
                       <Tooltip formatter={(value: number) => `￥${value.toLocaleString()}`} />
                       <Legend />
-                      <Bar dataKey="totalRevenue" fill="#10b981" name="销售额" />
-                      <Bar dataKey="totalExpense" fill="#ef4444" name="总费用" />
-                      <Bar dataKey="profit" fill="#3b82f6" name="净利润" />
-                    </BarChart>
+                    </PieChart>
                   </ResponsiveContainer>
                 </div>
 
