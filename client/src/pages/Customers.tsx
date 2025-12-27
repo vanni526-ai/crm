@@ -303,6 +303,9 @@ export default function Customers() {
                     <TableHead className="cursor-pointer" onClick={() => handleSort('totalSpent')}>
                       累计消费{getSortIcon('totalSpent')}
                     </TableHead>
+                    <TableHead className="cursor-pointer" onClick={() => handleSort('classCount')}>
+                      上课次数{getSortIcon('classCount')}
+                    </TableHead>
                     <TableHead className="cursor-pointer" onClick={() => handleSort('lastOrderDate')}>
                       最后消费{getSortIcon('lastOrderDate')}
                     </TableHead>
@@ -312,7 +315,7 @@ export default function Customers() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={9} className="text-center py-8">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -369,6 +372,9 @@ export default function Customers() {
                         </TableCell>
                         <TableCell className="font-medium text-blue-600">
                           ¥{Number(customer.totalSpent || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell className="font-medium text-purple-600">
+                          {customer.classCount || 0}次
                         </TableCell>
                         <TableCell>
                           {customer.lastOrderDate ? new Date(customer.lastOrderDate).toLocaleDateString() : "-"}
@@ -595,14 +601,14 @@ function CustomerDetailDialog({
             </Card>
             <Card className="glass-card">
               <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">订单数量</p>
-                <p className="text-2xl font-bold">{customerOrders.length}</p>
+                <p className="text-sm text-muted-foreground">上课次数</p>
+                <p className="text-2xl font-bold text-purple-600">{customerOrders.length}次</p>
               </CardContent>
             </Card>
             <Card className="glass-card">
               <CardContent className="pt-6">
-                <p className="text-sm text-muted-foreground">课程次数</p>
-                <p className="text-2xl font-bold">{customerSchedules.length}</p>
+                <p className="text-sm text-muted-foreground">课程排课</p>
+                <p className="text-2xl font-bold">{customerSchedules.length}次</p>
               </CardContent>
             </Card>
           </div>

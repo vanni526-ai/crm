@@ -167,6 +167,7 @@ export async function getAllCustomers() {
           totalAmount: sql<string>`SUM(${orders.paymentAmount})`,
           lastOrderDate: sql<Date>`MAX(${orders.createdAt})`,
           firstOrderDate: sql<Date>`MIN(${orders.createdAt})`,
+          orderCount: sql<number>`COUNT(*)`,
         })
         .from(orders)
         .where(eq(orders.customerName, customer.name));
@@ -185,6 +186,7 @@ export async function getAllCustomers() {
         lastOrderDate: customerOrders[0]?.lastOrderDate || null,
         firstOrderDate: customerOrders[0]?.firstOrderDate || null,
         accountBalance: latestOrder[0]?.accountBalance || "0.00",
+        classCount: customerOrders[0]?.orderCount || 0,
       };
     })
   );
