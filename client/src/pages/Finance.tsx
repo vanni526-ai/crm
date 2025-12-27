@@ -590,24 +590,34 @@ export default function Finance() {
                   </ResponsiveContainer>
                 </div>
 
-                {/* 城市利润率对比图 */}
+                {/* 城市净利润占比饼图 */}
                 <div className="mt-6">
-                  <h3 className="text-sm font-medium mb-3">城市利润率对比</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={cityFinancialStats.slice(0, 10)}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="city" />
-                      <YAxis />
-                      <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} />
-                      <Bar dataKey="profitMargin" fill="#8b5cf6" name="利润率">
-                        {cityFinancialStats.slice(0, 10).map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={entry.profitMargin >= 30 ? '#10b981' : entry.profitMargin >= 10 ? '#f59e0b' : '#ef4444'} 
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
+                  <h3 className="text-sm font-medium mb-3">城市净利润占比</h3>
+                  <ResponsiveContainer width="100%" height={400}>
+                    <PieChart>
+                      <Pie
+                        data={cityFinancialStats.filter(s => s.profit > 0).slice(0, 8)}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={true}
+                        label={(entry) => `${entry.city}: ￥${entry.profit.toLocaleString()} (${entry.profitMargin.toFixed(1)}%)`}
+                        outerRadius={120}
+                        fill="#8884d8"
+                        dataKey="profit"
+                      >
+                        {cityFinancialStats.filter(s => s.profit > 0).slice(0, 8).map((entry, index) => {
+                          const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16'];
+                          return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                        })}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number, name: string, props: any) => [
+                          `￥${value.toLocaleString()} (利润率: ${props.payload.profitMargin.toFixed(1)}%)`,
+                          '净利润'
+                        ]} 
+                      />
+                      <Legend />
+                    </PieChart>
                   </ResponsiveContainer>
                 </div>
               </div>
