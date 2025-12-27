@@ -503,3 +503,23 @@ export const parsingLearningConfig = mysqlTable("parsingLearningConfig", {
 
 export type ParsingLearningConfig = typeof parsingLearningConfig.$inferSelect;
 export type InsertParsingLearningConfig = typeof parsingLearningConfig.$inferInsert;
+
+/**
+ * 城市合伙人费配置表 - 存储各城市的合伙人费比例
+ */
+export const cityPartnerConfig = mysqlTable("cityPartnerConfig", {
+  id: int("id").autoincrement().primaryKey(),
+  city: varchar("city", { length: 50 }).notNull().unique(), // 城市名称
+  partnerFeeRate: decimal("partnerFeeRate", { precision: 5, scale: 2 }).notNull(), // 合伙人费比例(0-100)
+  description: text("description"), // 说明
+  isActive: boolean("isActive").default(true).notNull(), // 是否启用
+  updatedBy: int("updatedBy").notNull(), // 更新人 ID
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  cityIdx: index("city_idx").on(table.city),
+  activeIdx: index("active_idx").on(table.isActive),
+}));
+
+export type CityPartnerConfig = typeof cityPartnerConfig.$inferSelect;
+export type InsertCityPartnerConfig = typeof cityPartnerConfig.$inferInsert;

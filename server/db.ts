@@ -29,6 +29,7 @@ import {
   gmailImportHistory,
   InsertGmailImportHistory,
   GmailImportHistory,
+  cityPartnerConfig,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -2178,4 +2179,90 @@ export async function getTrafficSourceStats(startDate?: string, endDate?: string
     orderCount: Number(row.orderCount),
     totalAmount: Number(row.totalAmount) || 0,
   }));
+}
+
+
+// ========== 城市合伙人费配置管理 ==========
+
+/**
+ * 获取所有城市合伙人费配置
+ */
+export async function getAllCityPartnerConfig() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return db
+    .select()
+    .from(cityPartnerConfig)
+    .where(eq(cityPartnerConfig.isActive, true))
+    .orderBy(cityPartnerConfig.city);
+}
+
+/**
+ * 根据城市名称获取合伙人费配置
+ */
+export async function getCityPartnerConfigByCity(city: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const result = await db
+    .select()
+    .from(cityPartnerConfig)
+    .where(
+      and(
+        eq(cityPartnerConfig.city, city),
+        eq(cityPartnerConfig.isActive, true)
+      )
+    )
+    .limit(1);
+  
+  return result[0] || null;
+}
+
+/**
+ * 更新城市合伙人费配置
+ */
+export async function updateCityPartnerConfig(
+  id: number,
+  data: {
+    partnerFeeRate?: string;
+    description?: string;
+    isActive?: boolean;
+  },
+  updatedBy: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  return db
+    .update(cityPartnerConfig)
+    .set({
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .where(eq(cityPartnerConfig.id, id));
+}
+
+/**
+ * 计算合伙人费
+ * @param city 城市名称
+ * @param courseAmount 课程金额
+ * @param teacherFee 老师费用
+ * @returns 合伙人费金额
+ */
+export async function calculatePartnerFee(
+  city: string | null,
+  courseAmount: number,
+  teacherFee: number
+): Promise<number> {
+  if (!city) return 0;
+  
+  const config = await getCityPartnerConfigByCity(city);
+  if (!config) return 0;
+  
+  const rate = Number(config.partnerFeeRate) / 100;
+  const partnerFee = (courseAmount - teacherFee) * rate;
+  
+  return Math.round(partnerFee * 100) / 100; // 保留两位小数
 }

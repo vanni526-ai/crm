@@ -406,6 +406,17 @@ export const appRouter = router({
           }
         }
         
+        // 自动计算合伙人费(如果没有手动指定)
+        let partnerFee = input.partnerFee;
+        if (!partnerFee && input.deliveryCity && input.courseAmount && input.teacherFee !== undefined) {
+          const calculatedFee = await db.calculatePartnerFee(
+            input.deliveryCity,
+            parseFloat(input.courseAmount),
+            parseFloat(input.teacherFee || "0")
+          );
+          partnerFee = calculatedFee.toString();
+        }
+        
         const orderData: any = {
           orderNo,
           customerId: input.customerId || undefined,
@@ -425,7 +436,7 @@ export const appRouter = router({
           teacherFee: input.teacherFee || undefined,
           transportFee: input.transportFee || undefined,
           otherFee: input.otherFee || undefined,
-          partnerFee: input.partnerFee || undefined,
+          partnerFee: partnerFee?.toString() || undefined,
           finalAmount: input.finalAmount || undefined,
           deliveryCity: input.deliveryCity || undefined,
           deliveryRoom: input.deliveryRoom || undefined,
@@ -510,6 +521,21 @@ export const appRouter = router({
               }
             }
             
+            // 自动计算合伙人费
+            let partnerFee: string | undefined;
+            const deliveryCity = filterValue(orderData.deliveryCity);
+            const courseAmount = orderData.courseAmount || orderData.paymentAmount;
+            const teacherFee = filterValue(orderData.teacherFee);
+            
+            if (deliveryCity && courseAmount && teacherFee) {
+              const calculatedFee = await db.calculatePartnerFee(
+                deliveryCity,
+                parseFloat(courseAmount),
+                parseFloat(teacherFee)
+              );
+              partnerFee = calculatedFee.toString();
+            }
+            
             await db.createOrder({
               orderNo,
               customerName: orderData.customerName,
@@ -517,15 +543,16 @@ export const appRouter = router({
               salesPerson: salesPerson,
               deliveryTeacher: filterValue(orderData.deliveryTeacher),
               deliveryCourse: filterValue(orderData.deliveryCourse),
-              deliveryCity: filterValue(orderData.deliveryCity),
+              deliveryCity,
               deliveryRoom: filterValue(orderData.deliveryRoom),
               classDate: orderData.classDate ? new Date(orderData.classDate) : undefined,
               classTime: filterValue(orderData.classTime),
               paymentAmount: orderData.paymentAmount,
-              courseAmount: orderData.courseAmount || orderData.paymentAmount,
+              courseAmount,
               channelOrderNo: filterValue(orderData.channelOrderNo),
-              teacherFee: filterValue(orderData.teacherFee),
+              teacherFee,
               transportFee: filterValue(orderData.transportFee),
+              partnerFee,
               notes: filterValue(orderData.notes),
               // 结构化备注字段
               noteTags: filterValue(orderData.noteTags),
@@ -595,6 +622,27 @@ export const appRouter = router({
         if (updateData.classDate) {
           processedData.classDate = new Date(updateData.classDate);
         }
+        
+        // 如果更新了交付城市、课程金额或老师费用,自动重算合伙人费(除非手动指定)
+        if (!updateData.partnerFee && (updateData.deliveryCity || updateData.courseAmount || updateData.teacherFee !== undefined)) {
+          // 获取当前订单信息
+          const currentOrder = await db.getOrderById(id);
+          if (currentOrder) {
+            const deliveryCity = updateData.deliveryCity || currentOrder.deliveryCity;
+            const courseAmount = updateData.courseAmount || currentOrder.courseAmount;
+            const teacherFee = updateData.teacherFee !== undefined ? updateData.teacherFee : currentOrder.teacherFee;
+            
+            if (deliveryCity && courseAmount && teacherFee !== null) {
+              const calculatedFee = await db.calculatePartnerFee(
+                deliveryCity,
+                parseFloat(courseAmount),
+                parseFloat(teacherFee || "0")
+              );
+              processedData.partnerFee = calculatedFee.toString();
+            }
+          }
+        }
+        
         await db.updateOrder(id, processedData);
         return { success: true };
       }),
@@ -1116,6 +1164,40 @@ export const appRouter = router({
       .input(z.object({ days: z.number().default(30) }))
       .query(async ({ input }) => {
         return db.getInactiveCustomers(input.days);
+      }),
+    
+    // 城市合伙人费配置
+    getAllCityPartnerConfig: protectedProcedure
+      .query(async () => {
+        return db.getAllCityPartnerConfig();
+      }),
+    
+    updateCityPartnerConfig: adminProcedure
+      .input(z.object({
+        id: z.number(),
+        partnerFeeRate: z.string().optional(),
+        description: z.string().optional(),
+        isActive: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { id, ...data } = input;
+        await db.updateCityPartnerConfig(id, data, ctx.user.id);
+        return { success: true };
+      }),
+    
+    calculatePartnerFee: protectedProcedure
+      .input(z.object({
+        city: z.string().nullable(),
+        courseAmount: z.number(),
+        teacherFee: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const partnerFee = await db.calculatePartnerFee(
+          input.city,
+          input.courseAmount,
+          input.teacherFee
+        );
+        return { partnerFee };
       }),
   }),
 

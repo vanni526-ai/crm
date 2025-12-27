@@ -25,6 +25,7 @@ import TransportFeeFixTool from "./pages/TransportFeeFixTool";
 import TrafficSourceConfig from "./pages/TrafficSourceConfig";
 import TrafficSourceDashboard from "./pages/TrafficSourceDashboard";
 import ParsingLearning from "./pages/ParsingLearning";
+import CityPartnerConfig from "./pages/CityPartnerConfig";
 
 function Router() {
   return (
@@ -50,6 +51,7 @@ function Router() {
       <Route path={"/traffic-source-config"} component={TrafficSourceConfig} />
       <Route path={"/traffic-source-dashboard"} component={TrafficSourceDashboard} />
       <Route path={"/parsing-learning"} component={ParsingLearning} />
+      <Route path={"/city-partner-config"} component={CityPartnerConfig} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

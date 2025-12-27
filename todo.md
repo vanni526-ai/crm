@@ -337,4 +337,15 @@
 - [x] 修改财务管理页面 - 将城市销售额对比柱状图改为饼图展示
 - [x] 修改利润率对比图 - 将柱状图改为净利润占比饼图，同时显示利润率
 - [x] 过滤负利润城市 - 饼图仅显示正利润的城市
+- [x] 保存检查点
+### 44. 城市合伙人费自动计算功能
+- [x] 创建数据库表 - cityPartnerConfig存储各城市的合伙人费比例
+- [x] 初始化配置数据 - 11个城市的合伙人费比例(30%/40%/50%)
+- [x] 实现计算工具函数 - calculatePartnerFee(city, courseAmount, teacherFee)
+- [x] 创建配置管理API - getAllCityPartnerConfig, updateCityPartnerConfig, calculatePartnerFee
+- [x] 创建配置管理界面 - CityPartnerConfig.tsx并添加路由
+- [x] 集成到订单创建流程 - 手动创建和批量导入时自动计算
+- [x] 集成到订单编辑流程 - 修改交付城市、课程金额、老师费用时自动重算
+- [x] 支持手动覆盖 - 如果手动指定partnerFee则不自动计算
+- [x] 编写单元测试 - 24个测试用例全部通过，验证各城市计算准确性
 - [ ] 保存检查点
