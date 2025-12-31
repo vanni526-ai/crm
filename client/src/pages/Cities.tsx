@@ -2,6 +2,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { CityMap } from "@/components/CityMap";
 import { CityOrdersDialog } from "@/components/CityOrdersDialog";
+import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -95,11 +96,11 @@ export default function Cities() {
 
   if (isLoading) {
     return (
-      <div className="container py-8">
+      <DashboardLayout>
         <div className="flex items-center justify-center h-64">
           <p className="text-muted-foreground">加载中...</p>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
@@ -114,6 +115,7 @@ export default function Cities() {
   );
 
   return (
+    <DashboardLayout>
     <div className="container py-8">
       {/* 地图可视化 */}
       <div className="mb-6">
@@ -360,5 +362,6 @@ export default function Cities() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }
