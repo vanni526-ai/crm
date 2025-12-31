@@ -26,6 +26,7 @@ import TrafficSourceConfig from "./pages/TrafficSourceConfig";
 import TrafficSourceDashboard from "./pages/TrafficSourceDashboard";
 import ParsingLearning from "./pages/ParsingLearning";
 import CityPartnerConfig from "./pages/CityPartnerConfig";
+import Cities from "./pages/Cities";
 
 function Router() {
   return (
@@ -52,6 +53,7 @@ function Router() {
       <Route path={"/traffic-source-dashboard"} component={TrafficSourceDashboard} />
       <Route path={"/parsing-learning"} component={ParsingLearning} />
       <Route path={"/city-partner-config"} component={CityPartnerConfig} />
+      <Route path={"/cities"} component={Cities} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

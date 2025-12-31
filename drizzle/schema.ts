@@ -510,6 +510,7 @@ export type InsertParsingLearningConfig = typeof parsingLearningConfig.$inferIns
 export const cityPartnerConfig = mysqlTable("cityPartnerConfig", {
   id: int("id").autoincrement().primaryKey(),
   city: varchar("city", { length: 50 }).notNull().unique(), // 城市名称
+  areaCode: varchar("areaCode", { length: 10 }), // 电话区号
   partnerFeeRate: decimal("partnerFeeRate", { precision: 5, scale: 2 }).notNull(), // 合伙人费比例(0-100)
   description: text("description"), // 说明
   isActive: boolean("isActive").default(true).notNull(), // 是否启用

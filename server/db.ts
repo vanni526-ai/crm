@@ -2225,6 +2225,7 @@ export async function getCityPartnerConfigByCity(city: string) {
 export async function updateCityPartnerConfig(
   id: number,
   data: {
+    areaCode?: string;
     partnerFeeRate?: string;
     description?: string;
     isActive?: boolean;
@@ -2242,6 +2243,93 @@ export async function updateCityPartnerConfig(
       updatedAt: new Date(),
     })
     .where(eq(cityPartnerConfig.id, id));
+}
+
+/**
+ * 获取所有城市的统计数据
+ */
+export async function getAllCitiesWithStats() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  // 获取所有城市配置
+  const cities = await db
+    .select()
+    .from(cityPartnerConfig)
+    .orderBy(cityPartnerConfig.city);
+
+  // 为每个城市统计订单数据
+  const citiesWithStats = await Promise.all(
+    cities.map(async (city) => {
+      const stats = await db
+        .select({
+          orderCount: sql<number>`COUNT(*)`,
+          totalSales: sql<number>`COALESCE(SUM(${orders.paymentAmount}), 0)`,
+          totalTeacherFee: sql<number>`COALESCE(SUM(${orders.teacherFee}), 0)`,
+          totalTransportFee: sql<number>`COALESCE(SUM(${orders.transportFee}), 0)`,
+          totalOtherFee: sql<number>`COALESCE(SUM(${orders.otherFee}), 0)`,
+          totalPartnerFee: sql<number>`COALESCE(SUM(${orders.partnerFee}), 0)`,
+        })
+        .from(orders)
+        .where(
+          and(
+            eq(orders.deliveryCity, city.city),
+            ne(orders.status, "cancelled")
+          )
+        );
+
+      const stat = stats[0];
+      const totalExpense = Number(stat.totalTeacherFee) + Number(stat.totalTransportFee) + Number(stat.totalOtherFee) + Number(stat.totalPartnerFee);
+      const profit = Number(stat.totalSales) - totalExpense;
+      const profitRate = stat.totalSales > 0 ? (profit / Number(stat.totalSales)) * 100 : 0;
+
+      return {
+        ...city,
+        orderCount: Number(stat.orderCount),
+        totalSales: Number(stat.totalSales),
+        totalTeacherFee: Number(stat.totalTeacherFee),
+        totalTransportFee: Number(stat.totalTransportFee),
+        totalOtherFee: Number(stat.totalOtherFee),
+        totalPartnerFee: Number(stat.totalPartnerFee),
+        totalExpense,
+        profit,
+        profitRate: Math.round(profitRate * 100) / 100,
+      };
+    })
+  );
+
+  return citiesWithStats;
+}
+
+/**
+ * 创建城市配置
+ */
+export async function createCityConfig(
+  data: {
+    city: string;
+    areaCode?: string;
+    partnerFeeRate: string;
+    description?: string;
+  },
+  createdBy: number
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  return db.insert(cityPartnerConfig).values({
+    ...data,
+    updatedBy: createdBy,
+  });
+}
+
+/**
+ * 删除城市配置
+ */
+export async function deleteCityConfig(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  return db.delete(cityPartnerConfig).where(eq(cityPartnerConfig.id, id));
 }
 
 /**

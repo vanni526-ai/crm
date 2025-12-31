@@ -1175,6 +1175,7 @@ export const appRouter = router({
     updateCityPartnerConfig: adminProcedure
       .input(z.object({
         id: z.number(),
+        areaCode: z.string().optional(),
         partnerFeeRate: z.string().optional(),
         description: z.string().optional(),
         isActive: z.boolean().optional(),
@@ -1182,6 +1183,33 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { id, ...data } = input;
         await db.updateCityPartnerConfig(id, data, ctx.user.id);
+        return { success: true };
+      }),
+    
+    // 城市管理
+    getAllCitiesWithStats: protectedProcedure
+      .query(async () => {
+        return db.getAllCitiesWithStats();
+      }),
+    
+    createCityConfig: adminProcedure
+      .input(z.object({
+        city: z.string(),
+        areaCode: z.string().optional(),
+        partnerFeeRate: z.string(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.createCityConfig(input, ctx.user.id);
+        return { success: true };
+      }),
+    
+    deleteCityConfig: adminProcedure
+      .input(z.object({
+        id: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.deleteCityConfig(input.id);
         return { success: true };
       }),
     

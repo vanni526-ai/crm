@@ -1,0 +1,1 @@
+ALTER TABLE `cityPartnerConfig` ADD `areaCode` varchar(10);
