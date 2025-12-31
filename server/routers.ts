@@ -1189,8 +1189,16 @@ export const appRouter = router({
     
     // 城市管理
     getAllCitiesWithStats: protectedProcedure
-      .query(async () => {
-        return db.getAllCitiesWithStats();
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const options = input ? {
+          startDate: input.startDate ? new Date(input.startDate) : undefined,
+          endDate: input.endDate ? new Date(input.endDate) : undefined,
+        } : undefined;
+        return db.getAllCitiesWithStats(options);
       }),
     
     createCityConfig: adminProcedure

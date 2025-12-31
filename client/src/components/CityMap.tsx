@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import * as echarts from "echarts";
 import { trpc } from "@/lib/trpc";
 import { Card } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Calendar } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
 
 // 城市坐标映射(主要城市)
 const cityCoordinates: Record<string, [number, number]> = {
@@ -32,10 +37,56 @@ interface CityMapProps {
   onCityClick?: (cityName: string) => void;
 }
 
+type DateRange = {
+  from: Date | undefined;
+  to: Date | undefined;
+};
+
+type TimeRangePreset = "all" | "month" | "quarter" | "year";
+
 export function CityMap({ onCityClick }: CityMapProps) {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<echarts.ECharts | null>(null);
-  const { data: citiesData, isLoading } = trpc.analytics.getAllCitiesWithStats.useQuery();
+  const [timeRange, setTimeRange] = useState<TimeRangePreset>("all");
+  const [customDateRange, setCustomDateRange] = useState<DateRange>({
+    from: undefined,
+    to: undefined,
+  });
+
+  // 计算时间范围
+  const getDateRangeParams = () => {
+    if (timeRange === "all") return {};
+    if (timeRange === "month") {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      return {
+        startDate: startOfMonth.toISOString(),
+        endDate: now.toISOString(),
+      };
+    }
+    if (timeRange === "quarter") {
+      const now = new Date();
+      const currentQuarter = Math.floor(now.getMonth() / 3);
+      const startOfQuarter = new Date(now.getFullYear(), currentQuarter * 3, 1);
+      return {
+        startDate: startOfQuarter.toISOString(),
+        endDate: now.toISOString(),
+      };
+    }
+    if (timeRange === "year") {
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      return {
+        startDate: startOfYear.toISOString(),
+        endDate: now.toISOString(),
+      };
+    }
+    return {};
+  };
+
+  const { data: citiesData, isLoading } = trpc.analytics.getAllCitiesWithStats.useQuery(
+    getDateRangeParams()
+  );
 
   useEffect(() => {
     if (!chartRef.current || !citiesData) return;
@@ -247,6 +298,38 @@ export function CityMap({ onCityClick }: CityMapProps) {
 
   return (
     <Card className="p-4">
+      {/* 时间范围筛选器 */}
+      <div className="mb-4 flex items-center gap-2">
+        <Button
+          variant={timeRange === "all" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setTimeRange("all")}
+        >
+          全部
+        </Button>
+        <Button
+          variant={timeRange === "month" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setTimeRange("month")}
+        >
+          本月
+        </Button>
+        <Button
+          variant={timeRange === "quarter" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setTimeRange("quarter")}
+        >
+          本季度
+        </Button>
+        <Button
+          variant={timeRange === "year" ? "default" : "outline"}
+          size="sm"
+          onClick={() => setTimeRange("year")}
+        >
+          本年
+        </Button>
+      </div>
+
       <div ref={chartRef} style={{ width: "100%", height: "600px" }} />
       <div className="mt-4 flex items-center justify-center gap-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">

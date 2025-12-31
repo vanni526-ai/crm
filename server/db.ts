@@ -2260,7 +2260,10 @@ export async function updateCityPartnerConfig(
 /**
  * 获取所有城市的统计数据
  */
-export async function getAllCitiesWithStats() {
+export async function getAllCitiesWithStats(options?: {
+  startDate?: Date;
+  endDate?: Date;
+}) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
@@ -2273,6 +2276,20 @@ export async function getAllCitiesWithStats() {
   // 为每个城市统计订单数据
   const citiesWithStats = await Promise.all(
     cities.map(async (city) => {
+      // 构建查询条件
+      const conditions = [
+        eq(orders.deliveryCity, city.city),
+        ne(orders.status, "cancelled"),
+      ];
+
+      // 添加时间范围筛选
+      if (options?.startDate) {
+        conditions.push(gte(orders.classDate, options.startDate));
+      }
+      if (options?.endDate) {
+        conditions.push(lte(orders.classDate, options.endDate));
+      }
+
       const stats = await db
         .select({
           orderCount: sql<number>`COUNT(*)`,
@@ -2283,12 +2300,7 @@ export async function getAllCitiesWithStats() {
           totalPartnerFee: sql<number>`COALESCE(SUM(${orders.partnerFee}), 0)`,
         })
         .from(orders)
-        .where(
-          and(
-            eq(orders.deliveryCity, city.city),
-            ne(orders.status, "cancelled")
-          )
-        );
+        .where(and(...conditions));
 
       const stat = stats[0];
       const totalExpense = Number(stat.totalTeacherFee) + Number(stat.totalTransportFee) + Number(stat.totalOtherFee) + Number(stat.totalPartnerFee);
