@@ -1,0 +1,32 @@
+{
+  "query": "SELECT * FROM cityPartnerConfig WHERE city IN ('大连', '石家庄');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT * FROM cityPartnerConfig WHERE city IN ('大连', '石家庄');",
+  "rows": [
+    {
+      "id": "3",
+      "city": "大连",
+      "partnerFeeRate": "10.00",
+      "description": "(课程金额-老师费用)×10%",
+      "isActive": "1",
+      "updatedBy": "1",
+      "updatedAt": "2025-12-31 10:33:53",
+      "createdAt": "2025-12-27 12:04:14",
+      "areaCode": ""
+    },
+    {
+      "id": "2",
+      "city": "石家庄",
+      "partnerFeeRate": "10.00",
+      "description": "(课程金额-老师费用)×10%",
+      "isActive": "1",
+      "updatedBy": "1",
+      "updatedAt": "2025-12-31 10:34:08",
+      "createdAt": "2025-12-27 12:04:14",
+      "areaCode": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcity\tpartnerFeeRate\tdescription\tisActive\tupdatedBy\tupdatedAt\tcreatedAt\tareaCode\n3\t大连\t10.00\t(课程金额-老师费用)×10%\t1\t1\t2025-12-31 10:33:53\t2025-12-27 12:04:14\t\n2\t石家庄\t10.00\t(课程金额-老师费用)×10%\t1\t1\t2025-12-31 10:34:08\t2025-12-27 12:04:14\t\n",
+  "stderr": "",
+  "execution_time_ms": 1630
+}

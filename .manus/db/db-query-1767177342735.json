@@ -1,0 +1,22 @@
+{
+  "query": "SELECT city, partnerFeeRate, areaCode, description FROM cityPartnerConfig WHERE city IN ('大连', '石家庄');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT city, partnerFeeRate, areaCode, description FROM cityPartnerConfig WHERE city IN ('大连', '石家庄');",
+  "rows": [
+    {
+      "city": "大连",
+      "partnerFeeRate": "10.00",
+      "areaCode": "",
+      "description": "(课程金额-老师费用)×10%"
+    },
+    {
+      "city": "石家庄",
+      "partnerFeeRate": "10.00",
+      "areaCode": "",
+      "description": "(课程金额-老师费用)×10%"
+    }
+  ],
+  "messages": [],
+  "stdout": "city\tpartnerFeeRate\tareaCode\tdescription\n大连\t10.00\t\t(课程金额-老师费用)×10%\n石家庄\t10.00\t\t(课程金额-老师费用)×10%\n",
+  "stderr": "",
+  "execution_time_ms": 1491
+}
