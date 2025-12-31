@@ -246,7 +246,7 @@ export function CityMap({ onCityClick }: CityMapProps) {
     // 注册中国地图(简化版)
     if (!echarts.getMap("china")) {
       // 使用简化的中国地图GeoJSON
-      fetch("https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json")
+      fetch("/china.json")
         .then((response) => response.json())
         .then((geoJson) => {
           echarts.registerMap("china", geoJson);
