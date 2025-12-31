@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { CityMap } from "@/components/CityMap";
+import { CityOrdersDialog } from "@/components/CityOrdersDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +16,8 @@ import { toast } from "sonner";
 export default function Cities() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingCity, setEditingCity] = useState<any>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [showOrdersDialog, setShowOrdersDialog] = useState(false);
   
   const { data: cities, isLoading, refetch } = trpc.analytics.getAllCitiesWithStats.useQuery();
   const createMutation = trpc.analytics.createCityConfig.useMutation();
@@ -111,6 +115,14 @@ export default function Cities() {
 
   return (
     <div className="container py-8">
+      {/* 地图可视化 */}
+      <div className="mb-6">
+        <CityMap onCityClick={(cityName) => {
+          setSelectedCity(cityName);
+          setShowOrdersDialog(true);
+        }} />
+      </div>
+      
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">城市管理</h1>
@@ -290,6 +302,13 @@ export default function Cities() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* 城市订单列表对话框 */}
+      <CityOrdersDialog
+        cityName={selectedCity}
+        open={showOrdersDialog}
+        onOpenChange={setShowOrdersDialog}
+      />
 
       {/* 编辑对话框 */}
       <Dialog open={!!editingCity} onOpenChange={(open) => !open && setEditingCity(null)}>

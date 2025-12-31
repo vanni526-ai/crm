@@ -9,6 +9,7 @@ import { gmailAutoImportRouter } from "./gmailAutoImportRouter";
 import { trafficSourceConfigRouter } from "./trafficSourceConfigRouter";
 import { transportFeeFixRouter } from "./transportFeeFixRouter";
 import { parsingLearningRouter } from "./parsingLearningRouter";
+import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
@@ -1211,6 +1212,25 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await db.deleteCityConfig(input.id);
         return { success: true };
+      }),
+    
+    // 城市智能推荐
+    recommendCity: protectedProcedure
+      .input(z.object({
+        customerName: z.string().optional(),
+        salesPersonName: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        return recommendCity(input.customerName, input.salesPersonName);
+      }),
+    
+    getRecommendedCity: protectedProcedure
+      .input(z.object({
+        customerName: z.string().optional(),
+        salesPersonName: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        return getRecommendedCity(input.customerName, input.salesPersonName);
       }),
     
     calculatePartnerFee: protectedProcedure

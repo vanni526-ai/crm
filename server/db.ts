@@ -267,6 +267,18 @@ export async function getOrdersBySales(salesId: number) {
   return db.select().from(orders).where(eq(orders.salesId, salesId)).orderBy(desc(orders.createdAt));
 }
 
+export async function getOrdersByCustomerName(customerName: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(orders).where(eq(orders.customerName, customerName)).orderBy(desc(orders.createdAt));
+}
+
+export async function getOrdersBySalesPerson(salesPerson: string) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(orders).where(eq(orders.salesPerson, salesPerson)).orderBy(desc(orders.createdAt));
+}
+
 export async function getOrdersByDateRange(startDate: string, endDate: string) {
   const db = await getDb();
   if (!db) return [];
