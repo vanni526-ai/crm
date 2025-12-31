@@ -47,21 +47,29 @@ export function CityMap({ onCityClick }: CityMapProps) {
 
     const chart = chartInstance.current;
 
+    // 计算总销售额
+    const totalSales = citiesData.reduce((sum, city) => sum + city.totalSales, 0);
+
     // 准备地图数据
     const mapData = citiesData
       .filter((city) => cityCoordinates[city.city])
-      .map((city) => ({
-        name: city.city,
-        value: [
-          ...cityCoordinates[city.city],
-          city.orderCount,
-          city.totalSales,
-          city.profit,
-        ],
-      }));
+      .map((city) => {
+        const salesPercentage = totalSales > 0 ? (city.totalSales / totalSales) * 100 : 0;
+        return {
+          name: city.city,
+          value: [
+            ...cityCoordinates[city.city],
+            city.orderCount,
+            city.totalSales,
+            city.profit,
+            salesPercentage,
+          ],
+        };
+      });
 
     // 计算最大值用于气泡大小缩放
     const maxOrderCount = Math.max(...citiesData.map((c) => c.orderCount), 1);
+    const maxSalesPercentage = Math.max(...mapData.map((d) => d.value[5]), 1);
 
     const option: echarts.EChartsOption = {
       backgroundColor: "transparent",
@@ -79,12 +87,13 @@ export function CityMap({ onCityClick }: CityMapProps) {
         trigger: "item",
         formatter: (params: any) => {
           if (params.componentType === "series") {
-            const [lng, lat, orderCount, sales, profit] = params.value;
+            const [lng, lat, orderCount, sales, profit, percentage] = params.value;
             return `
               <div style="padding: 8px;">
                 <div style="font-weight: bold; margin-bottom: 4px;">${params.name}</div>
                 <div>订单数: ${orderCount}</div>
                 <div>销售额: ¥${sales.toFixed(2)}</div>
+                <div>销售占比: ${percentage.toFixed(2)}%</div>
                 <div>利润: ¥${profit.toFixed(2)}</div>
               </div>
             `;
@@ -131,8 +140,13 @@ export function CityMap({ onCityClick }: CityMapProps) {
           },
           itemStyle: {
             color: (params: any) => {
-              const profit = params.value[4];
-              return profit >= 0 ? "#10b981" : "#ef4444";
+              const salesPercentage = params.value[5];
+              // 使用蓝色渐变表示销售额占比,占比越高颜色越深
+              const intensity = Math.min(salesPercentage / maxSalesPercentage, 1);
+              const r = Math.floor(59 + (16 - 59) * intensity);
+              const g = Math.floor(130 + (185 - 130) * intensity);
+              const b = Math.floor(246 + (248 - 246) * intensity);
+              return `rgb(${r}, ${g}, ${b})`;
             },
             shadowBlur: 10,
             shadowColor: "rgba(0, 0, 0, 0.3)",
@@ -162,8 +176,13 @@ export function CityMap({ onCityClick }: CityMapProps) {
           },
           itemStyle: {
             color: (params: any) => {
-              const profit = params.value[4];
-              return profit >= 0 ? "#10b981" : "#ef4444";
+              const salesPercentage = params.value[5];
+              // 使用蓝色渐变表示销售额占比,占比越高颜色越深
+              const intensity = Math.min(salesPercentage / maxSalesPercentage, 1);
+              const r = Math.floor(59 + (16 - 59) * intensity);
+              const g = Math.floor(130 + (185 - 130) * intensity);
+              const b = Math.floor(246 + (248 - 246) * intensity);
+              return `rgb(${r}, ${g}, ${b})`;
             },
             shadowBlur: 10,
             shadowColor: "rgba(0, 0, 0, 0.5)",
@@ -231,12 +250,12 @@ export function CityMap({ onCityClick }: CityMapProps) {
       <div ref={chartRef} style={{ width: "100%", height: "600px" }} />
       <div className="mt-4 flex items-center justify-center gap-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500" />
-          <span>盈利城市</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-red-500" />
-          <span>亏损城市</span>
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "rgb(59, 130, 246)" }} />
+            <span>→</span>
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "rgb(16, 185, 248)" }} />
+          </div>
+          <span>颜色深浅代表销售额占比</span>
         </div>
         <div className="flex items-center gap-2">
           <span>气泡大小代表订单数量</span>
