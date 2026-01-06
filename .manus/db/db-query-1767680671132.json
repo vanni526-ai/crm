@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, emailSubject, emailDate, totalOrders, successOrders, failedOrders, status, LENGTH(emailContent) as contentLength FROM gmailImportLogs ORDER BY createdAt DESC LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, emailSubject, emailDate, totalOrders, successOrders, failedOrders, status, LENGTH(emailContent) as contentLength FROM gmailImportLogs ORDER BY createdAt DESC LIMIT 10",
+  "rows": [
+    {
+      "id": "780009",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:43:57",
+      "totalOrders": "8",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "1713"
+    },
+    {
+      "id": "780008",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:43:37",
+      "totalOrders": "6",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "1533"
+    },
+    {
+      "id": "780007",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:43:15",
+      "totalOrders": "1",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "396"
+    },
+    {
+      "id": "780006",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:42:58",
+      "totalOrders": "1",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "396"
+    },
+    {
+      "id": "780005",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:42:43",
+      "totalOrders": "4",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "821"
+    },
+    {
+      "id": "780004",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:42:19",
+      "totalOrders": "2",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "581"
+    },
+    {
+      "id": "780003",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:42:03",
+      "totalOrders": "13",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "2546"
+    },
+    {
+      "id": "780002",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:41:34",
+      "totalOrders": "14",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "3305"
+    },
+    {
+      "id": "780001",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-06 05:40:56",
+      "totalOrders": "12",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "2182"
+    },
+    {
+      "id": "750003",
+      "emailSubject": "手动粘贴导入",
+      "emailDate": "2026-01-01 10:33:16",
+      "totalOrders": "8",
+      "successOrders": "0",
+      "failedOrders": "0",
+      "status": "success",
+      "contentLength": "1856"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temailSubject\temailDate\ttotalOrders\tsuccessOrders\tfailedOrders\tstatus\tcontentLength\n780009\t手动粘贴导入\t2026-01-06 05:43:57\t8\t0\t0\tsuccess\t1713\n780008\t手动粘贴导入\t2026-01-06 05:43:37\t6\t0\t0\tsuccess\t1533\n780007\t手动粘贴导入\t2026-01-06 05:43:15\t1\t0\t0\tsuccess\t396\n780006\t手动粘贴导入\t2026-01-06 05:42:58\t1\t0\t0\tsuccess\t396\n780005\t手动粘贴导入\t2026-01-06 05:42:43\t4\t0\t0\tsuccess\t821\n780004\t手动粘贴导入\t2026-01-06 05:42:19\t2\t0\t0\tsuccess\t581\n780003\t手动粘贴导入\t2026-01-06 05:42:03\t13\t0\t0\tsuccess\t2546\n780002\t手动粘贴导入\t2026-01-06 05:41:34\t14\t0\t0\tsuccess\t3305\n780001\t手动粘贴导入\t2026-01-06 05:40:56\t12\t0\t0\tsuccess\t2182\n750003\t手动粘贴导入\t2026-01-01 10:33:16\t8\t0\t0\tsuccess\t1856\n",
+  "stderr": "",
+  "execution_time_ms": 1487
+}
