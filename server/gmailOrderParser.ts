@@ -294,25 +294,46 @@ ${emailContent}
       }
       
       // 从原始文本中提取费用信息(作为LLM解析的补充)
-      // 尝试通过销售人员名、客户名和日期在原始文本中定位订单
+      // 尝试通过销售人员名、客户名、老师名和渠道订单号在原始文本中定位订单
       let orderText = '';
       let foundOrderText = false;
       
-      if (order.salesperson && order.classDate) {
-        // 提取日期的MM.DD部分
-        const dateMatch = order.classDate.match(/(\d{1,2})\.(\d{1,2})/);
-        if (dateMatch) {
-          const [, month, day] = dateMatch;
-          // 在邮件内容中查找包含销售人员名和日期的行
+      // 策略1: 如果有渠道订单号,直接用渠道订单号定位(最准确)
+      if (order.channelOrderNo && order.channelOrderNo.trim()) {
+        const lines = emailContent.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.includes(order.channelOrderNo)) {
+            orderText = line;
+            foundOrderText = true;
+            break;
+          }
+        }
+      }
+      
+      // 策略2: 如果策略1失败,尝试通过销售人员名+日期定位
+      if (!foundOrderText && order.salesperson && order.classDate) {
+        // 从YYYY-MM-DD格式提取月日(如"2026-01-05" -> "1.5")
+        let month = '';
+        let day = '';
+        const isoDateMatch = order.classDate.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if (isoDateMatch) {
+          month = String(parseInt(isoDateMatch[2], 10)); // 去掉前导0
+          day = String(parseInt(isoDateMatch[3], 10));   // 去掉前导0
+        }
+        
+        if (month && day) {
           const lines = emailContent.split('\n');
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            // 匹配销售人员名和日期,或者客户名和日期
+            // 匹配销售人员名和日期(支持"1.5"格式)
             const matchesSalesperson = line.includes(order.salesperson) && line.includes(`${month}.${day}`);
+            // 也尝试匹配客户名和日期
             const matchesCustomer = customerName && line.includes(customerName) && line.includes(`${month}.${day}`);
+            // 也尝试匹配老师名和日期
+            const matchesTeacher = order.teacher && line.includes(order.teacher) && line.includes(`${month}.${day}`);
             
-            if (matchesSalesperson || matchesCustomer) {
-              // 找到匹配的行,使用这行作为订单文本
+            if (matchesSalesperson || matchesCustomer || matchesTeacher) {
               orderText = line;
               foundOrderText = true;
               break;
@@ -321,10 +342,12 @@ ${emailContent}
         }
       }
       
-      // 如果没有找到匹配的订单文本,使用整个邮件内容(但这可能导致费用提取不准确)
+      // 策略3: 如果前两个策略都失败,使用LLM已经解析的费用,不再从原始文本提取
+      // 这样可以避免从整个邮件内容中错误提取费用
       if (!foundOrderText) {
-        orderText = emailContent;
-        console.warn(`[Gmail解析] 未找到订单原始文本: 销售=${order.salesperson}, 客户=${customerName}, 日期=${order.classDate}`);
+        // 使用空字符串,这样extractFees会返回0,不会影响LLM的解析结果
+        orderText = '';
+        console.warn(`[Gmail解析] 未找到订单原始文本: 销售=${order.salesperson}, 客户=${customerName}, 日期=${order.classDate}, 将使用LLM解析的费用`);
       }
       
       const extractedFees = extractFees(orderText);
@@ -338,8 +361,8 @@ ${emailContent}
         // 如果LLM返回的费用为0,使用正则提取的费用
         teacherFee: order.teacherFee > 0 ? order.teacherFee : extractedFees.teacherFee,
         carFee: order.carFee > 0 ? order.carFee : extractedFees.carFee,
-        // 保存单个订单的原始文本,而不是整个邮件内容
-        originalText: orderText,
+        // 保存单行订单文本用于费用提取,但originalText保存完整邮件内容供用户查看
+        originalText: emailContent,
       });
     }
 
