@@ -109,3 +109,20 @@
 - [x] 添加分页按钮组件(上一页、下一页、页码显示)
 - [x] 测试验证分页功能正常工作
 - [x] 保存检查点
+
+### 64. 实现基于LLM智能匹配的自动财务对账功能
+- [x] 分析schedules表和orders表的数据结构
+- [x] 确认ICS文件格式和数据提取方式
+- [x] 增强ICS导入:使用LLM从SUMMARY提取关键信息(客户名、老师、课程、金额)
+- [x] 实现intelligentMatchSchedulesWithOrders函数(LLM智能匹配)
+- [x] 创建matchedScheduleOrders表存储匹配关系
+- [x] 实现getReconciliationReport函数(生成月度对账报表)
+- [x] 创建reconciliation路由,添加match和report API
+- [x] 创建ReconciliationMatch.tsx页面(对账匹配界面)
+- [x] 显示匹配结果:已匹配/未匹配/匹配置信度
+- [x] 支持手动调整匹配关系
+- [x] 实现一键生成月度对账报表功能
+- [x] 显示已授课订单的收入、支出、利润统计
+- [x] 编写单元测试验证匹配逻辑准确性
+- [x] 测试验证对账报表数据正确性
+- [ ] 保存检查点

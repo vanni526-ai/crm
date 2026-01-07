@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, Home, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Mail, PanelLeft, Brain, MapPin } from "lucide-react";
+import { LayoutDashboard, LogOut, Home, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Mail, PanelLeft, Brain, MapPin, FileCheck } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -36,6 +36,7 @@ const menuItems = [
   { icon: UserCheck, label: "老师管理", path: "/teachers" },
   { icon: MapPin, label: "城市管理", path: "/cities" },
   { icon: DollarSign, label: "财务管理", path: "/finance" },
+  { icon: FileCheck, label: "财务对账", path: "/reconciliation-match" },
   { icon: Upload, label: "数据导入", path: "/import" },
   { icon: Mail, label: "Gmail导入", path: "/gmail-import" },
   { icon: Brain, label: "解析学习", path: "/parsing-learning" },

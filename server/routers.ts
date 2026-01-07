@@ -9,6 +9,7 @@ import { gmailAutoImportRouter } from "./gmailAutoImportRouter";
 import { trafficSourceConfigRouter } from "./trafficSourceConfigRouter";
 import { transportFeeFixRouter } from "./transportFeeFixRouter";
 import { parsingLearningRouter } from "./parsingLearningRouter";
+import { reconciliationRouter } from "./reconciliationRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -49,6 +50,7 @@ export const appRouter = router({
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,
   parsingLearning: parsingLearningRouter,
+  reconciliation: reconciliationRouter,
 
   
   auth: router({

@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time, json } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time, json, unique } from "drizzle-orm/mysql-core";
 
 /**
  * 用户表 - 支持管理员、销售、财务三种角色
@@ -190,6 +190,27 @@ export const schedules = mysqlTable("schedules", {
   cityIdx: index("schedule_city_idx").on(table.city),
   salesIdx: index("sales_idx").on(table.salesName),
   paymentDateIdx: index("payment_date_idx").on(table.paymentDate),
+}));
+
+/**
+ * 课程日程与订单匹配关系表
+ */
+export const matchedScheduleOrders = mysqlTable("matchedScheduleOrders", {
+  id: int("id").autoincrement().primaryKey(),
+  scheduleId: int("scheduleId").notNull(), // 关联课程日程
+  orderId: int("orderId").notNull(), // 关联订单
+  matchMethod: mysqlEnum("matchMethod", ["llm_intelligent", "manual", "channel_order_no"]).notNull(), // 匹配方式
+  confidence: decimal("confidence", { precision: 5, scale: 2 }), // 匹配置信度(0-100)
+  matchDetails: text("matchDetails"), // 匹配详情(JSON格式,存储匹配依据)
+  isVerified: boolean("isVerified").default(false).notNull(), // 是否已人工验证
+  verifiedBy: int("verifiedBy"), // 验证人ID
+  verifiedAt: timestamp("verifiedAt"), // 验证时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  scheduleIdx: index("schedule_idx").on(table.scheduleId),
+  orderIdx: index("order_idx").on(table.orderId),
+  uniqueMatch: unique("unique_schedule_order").on(table.scheduleId, table.orderId),
 }));
 
 /**
