@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, TrendingUp, DollarSign, ShoppingCart, Filter } from "lucide-react";
+import { Loader2, TrendingUp, DollarSign, ShoppingCart, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "wouter";
 
 /**
@@ -14,6 +14,8 @@ export default function TrafficSourceDashboard() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [appliedFilters, setAppliedFilters] = useState<{ startDate?: string; endDate?: string }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
   // 查询统计数据
   const { data: stats, isLoading, refetch } = trpc.trafficSourceConfig.getTrafficSourceStats.useQuery(
@@ -26,17 +28,35 @@ export default function TrafficSourceDashboard() {
     } else {
       setAppliedFilters({});
     }
+    setCurrentPage(1); // 筛选后重置到第一页
   };
 
   const handleClearFilters = () => {
     setStartDate("");
     setEndDate("");
     setAppliedFilters({});
+    setCurrentPage(1); // 清除筛选后重置到第一页
   };
 
   // 计算总计
   const totalOrders = stats?.reduce((sum, item) => sum + item.orderCount, 0) || 0;
   const totalAmount = stats?.reduce((sum, item) => sum + item.totalAmount, 0) || 0;
+
+  // 分页逻辑
+  const totalPages = stats ? Math.ceil(stats.length / pageSize) : 0;
+  const paginatedStats = stats?.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -164,9 +184,10 @@ export default function TrafficSourceDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {stats && stats.length > 0 ? (
+          {paginatedStats && paginatedStats.length > 0 ? (
+            <>
             <div className="space-y-4">
-              {stats.map((item, index) => {
+              {paginatedStats.map((item, index) => {
                 const percentage = totalAmount > 0 ? (item.totalAmount / totalAmount * 100).toFixed(1) : "0.0";
                 const avgAmount = item.orderCount > 0 ? (item.totalAmount / item.orderCount).toFixed(2) : "0.00";
                 
@@ -214,6 +235,39 @@ export default function TrafficSourceDashboard() {
                 );
               })}
             </div>
+            
+            {/* 分页控件 */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  显示第 {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, stats?.length || 0)} 条,共 {stats?.length || 0} 条
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    上一页
+                  </Button>
+                  <div className="text-sm font-medium">
+                    第 {currentPage} / {totalPages} 页
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    下一页
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            </>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
               暂无数据
