@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orders SET channelOrderNo = NULL WHERE id IN (1470013, 1470017);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE orders SET channelOrderNo = NULL WHERE id IN (1470013, 1470017);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1504
+}

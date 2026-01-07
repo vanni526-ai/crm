@@ -46,8 +46,11 @@ const trpcClient = trpc.createClient({
         return globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
+          signal: init?.signal ?? AbortSignal.timeout(120000), // 120秒超时
         });
       },
+      // 增加批处理的最大URL长度限制
+      maxURLLength: Infinity,
     }),
   ],
 });

@@ -65,7 +65,20 @@ export default function Import() {
           toast.success(`成功解析 ${result.recordCount} 个事件`);
         }
       } catch (error: any) {
-        toast.error(error.message || "文件解析失败");
+        console.error("File parse error:", error);
+        let errorMsg = "文件解析失败";
+        if (error.message) {
+          errorMsg = error.message;
+        } else if (error.data?.message) {
+          errorMsg = error.data.message;
+        } else if (typeof error === "string") {
+          errorMsg = error;
+        }
+        // 特殊处理网络错误
+        if (error.name === "TypeError" && error.message.includes("fetch")) {
+          errorMsg = "网络请求失败,请检查网络连接或稍后重试";
+        }
+        toast.error(errorMsg);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -93,7 +106,20 @@ export default function Import() {
         refetch();
       }
     } catch (error: any) {
-      toast.error(error.message || "导入失败");
+      console.error("Import error:", error);
+      let errorMsg = "导入失败";
+      if (error.message) {
+        errorMsg = error.message;
+      } else if (error.data?.message) {
+        errorMsg = error.data.message;
+      } else if (typeof error === "string") {
+        errorMsg = error;
+      }
+      // 特殊处理网络错误
+      if (error.name === "TypeError" && error.message.includes("fetch")) {
+        errorMsg = "网络请求失败,请检查网络连接或文件大小是否过大";
+      }
+      toast.error(errorMsg);
     }
   };
 

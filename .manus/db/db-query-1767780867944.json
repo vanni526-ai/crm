@@ -1,0 +1,150 @@
+{
+  "query": "SELECT id, orderNo, customerName, salesPerson, deliveryTeacher FROM orders ORDER BY id DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, orderNo, customerName, salesPerson, deliveryTeacher FROM orders ORDER BY id DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "1470055",
+      "orderNo": "ORD1767678237612462",
+      "customerName": "恺",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "嘟嘟"
+    },
+    {
+      "id": "1470054",
+      "orderNo": "ORD1767678237579364",
+      "customerName": "恺",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "嘟嘟"
+    },
+    {
+      "id": "1470053",
+      "orderNo": "ORD1767678237543988",
+      "customerName": "凯",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "瑶瑶"
+    },
+    {
+      "id": "1470052",
+      "orderNo": "ORD1767678237511535",
+      "customerName": "凯",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "瑶瑶"
+    },
+    {
+      "id": "1470051",
+      "orderNo": "ORD1767678237479657",
+      "customerName": "hjl",
+      "salesPerson": "山竹",
+      "deliveryTeacher": "姜一"
+    },
+    {
+      "id": "1470050",
+      "orderNo": "ORD1767678237445231",
+      "customerName": "Zinco",
+      "salesPerson": "Grace",
+      "deliveryTeacher": "安雅"
+    },
+    {
+      "id": "1470049",
+      "orderNo": "ORD1767678237410451",
+      "customerName": "所念皆星河",
+      "salesPerson": "山竹",
+      "deliveryTeacher": "瑶瑶"
+    },
+    {
+      "id": "1470048",
+      "orderNo": "ORD1767678237394316",
+      "customerName": "Q.S.（贝丝）",
+      "salesPerson": "夏鑫",
+      "deliveryTeacher": "声声"
+    },
+    {
+      "id": "1470047",
+      "orderNo": "ORD1767678216790187",
+      "customerName": "荣",
+      "salesPerson": "山竹",
+      "deliveryTeacher": "小凡"
+    },
+    {
+      "id": "1470046",
+      "orderNo": "ORD1767678216755702",
+      "customerName": "程敢言",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "小羊"
+    },
+    {
+      "id": "1470045",
+      "orderNo": "ORD1767678216720813",
+      "customerName": "Hasten",
+      "salesPerson": "山竹",
+      "deliveryTeacher": "小夜"
+    },
+    {
+      "id": "1470044",
+      "orderNo": "ORD1767678216681668",
+      "customerName": "「censoreD」",
+      "salesPerson": "山竹",
+      "deliveryTeacher": "小夜"
+    },
+    {
+      "id": "1470043",
+      "orderNo": "ORD176767821664539",
+      "customerName": "佩奇",
+      "salesPerson": "夏鑫",
+      "deliveryTeacher": "小羊"
+    },
+    {
+      "id": "1470042",
+      "orderNo": "ORD1767678216609272",
+      "customerName": "KL",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "苏苏"
+    },
+    {
+      "id": "1470041",
+      "orderNo": "ORD1767678177829179",
+      "customerName": "城南土著",
+      "salesPerson": "Grace",
+      "deliveryTeacher": "声声"
+    },
+    {
+      "id": "1470040",
+      "orderNo": "ORD1767678163094655",
+      "customerName": "明宇",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "米妮上"
+    },
+    {
+      "id": "1470039",
+      "orderNo": "ORD1767678163076866",
+      "customerName": "FzyZzzz",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "米妮上"
+    },
+    {
+      "id": "1470038",
+      "orderNo": "ORD1767678163040827",
+      "customerName": "光耀艳阳",
+      "salesPerson": "嘟嘟",
+      "deliveryTeacher": "唐泽上"
+    },
+    {
+      "id": "1470037",
+      "orderNo": "ORD1767678163003870",
+      "customerName": "W",
+      "salesPerson": "Grace",
+      "deliveryTeacher": "米妮"
+    },
+    {
+      "id": "1470036",
+      "orderNo": "ORD1767678138991619",
+      "customerName": "stars",
+      "salesPerson": "土豆",
+      "deliveryTeacher": "云云"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNo\tcustomerName\tsalesPerson\tdeliveryTeacher\n1470055\tORD1767678237612462\t恺\t嘟嘟\t嘟嘟\n1470054\tORD1767678237579364\t恺\t嘟嘟\t嘟嘟\n1470053\tORD1767678237543988\t凯\t嘟嘟\t瑶瑶\n1470052\tORD1767678237511535\t凯\t嘟嘟\t瑶瑶\n1470051\tORD1767678237479657\thjl\t山竹\t姜一\n1470050\tORD1767678237445231\tZinco\tGrace\t安雅\n1470049\tORD1767678237410451\t所念皆星河\t山竹\t瑶瑶\n1470048\tORD1767678237394316\tQ.S.（贝丝）\t夏鑫\t声声\n1470047\tORD1767678216790187\t荣\t山竹\t小凡\n1470046\tORD1767678216755702\t程敢言\t嘟嘟\t小羊\n1470045\tORD1767678216720813\tHasten\t山竹\t小夜\n1470044\tORD1767678216681668\t「censoreD」\t山竹\t小夜\n1470043\tORD176767821664539\t佩奇\t夏鑫\t小羊\n1470042\tORD1767678216609272\tKL\t嘟嘟\t苏苏\n1470041\tORD1767678177829179\t城南土著\tGrace\t声声\n1470040\tORD1767678163094655\t明宇\t嘟嘟\t米妮上\n1470039\tORD1767678163076866\tFzyZzzz\t嘟嘟\t米妮上\n1470038\tORD1767678163040827\t光耀艳阳\t嘟嘟\t唐泽上\n1470037\tORD1767678163003870\tW\tGrace\t米妮\n1470036\tORD1767678138991619\tstars\t土豆\t云云\n",
+  "stderr": "",
+  "execution_time_ms": 1528
+}
