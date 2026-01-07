@@ -508,6 +508,7 @@ export default function () {
                   <TableHead>订单数</TableHead>
                   <TableHead>成功/失败</TableHead>
                   <TableHead>状态</TableHead>
+                  <TableHead>警告</TableHead>
                   <TableHead>导入时间</TableHead>
                   <TableHead>操作</TableHead>
                 </TableRow>
@@ -530,6 +531,18 @@ export default function () {
                         <span className="text-red-600 ml-1">{log.failedOrders}</span>
                       </TableCell>
                       <TableCell>{getStatusBadge(log.status)}</TableCell>
+                      <TableCell>
+                        {log.warningFlags && log.warningFlags.length > 0 ? (
+                          <div className="flex items-center gap-1">
+                            <AlertTriangle className="w-4 h-4 text-amber-500" />
+                            <Badge variant="outline" className="text-amber-600 border-amber-300">
+                              {log.warningFlags.includes('missing_channel_order_no') && '缺失渠道订单号'}
+                            </Badge>
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">无</span>
+                        )}
+                      </TableCell>
                       <TableCell>{format(new Date(log.createdAt), "yyyy-MM-dd HH:mm", { locale: zhCN })}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -545,7 +558,7 @@ export default function () {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="text-center text-muted-foreground">
                       暂无导入记录
                     </TableCell>
                   </TableRow>

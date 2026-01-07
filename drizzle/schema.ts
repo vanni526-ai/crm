@@ -274,6 +274,7 @@ export const gmailImportLogs = mysqlTable("gmailImportLogs", (table) => ({
   errorLog: text("errorLog"), // 错误日志
   emailContent: text("emailContent"), // 邮件内容(用于查看原始数据)
   parsedData: json("parsedData"), // 解析后的订单数据(JSON)
+  warningFlags: json("warningFlags"), // 警告标记(JSON数组,如["missing_channel_order_no","invalid_amount"])
   importedBy: int("importedBy").notNull(), // 导入人(0表示系统自动)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }), (table) => ({

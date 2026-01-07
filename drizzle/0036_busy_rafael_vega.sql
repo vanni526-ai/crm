@@ -1,0 +1,1 @@
+ALTER TABLE `gmailImportLogs` ADD `warningFlags` json;

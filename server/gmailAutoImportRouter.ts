@@ -9,7 +9,10 @@ import {
   checkOrderNoExists,
   checkChannelOrderNoExists,
   getOrderByChannelOrderNo,
+  getDb,
 } from "./db";
+import { gmailImportLogs } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 import { validateChannelOrderNo, identifyPaymentChannel } from "./channelOrderNoUtils";
 
 export const gmailAutoImportRouter = router({
@@ -107,6 +110,7 @@ export const gmailAutoImportRouter = router({
         let skippedCount = 0;
         const errorMessages: string[] = [];
         const warnings: string[] = [];
+        const warningFlags: string[] = []; // 警告标记数组
         
         for (const orderData of parsedOrders) {
           try {
@@ -125,6 +129,12 @@ export const gmailAutoImportRouter = router({
             let channelOrderNo = orderData.channelOrderNo || "";
             let paymentChannel = orderData.paymentMethod || "";
             let validationWarning = "";
+            
+            // 检测缺失渠道订单号
+            if (!channelOrderNo || channelOrderNo.trim() === '') {
+              warningFlags.push("missing_channel_order_no");
+              warnings.push(`订单 ${orderData.customerName || orderData.salesperson}: ⚠️ 缺失渠道订单号`);
+            }
             
             // 检查渠道订单号是否重复
             if (channelOrderNo && channelOrderNo.trim() !== '') {
@@ -188,6 +198,16 @@ export const gmailAutoImportRouter = router({
         }
         
         console.log(`导入完成: 成功 ${successCount}, 跳过 ${skippedCount}`);
+        
+        // 更新导入日志的警告标记
+        if (warningFlags.length > 0) {
+          const db = await getDb();
+          if (db) {
+            await db.update(gmailImportLogs)
+              .set({ warningFlags: Array.from(new Set(warningFlags)) })
+              .where(eq(gmailImportLogs.id, logId));
+          }
+        }
         
         return {
           successCount,

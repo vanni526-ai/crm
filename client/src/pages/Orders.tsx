@@ -137,6 +137,22 @@ export default function Orders() {
     },
   });
 
+  const batchUpdateChannelOrderNo = trpc.orders.batchUpdateChannelOrderNo.useMutation({
+    onSuccess: (data) => {
+      utils.orders.list.invalidate();
+      toast.success(`批量修正成功，共更新 ${data.successCount} 条订单`);
+      if (data.errors.length > 0) {
+        toast.error(`${data.failedCount} 条订单失败`, { description: data.errors.join(', ') });
+      }
+      setSelectedOrderIds([]);
+      setBatchChannelOrderNoOpen(false);
+      setBatchChannelOrderNo("");
+    },
+    onError: (error) => {
+      toast.error(error.message || "批量修正失败");
+    },
+  });
+
   const createCustomerFromOrder = trpc.customers.createFromOrder.useMutation({
     onSuccess: () => {
       utils.customers.list.invalidate();
@@ -168,6 +184,9 @@ export default function Orders() {
   const [learnRecordOpen, setLearnRecordOpen] = useState(false);
   const [selectedFields, setSelectedFields] = useState<string[]>([]);
   const [learnReason, setLearnReason] = useState("");
+  const [batchChannelOrderNoOpen, setBatchChannelOrderNoOpen] = useState(false);
+  const [batchChannelOrderNo, setBatchChannelOrderNo] = useState("");
+  const [batchChannelAction, setBatchChannelAction] = useState<"fill" | "clear">("fill");
 
 
   const {
@@ -318,6 +337,17 @@ export default function Orders() {
 
   const confirmBatchUpdateStatus = () => {
     batchUpdateStatus.mutate({ ids: selectedOrderIds, status: batchStatus });
+  };
+
+  const confirmBatchUpdateChannelOrderNo = () => {
+    if (batchChannelAction === "fill" && !batchChannelOrderNo.trim()) {
+      toast.error("请输入渠道订单号");
+      return;
+    }
+    batchUpdateChannelOrderNo.mutate({
+      orderIds: selectedOrderIds,
+      channelOrderNo: batchChannelAction === "clear" ? "" : batchChannelOrderNo,
+    });
   };
 
   const toggleSelectAll = () => {
@@ -705,6 +735,13 @@ export default function Orders() {
                     onClick={handleBatchUpdateStatus}
                   >
                     批量修改状态
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setBatchChannelOrderNoOpen(true)}
+                  >
+                    批量修正渠道订单号
                   </Button>
                   <Button 
                     variant="destructive" 
@@ -1425,6 +1462,58 @@ export default function Orders() {
               </Button>
               <Button onClick={confirmBatchUpdateStatus}>
                 确认修改
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 批量修正渠道订单号对话框 */}
+        <Dialog open={batchChannelOrderNoOpen} onOpenChange={setBatchChannelOrderNoOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>批量修正渠道订单号</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-muted-foreground">
+                将为 {selectedOrderIds.length} 个订单修正渠道订单号
+              </p>
+              <div>
+                <Label htmlFor="batchChannelAction">选择操作</Label>
+                <Select value={batchChannelAction} onValueChange={(v: any) => setBatchChannelAction(v)}>
+                  <SelectTrigger id="batchChannelAction">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fill">填充渠道订单号</SelectItem>
+                    <SelectItem value="clear">清空渠道订单号</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {batchChannelAction === "fill" && (
+                <div>
+                  <Label htmlFor="batchChannelOrderNo">渠道订单号</Label>
+                  <Input
+                    id="batchChannelOrderNo"
+                    value={batchChannelOrderNo}
+                    onChange={(e) => setBatchChannelOrderNo(e.target.value)}
+                    placeholder="请输入渠道订单号"
+                  />
+                </div>
+              )}
+              {batchChannelAction === "clear" && (
+                <div className="bg-amber-50 p-3 rounded-md border border-amber-200">
+                  <p className="text-sm text-amber-800">
+                    ⚠️ 注意：此操作将清空选中订单的渠道订单号，请谨慎操作。
+                  </p>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBatchChannelOrderNoOpen(false)}>
+                取消
+              </Button>
+              <Button onClick={confirmBatchUpdateChannelOrderNo}>
+                确认修正
               </Button>
             </DialogFooter>
           </DialogContent>

@@ -13,8 +13,12 @@ import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
 import * as db from "./db";
+import { getDb, getOrderById } from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
 import { generateOrderId } from "./orderIdGenerator";
+import { validateChannelOrderNo } from "./channelOrderNoUtils";
+import { orders } from "../drizzle/schema";
+import { eq } from "drizzle-orm";
 
 // 权限检查中间件
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -746,6 +750,68 @@ export const appRouter = router({
         const { previewBatchFillChannelOrderNo } = await import("./channelOrderNoBatchFill");
         const result = await previewBatchFillChannelOrderNo(input);
         return result;
+      }),
+    
+    // 批量修正渠道订单号
+    batchUpdateChannelOrderNo: salesOrAdminProcedure
+      .input(z.object({
+        orderIds: z.array(z.number()),
+        channelOrderNo: z.string().optional(), // 如果为空则清空
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("数据库连接失败");
+        
+        let successCount = 0;
+        const errors: string[] = [];
+        
+        for (const orderId of input.orderIds) {
+          try {
+            await db.update(orders)
+              .set({ channelOrderNo: input.channelOrderNo || null })
+              .where(eq(orders.id, orderId));
+            successCount++;
+          } catch (err: any) {
+            errors.push(`订单ID ${orderId}: ${err.message}`);
+          }
+        }
+        
+        return {
+          success: true,
+          successCount,
+          failedCount: input.orderIds.length - successCount,
+          errors,
+        };
+      }),
+    
+    // 批量验证渠道订单号格式
+    batchValidateChannelOrderNo: protectedProcedure
+      .input(z.object({
+        orderIds: z.array(z.number()),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error("数据库连接失败");
+        
+        const results = [];
+        
+        for (const orderId of input.orderIds) {
+          const order = await getOrderById(orderId);
+          if (!order) continue;
+          
+          const validation = validateChannelOrderNo(order.channelOrderNo || "");
+          results.push({
+            orderId: order.id,
+            orderNo: order.orderNo,
+            customerName: order.customerName,
+            channelOrderNo: order.channelOrderNo,
+            isValid: validation.isValid,
+            channelName: validation.channelName,
+            warning: validation.warning,
+          });
+        }
+        
+        return results;
       }),
     
     // 导出对账报表
