@@ -12,6 +12,8 @@ import {
   type AlipayXMLRecord,
   type ICSEvent,
 } from "./fileParser";
+import { parseICSOrderContent, type ParsedICSOrder } from "./icsOrderParser";
+import { generateOrderNo } from "./orderNoGenerator";
 
 // 权限检查:销售或管理员可以导入
 const importProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -301,6 +303,180 @@ export const importRouter = router({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: `ICS解析失败: ${error.message}`,
+        });
+      }
+    }),
+
+  // 解析ICS文件为订单格式(使用LLM)
+  parseICSToOrders: importProcedure
+    .input(
+      z.object({
+        fileContent: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const buffer = Buffer.from(input.fileContent, "base64");
+        const events = await parseICS(buffer);
+        const orders = await parseICSOrderContent(events);
+
+        await db.createImportLog({
+          fileName: "calendar.ics",
+          fileType: "ics",
+          dataType: "preview",
+          totalRows: orders.length,
+          successRows: orders.length,
+          failedRows: 0,
+          importedBy: ctx.user.id,
+        });
+
+        return {
+          success: true,
+          recordCount: orders.length,
+          orders: orders.slice(0, 10), // 只返回前10条预览
+        };
+      } catch (error: any) {
+        await db.createImportLog({
+          fileName: "calendar.ics",
+          fileType: "ics",
+          dataType: "preview",
+          totalRows: 0,
+          successRows: 0,
+          failedRows: 0,
+          errorLog: error.message,
+          importedBy: ctx.user.id,
+        });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `ICS订单解析失败: ${error.message}`,
+        });
+      }
+    }),
+
+  // 导入ICS数据到订单表
+  importICSToOrders: importProcedure
+    .input(
+      z.object({
+        fileContent: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const buffer = Buffer.from(input.fileContent, "base64");
+        const events = await parseICS(buffer);
+        const orders = await parseICSOrderContent(events);
+
+        let successCount = 0;
+        let failedCount = 0;
+        const errors: string[] = [];
+        const createdOrders: number[] = [];
+
+        for (const order of orders) {
+          try {
+            // 查找销售人员ID
+            let salespersonId: number | undefined;
+            if (order.salesperson) {
+              const salespersons = await db.searchSalespersons(order.salesperson);
+              salespersonId = salespersons.length > 0 ? salespersons[0].id : undefined;
+            }
+
+            // 查找或创建客户
+            let customerId: number | undefined;
+            if (order.customerName) {
+              const existingCustomers = await db.searchCustomers(order.customerName);
+              if (existingCustomers.length > 0) {
+                customerId = existingCustomers[0].id;
+              } else {
+                // 自动创建客户
+                customerId = await db.createCustomer({
+                  name: order.customerName,
+                  trafficSource: order.deviceWechat || "ICS导入",
+                  createdBy: ctx.user.id,
+                });
+              }
+            }
+
+            // 计算合伙人费用
+            const partnerFee = await db.calculatePartnerFee(
+              order.city || "",
+              order.courseAmount,
+              order.teacherFee
+            );
+
+            // 生成订单号
+            const orderNo = generateOrderNo(order.city);
+
+            // 创建订单
+            const result = await db.createOrder({
+              orderNo,
+              salesId: ctx.user.id,
+              customerId: customerId || undefined,
+              customerName: order.customerName || undefined,
+              salespersonId: salespersonId || undefined,
+              salesPerson: order.salesperson || undefined,
+              trafficSource: order.deviceWechat || "ICS导入",
+              paymentAmount: order.paymentAmount.toString(),
+              courseAmount: order.courseAmount.toString(),
+              accountBalance: order.accountBalance > 0 ? order.accountBalance.toString() : "0.00",
+              paymentCity: order.city || undefined,
+              paymentChannel: order.paymentMethod || undefined,
+              channelOrderNo: order.channelOrderNo || undefined,
+              paymentDate: order.classDate ? new Date(order.classDate) : undefined,
+              paymentTime: order.classTime || undefined,
+              teacherFee: order.teacherFee > 0 ? order.teacherFee.toString() : "0.00",
+              transportFee: order.carFee > 0 ? order.carFee.toString() : "0.00",
+              partnerFee: partnerFee > 0 ? partnerFee.toString() : "0.00",
+              deliveryCity: order.city || undefined,
+              deliveryRoom: order.classroom || undefined,
+              deliveryTeacher: order.teacher || undefined,
+              deliveryCourse: order.course || undefined,
+              classDate: order.classDate ? new Date(order.classDate) : undefined,
+              classTime: order.classTime || undefined,
+              status: "paid",
+              notes: order.notes || undefined,
+            });
+
+            createdOrders.push(result.id);
+            successCount++;
+          } catch (error: any) {
+            failedCount++;
+            errors.push(`订单导入失败(${order.customerName || "未知客户"}): ${error.message}`);
+          }
+        }
+
+        await db.createImportLog({
+          fileName: "calendar.ics",
+          fileType: "ics",
+          dataType: "order",
+          totalRows: orders.length,
+          successRows: successCount,
+          failedRows: failedCount,
+          errorLog: errors.length > 0 ? errors.join("\n") : undefined,
+          importedBy: ctx.user.id,
+        });
+
+        return {
+          success: true,
+          totalCount: orders.length,
+          successCount,
+          failedCount,
+          createdOrders,
+          errors,
+        };
+      } catch (error: any) {
+        await db.createImportLog({
+          fileName: "calendar.ics",
+          fileType: "ics",
+          dataType: "order",
+          totalRows: 0,
+          successRows: 0,
+          failedRows: 0,
+          errorLog: error.message,
+          importedBy: ctx.user.id,
+        });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `ICS订单导入失败: ${error.message}`,
         });
       }
     }),

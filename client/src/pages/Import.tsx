@@ -17,7 +17,11 @@ export default function Import() {
   const parseExcel = trpc.import.parseExcel.useMutation();
   const importExcel = trpc.import.importExcelToOrders.useMutation();
   const parseICS = trpc.import.parseICS.useMutation();
+  const parseICSToOrders = trpc.import.parseICSToOrders.useMutation();
   const importICS = trpc.import.importICSToSchedules.useMutation();
+  const importICSToOrders = trpc.import.importICSToOrders.useMutation();
+  
+  const [icsImportMode, setIcsImportMode] = useState<'schedule' | 'order'>('order');
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState<any[]>([]);
@@ -59,10 +63,17 @@ export default function Import() {
           setPreviewOpen(true);
           toast.success(`成功解析 ${result.recordCount} 条记录`);
         } else if (type === "ics") {
-          const result = await parseICS.mutateAsync({ fileContent: base64 });
-          setPreviewData(result.events);
-          setPreviewOpen(true);
-          toast.success(`成功解析 ${result.recordCount} 个事件`);
+          if (icsImportMode === 'order') {
+            const result = await parseICSToOrders.mutateAsync({ fileContent: base64 });
+            setPreviewData(result.orders);
+            setPreviewOpen(true);
+            toast.success(`成功解析 ${result.recordCount} 个订单`);
+          } else {
+            const result = await parseICS.mutateAsync({ fileContent: base64 });
+            setPreviewData(result.events);
+            setPreviewOpen(true);
+            toast.success(`成功解析 ${result.recordCount} 个事件`);
+          }
         }
       } catch (error: any) {
         console.error("File parse error:", error);
@@ -94,7 +105,11 @@ export default function Import() {
       } else if (currentFile.type === "excel") {
         result = await importExcel.mutateAsync({ fileContent: currentFile.content });
       } else if (currentFile.type === "ics") {
-        result = await importICS.mutateAsync({ fileContent: currentFile.content });
+        if (icsImportMode === 'order') {
+          result = await importICSToOrders.mutateAsync({ fileContent: currentFile.content });
+        } else {
+          result = await importICS.mutateAsync({ fileContent: currentFile.content });
+        }
       }
 
       if (result) {
@@ -198,9 +213,29 @@ export default function Import() {
                 <Calendar className="h-5 w-5 text-blue-600" />
                 <CardTitle className="text-lg">ICS文件</CardTitle>
               </div>
-              <CardDescription>日历排课信息</CardDescription>
+              <CardDescription>
+                {icsImportMode === 'order' ? '导入为订单（默认）' : '导入为排课'}
+              </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-3">
+              <div className="flex gap-2">
+                <Button
+                  variant={icsImportMode === 'order' ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setIcsImportMode('order')}
+                >
+                  订单模式
+                </Button>
+                <Button
+                  variant={icsImportMode === 'schedule' ? 'default' : 'outline'}
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setIcsImportMode('schedule')}
+                >
+                  排课模式
+                </Button>
+              </div>
               <input
                 ref={icsInputRef}
                 type="file"
@@ -214,10 +249,10 @@ export default function Import() {
               <Button
                 className="w-full"
                 onClick={() => icsInputRef.current?.click()}
-                disabled={parseICS.isPending}
+                disabled={parseICS.isPending || parseICSToOrders.isPending}
               >
                 <Upload className="mr-2 h-4 w-4" />
-                {parseICS.isPending ? "解析中..." : "上传ICS"}
+                {(parseICS.isPending || parseICSToOrders.isPending) ? "解析中..." : "上传ICS"}
               </Button>
             </CardContent>
           </Card>
