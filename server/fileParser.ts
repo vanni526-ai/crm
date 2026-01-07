@@ -1,7 +1,7 @@
 import { parse } from "csv-parse/sync";
 import * as XLSX from "xlsx";
 import { parseString } from "xml2js";
-import * as ical from "ical";
+import ical from "ical";
 import { promisify } from "util";
 
 const parseXML = promisify(parseString);
