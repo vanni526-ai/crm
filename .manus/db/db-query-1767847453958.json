@@ -1,0 +1,46 @@
+{
+  "query": "SELECT id, orderNo, customerName, deliveryCity, courseAmount, teacherFee, partnerFee FROM orders WHERE deliveryCity = '泉州' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, orderNo, customerName, deliveryCity, courseAmount, teacherFee, partnerFee FROM orders WHERE deliveryCity = '泉州' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1320070",
+      "orderNo": "ORD176664638520987",
+      "customerName": "候鸟的第七行诗",
+      "deliveryCity": "泉州",
+      "courseAmount": "2400.00",
+      "teacherFee": "3200.00",
+      "partnerFee": "-240.00"
+    },
+    {
+      "id": "1380020",
+      "orderNo": "ORD1767167664407479",
+      "customerName": "在路上",
+      "deliveryCity": "泉州",
+      "courseAmount": "2700.00",
+      "teacherFee": "4100.00",
+      "partnerFee": "-420.00"
+    },
+    {
+      "id": "1470013",
+      "orderNo": "ORD1767678094248571",
+      "customerName": "leo",
+      "deliveryCity": "泉州",
+      "courseAmount": "2700.00",
+      "teacherFee": "500.00",
+      "partnerFee": "660.00"
+    },
+    {
+      "id": "1470047",
+      "orderNo": "ORD1767678216790187",
+      "customerName": "荣",
+      "deliveryCity": "泉州",
+      "courseAmount": "2800.00",
+      "teacherFee": "900.00",
+      "partnerFee": "570.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNo\tcustomerName\tdeliveryCity\tcourseAmount\tteacherFee\tpartnerFee\n1320070\tORD176664638520987\t候鸟的第七行诗\t泉州\t2400.00\t3200.00\t-240.00\n1380020\tORD1767167664407479\t在路上\t泉州\t2700.00\t4100.00\t-420.00\n1470013\tORD1767678094248571\tleo\t泉州\t2700.00\t500.00\t660.00\n1470047\tORD1767678216790187\t荣\t泉州\t2800.00\t900.00\t570.00\n",
+  "stderr": "",
+  "execution_time_ms": 1495
+}

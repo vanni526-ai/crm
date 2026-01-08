@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE cityPartnerConfig SET partnerFeeRate = 0.30, description = '泉州合伙人费比例', isActive = 1 WHERE city = '泉州';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE cityPartnerConfig SET partnerFeeRate = 0.30, description = '泉州合伙人费比例', isActive = 1 WHERE city = '泉州';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1610
+}

@@ -2414,7 +2414,8 @@ export async function calculatePartnerFee(
   const config = await getCityPartnerConfigByCity(city);
   if (!config) return 0;
   
-  const rate = Number(config.partnerFeeRate) / 100;
+  // partnerFeeRate已经是小数格式(0.30 = 30%),不需要再除以100
+  const rate = Number(config.partnerFeeRate);
   const partnerFee = (courseAmount - teacherFee) * rate;
   
   return Math.round(partnerFee * 100) / 100; // 保留两位小数

@@ -131,16 +131,30 @@ export async function batchFixOrderFees(): Promise<{
         );
       }
       
-      // 如果提取到了新的费用或需要更新合伙人费,更新订单
-      const needUpdate = teacherFee > 0 || transportFee > 0 || partnerFee > 0;
+      // 准备更新的字段(只更新提取到新值的字段)
+      const updateData: any = {};
+      
+      // 只有提取到新的老师费用时才更新(避免清零)
+      if (teacherFee > 0) {
+        updateData.teacherFee = teacherFee.toFixed(2);
+      }
+      
+      // 只有提取到新的车费时才更新(避免清零)
+      if (transportFee > 0) {
+        updateData.transportFee = transportFee.toFixed(2);
+      }
+      
+      // 只有计算出新的合伙人费时才更新
+      if (partnerFee > 0) {
+        updateData.partnerFee = partnerFee.toFixed(2);
+      }
+      
+      // 如果有任何字段需要更新,执行更新
+      const needUpdate = Object.keys(updateData).length > 0;
       if (needUpdate) {
         await db
           .update(orders)
-          .set({
-            teacherFee: teacherFee.toFixed(2),
-            transportFee: transportFee.toFixed(2),
-            partnerFee: partnerFee.toFixed(2),
-          })
+          .set(updateData)
           .where(eq(orders.id, order.id));
         
         details.push({
