@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orders \nSET teacherFee = CASE \n  WHEN channelOrderNo = '4200002901202601055351076736' THEN '210.00'\n  WHEN channelOrderNo = '4200002915202512312083351883' THEN '200.00'\n  ELSE teacherFee\nEND\nWHERE channelOrderNo IN ('4200002901202601055351076736', '4200002915202512312083351883');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE orders \nSET teacherFee = CASE \n  WHEN channelOrderNo = '4200002901202601055351076736' THEN '210.00'\n  WHEN channelOrderNo = '4200002915202512312083351883' THEN '200.00'\n  ELSE teacherFee\nEND\nWHERE channelOrderNo IN ('4200002901202601055351076736', '4200002915202512312083351883');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1546
+}

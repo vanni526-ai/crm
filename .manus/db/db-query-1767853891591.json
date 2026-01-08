@@ -1,0 +1,28 @@
+{
+  "query": "SELECT \n  orderNo,\n  customerName,\n  deliveryTeacher,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  partnerFee\nFROM orders \nWHERE channelOrderNo IN ('4200002901202601055351076736', '4200002915202512312083351883');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  orderNo,\n  customerName,\n  deliveryTeacher,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  partnerFee\nFROM orders \nWHERE channelOrderNo IN ('4200002901202601055351076736', '4200002915202512312083351883');",
+  "rows": [
+    {
+      "orderNo": "ORD1767678237543988",
+      "customerName": "凯",
+      "deliveryTeacher": "瑶瑶",
+      "deliveryCity": "上海",
+      "courseAmount": "2100.00",
+      "teacherFee": "210.00",
+      "partnerFee": "540.00"
+    },
+    {
+      "orderNo": "ORD1767678237612462",
+      "customerName": "恺",
+      "deliveryTeacher": "嘟嘟",
+      "deliveryCity": "上海",
+      "courseAmount": "2000.00",
+      "teacherFee": "200.00",
+      "partnerFee": "480.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tdeliveryTeacher\tdeliveryCity\tcourseAmount\tteacherFee\tpartnerFee\nORD1767678237543988\t凯\t瑶瑶\t上海\t2100.00\t210.00\t540.00\nORD1767678237612462\t恺\t嘟嘟\t上海\t2000.00\t200.00\t480.00\n",
+  "stderr": "",
+  "execution_time_ms": 1499
+}

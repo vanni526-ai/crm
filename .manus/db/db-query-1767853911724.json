@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total\nFROM orders \nWHERE notes LIKE '%给老师%' \n   OR notes LIKE '%给瑶瑶%'\n   OR notes LIKE '%给嘟嘟%'\n   OR notes LIKE '%给姜一%'\n   OR notes LIKE '%给云云%'\n   OR notes LIKE '%给声声%'\n   OR notes LIKE '%给皮皮%'\n   OR notes LIKE '%给安雅%'\n   OR notes LIKE '%给苏苏%'\n   OR notes LIKE '%给嫩嫩%'\n   OR notes LIKE '%绘老师%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as total\nFROM orders \nWHERE notes LIKE '%给老师%' \n   OR notes LIKE '%给瑶瑶%'\n   OR notes LIKE '%给嘟嘟%'\n   OR notes LIKE '%给姜一%'\n   OR notes LIKE '%给云云%'\n   OR notes LIKE '%给声声%'\n   OR notes LIKE '%给皮皮%'\n   OR notes LIKE '%给安雅%'\n   OR notes LIKE '%给苏苏%'\n   OR notes LIKE '%给嫩嫩%'\n   OR notes LIKE '%绘老师%';",
+  "rows": [
+    {
+      "total": "192"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n192\n",
+  "stderr": "",
+  "execution_time_ms": 1615
+}
