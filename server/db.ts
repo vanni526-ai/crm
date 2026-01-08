@@ -505,53 +505,94 @@ export async function isTeacherName(name: string | null | undefined): Promise<bo
   return teacherNames.includes(name.trim());
 }
 
-// 获取老师统计数据
+// 获取老师统计数据(从orders表统计)
 export async function getTeacherStats(teacherId: number, startDate?: Date, endDate?: Date) {
   const db = await getDb();
   if (!db) return null;
 
-  // 统计授课次数和总课时
-  const scheduleConditions = startDate && endDate
-    ? and(
-        eq(schedules.teacherId, teacherId),
-        gte(schedules.startTime, startDate),
-        lte(schedules.startTime, endDate)
-      )
-    : eq(schedules.teacherId, teacherId);
+  // 先获取老师信息
+  const teacher = await db.select().from(teachers).where(eq(teachers.id, teacherId)).limit(1);
+  if (!teacher || teacher.length === 0) {
+    return {
+      classCount: 0,
+      totalHours: 0,
+      totalIncome: 0,
+    };
+  }
+  const teacherName = teacher[0].name;
 
-  const scheduleStats = await db
+  // 从orders表统计授课次数和收入(根据deliveryTeacher字段匹配老师名)
+  const orderConditions = [];
+  orderConditions.push(eq(orders.deliveryTeacher, teacherName));
+  
+  // 排除已取消的订单
+  orderConditions.push(ne(orders.status, "cancelled"));
+  
+  if (startDate && endDate) {
+    orderConditions.push(gte(orders.classDate, startDate));
+    orderConditions.push(lte(orders.classDate, endDate));
+  }
+
+  const orderStats = await db
     .select({
       count: sql<number>`COUNT(*)`,
-      totalHours: sql<number>`SUM(TIMESTAMPDIFF(HOUR, ${schedules.startTime}, ${schedules.endTime}))`,
+      totalIncome: sql<number>`COALESCE(SUM(${orders.teacherFee}), 0)`,
     })
-    .from(schedules)
-    .where(scheduleConditions);
+    .from(orders)
+    .where(and(...orderConditions));
 
-  // 统计总收入(已支付)
-  const paymentConditions = startDate && endDate
-    ? and(
-        eq(teacherPayments.teacherId, teacherId),
-        eq(teacherPayments.status, "paid"),
-        gte(teacherPayments.paymentTime, startDate),
-        lte(teacherPayments.paymentTime, endDate)
-      )
-    : and(
-        eq(teacherPayments.teacherId, teacherId),
-        eq(teacherPayments.status, "paid")
-      );
-
-  const paymentStats = await db
+  // 计算总课时(从classTime字段解析,格式如"11:00-13:00")
+  const orderRecords = await db
     .select({
-      totalIncome: sql<number>`SUM(${teacherPayments.amount})`,
+      classTime: orders.classTime,
     })
-    .from(teacherPayments)
-    .where(paymentConditions);
+    .from(orders)
+    .where(and(...orderConditions));
+
+  let totalHours = 0;
+  for (const record of orderRecords) {
+    if (record.classTime) {
+      const hours = parseClassTimeToHours(record.classTime);
+      totalHours += hours;
+    }
+  }
 
   return {
-    classCount: Number(scheduleStats[0]?.count) || 0,
-    totalHours: Number(scheduleStats[0]?.totalHours) || 0,
-    totalIncome: Number(paymentStats[0]?.totalIncome) || 0,
+    classCount: Number(orderStats[0]?.count) || 0,
+    totalHours: totalHours,
+    totalIncome: Number(orderStats[0]?.totalIncome) || 0,
   };
+}
+
+// 辅助函数:解析上课时间字符串为小时数
+function parseClassTimeToHours(classTime: string): number {
+  try {
+    // 支持格式: "11:00-13:00", "11:00~13:00", "11:00～13:00", "11.00-13.00"
+    const timeRange = classTime.replace(/[~～]/g, '-').replace(/\./g, ':');
+    const match = timeRange.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+    
+    if (!match) return 0;
+    
+    const startHour = parseInt(match[1]);
+    const startMinute = parseInt(match[2]);
+    const endHour = parseInt(match[3]);
+    const endMinute = parseInt(match[4]);
+    
+    let startTotalMinutes = startHour * 60 + startMinute;
+    let endTotalMinutes = endHour * 60 + endMinute;
+    
+    // 如果结束时间小于开始时间,说明跨越了午夜,给结束时间加1440分钟(24小时)
+    if (endTotalMinutes < startTotalMinutes) {
+      endTotalMinutes += 1440; // 24 * 60 = 1440分钟
+    }
+    
+    const durationMinutes = endTotalMinutes - startTotalMinutes;
+    
+    return durationMinutes / 60; // 转换为小时
+  } catch (error) {
+    console.error('[parseClassTimeToHours] Error parsing classTime:', classTime, error);
+    return 0;
+  }
 }
 
 // 获取所有老师的统计数据

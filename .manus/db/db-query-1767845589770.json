@@ -1,0 +1,215 @@
+{
+  "query": "SELECT deliveryTeacher, classTime, teacherFee FROM orders WHERE deliveryTeacher IN ('小凡', '宥香', '云云', '淼淼', '小梨') AND status != 'cancelled' ORDER BY deliveryTeacher, classTime LIMIT 50",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT deliveryTeacher, classTime, teacherFee FROM orders WHERE deliveryTeacher IN ('小凡', '宥香', '云云', '淼淼', '小梨') AND status != 'cancelled' ORDER BY deliveryTeacher, classTime LIMIT 50",
+  "rows": [
+    {
+      "deliveryTeacher": "云云",
+      "classTime": "18:00-19:00",
+      "teacherFee": "200.00"
+    },
+    {
+      "deliveryTeacher": "云云",
+      "classTime": "19:00-20:00",
+      "teacherFee": "300.00"
+    },
+    {
+      "deliveryTeacher": "云云",
+      "classTime": "22.00-00.00",
+      "teacherFee": "600.00"
+    },
+    {
+      "deliveryTeacher": "宥香",
+      "classTime": "08:00-10:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "宥香",
+      "classTime": "10:30-11:30",
+      "teacherFee": "300.00"
+    },
+    {
+      "deliveryTeacher": "宥香",
+      "classTime": "14:00-16:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "宥香",
+      "classTime": "14:00-16:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "宥香",
+      "classTime": "15:00-16:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "宥香",
+      "classTime": "17:00-19:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "宥香",
+      "classTime": "22:00-06:00",
+      "teacherFee": "1200.00"
+    },
+    {
+      "deliveryTeacher": "小凡",
+      "classTime": "15.00-17.00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "小凡",
+      "classTime": "17.30-19.30",
+      "teacherFee": "500.00"
+    },
+    {
+      "deliveryTeacher": "小凡",
+      "classTime": "18:00-20:00",
+      "teacherFee": "500.00"
+    },
+    {
+      "deliveryTeacher": "小凡",
+      "classTime": "23:00-0:20",
+      "teacherFee": "900.00"
+    },
+    {
+      "deliveryTeacher": "小梨",
+      "classTime": "12:00-13:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "小梨",
+      "classTime": "14:00-15:30",
+      "teacherFee": "450.00"
+    },
+    {
+      "deliveryTeacher": "小梨",
+      "classTime": "18:30-20:30",
+      "teacherFee": "600.00"
+    },
+    {
+      "deliveryTeacher": "小梨",
+      "classTime": "19:30-21:30",
+      "teacherFee": "600.00"
+    },
+    {
+      "deliveryTeacher": "小梨",
+      "classTime": "19:30-21:30",
+      "teacherFee": "600.00"
+    },
+    {
+      "deliveryTeacher": "小梨",
+      "classTime": "23:00-0:00",
+      "teacherFee": "300.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "teacherFee": "2900.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "teacherFee": "100.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "teacherFee": "2900.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "teacherFee": "100.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "teacherFee": "100.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "08:00-10:00",
+      "teacherFee": "720.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "teacherFee": "600.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "teacherFee": "2000.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "teacherFee": "2000.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "15:00-17:00",
+      "teacherFee": "400.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "15:00-17:00",
+      "teacherFee": "500.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "15:00-17:30",
+      "teacherFee": "750.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "16:00-17:00",
+      "teacherFee": "200.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "17:00-19:00",
+      "teacherFee": "1000.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "20:00-22:00",
+      "teacherFee": "0.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "20:20-22:20",
+      "teacherFee": "0.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "22:00-23:30",
+      "teacherFee": "300.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "23:00-00:30",
+      "teacherFee": "1075.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "23:30-0:30",
+      "teacherFee": "350.00"
+    },
+    {
+      "deliveryTeacher": "淼淼",
+      "classTime": "23:30-0:30",
+      "teacherFee": "400.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "deliveryTeacher\tclassTime\tteacherFee\n云云\t18:00-19:00\t200.00\n云云\t19:00-20:00\t300.00\n云云\t22.00-00.00\t600.00\n宥香\t08:00-10:00\t400.00\n宥香\t10:30-11:30\t300.00\n宥香\t14:00-16:00\t400.00\n宥香\t14:00-16:00\t400.00\n宥香\t15:00-16:00\t400.00\n宥香\t17:00-19:00\t400.00\n宥香\t22:00-06:00\t1200.00\n小凡\t15.00-17.00\t400.00\n小凡\t17.30-19.30\t500.00\n小凡\t18:00-20:00\t500.00\n小凡\t23:00-0:20\t900.00\n小梨\t12:00-13:00\t400.00\n小梨\t14:00-15:30\t450.00\n小梨\t18:30-20:30\t600.00\n小梨\t19:30-21:30\t600.00\n小梨\t19:30-21:30\t600.00\n小梨\t23:00-0:00\t300.00\n淼淼\t00:30-01:00\t2900.00\n淼淼\t00:30-01:00\t100.00\n淼淼\t00:30-01:00\t2900.00\n淼淼\t00:30-01:00\t100.00\n淼淼\t00:30-01:00\t100.00\n淼淼\t08:00-10:00\t720.00\n淼淼\t14:00-16:00\t600.00\n淼淼\t14:00-16:00\t2000.00\n淼淼\t14:00-16:00\t2000.00\n淼淼\t14:00-16:00\t400.00\n淼淼\t15:00-17:00\t400.00\n淼淼\t15:00-17:00\t500.00\n淼淼\t15:00-17:30\t750.00\n淼淼\t16:00-17:00\t200.00\n淼淼\t17:00-19:00\t1000.00\n淼淼\t20:00-22:00\t0.00\n淼淼\t20:20-22:20\t0.00\n淼淼\t22:00-23:30\t300.00\n淼淼\t23:00-00:30\t1075.00\n淼淼\t23:30-0:30\t350.00\n淼淼\t23:30-0:30\t400.00\n",
+  "stderr": "",
+  "execution_time_ms": 1559
+}

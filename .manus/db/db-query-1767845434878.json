@@ -1,0 +1,338 @@
+{
+  "query": "SELECT orderNo, customerName, deliveryTeacher, classTime, classDate, teacherFee \nFROM orders \nWHERE deliveryTeacher IN ('小凡', '宥香', '云云', '淼淼', '小梨') \nAND status != 'cancelled'\nORDER BY deliveryTeacher, classDate\nLIMIT 50",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT orderNo, customerName, deliveryTeacher, classTime, classDate, teacherFee \nFROM orders \nWHERE deliveryTeacher IN ('小凡', '宥香', '云云', '淼淼', '小梨') \nAND status != 'cancelled'\nORDER BY deliveryTeacher, classDate\nLIMIT 50",
+  "rows": [
+    {
+      "orderNo": "ORD1767167630225453",
+      "customerName": "Z",
+      "deliveryTeacher": "云云",
+      "classTime": "19:00-20:00",
+      "classDate": "2025-12-28",
+      "teacherFee": "300.00"
+    },
+    {
+      "orderNo": "ORD1767173971567517",
+      "customerName": "",
+      "deliveryTeacher": "云云",
+      "classTime": "18:00-19:00",
+      "classDate": "2025-12-29",
+      "teacherFee": "200.00"
+    },
+    {
+      "orderNo": "ORD1767678138991619",
+      "customerName": "stars",
+      "deliveryTeacher": "云云",
+      "classTime": "22.00-00.00",
+      "classDate": "2026-01-03",
+      "teacherFee": "600.00"
+    },
+    {
+      "orderNo": "ORD1767173971680339",
+      "customerName": "机密熊",
+      "deliveryTeacher": "宥香",
+      "classTime": "08:00-10:00",
+      "classDate": "2025-01-03",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1766646197184107",
+      "customerName": "",
+      "deliveryTeacher": "宥香",
+      "classTime": "15:00-16:00",
+      "classDate": "2025-12-23",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1766646385095689",
+      "customerName": "晴天",
+      "deliveryTeacher": "宥香",
+      "classTime": "10:30-11:30",
+      "classDate": "2025-12-23",
+      "teacherFee": "300.00"
+    },
+    {
+      "orderNo": "ORD1767173986166370",
+      "customerName": "Lay",
+      "deliveryTeacher": "宥香",
+      "classTime": "14:00-16:00",
+      "classDate": "2025-12-31",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1767173971636947",
+      "customerName": "Jim",
+      "deliveryTeacher": "宥香",
+      "classTime": "17:00-19:00",
+      "classDate": "2025-12-31",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1767263595910684",
+      "customerName": "Lay",
+      "deliveryTeacher": "宥香",
+      "classTime": "14:00-16:00",
+      "classDate": "2025-12-31",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1766833942271522",
+      "customerName": "",
+      "deliveryTeacher": "宥香",
+      "classTime": "22:00-06:00",
+      "classDate": "2026-01-03",
+      "teacherFee": "1200.00"
+    },
+    {
+      "orderNo": "ORD1767167664407479",
+      "customerName": "在路上",
+      "deliveryTeacher": "小凡",
+      "classTime": "18:00-20:00",
+      "classDate": "2025-12-28",
+      "teacherFee": "500.00"
+    },
+    {
+      "orderNo": "ORD176664638520987",
+      "customerName": "候鸟的第七行诗",
+      "deliveryTeacher": "小凡",
+      "classTime": "15.00-17.00",
+      "classDate": "2025-12-28",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1767678216790187",
+      "customerName": "荣",
+      "deliveryTeacher": "小凡",
+      "classTime": "23:00-0:20",
+      "classDate": "2026-01-05",
+      "teacherFee": "900.00"
+    },
+    {
+      "orderNo": "ORD1767678094248571",
+      "customerName": "leo",
+      "deliveryTeacher": "小凡",
+      "classTime": "17.30-19.30",
+      "classDate": "2026-01-09",
+      "teacherFee": "500.00"
+    },
+    {
+      "orderNo": "ORD1767263561969375",
+      "customerName": "时溯",
+      "deliveryTeacher": "小梨",
+      "classTime": "12:00-13:00",
+      "classDate": "2025-01-01",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1767167610713997",
+      "customerName": "",
+      "deliveryTeacher": "小梨",
+      "classTime": "23:00-0:00",
+      "classDate": "2025-12-26",
+      "teacherFee": "300.00"
+    },
+    {
+      "orderNo": "ORD1767263524881827",
+      "customerName": "ρ²=2a²cos2θ",
+      "deliveryTeacher": "小梨",
+      "classTime": "19:30-21:30",
+      "classDate": "2025-12-31",
+      "teacherFee": "600.00"
+    },
+    {
+      "orderNo": "ORD1767174000593774",
+      "customerName": "ρ²=2a²cos2θ",
+      "deliveryTeacher": "小梨",
+      "classTime": "19:30-21:30",
+      "classDate": "2025-12-31",
+      "teacherFee": "600.00"
+    },
+    {
+      "orderNo": "ORD1767678056362648",
+      "customerName": "宇宙第一",
+      "deliveryTeacher": "小梨",
+      "classTime": "14:00-15:30",
+      "classDate": "2026-01-02",
+      "teacherFee": "450.00"
+    },
+    {
+      "orderNo": "ORD1767678123059205",
+      "customerName": "beloved",
+      "deliveryTeacher": "小梨",
+      "classTime": "18:30-20:30",
+      "classDate": "2026-01-03",
+      "teacherFee": "600.00"
+    },
+    {
+      "orderNo": "ORD1767263561943485",
+      "customerName": "无趣顾顾",
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "classDate": "2025-01-01",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1767263561920565",
+      "customerName": "小新",
+      "deliveryTeacher": "淼淼",
+      "classTime": "15:00-17:30",
+      "classDate": "2025-01-03",
+      "teacherFee": "750.00"
+    },
+    {
+      "orderNo": "ORD1766646317317528",
+      "customerName": "John",
+      "deliveryTeacher": "淼淼",
+      "classTime": "23:30-0:30",
+      "classDate": "2025-12-20",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1766646367401833",
+      "customerName": "轨迹",
+      "deliveryTeacher": "淼淼",
+      "classTime": "23:00-00:30",
+      "classDate": "2025-12-22",
+      "teacherFee": "1075.00"
+    },
+    {
+      "orderNo": "ORD1766646367366829",
+      "customerName": "不忘初心",
+      "deliveryTeacher": "淼淼",
+      "classTime": "08:00-10:00",
+      "classDate": "2025-12-23",
+      "teacherFee": "720.00"
+    },
+    {
+      "orderNo": "ORD1766646401782519",
+      "customerName": "白昼",
+      "deliveryTeacher": "淼淼",
+      "classTime": "17:00-19:00",
+      "classDate": "2025-12-24",
+      "teacherFee": "1000.00"
+    },
+    {
+      "orderNo": "ORD1766833905651984",
+      "customerName": "v",
+      "deliveryTeacher": "淼淼",
+      "classTime": "22:00-23:30",
+      "classDate": "2025-12-25",
+      "teacherFee": "300.00"
+    },
+    {
+      "orderNo": "ORD1766646367622241",
+      "customerName": "v",
+      "deliveryTeacher": "淼淼",
+      "classTime": "16:00-17:00",
+      "classDate": "2025-12-25",
+      "teacherFee": "200.00"
+    },
+    {
+      "orderNo": "ORD1766833979523620",
+      "customerName": "",
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "classDate": "2025-12-26",
+      "teacherFee": "100.00"
+    },
+    {
+      "orderNo": "ORD1767167645277833",
+      "customerName": "",
+      "deliveryTeacher": "淼淼",
+      "classTime": "23:30-0:30",
+      "classDate": "2025-12-28",
+      "teacherFee": "350.00"
+    },
+    {
+      "orderNo": "ORD1767263524856454",
+      "customerName": "V",
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "classDate": "2025-12-28",
+      "teacherFee": "2900.00"
+    },
+    {
+      "orderNo": "ORD1767174000571408",
+      "customerName": "",
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "classDate": "2025-12-28",
+      "teacherFee": "2900.00"
+    },
+    {
+      "orderNo": "ORD1767263524899934",
+      "customerName": "V",
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "classDate": "2025-12-29",
+      "teacherFee": "100.00"
+    },
+    {
+      "orderNo": "ORD1767174000613606",
+      "customerName": "",
+      "deliveryTeacher": "淼淼",
+      "classTime": "00:30-01:00",
+      "classDate": "2025-12-29",
+      "teacherFee": "100.00"
+    },
+    {
+      "orderNo": "ORD1767167645235756",
+      "customerName": "愿将来胜过往",
+      "deliveryTeacher": "淼淼",
+      "classTime": "15:00-17:00",
+      "classDate": "2025-12-29",
+      "teacherFee": "500.00"
+    },
+    {
+      "orderNo": "ORD1767174000719281",
+      "customerName": "剑心犹在（上海）",
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "classDate": "2025-12-31",
+      "teacherFee": "2000.00"
+    },
+    {
+      "orderNo": "ORD1767263524984759",
+      "customerName": "剑心犹在（上海）",
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "classDate": "2025-12-31",
+      "teacherFee": "2000.00"
+    },
+    {
+      "orderNo": "ORD1767263562046936",
+      "customerName": "SteveMeister",
+      "deliveryTeacher": "淼淼",
+      "classTime": "20:00-22:00",
+      "classDate": "2025-12-31",
+      "teacherFee": "0.00"
+    },
+    {
+      "orderNo": "ORD1767678056269433",
+      "customerName": "小号",
+      "deliveryTeacher": "淼淼",
+      "classTime": "15:00-17:00",
+      "classDate": "2026-01-08",
+      "teacherFee": "400.00"
+    },
+    {
+      "orderNo": "ORD1767678056424300",
+      "customerName": "葱头雷",
+      "deliveryTeacher": "淼淼",
+      "classTime": "20:20-22:20",
+      "classDate": "2026-01-09",
+      "teacherFee": "0.00"
+    },
+    {
+      "orderNo": "ORD1767678056567935",
+      "customerName": "Waiting",
+      "deliveryTeacher": "淼淼",
+      "classTime": "14:00-16:00",
+      "classDate": "2026-01-16",
+      "teacherFee": "600.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tdeliveryTeacher\tclassTime\tclassDate\tteacherFee\nORD1767167630225453\tZ\t云云\t19:00-20:00\t2025-12-28\t300.00\nORD1767173971567517\t\t云云\t18:00-19:00\t2025-12-29\t200.00\nORD1767678138991619\tstars\t云云\t22.00-00.00\t2026-01-03\t600.00\nORD1767173971680339\t机密熊\t宥香\t08:00-10:00\t2025-01-03\t400.00\nORD1766646197184107\t\t宥香\t15:00-16:00\t2025-12-23\t400.00\nORD1766646385095689\t晴天\t宥香\t10:30-11:30\t2025-12-23\t300.00\nORD1767173986166370\tLay\t宥香\t14:00-16:00\t2025-12-31\t400.00\nORD1767173971636947\tJim\t宥香\t17:00-19:00\t2025-12-31\t400.00\nORD1767263595910684\tLay\t宥香\t14:00-16:00\t2025-12-31\t400.00\nORD1766833942271522\t\t宥香\t22:00-06:00\t2026-01-03\t1200.00\nORD1767167664407479\t在路上\t小凡\t18:00-20:00\t2025-12-28\t500.00\nORD176664638520987\t候鸟的第七行诗\t小凡\t15.00-17.00\t2025-12-28\t400.00\nORD1767678216790187\t荣\t小凡\t23:00-0:20\t2026-01-05\t900.00\nORD1767678094248571\tleo\t小凡\t17.30-19.30\t2026-01-09\t500.00\nORD1767263561969375\t时溯\t小梨\t12:00-13:00\t2025-01-01\t400.00\nORD1767167610713997\t\t小梨\t23:00-0:00\t2025-12-26\t300.00\nORD1767263524881827\tρ²=2a²cos2θ\t小梨\t19:30-21:30\t2025-12-31\t600.00\nORD1767174000593774\tρ²=2a²cos2θ\t小梨\t19:30-21:30\t2025-12-31\t600.00\nORD1767678056362648\t宇宙第一\t小梨\t14:00-15:30\t2026-01-02\t450.00\nORD1767678123059205\tbeloved\t小梨\t18:30-20:30\t2026-01-03\t600.00\nORD1767263561943485\t无趣顾顾\t淼淼\t14:00-16:00\t2025-01-01\t400.00\nORD1767263561920565\t小新\t淼淼\t15:00-17:30\t2025-01-03\t750.00\nORD1766646317317528\tJohn\t淼淼\t23:30-0:30\t2025-12-20\t400.00\nORD1766646367401833\t轨迹\t淼淼\t23:00-00:30\t2025-12-22\t1075.00\nORD1766646367366829\t不忘初心\t淼淼\t08:00-10:00\t2025-12-23\t720.00\nORD1766646401782519\t白昼\t淼淼\t17:00-19:00\t2025-12-24\t1000.00\nORD1766833905651984\tv\t淼淼\t22:00-23:30\t2025-12-25\t300.00\nORD1766646367622241\tv\t淼淼\t16:00-17:00\t2025-12-25\t200.00\nORD1766833979523620\t\t淼淼\t00:30-01:00\t2025-12-26\t100.00\nORD1767167645277833\t\t淼淼\t23:30-0:30\t2025-12-28\t350.00\nORD1767263524856454\tV\t淼淼\t00:30-01:00\t2025-12-28\t2900.00\nORD1767174000571408\t\t淼淼\t00:30-01:00\t2025-12-28\t2900.00\nORD1767263524899934\tV\t淼淼\t00:30-01:00\t2025-12-29\t100.00\nORD1767174000613606\t\t淼淼\t00:30-01:00\t2025-12-29\t100.00\nORD1767167645235756\t愿将来胜过往\t淼淼\t15:00-17:00\t2025-12-29\t500.00\nORD1767174000719281\t剑心犹在（上海）\t淼淼\t14:00-16:00\t2025-12-31\t2000.00\nORD1767263524984759\t剑心犹在（上海）\t淼淼\t14:00-16:00\t2025-12-31\t2000.00\nORD1767263562046936\tSteveMeister\t淼淼\t20:00-22:00\t2025-12-31\t0.00\nORD1767678056269433\t小号\t淼淼\t15:00-17:00\t2026-01-08\t400.00\nORD1767678056424300\t葱头雷\t淼淼\t20:20-22:20\t2026-01-09\t0.00\nORD1767678056567935\tWaiting\t淼淼\t14:00-16:00\t2026-01-16\t600.00\n",
+  "stderr": "",
+  "execution_time_ms": 1555
+}
