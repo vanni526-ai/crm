@@ -1,9 +1,9 @@
 /**
  * 批量修正历史订单费用数据
- * 为所有有originalText但费用字段为0的订单重新提取老师费用和车费
+ * 为所有有originalText但费用字段为0的订单重新提取老师费用、车费,并自动计算合伙人费
  */
 
-import { getDb } from './db';
+import { getDb, calculatePartnerFee } from './db';
 import { orders } from '../drizzle/schema';
 import { eq, and, or, isNotNull } from 'drizzle-orm';
 
@@ -86,7 +86,7 @@ export async function batchFixOrderFees(): Promise<{
   total: number;
   updated: number;
   skipped: number;
-  details: Array<{ orderId: number; orderNo: string; teacherFee: number; transportFee: number }>;
+  details: Array<{ orderId: number; orderNo: string; teacherFee: number; transportFee: number; partnerFee: number }>;
 }> {
   try {
     const db = await getDb();
@@ -110,7 +110,7 @@ export async function batchFixOrderFees(): Promise<{
 
     console.log(`[批量修正] 找到 ${ordersToFix.length} 个需要修正费用的订单`);
 
-    const details: Array<{ orderId: number; orderNo: string; teacherFee: number; transportFee: number }> = [];
+    const details: Array<{ orderId: number; orderNo: string; teacherFee: number; transportFee: number; partnerFee: number }> = [];
     let updated = 0;
     let skipped = 0;
 
@@ -120,13 +120,26 @@ export async function batchFixOrderFees(): Promise<{
       // 提取费用
       const { teacherFee, transportFee } = extractFeesFromText(originalText);
       
-      // 如果提取到了新的费用,更新订单
-      if (teacherFee > 0 || transportFee > 0) {
+      // 计算合伙人费(如果有城市和课程金额)
+      let partnerFee = 0;
+      if (order.deliveryCity && order.courseAmount) {
+        const courseAmount = parseFloat(order.courseAmount);
+        partnerFee = await calculatePartnerFee(
+          order.deliveryCity,
+          courseAmount,
+          teacherFee
+        );
+      }
+      
+      // 如果提取到了新的费用或需要更新合伙人费,更新订单
+      const needUpdate = teacherFee > 0 || transportFee > 0 || partnerFee > 0;
+      if (needUpdate) {
         await db
           .update(orders)
           .set({
             teacherFee: teacherFee.toFixed(2),
             transportFee: transportFee.toFixed(2),
+            partnerFee: partnerFee.toFixed(2),
           })
           .where(eq(orders.id, order.id));
         
@@ -135,10 +148,11 @@ export async function batchFixOrderFees(): Promise<{
           orderNo: order.orderNo || '',
           teacherFee,
           transportFee,
+          partnerFee,
         });
         
         updated++;
-        console.log(`[批量修正] 订单 ${order.orderNo}: 老师费用=${teacherFee}, 车费=${transportFee}`);
+        console.log(`[批量修正] 订单 ${order.orderNo}: 老师费用=${teacherFee}, 车费=${transportFee}, 合伙人费=${partnerFee}`);
       } else {
         skipped++;
         console.log(`[批量修正] 订单 ${order.orderNo}: 未提取到费用信息,跳过`);
