@@ -14,6 +14,7 @@ import {
 import { gmailImportLogs } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { validateChannelOrderNo, identifyPaymentChannel } from "./channelOrderNoUtils";
+import { validateTeacherFee } from "./teacherFeeValidator";
 
 export const gmailAutoImportRouter = router({
   /**
@@ -122,6 +123,19 @@ export const gmailAutoImportRouter = router({
             if (exists) {
               skippedCount++;
               errorMessages.push(`订单号 ${orderNo} 已存在`);
+              continue;
+            }
+            
+            // 验证老师费用不能超过课程金额
+            const teacherFeeValidation = validateTeacherFee(
+              orderData.teacherFee || 0,
+              orderData.courseAmount || 0
+            );
+            if (!teacherFeeValidation.isValid) {
+              skippedCount++;
+              errorMessages.push(
+                `订单 ${orderData.customerName || orderData.salesperson}: ${teacherFeeValidation.error}`
+              );
               continue;
             }
             

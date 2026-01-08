@@ -294,6 +294,25 @@ export async function getOrdersByDateRange(startDate: string, endDate: string) {
 export async function updateOrder(id: number, data: Partial<InsertOrder>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // 如果更新了老师费用或课程金额,需要验证
+  if (data.teacherFee !== undefined || data.courseAmount !== undefined) {
+    // 获取现有订单数据
+    const existingOrder = await getOrderById(id);
+    if (!existingOrder) throw new Error("订单不存在");
+    
+    // 使用新值或现有值
+    const teacherFee = data.teacherFee !== undefined ? parseFloat(data.teacherFee as any) : parseFloat(existingOrder.teacherFee as any || "0");
+    const courseAmount = data.courseAmount !== undefined ? parseFloat(data.courseAmount as any) : parseFloat(existingOrder.courseAmount as any || "0");
+    
+    // 验证老师费用
+    const { validateTeacherFee } = await import("./teacherFeeValidator");
+    const validation = validateTeacherFee(teacherFee, courseAmount);
+    if (!validation.isValid) {
+      throw new Error(validation.error || "老师费用验证失败");
+    }
+  }
+  
   await db.update(orders).set(data).where(eq(orders.id, id));
 }
 

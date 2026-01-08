@@ -18,6 +18,7 @@ import { getDb, getOrderById } from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
 import { generateOrderId } from "./orderIdGenerator";
 import { validateChannelOrderNo } from "./channelOrderNoUtils";
+import { validateTeacherFee } from "./teacherFeeValidator";
 import { orders } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
@@ -360,6 +361,17 @@ export const appRouter = router({
               message: `客户名不能使用老师名字: ${input.customerName}`,
             });
           }
+        }
+        
+        // 验证老师费用不能超过课程金额
+        const teacherFeeNum = input.teacherFee ? parseFloat(input.teacherFee) : 0;
+        const courseAmountNum = input.courseAmount ? parseFloat(input.courseAmount) : 0;
+        const teacherFeeValidation = validateTeacherFee(teacherFeeNum, courseAmountNum);
+        if (!teacherFeeValidation.isValid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: teacherFeeValidation.error || "老师费用验证失败",
+          });
         }
         
         // 检查渠道订单号是否重复

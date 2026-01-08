@@ -14,6 +14,7 @@ import {
 } from "./fileParser";
 import { parseICSOrderContent, type ParsedICSOrder } from "./icsOrderParser";
 import { generateOrderNo } from "./orderNoGenerator";
+import { validateTeacherFee } from "./teacherFeeValidator";
 
 // 权限检查:销售或管理员可以导入
 const importProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -396,6 +397,19 @@ export const importRouter = router({
               }
             }
 
+            // 验证老师费用不能超过课程金额
+            const teacherFeeValidation = validateTeacherFee(
+              order.teacherFee || 0,
+              order.courseAmount || 0
+            );
+            if (!teacherFeeValidation.isValid) {
+              failedCount++;
+              errors.push(
+                `订单 ${order.customerName || order.salesperson}: ${teacherFeeValidation.error}`
+              );
+              continue;
+            }
+            
             // 计算合伙人费用
             const partnerFee = await db.calculatePartnerFee(
               order.city || "",
