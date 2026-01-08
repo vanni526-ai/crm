@@ -2415,7 +2415,12 @@ export async function calculatePartnerFee(
   if (!config) return 0;
   
   const rate = Number(config.partnerFeeRate) / 100;
-  const partnerFee = (courseAmount - teacherFee) * rate;
+  const baseRevenue = courseAmount - teacherFee;
+  
+  // 如果基础收益<=0，返回0（合伙人不承担亏损）
+  if (baseRevenue <= 0) return 0;
+  
+  const partnerFee = baseRevenue * rate;
   
   return Math.round(partnerFee * 100) / 100; // 保留两位小数
 }

@@ -1323,6 +1323,72 @@ export const appRouter = router({
         );
         return { partnerFee };
       }),
+    
+    recalculateAllPartnerFees: adminProcedure
+      .mutation(async () => {
+        // 查询所有需要重算的订单
+        const allOrders = await db.getAllOrders();
+        
+        let updatedCount = 0;
+        let unchangedCount = 0;
+        let errorCount = 0;
+        const updates: any[] = [];
+        
+        for (const order of allOrders) {
+          try {
+            // 跳过没有必要字段的订单
+            if (!order.deliveryCity || !order.courseAmount || order.teacherFee === null) {
+              continue;
+            }
+            
+            const courseAmount = parseFloat(order.courseAmount);
+            const teacherFee = parseFloat(order.teacherFee || "0");
+            
+            // 计算新的合伙人费
+            const newPartnerFee = await db.calculatePartnerFee(
+              order.deliveryCity,
+              courseAmount,
+              teacherFee
+            );
+            
+            const oldPartnerFee = parseFloat(order.partnerFee || "0");
+            
+            // 如果合伙人费有变化，记录更新
+            if (Math.abs(newPartnerFee - oldPartnerFee) > 0.01) {
+              updates.push({
+                orderNo: order.orderNo,
+                customerName: order.customerName,
+                deliveryCity: order.deliveryCity,
+                courseAmount: courseAmount,
+                teacherFee: teacherFee,
+                oldPartnerFee: oldPartnerFee,
+                newPartnerFee: newPartnerFee,
+              });
+              
+              // 更新数据库
+              await db.updateOrder(order.id, {
+                partnerFee: newPartnerFee.toString()
+              });
+              
+              updatedCount++;
+            } else {
+              unchangedCount++;
+            }
+          } catch (error) {
+            console.error(`处理订单 ${order.orderNo} 时出错:`, error);
+            errorCount++;
+          }
+        }
+        
+        return {
+          success: true,
+          totalOrders: allOrders.length,
+          updatedCount,
+          unchangedCount,
+          errorCount,
+          updates,
+        };
+      }),
   }),
 
   // 数据导入

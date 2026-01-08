@@ -1,0 +1,210 @@
+{
+  "query": "SELECT \n  o.orderNo,\n  o.customerName,\n  o.deliveryCity,\n  o.courseAmount,\n  o.teacherFee,\n  o.partnerFee as oldPartnerFee,\n  c.partnerFeeRate,\n  CASE \n    WHEN o.courseAmount - IFNULL(o.teacherFee, 0) <= 0 THEN 0\n    ELSE ROUND((o.courseAmount - IFNULL(o.teacherFee, 0)) * c.partnerFeeRate / 100, 2)\n  END as newPartnerFee\nFROM orders o\nLEFT JOIN cityPartnerConfig c ON o.deliveryCity = c.city AND c.isActive = 1\nWHERE o.deliveryCity IS NOT NULL \n  AND o.courseAmount IS NOT NULL\n  AND o.teacherFee IS NOT NULL\n  AND (\n    CAST(o.partnerFee AS DECIMAL(10,2)) < 0\n    OR\n    (IFNULL(o.partnerFee, 0) = 0 AND o.courseAmount > IFNULL(o.teacherFee, 0))\n    OR\n    ABS(IFNULL(CAST(o.partnerFee AS DECIMAL(10,2)), 0) - \n        CASE \n          WHEN o.courseAmount - IFNULL(o.teacherFee, 0) <= 0 THEN 0\n          ELSE ROUND((o.courseAmount - IFNULL(o.teacherFee, 0)) * c.partnerFeeRate / 100, 2)\n        END\n    ) > 0.01\n  )\nORDER BY o.deliveryCity, o.id\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  o.orderNo,\n  o.customerName,\n  o.deliveryCity,\n  o.courseAmount,\n  o.teacherFee,\n  o.partnerFee as oldPartnerFee,\n  c.partnerFeeRate,\n  CASE \n    WHEN o.courseAmount - IFNULL(o.teacherFee, 0) <= 0 THEN 0\n    ELSE ROUND((o.courseAmount - IFNULL(o.teacherFee, 0)) * c.partnerFeeRate / 100, 2)\n  END as newPartnerFee\nFROM orders o\nLEFT JOIN cityPartnerConfig c ON o.deliveryCity = c.city AND c.isActive = 1\nWHERE o.deliveryCity IS NOT NULL \n  AND o.courseAmount IS NOT NULL\n  AND o.teacherFee IS NOT NULL\n  AND (\n    CAST(o.partnerFee AS DECIMAL(10,2)) < 0\n    OR\n    (IFNULL(o.partnerFee, 0) = 0 AND o.courseAmount > IFNULL(o.teacherFee, 0))\n    OR\n    ABS(IFNULL(CAST(o.partnerFee AS DECIMAL(10,2)), 0) - \n        CASE \n          WHEN o.courseAmount - IFNULL(o.teacherFee, 0) <= 0 THEN 0\n          ELSE ROUND((o.courseAmount - IFNULL(o.teacherFee, 0)) * c.partnerFeeRate / 100, 2)\n        END\n    ) > 0.01\n  )\nORDER BY o.deliveryCity, o.id\nLIMIT 20;",
+  "rows": [
+    {
+      "orderNo": "ORD176664619722089",
+      "customerName": "望山",
+      "deliveryCity": "",
+      "courseAmount": "5000.00",
+      "teacherFee": "2400.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1766646317300914",
+      "customerName": "",
+      "deliveryCity": "",
+      "courseAmount": "2400.00",
+      "teacherFee": "240.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767167610638406",
+      "customerName": "孟琳森",
+      "deliveryCity": "",
+      "courseAmount": "12000.00",
+      "teacherFee": "900.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767167610658976",
+      "customerName": "solo",
+      "deliveryCity": "",
+      "courseAmount": "12000.00",
+      "teacherFee": "900.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767263524856454",
+      "customerName": "V",
+      "deliveryCity": "",
+      "courseAmount": "10800.00",
+      "teacherFee": "2900.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767263524899934",
+      "customerName": "V",
+      "deliveryCity": "",
+      "courseAmount": "10800.00",
+      "teacherFee": "2900.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678056406613",
+      "customerName": "",
+      "deliveryCity": "",
+      "courseAmount": "4000.00",
+      "teacherFee": "3950.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767167645277833",
+      "customerName": "",
+      "deliveryCity": "V",
+      "courseAmount": "10800.00",
+      "teacherFee": "350.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767174000571408",
+      "customerName": "",
+      "deliveryCity": "V",
+      "courseAmount": "10800.00",
+      "teacherFee": "2900.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1767174000613606",
+      "customerName": "",
+      "deliveryCity": "V",
+      "courseAmount": "10800.00",
+      "teacherFee": "2900.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "weORD20251221034755272021",
+      "customerName": "晓曦东晨",
+      "deliveryCity": "上海",
+      "courseAmount": "1888.00",
+      "teacherFee": "450.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "payORD20251221034755DZ5021",
+      "customerName": "JoeGong",
+      "deliveryCity": "上海",
+      "courseAmount": "2800.00",
+      "teacherFee": "200.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "payORD20251221044113X97021",
+      "customerName": "JoeGong",
+      "deliveryCity": "上海",
+      "courseAmount": "2800.00",
+      "teacherFee": "600.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "payORD20251221061953NKB021",
+      "customerName": "JoeGong",
+      "deliveryCity": "上海",
+      "courseAmount": "2800.00",
+      "teacherFee": "600.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "payORD202512212237014A0021",
+      "customerName": "JoeGong",
+      "deliveryCity": "上海",
+      "courseAmount": "2800.00",
+      "teacherFee": "600.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "payORD202512220826252G1021",
+      "customerName": "JoeGong",
+      "deliveryCity": "上海",
+      "courseAmount": "2800.00",
+      "teacherFee": "600.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "payORD202512220828172VZ021",
+      "customerName": "JoeGong",
+      "deliveryCity": "上海",
+      "courseAmount": "2800.00",
+      "teacherFee": "600.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1766461847779652",
+      "customerName": "涛涛",
+      "deliveryCity": "上海",
+      "courseAmount": "10800.00",
+      "teacherFee": "6600.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1766646302308770",
+      "customerName": "stefan Icke 斯特凡, 艾克",
+      "deliveryCity": "上海",
+      "courseAmount": "2400.00",
+      "teacherFee": "400.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    },
+    {
+      "orderNo": "ORD1766646317175851",
+      "customerName": "涛涛",
+      "deliveryCity": "上海",
+      "courseAmount": "10800.00",
+      "teacherFee": "600.00",
+      "oldPartnerFee": "0.00",
+      "partnerFeeRate": "NULL",
+      "newPartnerFee": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tdeliveryCity\tcourseAmount\tteacherFee\toldPartnerFee\tpartnerFeeRate\tnewPartnerFee\nORD176664619722089\t望山\t\t5000.00\t2400.00\t0.00\tNULL\tNULL\nORD1766646317300914\t\t\t2400.00\t240.00\t0.00\tNULL\tNULL\nORD1767167610638406\t孟琳森\t\t12000.00\t900.00\t0.00\tNULL\tNULL\nORD1767167610658976\tsolo\t\t12000.00\t900.00\t0.00\tNULL\tNULL\nORD1767263524856454\tV\t\t10800.00\t2900.00\t0.00\tNULL\tNULL\nORD1767263524899934\tV\t\t10800.00\t2900.00\t0.00\tNULL\tNULL\nORD1767678056406613\t\t\t4000.00\t3950.00\t0.00\tNULL\tNULL\nORD1767167645277833\t\tV\t10800.00\t350.00\t0.00\tNULL\tNULL\nORD1767174000571408\t\tV\t10800.00\t2900.00\t0.00\tNULL\tNULL\nORD1767174000613606\t\tV\t10800.00\t2900.00\t0.00\tNULL\tNULL\nweORD20251221034755272021\t晓曦东晨\t上海\t1888.00\t450.00\t0.00\tNULL\tNULL\npayORD20251221034755DZ5021\tJoeGong\t上海\t2800.00\t200.00\t0.00\tNULL\tNULL\npayORD20251221044113X97021\tJoeGong\t上海\t2800.00\t600.00\t0.00\tNULL\tNULL\npayORD20251221061953NKB021\tJoeGong\t上海\t2800.00\t600.00\t0.00\tNULL\tNULL\npayORD202512212237014A0021\tJoeGong\t上海\t2800.00\t600.00\t0.00\tNULL\tNULL\npayORD202512220826252G1021\tJoeGong\t上海\t2800.00\t600.00\t0.00\tNULL\tNULL\npayORD202512220828172VZ021\tJoeGong\t上海\t2800.00\t600.00\t0.00\tNULL\tNULL\nORD1766461847779652\t涛涛\t上海\t10800.00\t6600.00\t0.00\tNULL\tNULL\nORD1766646302308770\tstefan Icke 斯特凡, 艾克\t上海\t2400.00\t400.00\t0.00\tNULL\tNULL\nORD1766646317175851\t涛涛\t上海\t10800.00\t600.00\t0.00\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1542
+}

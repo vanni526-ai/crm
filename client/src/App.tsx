@@ -29,6 +29,7 @@ import CityPartnerConfig from "./pages/CityPartnerConfig";
 import Cities from "./pages/Cities";
 import ReconciliationMatch from "./pages/ReconciliationMatch";
 import ReconciliationReport from "./pages/ReconciliationReport";
+import RecalculatePartnerFees from "./pages/RecalculatePartnerFees";
 
 function Router() {
   return (
@@ -58,6 +59,7 @@ function Router() {
       <Route path={"/cities"} component={Cities} />
       <Route path={"/reconciliation-match"} component={ReconciliationMatch} />
       <Route path={"/reconciliation-report"} component={ReconciliationReport} />
+      <Route path={"/recalculate-partner-fees"} component={RecalculatePartnerFees} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -1,0 +1,24 @@
+{
+  "query": "SELECT \n  id,\n  orderNo,\n  customerName,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  transportFee,\n  otherFee,\n  partnerFee,\n  deliveryTeacher,\n  deliveryCourse,\n  createdAt\nFROM orders \nWHERE partnerFee = '75000';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  id,\n  orderNo,\n  customerName,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  transportFee,\n  otherFee,\n  partnerFee,\n  deliveryTeacher,\n  deliveryCourse,\n  createdAt\nFROM orders \nWHERE partnerFee = '75000';",
+  "rows": [
+    {
+      "id": "1470036",
+      "orderNo": "ORD1767678138991619",
+      "customerName": "stars",
+      "deliveryCity": "无锡",
+      "courseAmount": "3100.00",
+      "teacherFee": "600.00",
+      "transportFee": "100.00",
+      "otherFee": "0.00",
+      "partnerFee": "75000.00",
+      "deliveryTeacher": "云云",
+      "deliveryCourse": "埃及艳后+sp",
+      "createdAt": "2026-01-06 05:42:19"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNo\tcustomerName\tdeliveryCity\tcourseAmount\tteacherFee\ttransportFee\totherFee\tpartnerFee\tdeliveryTeacher\tdeliveryCourse\tcreatedAt\n1470036\tORD1767678138991619\tstars\t无锡\t3100.00\t600.00\t100.00\t0.00\t75000.00\t云云\t埃及艳后+sp\t2026-01-06 05:42:19\n",
+  "stderr": "",
+  "execution_time_ms": 1541
+}

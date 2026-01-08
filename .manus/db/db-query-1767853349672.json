@@ -1,0 +1,120 @@
+{
+  "query": "SELECT \n  orderNo,\n  customerName,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  transportFee,\n  partnerFee,\n  deliveryTeacher,\n  deliveryCourse\nFROM orders \nWHERE deliveryCity IN ('宁波', '无锡', '天津')\n  AND courseAmount IS NOT NULL\nORDER BY deliveryCity, id DESC\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  orderNo,\n  customerName,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  transportFee,\n  partnerFee,\n  deliveryTeacher,\n  deliveryCourse\nFROM orders \nWHERE deliveryCity IN ('宁波', '无锡', '天津')\n  AND courseAmount IS NOT NULL\nORDER BY deliveryCity, id DESC\nLIMIT 10;",
+  "rows": [
+    {
+      "orderNo": "ORD1767678177829179",
+      "customerName": "城南土著",
+      "deliveryCity": "天津",
+      "courseAmount": "3300.00",
+      "teacherFee": "700.00",
+      "transportFee": "0.00",
+      "partnerFee": "1300.00",
+      "deliveryTeacher": "声声",
+      "deliveryCourse": "基础局2小时（第二节半价）+丝足1小时"
+    },
+    {
+      "orderNo": "ORD1767678138957279",
+      "customerName": "",
+      "deliveryCity": "天津",
+      "courseAmount": "1500.00",
+      "teacherFee": "900.00",
+      "transportFee": "0.00",
+      "partnerFee": "300.00",
+      "deliveryTeacher": "凌乱的节奏",
+      "deliveryCourse": "丝足课1节"
+    },
+    {
+      "orderNo": "ORD1767678094558319",
+      "customerName": "Augustin.W",
+      "deliveryCity": "天津",
+      "courseAmount": "300.00",
+      "teacherFee": "130.00",
+      "transportFee": "100.00",
+      "partnerFee": "85.00",
+      "deliveryTeacher": "yy",
+      "deliveryCourse": "原来的基础女王局升级为木乃伊"
+    },
+    {
+      "orderNo": "ORD1767678094439999",
+      "customerName": "清淼",
+      "deliveryCity": "天津",
+      "courseAmount": "4888.00",
+      "teacherFee": "6980.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00",
+      "deliveryTeacher": "yy",
+      "deliveryCourse": "luo足+埃及艳后+情趣变装"
+    },
+    {
+      "orderNo": "ORD1767678094210302",
+      "customerName": "魍魉君",
+      "deliveryCity": "天津",
+      "courseAmount": "5600.00",
+      "teacherFee": "700.00",
+      "transportFee": "100.00",
+      "partnerFee": "2450.00",
+      "deliveryTeacher": "yy",
+      "deliveryCourse": "臣服"
+    },
+    {
+      "orderNo": "ORD1767263596112807",
+      "customerName": "ゴミ箱",
+      "deliveryCity": "天津",
+      "courseAmount": "2350.00",
+      "teacherFee": "700.00",
+      "transportFee": "100.00",
+      "partnerFee": "825.00",
+      "deliveryTeacher": "yy",
+      "deliveryCourse": "sp+ 丝袜（参加第二节半价）"
+    },
+    {
+      "orderNo": "ORD1767263596004354",
+      "customerName": "Augustin.W",
+      "deliveryCity": "天津",
+      "courseAmount": "3000.00",
+      "teacherFee": "600.00",
+      "transportFee": "100.00",
+      "partnerFee": "1200.00",
+      "deliveryTeacher": "yy",
+      "deliveryCourse": "3个小时基础女王局（第三节课半价）"
+    },
+    {
+      "orderNo": "ORD1767263595945635",
+      "customerName": "z",
+      "deliveryCity": "天津",
+      "courseAmount": "2000.00",
+      "teacherFee": "3250.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "基础局一个半小时"
+    },
+    {
+      "orderNo": "ORD1767173986284580",
+      "customerName": "清淼",
+      "deliveryCity": "天津",
+      "courseAmount": "2400.00",
+      "teacherFee": "2500.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00",
+      "deliveryTeacher": "yy",
+      "deliveryCourse": "基础课2h"
+    },
+    {
+      "orderNo": "ORD1767173986129956",
+      "customerName": "佳胜",
+      "deliveryCity": "天津",
+      "courseAmount": "1500.00",
+      "teacherFee": "2500.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00",
+      "deliveryTeacher": "yy",
+      "deliveryCourse": "tk一节"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tdeliveryCity\tcourseAmount\tteacherFee\ttransportFee\tpartnerFee\tdeliveryTeacher\tdeliveryCourse\nORD1767678177829179\t城南土著\t天津\t3300.00\t700.00\t0.00\t1300.00\t声声\t基础局2小时（第二节半价）+丝足1小时\nORD1767678138957279\t\t天津\t1500.00\t900.00\t0.00\t300.00\t凌乱的节奏\t丝足课1节\nORD1767678094558319\tAugustin.W\t天津\t300.00\t130.00\t100.00\t85.00\tyy\t原来的基础女王局升级为木乃伊\nORD1767678094439999\t清淼\t天津\t4888.00\t6980.00\t0.00\t0.00\tyy\tluo足+埃及艳后+情趣变装\nORD1767678094210302\t魍魉君\t天津\t5600.00\t700.00\t100.00\t2450.00\tyy\t臣服\nORD1767263596112807\tゴミ箱\t天津\t2350.00\t700.00\t100.00\t825.00\tyy\tsp+ 丝袜（参加第二节半价）\nORD1767263596004354\tAugustin.W\t天津\t3000.00\t600.00\t100.00\t1200.00\tyy\t3个小时基础女王局（第三节课半价）\nORD1767263595945635\tz\t天津\t2000.00\t3250.00\t0.00\t0.00\tYY\t基础局一个半小时\nORD1767173986284580\t清淼\t天津\t2400.00\t2500.00\t0.00\t0.00\tyy\t基础课2h\nORD1767173986129956\t佳胜\t天津\t1500.00\t2500.00\t0.00\t0.00\tyy\ttk一节\n",
+  "stderr": "",
+  "execution_time_ms": 1544
+}
