@@ -1,0 +1,18 @@
+{
+  "query": "SELECT city, partnerFeeRate FROM cityPartnerConfig WHERE city IN ('石家庄', '大连');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT city, partnerFeeRate FROM cityPartnerConfig WHERE city IN ('石家庄', '大连');",
+  "rows": [
+    {
+      "city": "石家庄",
+      "partnerFeeRate": "10.00"
+    },
+    {
+      "city": "大连",
+      "partnerFeeRate": "10.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "city\tpartnerFeeRate\n石家庄\t10.00\n大连\t10.00\n",
+  "stderr": "",
+  "execution_time_ms": 1539
+}

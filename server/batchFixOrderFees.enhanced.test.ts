@@ -100,8 +100,8 @@ describe("批量修正费用功能增强测试", () => {
 
     it("应该处理老师费用大于课程金额的情况", async () => {
       const partnerFee = await calculatePartnerFee("济南", 500, 1000);
-      // (500 - 1000) * 0.3 = -150, 但应该返回负数或0
-      expect(partnerFee).toBeLessThanOrEqual(0);
+      // (500 - 1000) * 0.3 = -150, 但修复后应该返回0
+      expect(partnerFee).toBe(0);
     });
   });
 });

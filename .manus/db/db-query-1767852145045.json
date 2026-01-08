@@ -1,0 +1,50 @@
+{
+  "query": "SELECT orderNo, customerName, deliveryCity, courseAmount, teacherFee, transportFee, partnerFee,\n  (CAST(courseAmount AS DECIMAL(10,2)) - CAST(teacherFee AS DECIMAL(10,2))) AS baseProfit\nFROM orders \nWHERE orderNo IN ('ORD1767678237511535', 'ORD1767678237410451', 'ORD1767678216755702', 'ORD1767678216720813')\nORDER BY orderNo;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT orderNo, customerName, deliveryCity, courseAmount, teacherFee, transportFee, partnerFee,\n  (CAST(courseAmount AS DECIMAL(10,2)) - CAST(teacherFee AS DECIMAL(10,2))) AS baseProfit\nFROM orders \nWHERE orderNo IN ('ORD1767678237511535', 'ORD1767678237410451', 'ORD1767678216755702', 'ORD1767678216720813')\nORDER BY orderNo;",
+  "rows": [
+    {
+      "orderNo": "ORD1767678216720813",
+      "customerName": "hjl",
+      "deliveryCity": "上海",
+      "courseAmount": "7800.00",
+      "teacherFee": "1050.00",
+      "transportFee": "100.00",
+      "partnerFee": "0.00",
+      "baseProfit": "6750.00"
+    },
+    {
+      "orderNo": "ORD1767678216755702",
+      "customerName": "程敢言",
+      "deliveryCity": "武汉",
+      "courseAmount": "4300.00",
+      "teacherFee": "1050.00",
+      "transportFee": "800.00",
+      "partnerFee": "735.00",
+      "baseProfit": "3250.00"
+    },
+    {
+      "orderNo": "ORD1767678237410451",
+      "customerName": "所念皆星河",
+      "deliveryCity": "上海",
+      "courseAmount": "1000.00",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00",
+      "baseProfit": "1000.00"
+    },
+    {
+      "orderNo": "ORD1767678237511535",
+      "customerName": "凯",
+      "deliveryCity": "上海",
+      "courseAmount": "1800.00",
+      "teacherFee": "300.00",
+      "transportFee": "0.00",
+      "partnerFee": "450.00",
+      "baseProfit": "1500.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tdeliveryCity\tcourseAmount\tteacherFee\ttransportFee\tpartnerFee\tbaseProfit\nORD1767678216720813\thjl\t上海\t7800.00\t1050.00\t100.00\t0.00\t6750.00\nORD1767678216755702\t程敢言\t武汉\t4300.00\t1050.00\t800.00\t735.00\t3250.00\nORD1767678237410451\t所念皆星河\t上海\t1000.00\t0.00\t0.00\t0.00\t1000.00\nORD1767678237511535\t凯\t上海\t1800.00\t300.00\t0.00\t450.00\t1500.00\n",
+  "stderr": "",
+  "execution_time_ms": 1547
+}
