@@ -1,0 +1,66 @@
+{
+  "query": "SELECT \n  o.orderNo,\n  o.deliveryCity,\n  o.courseAmount,\n  o.teacherFee,\n  c.partnerFeeRate\nFROM orders o\nLEFT JOIN cityPartnerConfig c ON o.deliveryCity = c.city\nWHERE o.orderNo IN (\n  'ORD1767678237612462',\n  'ORD1767678237579364',\n  'ORD1767678237543988',\n  'ORD1767678237511535',\n  'ORD1767678237479657',\n  'ORD1767678237445231',\n  'ORD1767678237410451',\n  'ORD1767678237394316'\n)\nORDER BY o.orderNo;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  o.orderNo,\n  o.deliveryCity,\n  o.courseAmount,\n  o.teacherFee,\n  c.partnerFeeRate\nFROM orders o\nLEFT JOIN cityPartnerConfig c ON o.deliveryCity = c.city\nWHERE o.orderNo IN (\n  'ORD1767678237612462',\n  'ORD1767678237579364',\n  'ORD1767678237543988',\n  'ORD1767678237511535',\n  'ORD1767678237479657',\n  'ORD1767678237445231',\n  'ORD1767678237410451',\n  'ORD1767678237394316'\n)\nORDER BY o.orderNo;",
+  "rows": [
+    {
+      "orderNo": "ORD1767678237394316",
+      "deliveryCity": "北京",
+      "courseAmount": "2400.00",
+      "teacherFee": "900.00",
+      "partnerFeeRate": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678237410451",
+      "deliveryCity": "上海",
+      "courseAmount": "1000.00",
+      "teacherFee": "1050.00",
+      "partnerFeeRate": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678237445231",
+      "deliveryCity": "上海",
+      "courseAmount": "2400.00",
+      "teacherFee": "500.00",
+      "partnerFeeRate": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678237479657",
+      "deliveryCity": "上海",
+      "courseAmount": "7800.00",
+      "teacherFee": "720.00",
+      "partnerFeeRate": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678237511535",
+      "deliveryCity": "上海",
+      "courseAmount": "350.00",
+      "teacherFee": "750.00",
+      "partnerFeeRate": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678237543988",
+      "deliveryCity": "上海",
+      "courseAmount": "2100.00",
+      "teacherFee": "300.00",
+      "partnerFeeRate": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678237579364",
+      "deliveryCity": "上海",
+      "courseAmount": "350.00",
+      "teacherFee": "400.00",
+      "partnerFeeRate": "NULL"
+    },
+    {
+      "orderNo": "ORD1767678237612462",
+      "deliveryCity": "上海",
+      "courseAmount": "2000.00",
+      "teacherFee": "400.00",
+      "partnerFeeRate": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tdeliveryCity\tcourseAmount\tteacherFee\tpartnerFeeRate\nORD1767678237394316\t北京\t2400.00\t900.00\tNULL\nORD1767678237410451\t上海\t1000.00\t1050.00\tNULL\nORD1767678237445231\t上海\t2400.00\t500.00\tNULL\nORD1767678237479657\t上海\t7800.00\t720.00\tNULL\nORD1767678237511535\t上海\t350.00\t750.00\tNULL\nORD1767678237543988\t上海\t2100.00\t300.00\tNULL\nORD1767678237579364\t上海\t350.00\t400.00\tNULL\nORD1767678237612462\t上海\t2000.00\t400.00\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1497
+}

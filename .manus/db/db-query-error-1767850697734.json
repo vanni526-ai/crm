@@ -1,0 +1,8 @@
+{
+  "query": "SELECT \n  o.orderNo,\n  o.deliveryCity,\n  o.courseAmount,\n  o.teacherFee,\n  c.partnerFeeRate\nFROM orders o\nLEFT JOIN cityPartnerConfig c ON o.deliveryCity = c.cityName\nWHERE o.orderNo IN (\n  'ORD1767678237612462',\n  'ORD1767678237579364',\n  'ORD1767678237543988',\n  'ORD1767678237511535',\n  'ORD1767678237479657',\n  'ORD1767678237445231',\n  'ORD1767678237410451',\n  'ORD1767678237394316'\n)\nORDER BY o.orderNo;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  o.orderNo,\n  o.deliveryCity,\n  o.courseAmount,\n  o.teacherFee,\n  c.partnerFeeRate\nFROM orders o\nLEFT JOIN cityPartnerConfig c ON o.deliveryCity = c.cityName\nWHERE o.orderNo IN (\n  'ORD1767678237612462',\n  'ORD1767678237579364',\n  'ORD1767678237543988',\n  'ORD1767678237511535',\n  'ORD1767678237479657',\n  'ORD1767678237445231',\n  'ORD1767678237410451',\n  'ORD1767678237394316'\n)\nORDER BY o.orderNo;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'c.cityname' in 'on clause'"
+  ]
+}

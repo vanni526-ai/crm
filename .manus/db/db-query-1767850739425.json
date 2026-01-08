@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orders SET partnerFee = '480.00' WHERE orderNo = 'ORD1767678237612462';\nUPDATE orders SET partnerFee = '0.00' WHERE orderNo = 'ORD1767678237579364';\nUPDATE orders SET partnerFee = '540.00' WHERE orderNo = 'ORD1767678237543988';\nUPDATE orders SET partnerFee = '-120.00' WHERE orderNo = 'ORD1767678237511535';\nUPDATE orders SET partnerFee = '0.00' WHERE orderNo = 'ORD1767678237479657';\nUPDATE orders SET partnerFee = '0.00' WHERE orderNo = 'ORD1767678237445231';\nUPDATE orders SET partnerFee = '-15.00' WHERE orderNo = 'ORD1767678237410451';\nUPDATE orders SET partnerFee = '450.00' WHERE orderNo = 'ORD1767678237394316';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE orders SET partnerFee = '480.00' WHERE orderNo = 'ORD1767678237612462';\nUPDATE orders SET partnerFee = '0.00' WHERE orderNo = 'ORD1767678237579364';\nUPDATE orders SET partnerFee = '540.00' WHERE orderNo = 'ORD1767678237543988';\nUPDATE orders SET partnerFee = '-120.00' WHERE orderNo = 'ORD1767678237511535';\nUPDATE orders SET partnerFee = '0.00' WHERE orderNo = 'ORD1767678237479657';\nUPDATE orders SET partnerFee = '0.00' WHERE orderNo = 'ORD1767678237445231';\nUPDATE orders SET partnerFee = '-15.00' WHERE orderNo = 'ORD1767678237410451';\nUPDATE orders SET partnerFee = '450.00' WHERE orderNo = 'ORD1767678237394316';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2978
+}

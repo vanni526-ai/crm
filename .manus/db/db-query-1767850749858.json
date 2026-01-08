@@ -1,0 +1,82 @@
+{
+  "query": "SELECT \n  orderNo,\n  customerName,\n  deliveryTeacher,\n  courseAmount,\n  teacherFee,\n  transportFee,\n  partnerFee\nFROM orders\nWHERE orderNo IN (\n  'ORD1767678237612462',\n  'ORD1767678237579364',\n  'ORD1767678237543988',\n  'ORD1767678237511535',\n  'ORD1767678237479657',\n  'ORD1767678237445231',\n  'ORD1767678237410451',\n  'ORD1767678237394316'\n)\nORDER BY orderNo;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  orderNo,\n  customerName,\n  deliveryTeacher,\n  courseAmount,\n  teacherFee,\n  transportFee,\n  partnerFee\nFROM orders\nWHERE orderNo IN (\n  'ORD1767678237612462',\n  'ORD1767678237579364',\n  'ORD1767678237543988',\n  'ORD1767678237511535',\n  'ORD1767678237479657',\n  'ORD1767678237445231',\n  'ORD1767678237410451',\n  'ORD1767678237394316'\n)\nORDER BY orderNo;",
+  "rows": [
+    {
+      "orderNo": "ORD1767678237394316",
+      "customerName": "Q.S.（贝丝）",
+      "deliveryTeacher": "声声",
+      "courseAmount": "2400.00",
+      "teacherFee": "900.00",
+      "transportFee": "400.00",
+      "partnerFee": "450.00"
+    },
+    {
+      "orderNo": "ORD1767678237410451",
+      "customerName": "所念皆星河",
+      "deliveryTeacher": "瑶瑶",
+      "courseAmount": "1000.00",
+      "teacherFee": "1050.00",
+      "transportFee": "100.00",
+      "partnerFee": "-15.00"
+    },
+    {
+      "orderNo": "ORD1767678237445231",
+      "customerName": "Zinco",
+      "deliveryTeacher": "安雅",
+      "courseAmount": "2400.00",
+      "teacherFee": "500.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "orderNo": "ORD1767678237479657",
+      "customerName": "hjl",
+      "deliveryTeacher": "姜一",
+      "courseAmount": "7800.00",
+      "teacherFee": "720.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "orderNo": "ORD1767678237511535",
+      "customerName": "凯",
+      "deliveryTeacher": "瑶瑶",
+      "courseAmount": "350.00",
+      "teacherFee": "750.00",
+      "transportFee": "0.00",
+      "partnerFee": "-120.00"
+    },
+    {
+      "orderNo": "ORD1767678237543988",
+      "customerName": "凯",
+      "deliveryTeacher": "瑶瑶",
+      "courseAmount": "2100.00",
+      "teacherFee": "300.00",
+      "transportFee": "0.00",
+      "partnerFee": "540.00"
+    },
+    {
+      "orderNo": "ORD1767678237579364",
+      "customerName": "恺",
+      "deliveryTeacher": "嘟嘟",
+      "courseAmount": "350.00",
+      "teacherFee": "400.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "orderNo": "ORD1767678237612462",
+      "customerName": "恺",
+      "deliveryTeacher": "嘟嘟",
+      "courseAmount": "2000.00",
+      "teacherFee": "400.00",
+      "transportFee": "0.00",
+      "partnerFee": "480.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tdeliveryTeacher\tcourseAmount\tteacherFee\ttransportFee\tpartnerFee\nORD1767678237394316\tQ.S.（贝丝）\t声声\t2400.00\t900.00\t400.00\t450.00\nORD1767678237410451\t所念皆星河\t瑶瑶\t1000.00\t1050.00\t100.00\t-15.00\nORD1767678237445231\tZinco\t安雅\t2400.00\t500.00\t0.00\t0.00\nORD1767678237479657\thjl\t姜一\t7800.00\t720.00\t0.00\t0.00\nORD1767678237511535\t凯\t瑶瑶\t350.00\t750.00\t0.00\t-120.00\nORD1767678237543988\t凯\t瑶瑶\t2100.00\t300.00\t0.00\t540.00\nORD1767678237579364\t恺\t嘟嘟\t350.00\t400.00\t0.00\t0.00\nORD1767678237612462\t恺\t嘟嘟\t2000.00\t400.00\t0.00\t480.00\n",
+  "stderr": "",
+  "execution_time_ms": 1535
+}

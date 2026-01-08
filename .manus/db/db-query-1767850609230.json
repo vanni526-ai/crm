@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orders \nSET \n  teacherFee = '2680.00',\n  transportFee = '0.00',\n  partnerFee = '0.00'\nWHERE orderNo = 'ORD1767678237612462';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE orders \nSET \n  teacherFee = '2680.00',\n  transportFee = '0.00',\n  partnerFee = '0.00'\nWHERE orderNo = 'ORD1767678237612462';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1532
+}

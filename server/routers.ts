@@ -730,6 +730,14 @@ export const appRouter = router({
         return result;
       }),
     
+    // 恢复被批量修正错误影响的订单费用
+    restoreOrderFees: adminProcedure
+      .mutation(async () => {
+        const { restoreOrderFeesFromGmail } = await import("./restoreOrderFees");
+        const result = await restoreOrderFeesFromGmail();
+        return result;
+      }),
+    
     // 批量补全渠道订单号
     batchFillChannelOrderNo: adminProcedure
       .input(z.object({

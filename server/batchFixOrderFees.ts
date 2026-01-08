@@ -94,17 +94,17 @@ export async function batchFixOrderFees(): Promise<{
       throw new Error('Database not available');
     }
 
-    // 查询所有有notes但费用字段为0的订单(originalText存储在notes字段中)
+    // 查询所有有notes但费用字段全部为0的订单(originalText存储在notes字段中)
+    // 注意:只修正老师费用AND车费AND合伙人费都为0的订单,避免误修正部分正常订单
     const ordersToFix = await db
       .select()
       .from(orders)
       .where(
         and(
           isNotNull(orders.notes),
-          or(
-            eq(orders.teacherFee, '0.00'),
-            eq(orders.transportFee, '0.00')
-          )
+          eq(orders.teacherFee, '0.00'),
+          eq(orders.transportFee, '0.00'),
+          eq(orders.partnerFee, '0.00')
         )
       );
 
