@@ -1,9 +1,0 @@
-{
-  "query": "UPDATE orders \nSET partnerFee = ROUND((CAST(courseAmount AS DECIMAL(10,2)) - CAST(teacherFee AS DECIMAL(10,2))) * 0.30, 2)\nWHERE deliveryCity = '泉州' \n  AND courseAmount IS NOT NULL \n  AND courseAmount != '0.00'\n  AND teacherFee IS NOT NULL;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE orders \nSET partnerFee = ROUND((CAST(courseAmount AS DECIMAL(10,2)) - CAST(teacherFee AS DECIMAL(10,2))) * 0.30, 2)\nWHERE deliveryCity = '泉州' \n  AND courseAmount IS NOT NULL \n  AND courseAmount != '0.00'\n  AND teacherFee IS NOT NULL;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1534
-}

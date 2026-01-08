@@ -2414,18 +2414,8 @@ export async function calculatePartnerFee(
   const config = await getCityPartnerConfigByCity(city);
   if (!config) return 0;
   
-  // 计算基础收益(课程金额 - 老师费用)
-  const baseProfit = courseAmount - teacherFee;
-  
-  // 如果老师费用超过课程金额,合伙人费为0(不应该出现负数)
-  if (baseProfit <= 0) {
-    console.warn(`[合伙人费计算] 警告: 城市=${city}, 课程金额=${courseAmount}, 老师费用=${teacherFee}, 基础收益=${baseProfit} <= 0, 合伙人费设为0`);
-    return 0;
-  }
-  
-  // partnerFeeRate存储的是百分比数值(30.00 = 30%),需要除以100转换为小数
   const rate = Number(config.partnerFeeRate) / 100;
-  const partnerFee = baseProfit * rate;
+  const partnerFee = (courseAmount - teacherFee) * rate;
   
   return Math.round(partnerFee * 100) / 100; // 保留两位小数
 }

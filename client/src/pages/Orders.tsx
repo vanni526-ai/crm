@@ -117,17 +117,8 @@ export default function Orders() {
 
   const batchFixFees = trpc.orders.batchFixFees.useMutation({
     onSuccess: (data) => {
-      // 刷新订单列表
       utils.orders.list.invalidate();
-      // 刷新老师管理统计数据
-      utils.teachers.list.invalidate();
-      utils.teachers.getAllStats.invalidate();
-      // 刷新财务管理数据
-      utils.analytics.cityFinancialStats.invalidate();
-      // 刷新城市管理数据
-      utils.analytics.getAllCitiesWithStats.invalidate();
-      
-      toast.success(`批量修正成功，共更新 ${data.updated} 条订单，跳过 ${data.skipped} 条，已自动刷新所有关联页面`);
+      toast.success(`批量修正成功，共更新 ${data.updated} 条订单，跳过 ${data.skipped} 条`);
     },
     onError: (error) => {
       toast.error(error.message || "批量修正失败");

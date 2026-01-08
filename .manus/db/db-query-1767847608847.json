@@ -1,9 +1,0 @@
-{
-  "query": "UPDATE orders o\nINNER JOIN cityPartnerConfig c ON o.deliveryCity = c.city\nSET o.partnerFee = ROUND((CAST(o.courseAmount AS DECIMAL(10,2)) - CAST(o.teacherFee AS DECIMAL(10,2))) * c.partnerFeeRate, 2)\nWHERE o.courseAmount IS NOT NULL \n  AND o.courseAmount != '0.00'\n  AND o.teacherFee IS NOT NULL\n  AND c.isActive = 1;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE orders o\nINNER JOIN cityPartnerConfig c ON o.deliveryCity = c.city\nSET o.partnerFee = ROUND((CAST(o.courseAmount AS DECIMAL(10,2)) - CAST(o.teacherFee AS DECIMAL(10,2))) * c.partnerFeeRate, 2)\nWHERE o.courseAmount IS NOT NULL \n  AND o.courseAmount != '0.00'\n  AND o.teacherFee IS NOT NULL\n  AND c.isActive = 1;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1534
-}
