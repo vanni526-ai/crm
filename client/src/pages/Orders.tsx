@@ -115,15 +115,7 @@ export default function Orders() {
     },
   });
 
-  const batchFixFees = trpc.orders.batchFixFees.useMutation({
-    onSuccess: (data) => {
-      utils.orders.list.invalidate();
-      toast.success(`批量修正成功，共更新 ${data.updated} 条订单，跳过 ${data.skipped} 条`);
-    },
-    onError: (error) => {
-      toast.error(error.message || "批量修正失败");
-    },
-  });
+
 
   const batchUpdateStatus = trpc.orders.batchUpdateStatus.useMutation({
     onSuccess: (data) => {
@@ -698,18 +690,7 @@ export default function Orders() {
               <Upload className="mr-2 h-4 w-4" />
               智能登记
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                if (confirm('确定要批量修正历史订单的费用数据吗？这将为所有有备注但费用为0的订单重新提取老师费用和车费。')) {
-                  batchFixFees.mutate();
-                }
-              }}
-              disabled={batchFixFees.isPending}
-            >
-              <Wrench className="mr-2 h-4 w-4" />
-              {batchFixFees.isPending ? '修正中...' : '批量修正费用'}
-            </Button>
+
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               新建订单

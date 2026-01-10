@@ -735,13 +735,7 @@ export const appRouter = router({
         return db.getOrdersByDateRange(input.startDate, input.endDate);
       }),
     
-    batchFixFees: adminProcedure
-      .mutation(async () => {
-        const { batchFixOrderFees } = await import("./batchFixOrderFees");
-        const result = await batchFixOrderFees();
-        return result;
-      }),
-    
+
     // 批量补全渠道订单号
     batchFillChannelOrderNo: adminProcedure
       .input(z.object({
