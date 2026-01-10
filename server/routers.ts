@@ -870,6 +870,73 @@ export const appRouter = router({
           allOrders: orders,
         };
       }),
+
+    // 批量计算合伙人费用
+    batchCalculatePartnerFee: salesOrAdminProcedure
+      .mutation(async () => {
+        // 查询所有需要计算的订单
+        const allOrders = await db.getAllOrders();
+        
+        let updatedCount = 0;
+        let unchangedCount = 0;
+        let errorCount = 0;
+        const updates: any[] = [];
+        
+        for (const order of allOrders) {
+          try {
+            // 跳过没有必要字段的订单
+            if (!order.deliveryCity || !order.courseAmount || order.teacherFee === null) {
+              continue;
+            }
+            
+            const courseAmount = parseFloat(order.courseAmount);
+            const teacherFee = parseFloat(order.teacherFee || "0");
+            
+            // 计算新的合伙人费
+            const newPartnerFee = await db.calculatePartnerFee(
+              order.deliveryCity,
+              courseAmount,
+              teacherFee
+            );
+            
+            const oldPartnerFee = parseFloat(order.partnerFee || "0");
+            
+            // 如果合伙人费有变化，记录更新
+            if (Math.abs(newPartnerFee - oldPartnerFee) > 0.01) {
+              updates.push({
+                orderNo: order.orderNo,
+                customerName: order.customerName,
+                deliveryCity: order.deliveryCity,
+                courseAmount: courseAmount,
+                teacherFee: teacherFee,
+                oldPartnerFee: oldPartnerFee,
+                newPartnerFee: newPartnerFee,
+              });
+              
+              // 更新数据库
+              await db.updateOrder(order.id, {
+                partnerFee: newPartnerFee.toString()
+              });
+              
+              updatedCount++;
+            } else {
+              unchangedCount++;
+            }
+          } catch (error) {
+            console.error(`处理订单 ${order.orderNo} 时出错:`, error);
+            errorCount++;
+          }
+        }
+        
+        return {
+          success: true,
+          totalOrders: allOrders.length,
+          updatedCount,
+          unchangedCount,
+          errorCount,
+          updates,
+        };
+      }),
   }),
 
   // 老师管理
@@ -1182,15 +1249,6 @@ export const appRouter = router({
       }))
       .query(async ({ input }) => {
         return db.getOrderStatsByDateRange(input.startDate, input.endDate);
-      }),
-    
-    salesPerformance: protectedProcedure
-      .input(z.object({
-        startDate: z.string(),
-        endDate: z.string(),
-      }))
-      .query(async ({ input }) => {
-        return db.getSalesPerformance(input.startDate, input.endDate);
       }),
     
     cityRevenue: protectedProcedure.query(async () => {
