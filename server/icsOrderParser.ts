@@ -49,6 +49,20 @@ export async function parseICSOrderContent(
   const salespersonList = salespersons.map(s => `${s.name}${s.aliases ? ` (别名: ${s.aliases})` : ""}`).join(", ");
   const teacherList = teachers.map(t => `${t.name}${t.aliases ? ` (别名: ${t.aliases})` : ""}`).join(", ");
 
+  // 格式化日期和时间(直接使用本地时间,不做时区转换)
+  const formatDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatTime = (date: Date) => {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   // 构建LLM提示词
   const prompt = `你是一个专业的订单信息提取助手。请从以下ICS日历事件中提取所有订单信息。
 
@@ -56,15 +70,19 @@ export async function parseICSOrderContent(
 已知的老师列表: ${teacherList}
 
 ICS日历事件列表:
-${icsEvents.map((event, index) => `
+${icsEvents.map((event, index) => {
+  const classDate = formatDate(event.startTime);
+  const classTime = `${formatTime(event.startTime)}-${formatTime(event.endTime)}`;
+  return `
 事件 ${index + 1}:
 - SUMMARY: ${event.summary}
 - LOCATION: ${event.location}
 - ORGANIZER: ${event.organizer}
-- START: ${event.startTime.toISOString()}
-- END: ${event.endTime.toISOString()}
+- 上课日期: ${classDate}
+- 上课时间: ${classTime}
 - DESCRIPTION: ${event.description}
-`).join("\n")}
+`;
+}).join("\n")}
 
 请提取每个事件的以下信息:
 1. 销售人员 - 从SUMMARY第一个词识别销售人员花名(如"昭昭"、"嘟嘟"、"七七"),如果无法识别则留空
@@ -73,8 +91,8 @@ ${icsEvents.map((event, index) => `
    ⚠️ 注意:客户名不能是老师名,也不能是课程名!
    * 如果识别出的名字在老师列表中,则不是客户名
    * 如果识别出的名字看起来像课程名称(如"高定网T"、"LEC4"、"基础局"等),则不是客户名
-4. 上课日期 - 从START时间提取,格式YYYY-MM-DD(如"2025-12-17")
-5. 上课时间 - 从START和END时间提取,格式HH:MM-HH:MM(如"20:30-21:30")
+4. 上课日期 - 直接使用提供的"上课日期",格式YYYY-MM-DD(如"2025-12-17")
+5. 上课时间 - 直接使用提供的"上课时间",格式HH:MM-HH:MM(如"20:30-21:30")
 6. 课程名称 - 课程内容,从SUMMARY中提取(如"线上理论课"、"水不在深有龙则呜")
 7. 老师名称 - 老师的名字,从SUMMARY或ORGANIZER中提取(如"姜一"、"云云")
 8. 城市 - 从LOCATION中提取城市信息(如"上海"、"无锡")
@@ -87,7 +105,11 @@ ${icsEvents.map((event, index) => `
 11. 课程金额 - 课程总价,通常等于支付金额
 12. 首付金额 - 定金,如果SUMMARY中提到"定金XXX"则提取,否则为0
 13. 尾款金额 - 尾款,如果SUMMARY中提到"尾款XXX"则提取,否则为0
-14. 老师费用 - 老师的费用,如果SUMMARY或DESCRIPTION中提到"给老师XXX"则提取,否则为0
+14. 老师费用 - 老师的费用,从SUMMARY或DESCRIPTION中提取:
+   * 格式1: "给老师XXX" 或 "给{老师名}XXX" (如"给老师500"、"给姜一300")
+   * 格式2: "老师费XXX" 或 "老师XXX" (如"老师费500"、"老师300")
+   * 格式3: 在金额描述中明确标注的老师费用
+   * 如果无法识别则为0
 15. 车费 - 车费,如果提到"报销XXX车费"则提取,否则为0
 16. 账户余额 - 客户账户余额,如果SUMMARY中提到则提取,否则为0
 17. 支付方式 - 支付方式(支付宝/微信/富掌柜/现金/银行转账),如果无法识别则留空
@@ -99,7 +121,7 @@ ${icsEvents.map((event, index) => `
 - 客户名不能是课程名!如果识别出的名字看起来像课程名称(如"高定网T"、"LEC4"、"基础局"、"刘心班任"等),则将客户名设为空
 - 如果SUMMARY格式类似"客户名 课程 老师名 金额",则第一个词是客户名,倒数第二个词是老师名
 - 课程名应该填写到course字段,不要填写到customerName字段
-- 日期和时间必须从START/END字段提取,不要从SUMMARY中猜测
+- 日期和时间必须直接使用提供的"上课日期"和"上课时间",不要自己计算或从SUMMARY中猜测
 - 金额相关字段如果无法识别则填0,不要填null
 - 字符串字段如果无法识别则留空,不要填"未知"或"无"
 

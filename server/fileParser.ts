@@ -192,6 +192,41 @@ export async function parseICS(fileBuffer: Buffer): Promise<ICSEvent[]> {
   const content = fileBuffer.toString("utf-8");
   const events = ical.parseICS(content);
   
+  // 辅助函数:从原始ICS内容中提取DTSTART和DTEND
+  const extractRawDateTime = (summary: string): { startTime: Date; endTime: Date } | null => {
+    // 转义特殊字符
+    const summaryEscaped = summary.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // 向后查找: 从SUMMARY往前查找最近的DTSTART和DTEND
+    const summaryIndex = content.indexOf(`SUMMARY:${summary}`);
+    if (summaryIndex === -1) return null;
+    
+    // 在SUMMARY之前的500个字符内查找DTSTART和DTEND
+    const beforeSummary = content.substring(Math.max(0, summaryIndex - 500), summaryIndex);
+    const dtstartMatch = beforeSummary.match(/DTSTART(?:;TZID=[^:]+)?:(\d{8}T\d{6})/);
+    const dtendMatch = beforeSummary.match(/DTEND(?:;TZID=[^:]+)?:(\d{8}T\d{6})/);
+    
+    if (dtstartMatch && dtendMatch) {
+      // 解析ICS日期时间格式: 20250713T190000
+      const parseICSDate = (dateStr: string) => {
+        const year = parseInt(dateStr.substring(0, 4));
+        const month = parseInt(dateStr.substring(4, 6)) - 1; // JS月份从0开始
+        const day = parseInt(dateStr.substring(6, 8));
+        const hour = parseInt(dateStr.substring(9, 11));
+        const minute = parseInt(dateStr.substring(11, 13));
+        const second = parseInt(dateStr.substring(13, 15));
+        // 直接使用本地时间,不做时区转换(ICS文件中已经是Asia/Shanghai时区)
+        return new Date(year, month, day, hour, minute, second);
+      };
+      
+      return {
+        startTime: parseICSDate(dtstartMatch[1]),
+        endTime: parseICSDate(dtendMatch[1])
+      };
+    }
+    
+    return null;
+  };
+  
   const result: ICSEvent[] = [];
   
   for (const key in events) {
@@ -208,14 +243,18 @@ export async function parseICS(fileBuffer: Buffer): Promise<ICSEvent[]> {
         }
       }
 
-      // 处理时间对象
-      let startTime = new Date();
-      let endTime = new Date();
-      if (event.start) {
-        startTime = event.start instanceof Date ? event.start : new Date(event.start);
-      }
-      if (event.end) {
-        endTime = event.end instanceof Date ? event.end : new Date(event.end);
+      // 优先从原始ICS内容中提取时间(避免时区转换问题)
+      const rawDateTime = extractRawDateTime(event.summary || "");
+      let startTime: Date;
+      let endTime: Date;
+      
+      if (rawDateTime) {
+        startTime = rawDateTime.startTime;
+        endTime = rawDateTime.endTime;
+      } else {
+        // 回退到ical库解析的时间
+        startTime = event.start instanceof Date ? event.start : new Date(event.start || Date.now());
+        endTime = event.end instanceof Date ? event.end : new Date(event.end || Date.now());
       }
 
       result.push({
