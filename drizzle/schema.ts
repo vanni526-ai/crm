@@ -119,6 +119,8 @@ export const teachers = mysqlTable("teachers", {
   bankAccount: varchar("bankAccount", { length: 100 }), // 银行账号
   bankName: varchar("bankName", { length: 100 }), // 开户行
   aliases: text("aliases"), // 别名列表(JSON数组)
+  contractEndDate: date("contractEndDate"), // 合同到期时间
+  joinDate: date("joinDate"), // 入职时间
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

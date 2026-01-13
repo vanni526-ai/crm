@@ -1,0 +1,360 @@
+{
+  "query": "SELECT id, name, wechatId, phone, trafficSource FROM customers ORDER BY id DESC LIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, wechatId, phone, trafficSource FROM customers ORDER BY id DESC LIMIT 50;",
+  "rows": [
+    {
+      "id": "330025",
+      "name": "剑心犹在（上海）",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小九（12:00-21:00）"
+    },
+    {
+      "id": "330024",
+      "name": "机智豆",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小九（12:00-21:00）"
+    },
+    {
+      "id": "330023",
+      "name": "无趣顾顾",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬沐沐（11-20点 周天周一休息）"
+    },
+    {
+      "id": "330022",
+      "name": "ρ²=2a²cos2θ",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬秋秋11:00-20:00"
+    },
+    {
+      "id": "330021",
+      "name": "清淼",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬起司11:00-20:00"
+    },
+    {
+      "id": "330019",
+      "name": "冬至",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬娜娜11:00-20:00"
+    },
+    {
+      "id": "330018",
+      "name": "Jdbya",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬月芽（11-20点 周天周一休息）"
+    },
+    {
+      "id": "330017",
+      "name": "Lay",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬秋秋11:00-20:00"
+    },
+    {
+      "id": "330016",
+      "name": "佳胜",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬月芽（11-20点 周天周一休息）"
+    },
+    {
+      "id": "330015",
+      "name": "机密熊",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬依依（13:00-21:00）"
+    },
+    {
+      "id": "330014",
+      "name": "Jim",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小九（12:00-21:00）"
+    },
+    {
+      "id": "330013",
+      "name": "列斯卡农",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬思涵11:00-20:00"
+    },
+    {
+      "id": "330012",
+      "name": "Lhingfree",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬依依（13:00-21:00）"
+    },
+    {
+      "id": "330011",
+      "name": "baptismal",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬思涵11:00-20:00"
+    },
+    {
+      "id": "330010",
+      "name": "在路上",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬思涵11:00-20:00"
+    },
+    {
+      "id": "330009",
+      "name": "伍",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬思涵11:00-20:00"
+    },
+    {
+      "id": "330008",
+      "name": "Reiki",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬奈落（11-20点 周一二休息）"
+    },
+    {
+      "id": "330007",
+      "name": "Mephisto",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小颖"
+    },
+    {
+      "id": "330006",
+      "name": "Qqw",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小咩（11-20点 周日周一休息）"
+    },
+    {
+      "id": "330005",
+      "name": "Z",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬沐沐（11-20点 周天周一休息）"
+    },
+    {
+      "id": "330004",
+      "name": "指尖凝滞的时间",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬娜娜11:00-20:00"
+    },
+    {
+      "id": "330003",
+      "name": "solo",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬依依（13:00-21:00）"
+    },
+    {
+      "id": "330002",
+      "name": "孟琳森",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬依依（13:00-21:00）"
+    },
+    {
+      "id": "300049",
+      "name": "Vince",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小颖"
+    },
+    {
+      "id": "300048",
+      "name": "D.司准只佬",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬弥音"
+    },
+    {
+      "id": "300047",
+      "name": "A Ridiculous Showman",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "灜姬十一（11-20点 周1、2休息）"
+    },
+    {
+      "id": "300046",
+      "name": "武安卿",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬秋秋11:00-20:00"
+    },
+    {
+      "id": "300045",
+      "name": "贾宁余",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬依依（13:00-21:00）"
+    },
+    {
+      "id": "300044",
+      "name": "Puff",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小咩（11-20点 周日周一休息）"
+    },
+    {
+      "id": "300043",
+      "name": "伊大明",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬露露（详情看背景图)"
+    },
+    {
+      "id": "300042",
+      "name": "Segal",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬梦梦11:00-20:00"
+    },
+    {
+      "id": "300041",
+      "name": "小麦",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小颖"
+    },
+    {
+      "id": "300040",
+      "name": "季与",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小九（12:00-21:00）"
+    },
+    {
+      "id": "300039",
+      "name": "徐",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬草莓11:00-20:00"
+    },
+    {
+      "id": "300038",
+      "name": "🌏",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬梦梦11:00-20:00"
+    },
+    {
+      "id": "300037",
+      "name": "詯の吢、伤ㄋ",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬 紫希上班时间（11:00-20:00）"
+    },
+    {
+      "id": "300036",
+      "name": "Yixian",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬 斯斯11:00-20:00"
+    },
+    {
+      "id": "300035",
+      "name": "Duo_",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬九淑（11-20点 周天周一休息）"
+    },
+    {
+      "id": "300034",
+      "name": "氢氦锂铍硼",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬沐沐（11-20点 周天周一休息）"
+    },
+    {
+      "id": "300033",
+      "name": "白昼",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬安琪11:00-20:00"
+    },
+    {
+      "id": "300032",
+      "name": "Nick",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬觅知音（周六周日休息）"
+    },
+    {
+      "id": "300031",
+      "name": "Haha",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬喵喵11:00-20:00"
+    },
+    {
+      "id": "300030",
+      "name": "駅",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬小九（12:00-21:00）"
+    },
+    {
+      "id": "300029",
+      "name": "大王叫我来巡山",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬喵喵11:00-20:00"
+    },
+    {
+      "id": "300028",
+      "name": "愿将来胜过往",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬甜甜11:00-20:00"
+    },
+    {
+      "id": "300027",
+      "name": "March",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬芊芊（11:00-20:00)"
+    },
+    {
+      "id": "300026",
+      "name": "候鸟的第七行诗",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬月芽（11-20点 周天周一休息）"
+    },
+    {
+      "id": "300025",
+      "name": "小希",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬秋秋11:00-20:00"
+    },
+    {
+      "id": "300024",
+      "name": "晴天",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬秋秋11:00-20:00"
+    },
+    {
+      "id": "300023",
+      "name": "玛卡巴卡",
+      "wechatId": "NULL",
+      "phone": "NULL",
+      "trafficSource": "瀛姬九淑（11-20点 周天周一休息）"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\twechatId\tphone\ttrafficSource\n330025\t剑心犹在（上海）\tNULL\tNULL\t瀛姬小九（12:00-21:00）\n330024\t机智豆\tNULL\tNULL\t瀛姬小九（12:00-21:00）\n330023\t无趣顾顾\tNULL\tNULL\t瀛姬沐沐（11-20点 周天周一休息）\n330022\tρ²=2a²cos2θ\tNULL\tNULL\t瀛姬秋秋11:00-20:00\n330021\t清淼\tNULL\tNULL\t瀛姬起司11:00-20:00\n330019\t冬至\tNULL\tNULL\t瀛姬娜娜11:00-20:00\n330018\tJdbya\tNULL\tNULL\t瀛姬月芽（11-20点 周天周一休息）\n330017\tLay\tNULL\tNULL\t瀛姬秋秋11:00-20:00\n330016\t佳胜\tNULL\tNULL\t瀛姬月芽（11-20点 周天周一休息）\n330015\t机密熊\tNULL\tNULL\t瀛姬依依（13:00-21:00）\n330014\tJim\tNULL\tNULL\t瀛姬小九（12:00-21:00）\n330013\t列斯卡农\tNULL\tNULL\t瀛姬思涵11:00-20:00\n330012\tLhingfree\tNULL\tNULL\t瀛姬依依（13:00-21:00）\n330011\tbaptismal\tNULL\tNULL\t瀛姬思涵11:00-20:00\n330010\t在路上\tNULL\tNULL\t瀛姬思涵11:00-20:00\n330009\t伍\tNULL\tNULL\t瀛姬思涵11:00-20:00\n330008\tReiki\tNULL\tNULL\t瀛姬奈落（11-20点 周一二休息）\n330007\tMephisto\tNULL\tNULL\t瀛姬小颖\n330006\tQqw\tNULL\tNULL\t瀛姬小咩（11-20点 周日周一休息）\n330005\tZ\tNULL\tNULL\t瀛姬沐沐（11-20点 周天周一休息）\n330004\t指尖凝滞的时间\tNULL\tNULL\t瀛姬娜娜11:00-20:00\n330003\tsolo\tNULL\tNULL\t瀛姬依依（13:00-21:00）\n330002\t孟琳森\tNULL\tNULL\t瀛姬依依（13:00-21:00）\n300049\tVince\tNULL\tNULL\t瀛姬小颖\n300048\tD.司准只佬\tNULL\tNULL\t瀛姬弥音\n300047\tA Ridiculous Showman\tNULL\tNULL\t灜姬十一（11-20点 周1、2休息）\n300046\t武安卿\tNULL\tNULL\t瀛姬秋秋11:00-20:00\n300045\t贾宁余\tNULL\tNULL\t瀛姬依依（13:00-21:00）\n300044\tPuff\tNULL\tNULL\t瀛姬小咩（11-20点 周日周一休息）\n300043\t伊大明\tNULL\tNULL\t瀛姬露露（详情看背景图)\n300042\tSegal\tNULL\tNULL\t瀛姬梦梦11:00-20:00\n300041\t小麦\tNULL\tNULL\t瀛姬小颖\n300040\t季与\tNULL\tNULL\t瀛姬小九（12:00-21:00）\n300039\t徐\tNULL\tNULL\t瀛姬草莓11:00-20:00\n300038\t🌏\tNULL\tNULL\t瀛姬梦梦11:00-20:00\n300037\t詯の吢、伤ㄋ\tNULL\tNULL\t瀛姬 紫希上班时间（11:00-20:00）\n300036\tYixian\tNULL\tNULL\t瀛姬 斯斯11:00-20:00\n300035\tDuo_\tNULL\tNULL\t瀛姬九淑（11-20点 周天周一休息）\n300034\t氢氦锂铍硼\tNULL\tNULL\t瀛姬沐沐（11-20点 周天周一休息）\n300033\t白昼\tNULL\tNULL\t瀛姬安琪11:00-20:00\n300032\tNick\tNULL\tNULL\t瀛姬觅知音（周六周日休息）\n300031\tHaha\tNULL\tNULL\t瀛姬喵喵11:00-20:00\n300030\t駅\tNULL\tNULL\t瀛姬小九（12:00-21:00）\n300029\t大王叫我来巡山\tNULL\tNULL\t瀛姬喵喵11:00-20:00\n300028\t愿将来胜过往\tNULL\tNULL\t瀛姬甜甜11:00-20:00\n300027\tMarch\tNULL\tNULL\t瀛姬芊芊（11:00-20:00)\n300026\t候鸟的第七行诗\tNULL\tNULL\t瀛姬月芽（11-20点 周天周一休息）\n300025\t小希\tNULL\tNULL\t瀛姬秋秋11:00-20:00\n300024\t晴天\tNULL\tNULL\t瀛姬秋秋11:00-20:00\n300023\t玛卡巴卡\tNULL\tNULL\t瀛姬九淑（11-20点 周天周一休息）\n",
+  "stderr": "",
+  "execution_time_ms": 1519
+}

@@ -996,6 +996,8 @@ export const appRouter = router({
           category: z.string().optional(),
           city: z.string().optional(),
           aliases: z.string().optional(), // 别名(逗号分隔的字符串)
+          contractEndDate: z.union([z.string(), z.date()]).optional(), // 合同到期时间
+          joinDate: z.union([z.string(), z.date()]).optional(), // 入职时间
           // 兼容旧字段
           nickname: z.string().optional(),
           email: z.string().optional(),
@@ -1041,6 +1043,8 @@ export const appRouter = router({
           notes: z.string().optional(),
           category: z.string().optional(),
           city: z.string().optional(),
+          contractEndDate: z.union([z.string(), z.date()]).optional(),
+          joinDate: z.union([z.string(), z.date()]).optional(),
         })),
       }))
       .mutation(async ({ input }) => {

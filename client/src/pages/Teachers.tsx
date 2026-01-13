@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Search, Eye, Edit, Upload, Download, Trash2, RefreshCw } from "lucide-react";
+import { Plus, Search, Eye, Edit, Upload, Download, Trash2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,8 @@ const teacherSchema = z.object({
   category: z.string().optional(),
   city: z.string().optional(),
   aliases: z.string().optional(), // 别名(逗号分隔)
+  contractEndDate: z.string().optional(), // 合同到期时间
+  joinDate: z.string().optional(), // 入职时间
   // 兼容旧字段
   nickname: z.string().optional(),
   email: z.string().email("请输入有效的邮箱地址").optional().or(z.literal("")),
@@ -120,6 +122,8 @@ export default function Teachers() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [importing, setImporting] = useState(false);
   const [newStatus, setNewStatus] = useState("活跃");
+  const [sortField, setSortField] = useState<'name' | 'classCount' | 'totalHours' | 'totalIncome' | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // 处理时间范围切换
   const handleDateRangeChange = (range: 'all' | 'month' | 'quarter' | 'year') => {
@@ -173,6 +177,8 @@ export default function Teachers() {
       (typeof teacher.aliases === 'string' ? teacher.aliases : JSON.parse(teacher.aliases).join(', ')) : 
       '';
     setValue("aliases", aliasesStr);
+    setValue("contractEndDate", teacher.contractEndDate || "");
+    setValue("joinDate", teacher.joinDate || "");
     setValue("nickname", teacher.nickname || "");
     setValue("email", teacher.email || "");
     setValue("wechat", teacher.wechat || "");
@@ -194,6 +200,8 @@ export default function Teachers() {
       customerType: data.customerType,
       aliases: data.aliases,
       notes: data.notes,
+      contractEndDate: data.contractEndDate,
+      joinDate: data.joinDate,
     };
     updateTeacher.mutate({
       id: selectedTeacher.id,
@@ -283,7 +291,7 @@ export default function Teachers() {
         
         jsonData.forEach((row: any) => {
           console.log('解析行数据:', row);
-          const teacher = {
+          const teacher: any = {
             name: row['姓名'] || row['name'] || '',
             phone: row['电话号码'] || row['phone'] ? String(row['电话号码'] || row['phone']) : '',
             status: row['活跃状态'] || row['status'] || '活跃',
@@ -292,6 +300,17 @@ export default function Teachers() {
             category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他',
             city: row['地区'] || (sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : ''),
           };
+          
+          // 处理日期字段，将字符串转换为Date对象
+          const contractEndDateStr = row['合同到期时间'] || row['contractEndDate'];
+          if (contractEndDateStr) {
+            teacher.contractEndDate = new Date(contractEndDateStr);
+          }
+          
+          const joinDateStr = row['入职时间'] || row['joinDate'];
+          if (joinDateStr) {
+            teacher.joinDate = new Date(joinDateStr);
+          }
           
           console.log('解析后的老师数据:', teacher);
           
@@ -342,6 +361,8 @@ export default function Teachers() {
         '电话号码': teacher.phone || '',
         '活跃状态': teacher.status || '活跃',
         '受众客户类型': teacher.customerType || '',
+        '合同到期时间': teacher.contractEndDate || '',
+        '入职时间': teacher.joinDate || '',
         '备注': teacher.notes || '',
       });
     });
@@ -362,7 +383,19 @@ export default function Teachers() {
     toast.success("导出成功");
   };
 
-  // 过滤老师
+  // 排序功能
+  const handleSort = (field: 'name' | 'classCount' | 'totalHours' | 'totalIncome') => {
+    if (sortField === field) {
+      // 切换排序顺序
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // 新字段，默认降序
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
+
+  // 过滤和排序老师
   const filteredTeachers = teachers?.filter((teacher: any) => {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
@@ -372,6 +405,38 @@ export default function Teachers() {
       teacher.customerType?.toLowerCase().includes(term) ||
       teacher.city?.toLowerCase().includes(term)
     );
+  });
+
+  const sortedTeachers = filteredTeachers?.slice().sort((a: any, b: any) => {
+    if (!sortField) return 0;
+    
+    let aValue: any;
+    let bValue: any;
+    
+    if (sortField === 'name') {
+      aValue = a.name || '';
+      bValue = b.name || '';
+      return sortOrder === 'asc' 
+        ? aValue.localeCompare(bValue, 'zh-CN')
+        : bValue.localeCompare(aValue, 'zh-CN');
+    } else {
+      // 统计数据排序
+      const aStats = allStats?.find(s => s.teacherId === a.id);
+      const bStats = allStats?.find(s => s.teacherId === b.id);
+      
+      if (sortField === 'classCount') {
+        aValue = aStats?.classCount || 0;
+        bValue = bStats?.classCount || 0;
+      } else if (sortField === 'totalHours') {
+        aValue = aStats?.totalHours || 0;
+        bValue = bStats?.totalHours || 0;
+      } else if (sortField === 'totalIncome') {
+        aValue = aStats?.totalIncome || 0;
+        bValue = bStats?.totalIncome || 0;
+      }
+      
+      return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+    }
   });
 
   // 计算总体统计数据
@@ -423,10 +488,11 @@ export default function Teachers() {
           </div>
         </div>
 
-        {/* 统计卡片 */}
+          {/* 统计卡片 */}
         <div className="space-y-4">
-          {/* 时间范围切换 */}
-          <div className="flex gap-2">
+          {/* 时间范围切换和刷新按钮 */}
+          <div className="flex justify-between items-center">
+            <div className="flex gap-2">
             <Button
               variant={dateRange === 'all' ? 'default' : 'outline'}
               size="sm"
@@ -454,6 +520,16 @@ export default function Teachers() {
               onClick={() => handleDateRangeChange('year')}
             >
               本年
+            </Button>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => utils.teachers.getAllStats.invalidate()}
+              disabled={statsLoading}
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${statsLoading ? 'animate-spin' : ''}`} />
+              刷新统计数据
             </Button>
           </div>
 
@@ -563,19 +639,73 @@ export default function Teachers() {
                         onCheckedChange={handleSelectAll}
                       />
                     </TableHead>
-                    <TableHead>姓名</TableHead>
+                    <TableHead>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleSort('name')}
+                        className="h-8 px-2 hover:bg-accent"
+                      >
+                        姓名
+                        {sortField === 'name' && (
+                          sortOrder === 'asc' ? <ArrowUp className="ml-1 w-3 h-3" /> : <ArrowDown className="ml-1 w-3 h-3" />
+                        )}
+                        {sortField !== 'name' && <ArrowUpDown className="ml-1 w-3 h-3 opacity-30" />}
+                      </Button>
+                    </TableHead>
                     <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>分类</TableHead>
                     <TableHead>城市</TableHead>
-                    <TableHead>授课次数</TableHead>
-                    <TableHead>总课时</TableHead>
-                    <TableHead>总收入</TableHead>
+                    <TableHead>合同到期</TableHead>
+                    <TableHead>入职时间</TableHead>
+                    <TableHead>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleSort('classCount')}
+                        className="h-8 px-2 hover:bg-accent"
+                      >
+                        授课次数
+                        {sortField === 'classCount' && (
+                          sortOrder === 'asc' ? <ArrowUp className="ml-1 w-3 h-3" /> : <ArrowDown className="ml-1 w-3 h-3" />
+                        )}
+                        {sortField !== 'classCount' && <ArrowUpDown className="ml-1 w-3 h-3 opacity-30" />}
+                      </Button>
+                    </TableHead>
+                    <TableHead>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleSort('totalHours')}
+                        className="h-8 px-2 hover:bg-accent"
+                      >
+                        总课时
+                        {sortField === 'totalHours' && (
+                          sortOrder === 'asc' ? <ArrowUp className="ml-1 w-3 h-3" /> : <ArrowDown className="ml-1 w-3 h-3" />
+                        )}
+                        {sortField !== 'totalHours' && <ArrowUpDown className="ml-1 w-3 h-3 opacity-30" />}
+                      </Button>
+                    </TableHead>
+                    <TableHead>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleSort('totalIncome')}
+                        className="h-8 px-2 hover:bg-accent"
+                      >
+                        总收入
+                        {sortField === 'totalIncome' && (
+                          sortOrder === 'asc' ? <ArrowUp className="ml-1 w-3 h-3" /> : <ArrowDown className="ml-1 w-3 h-3" />
+                        )}
+                        {sortField !== 'totalIncome' && <ArrowUpDown className="ml-1 w-3 h-3 opacity-30" />}
+                      </Button>
+                    </TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTeachers?.map((teacher: any) => (
+                  {sortedTeachers?.map((teacher: any) => (
                     <TableRow key={teacher.id}>
                       <TableCell>
                         <Checkbox
@@ -592,6 +722,23 @@ export default function Teachers() {
                       </TableCell>
                       <TableCell>{teacher.category || '-'}</TableCell>
                       <TableCell>{teacher.city || '-'}</TableCell>
+                      <TableCell>
+                        {teacher.contractEndDate ? (() => {
+                          const endDate = new Date(teacher.contractEndDate);
+                          const today = new Date();
+                          const daysUntilExpiry = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                          const isExpiringSoon = daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
+                          const isExpired = daysUntilExpiry < 0;
+                          return (
+                            <span className={isExpiringSoon || isExpired ? 'text-red-600 font-bold' : ''}>
+                              {teacher.contractEndDate}
+                              {isExpiringSoon && ` (还剩${daysUntilExpiry}天)`}
+                              {isExpired && ' (已过期)'}
+                            </span>
+                          );
+                        })() : '-'}
+                      </TableCell>
+                      <TableCell>{teacher.joinDate || '-'}</TableCell>
                       <TableCell>
                         {allStats?.find(s => s.teacherId === teacher.id)?.classCount || 0}
                       </TableCell>
@@ -709,6 +856,14 @@ export default function Teachers() {
                 <div>
                   <Label htmlFor="edit-customerType">受众客户类型</Label>
                   <Input id="edit-customerType" {...register("customerType")} />
+                </div>
+                <div>
+                  <Label htmlFor="edit-contractEndDate">合同到期时间</Label>
+                  <Input id="edit-contractEndDate" type="date" {...register("contractEndDate")} />
+                </div>
+                <div>
+                  <Label htmlFor="edit-joinDate">入职时间</Label>
+                  <Input id="edit-joinDate" type="date" {...register("joinDate")} />
                 </div>
               </div>
               <div>
