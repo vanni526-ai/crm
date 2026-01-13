@@ -181,6 +181,7 @@ export default function Orders() {
   const [calculatePartnerFeeOpen, setCalculatePartnerFeeOpen] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [batchChannelAction, setBatchChannelAction] = useState<"fill" | "clear">("fill");
+  const [classDateFilter, setClassDateFilter] = useState<"all" | "today" | "thisWeek" | "thisMonth" | "thisYear">("all");
 
 
   const {
@@ -430,7 +431,36 @@ export default function Orders() {
       // 默认不显示作废订单(除非用户选择显示)
       const matchesVoided = !order.isVoided; // TODO: 添加作废订单筛选器
 
-      return matchesSearch && matchesStatus && matchesSales && matchesVoided;
+      // 按上课日期筛选
+      let matchesClassDate = true;
+      if (classDateFilter !== "all" && order.classDate) {
+        const classDate = new Date(order.classDate);
+        const now = new Date();
+        
+        if (classDateFilter === "today") {
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          matchesClassDate = classDate >= today && classDate < tomorrow;
+        } else if (classDateFilter === "thisWeek") {
+          const startOfWeek = new Date(now);
+          startOfWeek.setDate(now.getDate() - now.getDay());
+          startOfWeek.setHours(0, 0, 0, 0);
+          const endOfWeek = new Date(startOfWeek);
+          endOfWeek.setDate(startOfWeek.getDate() + 7);
+          matchesClassDate = classDate >= startOfWeek && classDate < endOfWeek;
+        } else if (classDateFilter === "thisMonth") {
+          const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+          matchesClassDate = classDate >= startOfMonth && classDate <= endOfMonth;
+        } else if (classDateFilter === "thisYear") {
+          const startOfYear = new Date(now.getFullYear(), 0, 1);
+          const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+          matchesClassDate = classDate >= startOfYear && classDate <= endOfYear;
+        }
+      }
+
+      return matchesSearch && matchesStatus && matchesSales && matchesVoided && matchesClassDate;
     });
 
     filtered.sort((a, b) => {
@@ -448,7 +478,7 @@ export default function Orders() {
     });
 
     return filtered;
-  }, [orders, searchTerm, statusFilter, salesFilter, sortBy, sortOrder]);
+  }, [orders, searchTerm, statusFilter, salesFilter, classDateFilter, sortBy, sortOrder]);
 
   const getFilteredOrdersByTimeRange = () => {
     const now = new Date();
@@ -846,6 +876,19 @@ export default function Orders() {
                         {sales}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={classDateFilter} onValueChange={(v: any) => setClassDateFilter(v)}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="上课日期" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部日期</SelectItem>
+                    <SelectItem value="today">今天</SelectItem>
+                    <SelectItem value="thisWeek">本周</SelectItem>
+                    <SelectItem value="thisMonth">本月</SelectItem>
+                    <SelectItem value="thisYear">今年</SelectItem>
                   </SelectContent>
                 </Select>
 

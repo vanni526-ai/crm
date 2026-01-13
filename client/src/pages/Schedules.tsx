@@ -63,7 +63,7 @@ type ScheduleFormData = z.infer<typeof scheduleSchema>;
 
 export default function Schedules() {
   const utils = trpc.useUtils();
-  const { data: schedules, isLoading } = trpc.schedules.list.useQuery();
+  const { data: schedules, isLoading } = trpc.schedules.listWithOrderInfo.useQuery();
 
   const createSchedule = trpc.schedules.create.useMutation({
     onSuccess: () => {
@@ -306,6 +306,21 @@ export default function Schedules() {
                                         <div>销售: {schedule.salesName}</div>
                                       )}
                                     </div>
+                                    {schedule.channelOrderNo && (
+                                      <div className="mt-2 p-2 bg-muted rounded-md">
+                                        <div className="text-sm font-medium mb-1">渠道订单号: {schedule.channelOrderNo}</div>
+                                        {schedule.matchedOrder ? (
+                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-muted-foreground">
+                                            <div>课程金额: ￥{schedule.matchedOrder.courseAmount || '0.00'}</div>
+                                            <div>老师费用: ￥{schedule.matchedOrder.teacherFee || '0.00'}</div>
+                                            <div>车费: ￥{schedule.matchedOrder.transportFee || '0.00'}</div>
+                                            <div>合伙人费: ￥{schedule.matchedOrder.partnerFee || '0.00'}</div>
+                                          </div>
+                                        ) : (
+                                          <Badge variant="destructive" className="text-xs">未匹配订单</Badge>
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                   <Button
                                     variant="ghost"
@@ -562,6 +577,8 @@ function ScheduleTable({
             <TableHead>开始时间</TableHead>
             <TableHead>结束时间</TableHead>
             <TableHead>地点</TableHead>
+            <TableHead>渠道订单号</TableHead>
+            <TableHead>订单信息</TableHead>
             <TableHead>操作</TableHead>
           </TableRow>
         </TableHeader>
@@ -578,6 +595,27 @@ function ScheduleTable({
                 <TableCell>{new Date(schedule.endTime).toLocaleString()}</TableCell>
                 <TableCell>{schedule.location || "-"}</TableCell>
                 <TableCell>
+                  {schedule.channelOrderNo ? (
+                    <span className="text-sm">{schedule.channelOrderNo}</span>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">-</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {schedule.matchedOrder ? (
+                    <div className="text-sm space-y-1">
+                      <div>课程金额: ￥{schedule.matchedOrder.courseAmount || '0.00'}</div>
+                      <div>老师费用: ￥{schedule.matchedOrder.teacherFee || '0.00'}</div>
+                      <div>车费: ￥{schedule.matchedOrder.transportFee || '0.00'}</div>
+                      <div>合伙人费: ￥{schedule.matchedOrder.partnerFee || '0.00'}</div>
+                    </div>
+                  ) : schedule.channelOrderNo ? (
+                    <Badge variant="destructive">未匹配订单</Badge>
+                  ) : (
+                    <span className="text-muted-foreground text-sm">无渠道订单号</span>
+                  )}
+                </TableCell>
+                <TableCell>
                   <Button variant="ghost" size="sm" onClick={() => onDelete(schedule.id)}>
                     删除
                   </Button>
@@ -586,7 +624,7 @@ function ScheduleTable({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                 暂无排课记录
               </TableCell>
             </TableRow>

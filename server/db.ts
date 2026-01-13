@@ -666,6 +666,39 @@ export async function getSchedulesByTeacher(teacherId: number) {
   return db.select().from(schedules).where(eq(schedules.teacherId, teacherId)).orderBy(desc(schedules.startTime));
 }
 
+export async function getSchedulesWithOrderInfo() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // 查询所有有渠道订单号的排课记录
+  const allSchedules = await db.select().from(schedules).orderBy(desc(schedules.startTime));
+  
+  // 为每个排课记录匹配订单信息
+  const schedulesWithOrders = await Promise.all(
+    allSchedules.map(async (schedule) => {
+      let matchedOrder = null;
+      
+      // 如果有渠道订单号，尝试匹配订单
+      if (schedule.channelOrderNo) {
+        const orderResult = await db
+          .select()
+          .from(orders)
+          .where(eq(orders.channelOrderNo, schedule.channelOrderNo))
+          .limit(1);
+        
+        matchedOrder = orderResult[0] || null;
+      }
+      
+      return {
+        ...schedule,
+        matchedOrder,
+      };
+    })
+  );
+  
+  return schedulesWithOrders;
+}
+
 export async function deleteSchedule(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

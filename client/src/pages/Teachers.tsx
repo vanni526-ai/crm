@@ -160,7 +160,12 @@ export default function Teachers() {
   });
 
   const handleCreate = (data: TeacherFormData) => {
-    createTeacher.mutate(data);
+    const createData = {
+      ...data,
+      contractEndDate: data.contractEndDate ? new Date(data.contractEndDate) : undefined,
+      joinDate: data.joinDate ? new Date(data.joinDate) : undefined,
+    };
+    createTeacher.mutate(createData);
   };
 
   const handleEdit = (teacher: any) => {
@@ -200,8 +205,8 @@ export default function Teachers() {
       customerType: data.customerType,
       aliases: data.aliases,
       notes: data.notes,
-      contractEndDate: data.contractEndDate,
-      joinDate: data.joinDate,
+      contractEndDate: data.contractEndDate ? new Date(data.contractEndDate) : undefined,
+      joinDate: data.joinDate ? new Date(data.joinDate) : undefined,
     };
     updateTeacher.mutate({
       id: selectedTeacher.id,

@@ -995,9 +995,9 @@ export const appRouter = router({
           notes: z.string().optional(),
           category: z.string().optional(),
           city: z.string().optional(),
-          aliases: z.string().optional(), // 别名(逗号分隔的字符串)
-          contractEndDate: z.union([z.string(), z.date()]).optional(), // 合同到期时间
-          joinDate: z.union([z.string(), z.date()]).optional(), // 入职时间
+          contractEndDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
+          joinDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
+          aliases: z.string().optional(), // 别名(逗号分隔)
           // 兼容旧字段
           nickname: z.string().optional(),
           email: z.string().optional(),
@@ -1043,8 +1043,8 @@ export const appRouter = router({
           notes: z.string().optional(),
           category: z.string().optional(),
           city: z.string().optional(),
-          contractEndDate: z.union([z.string(), z.date()]).optional(),
-          joinDate: z.union([z.string(), z.date()]).optional(),
+          contractEndDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
+          joinDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
         })),
       }))
       .mutation(async ({ input }) => {
@@ -1098,6 +1098,11 @@ export const appRouter = router({
         const now = new Date();
         const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
         return db.getSchedulesByDateRange(oneMonthAgo, now);
+      }),
+    
+    listWithOrderInfo: protectedProcedure
+      .query(async () => {
+        return db.getSchedulesWithOrderInfo();
       }),
     
     getByTeacher: protectedProcedure
