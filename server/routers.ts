@@ -634,12 +634,23 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const { id, ...updateData } = input;
-        const processedData: any = { ...updateData };
-        if (updateData.paymentDate) {
-          processedData.paymentDate = new Date(updateData.paymentDate);
+        
+        // 过滤掉空字符串和undefined,只保留有效值
+        const processedData: any = {};
+        for (const [key, value] of Object.entries(updateData)) {
+          // 跳过undefined和空字符串(但保留数字0)
+          if (value === undefined || value === "") {
+            continue;
+          }
+          processedData[key] = value;
         }
-        if (updateData.classDate) {
-          processedData.classDate = new Date(updateData.classDate);
+        
+        // 处理日期字段:只有非空字符串才转换
+        if (processedData.paymentDate && processedData.paymentDate !== "") {
+          processedData.paymentDate = new Date(processedData.paymentDate);
+        }
+        if (processedData.classDate && processedData.classDate !== "") {
+          processedData.classDate = new Date(processedData.classDate);
         }
         
         // 如果更新了交付城市、课程金额或老师费用,自动重算合伙人费(除非手动指定)

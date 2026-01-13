@@ -266,7 +266,12 @@ export default function Orders() {
     setSelectedOrder(order);
     setValue("orderNo", order.orderNo);
     setValue("customerName", order.customerName || "");
-    setValue("salespersonId", order.salespersonId);
+    // 只在salespersonId有值时设置,否则设为undefined
+    if (order.salespersonId) {
+      setValue("salespersonId", order.salespersonId);
+    } else {
+      setValue("salespersonId", undefined);
+    }
     setValue("salesPerson", order.salesPerson || "");
     setValue("trafficSource", order.trafficSource || "");
     setValue("paymentAmount", order.paymentAmount ?? "");
@@ -286,7 +291,28 @@ export default function Orders() {
     setValue("deliveryRoom", order.deliveryRoom || "");
     setValue("deliveryTeacher", order.deliveryTeacher || "");
     setValue("deliveryCourse", order.deliveryCourse || "");
-    setValue("classDate", order.classDate || "");
+    // 处理日期字段:转换为YYYY-MM-DD格式
+    if (order.classDate) {
+      const date = order.classDate instanceof Date ? order.classDate : new Date(order.classDate);
+      if (!isNaN(date.getTime())) {
+        setValue("classDate", date.toISOString().split('T')[0]);
+      } else {
+        setValue("classDate", "");
+      }
+    } else {
+      setValue("classDate", "");
+    }
+    // 处理支付日期
+    if (order.paymentDate) {
+      const date = order.paymentDate instanceof Date ? order.paymentDate : new Date(order.paymentDate);
+      if (!isNaN(date.getTime())) {
+        setValue("paymentDate", date.toISOString().split('T')[0]);
+      } else {
+        setValue("paymentDate", "");
+      }
+    } else {
+      setValue("paymentDate", "");
+    }
     setValue("classTime", order.classTime || "");
     setValue("notes", order.notes || "");
     setEditOpen(true);
