@@ -69,7 +69,10 @@ ${icsEvents.map((event, index) => `
 请提取每个事件的以下信息:
 1. 销售人员 - 从SUMMARY第一个词识别销售人员花名(如"昭昭"、"嘟嘟"、"七七"),如果无法识别则留空
 2. 设备微信号 - 流量来源,通常是日历所有者或设备账号,可以从ORGANIZER或文件元数据推断,如果无法识别则留空
-3. 客户名 - 客户的名字,通常在SUMMARY中(如"七七"可能是客户名),注意不要把老师名当作客户名
+3. 客户名 - 客户的名字,通常在SUMMARY中(如"七七"可能是客户名)
+   ⚠️ 注意:客户名不能是老师名,也不能是课程名!
+   * 如果识别出的名字在老师列表中,则不是客户名
+   * 如果识别出的名字看起来像课程名称(如"高定网T"、"LEC4"、"基础局"等),则不是客户名
 4. 上课日期 - 从START时间提取,格式YYYY-MM-DD(如"2025-12-17")
 5. 上课时间 - 从START和END时间提取,格式HH:MM-HH:MM(如"20:30-21:30")
 6. 课程名称 - 课程内容,从SUMMARY中提取(如"线上理论课"、"水不在深有龙则呜")
@@ -93,7 +96,9 @@ ${icsEvents.map((event, index) => `
 
 ⚠️ 重要规则:
 - 客户名不能是老师名!如果识别出的客户名在老师列表中,则将客户名设为空
+- 客户名不能是课程名!如果识别出的名字看起来像课程名称(如"高定网T"、"LEC4"、"基础局"、"刘心班任"等),则将客户名设为空
 - 如果SUMMARY格式类似"客户名 课程 老师名 金额",则第一个词是客户名,倒数第二个词是老师名
+- 课程名应该填写到course字段,不要填写到customerName字段
 - 日期和时间必须从START/END字段提取,不要从SUMMARY中猜测
 - 金额相关字段如果无法识别则填0,不要填null
 - 字符串字段如果无法识别则留空,不要填"未知"或"无"
@@ -165,10 +170,17 @@ ${icsEvents.map((event, index) => `
     const parsed = JSON.parse(content);
     const orders: ParsedICSOrder[] = parsed.orders;
 
-    // 后处理:过滤掉客户名是老师名的情况
+    // 后处理:过滤掉客户名是老师名或课程名的情况
+    const courseKeywords = ["高定", "网T", "LEC", "基础局", "班任", "课程", "课"];
     for (const order of orders) {
+      // 检查是否是老师名
       if (order.customerName && await isTeacherName(order.customerName)) {
         console.warn(`[ICS解析] 客户名"${order.customerName}"是老师名,已清空`);
+        order.customerName = "";
+      }
+      // 检查是否是课程名
+      if (order.customerName && courseKeywords.some(keyword => order.customerName.includes(keyword))) {
+        console.warn(`[ICS解析] 客户名"${order.customerName}"疑似课程名,已清空`);
         order.customerName = "";
       }
     }
