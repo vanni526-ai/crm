@@ -67,13 +67,33 @@ export default function Import() {
           if (icsImportMode === 'order') {
             const result = await parseICSToOrders.mutateAsync({ fileContent: base64 });
             setPreviewData(result.orders);
-            setPreviewOpen(true);
-            toast.success(`成功解析 ${result.recordCount} 个订单`);
+            
+            // 优化提示信息:显示事件数量和订单数量
+            if (result.recordCount === 0) {
+              toast.warning(
+                `ICS文件解析完成，但未能识别出订单信息。\n` +
+                `请确认文件内容是否包含课程订单相关信息（客户名、课程、老师、金额等）。`,
+                { duration: 6000 }
+              );
+              setPreviewOpen(false);
+            } else {
+              setPreviewOpen(true);
+              toast.success(`成功解析 ${result.recordCount} 个订单`);
+            }
           } else {
             const result = await parseICS.mutateAsync({ fileContent: base64 });
             setPreviewData(result.events);
-            setPreviewOpen(true);
-            toast.success(`成功解析 ${result.recordCount} 个事件`);
+            
+            if (result.recordCount === 0) {
+              toast.warning(
+                `ICS文件为空或格式不正确，未解析到任何事件。`,
+                { duration: 5000 }
+              );
+              setPreviewOpen(false);
+            } else {
+              setPreviewOpen(true);
+              toast.success(`成功解析 ${result.recordCount} 个事件`);
+            }
           }
         }
       } catch (error: any) {
