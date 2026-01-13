@@ -1164,6 +1164,28 @@ export const appRouter = router({
         await db.deleteSchedule(input.id);
         return { success: true };
       }),
+    
+    // 月度合伙人费用统计
+    getMonthlyPartnerSettlement: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        month: z.number().min(1).max(12),
+      }))
+      .query(async ({ input }) => {
+        const { getMonthlyPartnerSettlement } = await import("./partnerSettlement");
+        return getMonthlyPartnerSettlement(input.year, input.month);
+      }),
+    
+    // 按日期范围统计合伙人费用
+    getPartnerSettlementByDateRange: protectedProcedure
+      .input(z.object({
+        startDate: z.date(),
+        endDate: z.date(),
+      }))
+      .query(async ({ input }) => {
+        const { getPartnerSettlementByDateRange } = await import("./partnerSettlement");
+        return getPartnerSettlementByDateRange(input.startDate, input.endDate);
+      }),
   }),
 
   // 老师费用结算

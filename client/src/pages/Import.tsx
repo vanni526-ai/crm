@@ -8,6 +8,7 @@ import { Upload, FileSpreadsheet, FileText, Calendar, CheckCircle, XCircle, List
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import MonthlyPartnerSettlement from "@/components/MonthlyPartnerSettlement";
 
 export default function Import() {
   const { data: logs, refetch } = trpc.import.getLogs.useQuery();
@@ -503,6 +504,9 @@ export default function Import() {
             </div>
           </CardContent>
         </Card>
+
+        {/* 月度合伙人费用统计 */}
+        <MonthlyPartnerSettlement />
 
         <Card>
           <CardHeader>
