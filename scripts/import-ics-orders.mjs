@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 import ical from 'ical';
-import { parseICSToOrders } from '../server/icsOrderParser.js';
-import { db } from '../server/db.js';
-import { orders } from '../drizzle/schema.js';
+import { parseICSToOrders } from '../server/icsOrderParser.ts';
+import { db } from '../server/db.ts';
+import { orders } from '../drizzle/schema.ts';
 
 const icsFilePath = '/home/ubuntu/upload/20260113.ics';
 

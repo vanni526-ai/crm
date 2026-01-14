@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE orders \nSET salespersonId = (SELECT id FROM salespersons WHERE nickname = '土豆' LIMIT 1)\nWHERE salesPerson = '土豆' AND salespersonId IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE orders \nSET salespersonId = (SELECT id FROM salespersons WHERE nickname = '土豆' LIMIT 1)\nWHERE salesPerson = '土豆' AND salespersonId IS NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1589
+}
