@@ -1,0 +1,110 @@
+{
+  "query": "SELECT \n  deliveryCity,\n  COUNT(*) as count,\n  GROUP_CONCAT(DISTINCT deliveryRoom SEPARATOR ', ') as rooms\nFROM orders \nWHERE deliveryCity IS NULL \n   OR deliveryCity = '' \n   OR deliveryCity = '未知城市'\n   OR deliveryCity LIKE '%会议室%'\n   OR deliveryCity LIKE '%http%'\n   OR deliveryCity LIKE '%腾讯%'\nGROUP BY deliveryCity\nORDER BY count DESC\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  deliveryCity,\n  COUNT(*) as count,\n  GROUP_CONCAT(DISTINCT deliveryRoom SEPARATOR ', ') as rooms\nFROM orders \nWHERE deliveryCity IS NULL \n   OR deliveryCity = '' \n   OR deliveryCity = '未知城市'\n   OR deliveryCity LIKE '%会议室%'\n   OR deliveryCity LIKE '%http%'\n   OR deliveryCity LIKE '%腾讯%'\nGROUP BY deliveryCity\nORDER BY count DESC\nLIMIT 20;",
+  "rows": [
+    {
+      "deliveryCity": "",
+      "count": "1473",
+      "rooms": ", 腾讯会议"
+    },
+    {
+      "deliveryCity": "会议室：长风北岸1101",
+      "count": "358",
+      "rooms": ", (北岸·长风I幢-404), (北岸·长风I幢-1101)"
+    },
+    {
+      "deliveryCity": "会议室：长风北岸404",
+      "count": "207",
+      "rooms": "(北岸·长风I幢-404)"
+    },
+    {
+      "deliveryCity": "会议室：天津教室",
+      "count": "78",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：捷运大厦16D",
+      "count": "32",
+      "rooms": ", (新虹桥捷运大厦-16D)"
+    },
+    {
+      "deliveryCity": "会议室：东莞教室",
+      "count": "26",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：武汉教室",
+      "count": "24",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：南京教室",
+      "count": "21",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：济南教室",
+      "count": "21",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：无锡教室",
+      "count": "11",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：石家庄教室",
+      "count": "11",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：大连教室",
+      "count": "9",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：重庆教室",
+      "count": "8",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：郑州教室",
+      "count": "8",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：太原教室",
+      "count": "6",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：福州教室",
+      "count": "4",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：苏州教室",
+      "count": "4",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "会议室：泉州教室",
+      "count": "3",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "点击链接入会：https://work.weixin.qq.com/webapp/tm/4XRn1v",
+      "count": "1",
+      "rooms": ""
+    },
+    {
+      "deliveryCity": "点击链接入会：https://work.weixin.qq.com/webapp/tm/05vbKA",
+      "count": "1",
+      "rooms": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "deliveryCity\tcount\trooms\n\t1473\t, 腾讯会议\n会议室：长风北岸1101\t358\t, (北岸·长风I幢-404), (北岸·长风I幢-1101)\n会议室：长风北岸404\t207\t(北岸·长风I幢-404)\n会议室：天津教室\t78\t\n会议室：捷运大厦16D\t32\t, (新虹桥捷运大厦-16D)\n会议室：东莞教室\t26\t\n会议室：武汉教室\t24\t\n会议室：南京教室\t21\t\n会议室：济南教室\t21\t\n会议室：无锡教室\t11\t\n会议室：石家庄教室\t11\t\n会议室：大连教室\t9\t\n会议室：重庆教室\t8\t\n会议室：郑州教室\t8\t\n会议室：太原教室\t6\t\n会议室：福州教室\t4\t\n会议室：苏州教室\t4\t\n会议室：泉州教室\t3\t\n点击链接入会：https://work.weixin.qq.com/webapp/tm/4XRn1v\t1\t\n点击链接入会：https://work.weixin.qq.com/webapp/tm/05vbKA\t1\t\n",
+  "stderr": "",
+  "execution_time_ms": 1595
+}

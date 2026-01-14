@@ -7,16 +7,36 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle, MapPin } from "lucide-react";
+import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle, MapPin, RefreshCw } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 
 export default function Finance() {
-  const { data: orders } = trpc.orders.list.useQuery();
+  const utils = trpc.useUtils();
+  const { data: orders, refetch: refetchOrders } = trpc.orders.list.useQuery();
   const { data: users } = trpc.users.list.useQuery();
-  const { data: cityRevenue } = trpc.analytics.cityRevenue.useQuery();
-  const { data: cityRevenueTrend } = trpc.analytics.cityRevenueTrend.useQuery();
+  const { data: cityRevenue, refetch: refetchCityRevenue } = trpc.analytics.cityRevenue.useQuery();
+  const { data: cityRevenueTrend, refetch: refetchCityRevenueTrend } = trpc.analytics.cityRevenueTrend.useQuery();
+  
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        refetchOrders(),
+        refetchCityRevenue(),
+        refetchCityRevenueTrend(),
+        utils.analytics.cityFinancialStats.invalidate()
+      ]);
+      toast.success("财务数据已刷新");
+    } catch (error) {
+      toast.error("刷新失败，请重试");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   
   // 城市财务统计
   const [cityStatsDateRange, setCityStatsDateRange] = useState<string>("all");
@@ -473,6 +493,10 @@ export default function Finance() {
             <p className="text-muted-foreground mt-2">查看收支明细和利润分析</p>
           </div>
           <div className="flex gap-2">
+            <Button onClick={handleRefresh} variant="outline" disabled={isRefreshing}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              刷新数据
+            </Button>
             <Button onClick={handleBatchUpdateOrderIds} variant="outline">
               <AlertCircle className="mr-2 h-4 w-4" />
               批量更新订单号
