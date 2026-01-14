@@ -1189,6 +1189,45 @@ export async function getTrafficSourceMonthlyStats() {
   })).sort((a, b) => b.orderCount - a.orderCount);
 }
 
+// 流量来源详细统计(包含成交额和转化率)
+export async function getTrafficSourceAnalysis() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  const result = await db
+    .select({
+      source: orders.trafficSource,
+      orderCount: sql<number>`count(*)`,
+      totalRevenue: sql<string>`COALESCE(SUM(CAST(${orders.paymentAmount} AS DECIMAL(10,2))), 0)`,
+      paidOrderCount: sql<number>`SUM(CASE WHEN ${orders.status} = 'paid' THEN 1 ELSE 0 END)`,
+    })
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, startOfMonth),
+        ne(orders.status, "cancelled"),
+        isNotNull(orders.trafficSource)
+      )
+    )
+    .groupBy(orders.trafficSource);
+  
+  return result.map(r => {
+    const orderCount = r.orderCount || 0;
+    const paidOrderCount = r.paidOrderCount || 0;
+    const conversionRate = orderCount > 0 ? (paidOrderCount / orderCount) * 100 : 0;
+    
+    return {
+      source: r.source || '未知',
+      orderCount,
+      totalRevenue: parseFloat(r.totalRevenue || '0'),
+      conversionRate: Math.round(conversionRate * 100) / 100, // 保留两位小数
+    };
+  }).sort((a, b) => b.totalRevenue - a.totalRevenue); // 按成交额排序
+}
+
 // 销售人员支付金额统计
 export async function getSalesPersonPaymentStats() {
   const db = await getDb();

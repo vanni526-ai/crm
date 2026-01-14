@@ -18,6 +18,7 @@ export default function Finance() {
   const { data: users } = trpc.users.list.useQuery();
   const { data: cityRevenue, refetch: refetchCityRevenue } = trpc.analytics.cityRevenue.useQuery();
   const { data: cityRevenueTrend, refetch: refetchCityRevenueTrend } = trpc.analytics.cityRevenueTrend.useQuery();
+  const { data: trafficSourceAnalysis, refetch: refetchTrafficSourceAnalysis } = trpc.analytics.trafficSourceAnalysis.useQuery();
   
   const [isRefreshing, setIsRefreshing] = useState(false);
   
@@ -28,6 +29,7 @@ export default function Finance() {
         refetchOrders(),
         refetchCityRevenue(),
         refetchCityRevenueTrend(),
+        refetchTrafficSourceAnalysis(),
         utils.analytics.cityFinancialStats.invalidate()
       ]);
       toast.success("财务数据已刷新");
@@ -507,6 +509,90 @@ export default function Finance() {
             </Button>
           </div>
         </div>
+
+        {/* 流量来源分析 */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle>流量来源分析</CardTitle>
+            <p className="text-sm text-muted-foreground">本月各渠道的订单量、成交额和转化率排名</p>
+          </CardHeader>
+          <CardContent>
+            {trafficSourceAnalysis && trafficSourceAnalysis.length > 0 ? (
+              <div className="space-y-4">
+                {/* 排行榜 */}
+                <div className="space-y-3">
+                  {trafficSourceAnalysis.slice(0, 10).map((item, index) => (
+                    <div key={item.source} className="flex items-center gap-4 p-3 rounded-lg border hover:bg-accent/50 transition-colors">
+                      {/* 排名 */}
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold" style={{
+                        background: index === 0 ? 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' :
+                                   index === 1 ? 'linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%)' :
+                                   index === 2 ? 'linear-gradient(135deg, #cd7f32 0%, #d4a574 100%)' :
+                                   '#f3f4f6',
+                        color: index < 3 ? '#000' : '#6b7280'
+                      }}>
+                        {index + 1}
+                      </div>
+                      
+                      {/* 渠道名称 */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{item.source}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {item.orderCount} 个订单
+                        </div>
+                      </div>
+                      
+                      {/* 成交额 */}
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-600">
+                          ￥{item.totalRevenue.toLocaleString()}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          转化率 {item.conversionRate}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {trafficSourceAnalysis.length > 10 && (
+                  <div className="text-center text-sm text-muted-foreground pt-2">
+                    还有 {trafficSourceAnalysis.length - 10} 个渠道...
+                  </div>
+                )}
+                
+                {/* 成交额排行图 */}
+                <div className="mt-6">
+                  <h3 className="text-sm font-medium mb-3">成交额 TOP 8</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={trafficSourceAnalysis.slice(0, 8)}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="source" 
+                        angle={-45} 
+                        textAnchor="end" 
+                        height={100}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        formatter={(value: number, name: string, props: any) => [
+                          `￥${value.toLocaleString()}`,
+                          '成交额'
+                        ]}
+                      />
+                      <Bar dataKey="totalRevenue" fill="#10b981" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground py-8">
+                暂无数据
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* 城市订单财务统计 */}
         <Card className="glass-card">

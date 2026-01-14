@@ -1311,6 +1311,11 @@ export const appRouter = router({
         return db.getTrafficSourceMonthlyStats();
       }),
     
+    trafficSourceAnalysis: publicProcedure
+      .query(async () => {
+        return db.getTrafficSourceAnalysis();
+      }),
+    
     salesPersonPaymentStats: publicProcedure
       .query(async () => {
         return db.getSalesPersonPaymentStats();
