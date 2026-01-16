@@ -25,6 +25,9 @@ export default function () {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [showPasteDialog, setShowPasteDialog] = useState(false);
   const [emailContent, setEmailContent] = useState("");
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewData, setPreviewData] = useState<any>(null);
+  const [editedOrders, setEditedOrders] = useState<any[]>([]);
 
   // 获取导入历史
   const { data: historyData, refetch: refetchHistory } = trpc.gmailAutoImport.getImportHistory.useQuery();
@@ -113,7 +116,45 @@ export default function () {
     },
   });
 
-  // 手动导入(粘贴内容)
+  // 预览导入
+  const previewImportMutation = trpc.gmailAutoImport.previewImport.useMutation({
+    onSuccess: (data: any) => {
+      setPreviewData(data);
+      setEditedOrders(data.orders);
+      setShowPasteDialog(false);
+      setShowPreviewDialog(true);
+      setIsImporting(false);
+      toast.success("解析完成", { 
+        description: `解析到${data.totalCount}个订单, 其中${data.validCount}个有效, ${data.invalidCount}个有警告` 
+      });
+    },
+    onError: (error: any) => {
+      toast.error("预览失败", { description: error.message });
+      setIsImporting(false);
+    },
+  });
+
+  // 确认导入
+  const confirmImportMutation = trpc.gmailAutoImport.confirmImport.useMutation({
+    onSuccess: (data: any) => {
+      toast.success("导入完成", { 
+        description: `成功导入${data.successCount}个订单, 跳过${data.skippedCount}个重复订单` 
+      });
+      refetchHistory();
+      refetchStats();
+      setIsImporting(false);
+      setShowPreviewDialog(false);
+      setEmailContent("");
+      setPreviewData(null);
+      setEditedOrders([]);
+    },
+    onError: (error: any) => {
+      toast.error("导入失败", { description: error.message });
+      setIsImporting(false);
+    },
+  });
+
+  // 手动导入(粘贴内容) - 保留旧版本以兼容
   const pasteImportMutation = trpc.gmailAutoImport.pasteImport.useMutation({
     onSuccess: (data: any) => {
       toast.success("导入完成", { 
@@ -143,14 +184,37 @@ export default function () {
     setShowPasteDialog(true);
   };
 
-  // 提交粘贴内容
+  // 提交粘贴内容 - 进入预览模式
   const handlePasteSubmit = () => {
     if (!emailContent.trim()) {
       toast.error("请粘贴邮件内容");
       return;
     }
     setIsImporting(true);
-    pasteImportMutation.mutate({ emailContent });
+    previewImportMutation.mutate({ emailContent });
+  };
+
+  // 确认导入预览的订单
+  const handleConfirmImport = () => {
+    setIsImporting(true);
+    confirmImportMutation.mutate({ 
+      orders: editedOrders,
+      emailContent 
+    });
+  };
+
+  // 编辑预览订单
+  const handleEditOrder = (index: number, field: string, value: any) => {
+    const newOrders = [...editedOrders];
+    newOrders[index] = { ...newOrders[index], [field]: value };
+    setEditedOrders(newOrders);
+  };
+
+  // 删除预览订单
+  const handleRemoveOrder = (index: number) => {
+    const newOrders = editedOrders.filter((_, i) => i !== index);
+    setEditedOrders(newOrders);
+    toast.success("已移除订单");
   };
 
   // 查看详情
@@ -698,6 +762,200 @@ export default function () {
                   </>
                 ) : (
                   "开始导入"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 预览导入结果对话框 */}
+        <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+          <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>预览导入结果</DialogTitle>
+              <DialogDescription>
+                请检查解析结果,可以编辑修正错误信息,确认无误后点击"确认导入"
+              </DialogDescription>
+            </DialogHeader>
+            
+            {previewData && (
+              <div className="space-y-4">
+                {/* 统计信息 */}
+                <div className="flex gap-4 p-4 bg-muted rounded-lg">
+                  <div className="flex-1">
+                    <div className="text-sm text-muted-foreground">总订单数</div>
+                    <div className="text-2xl font-bold">{editedOrders.length}</div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-muted-foreground">有效订单</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {editedOrders.filter((o: any) => o.isValid).length}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm text-muted-foreground">有警告</div>
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {editedOrders.filter((o: any) => !o.isValid).length}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 订单列表 */}
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-12">#</TableHead>
+                        <TableHead>客户名</TableHead>
+                        <TableHead>销售人</TableHead>
+                        <TableHead>流量来源</TableHead>
+                        <TableHead>支付金额</TableHead>
+                        <TableHead>课程金额</TableHead>
+                        <TableHead>老师费用</TableHead>
+                        <TableHead>渠道订单号</TableHead>
+                        <TableHead>交付城市</TableHead>
+                        <TableHead>老师</TableHead>
+                        <TableHead>课程</TableHead>
+                        <TableHead>上课日期</TableHead>
+                        <TableHead>状态</TableHead>
+                        <TableHead className="w-24">操作</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {editedOrders.map((order: any, index: number) => (
+                        <TableRow key={index} className={!order.isValid ? "bg-yellow-50" : ""}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>
+                            <input
+                              type="text"
+                              value={order.customerName || ""}
+                              onChange={(e) => handleEditOrder(index, "customerName", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="text"
+                              value={order.salesperson || ""}
+                              onChange={(e) => handleEditOrder(index, "salesperson", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="text"
+                              value={order.deviceWechat || ""}
+                              onChange={(e) => handleEditOrder(index, "deviceWechat", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="number"
+                              value={order.paymentAmount || 0}
+                              onChange={(e) => handleEditOrder(index, "paymentAmount", parseFloat(e.target.value))}
+                              className="w-24 px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="number"
+                              value={order.courseAmount || 0}
+                              onChange={(e) => handleEditOrder(index, "courseAmount", parseFloat(e.target.value))}
+                              className="w-24 px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="number"
+                              value={order.teacherFee || 0}
+                              onChange={(e) => handleEditOrder(index, "teacherFee", parseFloat(e.target.value))}
+                              className="w-24 px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="text"
+                              value={order.channelOrderNo || ""}
+                              onChange={(e) => handleEditOrder(index, "channelOrderNo", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm font-mono"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="text"
+                              value={order.city || ""}
+                              onChange={(e) => handleEditOrder(index, "city", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="text"
+                              value={order.teacher || ""}
+                              onChange={(e) => handleEditOrder(index, "teacher", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="text"
+                              value={order.course || ""}
+                              onChange={(e) => handleEditOrder(index, "course", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <input
+                              type="date"
+                              value={order.classDate ? new Date(order.classDate).toISOString().split('T')[0] : ""}
+                              onChange={(e) => handleEditOrder(index, "classDate", e.target.value)}
+                              className="w-full px-2 py-1 border rounded text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {order.warnings && order.warnings.length > 0 ? (
+                              <div className="space-y-1">
+                                {order.warnings.map((warning: string, i: number) => (
+                                  <Badge key={i} variant="outline" className="text-xs">
+                                    {warning}
+                                  </Badge>
+                                ))}
+                              </div>
+                            ) : (
+                              <Badge variant="outline" className="text-green-600">正常</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveOrder(index)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            )}
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowPreviewDialog(false)}>
+                取消
+              </Button>
+              <Button onClick={handleConfirmImport} disabled={isImporting || editedOrders.length === 0}>
+                {isImporting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    导入中...
+                  </>
+                ) : (
+                  `确认导入 (${editedOrders.length}个订单)`
                 )}
               </Button>
             </DialogFooter>

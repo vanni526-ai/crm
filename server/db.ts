@@ -30,6 +30,8 @@ import {
   InsertGmailImportHistory,
   GmailImportHistory,
   cityPartnerConfig,
+  auditLogs,
+  partnerFeeAuditLogs,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -2514,4 +2516,246 @@ export async function calculatePartnerFee(
   const partnerFee = baseRevenue * rate;
   
   return Math.round(partnerFee * 100) / 100; // 保留两位小数
+}
+
+// ========== 合伙人费审计日志管理 ==========
+
+/**
+ * 创建合伙人费审计日志
+ */
+export async function createAuditLog(data: {
+  operationType: string;
+  operationDescription: string;
+  operatorId: number;
+  operatorName: string;
+  affectedCount?: number;
+  details?: any;
+  status?: "success" | "failed" | "partial";
+  errorMessage?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(partnerFeeAuditLogs).values({
+    operationType: data.operationType,
+    operationDescription: data.operationDescription,
+    operatorId: data.operatorId,
+    operatorName: data.operatorName,
+    affectedCount: data.affectedCount || 0,
+    details: data.details ? JSON.stringify(data.details) : null,
+    status: data.status || "success",
+    errorMessage: data.errorMessage || null,
+  });
+  
+  return result[0].insertId;
+}
+
+/**
+ * 获取所有合伙人费审计日志
+ */
+export async function getAllAuditLogs(limit: number = 100, offset: number = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(partnerFeeAuditLogs)
+    .orderBy(desc(partnerFeeAuditLogs.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+/**
+ * 按操作类型获取审计日志
+ */
+export async function getAuditLogsByType(operationType: string, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(partnerFeeAuditLogs)
+    .where(eq(partnerFeeAuditLogs.operationType, operationType))
+    .orderBy(desc(partnerFeeAuditLogs.createdAt))
+    .limit(limit);
+}
+
+/**
+ * 按操作人获取审计日志
+ */
+export async function getAuditLogsByOperator(operatorId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(partnerFeeAuditLogs)
+    .where(eq(partnerFeeAuditLogs.operatorId, operatorId))
+    .orderBy(desc(partnerFeeAuditLogs.createdAt))
+    .limit(limit);
+}
+
+/**
+ * 按日期范围获取审计日志
+ */
+export async function getAuditLogsByDateRange(startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(partnerFeeAuditLogs)
+    .where(
+      and(
+        gte(partnerFeeAuditLogs.createdAt, startDate),
+        lte(partnerFeeAuditLogs.createdAt, endDate)
+      )
+    )
+    .orderBy(desc(partnerFeeAuditLogs.createdAt));
+}
+
+/**
+ * 获取审计日志统计
+ */
+export async function getAuditLogStats() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const result = await db
+    .select({
+      totalLogs: sql<number>`COUNT(*)`,
+      successCount: sql<number>`SUM(CASE WHEN ${partnerFeeAuditLogs.status} = 'success' THEN 1 ELSE 0 END)`,
+      failedCount: sql<number>`SUM(CASE WHEN ${partnerFeeAuditLogs.status} = 'failed' THEN 1 ELSE 0 END)`,
+      partialCount: sql<number>`SUM(CASE WHEN ${partnerFeeAuditLogs.status} = 'partial' THEN 1 ELSE 0 END)`,
+      totalAffectedRecords: sql<number>`SUM(${partnerFeeAuditLogs.affectedCount})`,
+    })
+    .from(partnerFeeAuditLogs);
+  
+  return result[0] || null;
+}
+
+// ========== 数据质量检查 ==========
+
+/**
+ * 检查订单数据质量问题
+ */
+export async function checkOrderDataQuality() {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const allOrders = await getAllOrders();
+  const cityConfigs = await getAllCityPartnerConfig();
+  const configuredCities = new Set(cityConfigs.map(c => c.city));
+  
+  const issues = {
+    missingCityConfig: [] as any[],
+    abnormalTeacherFee: [] as any[],
+    invalidChannelOrderNo: [] as any[],
+    missingRequiredFields: [] as any[],
+  };
+  
+  for (const order of allOrders) {
+    // 检查缺失城市配置
+    if (order.deliveryCity && !configuredCities.has(order.deliveryCity)) {
+      issues.missingCityConfig.push({
+        orderId: order.id,
+        orderNo: order.orderNo,
+        customerName: order.customerName,
+        deliveryCity: order.deliveryCity,
+        issue: `城市"${order.deliveryCity}"未配置合伙人费比例`,
+      });
+    }
+    
+    // 检查老师费用异常
+    if (order.teacherFee && order.courseAmount) {
+      const teacherFee = parseFloat(order.teacherFee);
+      const courseAmount = parseFloat(order.courseAmount);
+      if (teacherFee > courseAmount) {
+        issues.abnormalTeacherFee.push({
+          orderId: order.id,
+          orderNo: order.orderNo,
+          customerName: order.customerName,
+          teacherFee,
+          courseAmount,
+          issue: `老师费用(${teacherFee})超过课程金额(${courseAmount})`,
+        });
+      }
+    }
+    
+    // 检查渠道订单号格式
+    if (order.channelOrderNo && order.channelOrderNo.trim() !== '') {
+      const channelOrderNo = order.channelOrderNo.trim();
+      // 支付宝通常28位,微信通常32位
+      if (channelOrderNo.length < 20 || channelOrderNo.length > 35) {
+        issues.invalidChannelOrderNo.push({
+          orderId: order.id,
+          orderNo: order.orderNo,
+          customerName: order.customerName,
+          channelOrderNo,
+          length: channelOrderNo.length,
+          issue: `渠道订单号长度异常(${channelOrderNo.length}位)`,
+        });
+      }
+    }
+    
+    // 检查缺失必填字段
+    const missingFields: string[] = [];
+    if (!order.customerName || order.customerName.trim() === '') missingFields.push('客户名');
+    if (!order.deliveryCity || order.deliveryCity.trim() === '') missingFields.push('交付城市');
+    if (!order.courseAmount || order.courseAmount === '0') missingFields.push('课程金额');
+    if (!order.classDate) missingFields.push('上课日期');
+    
+    if (missingFields.length > 0) {
+      issues.missingRequiredFields.push({
+        orderId: order.id,
+        orderNo: order.orderNo,
+        customerName: order.customerName || '(未填写)',
+        missingFields,
+        issue: `缺失必填字段: ${missingFields.join(', ')}`,
+      });
+    }
+  }
+  
+  return {
+    totalOrders: allOrders.length,
+    totalIssues: 
+      issues.missingCityConfig.length +
+      issues.abnormalTeacherFee.length +
+      issues.invalidChannelOrderNo.length +
+      issues.missingRequiredFields.length,
+    issues,
+    summary: {
+      missingCityConfigCount: issues.missingCityConfig.length,
+      abnormalTeacherFeeCount: issues.abnormalTeacherFee.length,
+      invalidChannelOrderNoCount: issues.invalidChannelOrderNo.length,
+      missingRequiredFieldsCount: issues.missingRequiredFields.length,
+    },
+  };
+}
+
+/**
+ * 获取未配置城市列表
+ */
+export async function getUnconfiguredCities() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const allOrders = await getAllOrders();
+  const cityConfigs = await getAllCityPartnerConfig();
+  const configuredCities = new Set(cityConfigs.map(c => c.city));
+  
+  const unconfiguredCities = new Set<string>();
+  const cityOrderCounts: Record<string, number> = {};
+  
+  for (const order of allOrders) {
+    if (order.deliveryCity && !configuredCities.has(order.deliveryCity)) {
+      unconfiguredCities.add(order.deliveryCity);
+      cityOrderCounts[order.deliveryCity] = (cityOrderCounts[order.deliveryCity] || 0) + 1;
+    }
+  }
+  
+  return Array.from(unconfiguredCities).map(city => ({
+    city,
+    orderCount: cityOrderCounts[city],
+  })).sort((a, b) => b.orderCount - a.orderCount);
 }

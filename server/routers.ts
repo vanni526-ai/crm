@@ -53,6 +53,72 @@ export const appRouter = router({
   parsingLearning: parsingLearningRouter,
   reconciliation: reconciliationRouter,
 
+  // 数据质量检查
+  dataQuality: router({
+    // 检查订单数据质量
+    checkOrders: protectedProcedure.query(async () => {
+      return db.checkOrderDataQuality();
+    }),
+
+    // 获取未配置城市列表
+    getUnconfiguredCities: protectedProcedure.query(async () => {
+      return db.getUnconfiguredCities();
+    }),
+  }),
+
+  // 审计日志
+  auditLogs: router({
+    // 获取所有审计日志
+    getAll: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const limit = input?.limit || 100;
+        const offset = input?.offset || 0;
+        return db.getAllAuditLogs(limit, offset);
+      }),
+
+    // 按操作类型获取审计日志
+    getByType: protectedProcedure
+      .input(z.object({
+        operationType: z.string(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const limit = input.limit || 50;
+        return db.getAuditLogsByType(input.operationType, limit);
+      }),
+
+    // 按操作人获取审计日志
+    getByOperator: protectedProcedure
+      .input(z.object({
+        operatorId: z.number(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const limit = input.limit || 50;
+        return db.getAuditLogsByOperator(input.operatorId, limit);
+      }),
+
+    // 按日期范围获取审计日志
+    getByDateRange: protectedProcedure
+      .input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const startDate = new Date(input.startDate);
+        const endDate = new Date(input.endDate);
+        return db.getAuditLogsByDateRange(startDate, endDate);
+      }),
+
+    // 获取审计日志统计
+    getStats: protectedProcedure.query(async () => {
+      return db.getAuditLogStats();
+    }),
+  }),
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
@@ -1440,13 +1506,14 @@ export const appRouter = router({
       .input(z.object({
         orderIds: z.array(z.number())
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         const { orderIds } = input;
         
         let updatedCount = 0;
         let unchangedCount = 0;
         let errorCount = 0;
         const updates: any[] = [];
+        const errorMessages: string[] = [];
         
         for (const orderId of orderIds) {
           try {
@@ -1454,6 +1521,7 @@ export const appRouter = router({
             const order = await db.getOrderById(orderId);
             if (!order) {
               errorCount++;
+              errorMessages.push(`订单ID ${orderId} 不存在`);
               continue;
             }
             
@@ -1478,6 +1546,7 @@ export const appRouter = router({
             // 如果合伙人费有变化，记录更新
             if (Math.abs(newPartnerFee - oldPartnerFee) > 0.01) {
               updates.push({
+                orderId: order.id,
                 orderNo: order.orderNo,
                 customerName: order.customerName,
                 deliveryCity: order.deliveryCity,
@@ -1499,7 +1568,28 @@ export const appRouter = router({
           } catch (error) {
             console.error(`处理订单 ${orderId} 时出错:`, error);
             errorCount++;
+            errorMessages.push(`订单ID ${orderId}: ${error instanceof Error ? error.message : '未知错误'}`);
           }
+        }
+        
+        // 记录审计日志
+        try {
+          await db.createAuditLog({
+            operationType: "batch_calculate_partner_fee",
+            operationDescription: `批量重新计算合伙人费: 共${orderIds.length}个订单, 更新${updatedCount}个, 未变${unchangedCount}个, 失败${errorCount}个`,
+            operatorId: ctx.user.id,
+            operatorName: ctx.user.name || ctx.user.nickname || "未知",
+            affectedCount: updatedCount,
+            details: {
+              orderIds,
+              updates,
+              errorMessages,
+            },
+            status: errorCount > 0 ? (updatedCount > 0 ? "partial" : "failed") : "success",
+            errorMessage: errorMessages.length > 0 ? errorMessages.join("; ") : undefined,
+          });
+        } catch (auditError) {
+          console.error("记录审计日志失败:", auditError);
         }
         
         return {
@@ -1509,6 +1599,7 @@ export const appRouter = router({
           unchangedCount,
           errorCount,
           updates,
+          errorMessages,
         };
       }),
     

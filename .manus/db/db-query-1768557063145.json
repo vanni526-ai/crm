@@ -1,0 +1,25 @@
+{
+  "query": "SELECT * FROM auditLogs LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT * FROM auditLogs LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "action": "user_create",
+      "userId": "1",
+      "userName": "顗杰 韩",
+      "userRole": "admin",
+      "targetType": "user",
+      "targetId": "1740005",
+      "targetName": "测试",
+      "description": "创建新用户: aaa (测试)",
+      "changes": "{\"role\": \"sales\", \"username\": \"aaa\"}",
+      "ipAddress": "NULL",
+      "userAgent": "NULL",
+      "createdAt": "2025-12-18 04:33:05"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\taction\tuserId\tuserName\tuserRole\ttargetType\ttargetId\ttargetName\tdescription\tchanges\tipAddress\tuserAgent\tcreatedAt\n1\tuser_create\t1\t顗杰 韩\tadmin\tuser\t1740005\t测试\t创建新用户: aaa (测试)\t{\"role\": \"sales\", \"username\": \"aaa\"}\tNULL\tNULL\t2025-12-18 04:33:05\n",
+  "stderr": "",
+  "execution_time_ms": 1514
+}

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `partnerFeeAuditLogs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `operationType` varchar(50) NOT NULL,\n  `operationDescription` text NOT NULL,\n  `operatorId` int NOT NULL,\n  `operatorName` varchar(100) NOT NULL,\n  `affectedCount` int NOT NULL DEFAULT 0,\n  `details` json,\n  `status` enum('success','failed','partial') NOT NULL DEFAULT 'success',\n  `errorMessage` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `partnerFeeAuditLogs_id` PRIMARY KEY(`id`),\n  INDEX `operation_type_idx` (`operationType`),\n  INDEX `operator_idx` (`operatorId`),\n  INDEX `created_at_idx` (`createdAt`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `partnerFeeAuditLogs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `operationType` varchar(50) NOT NULL,\n  `operationDescription` text NOT NULL,\n  `operatorId` int NOT NULL,\n  `operatorName` varchar(100) NOT NULL,\n  `affectedCount` int NOT NULL DEFAULT 0,\n  `details` json,\n  `status` enum('success','failed','partial') NOT NULL DEFAULT 'success',\n  `errorMessage` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  CONSTRAINT `partnerFeeAuditLogs_id` PRIMARY KEY(`id`),\n  INDEX `operation_type_idx` (`operationType`),\n  INDEX `operator_idx` (`operatorId`),\n  INDEX `created_at_idx` (`createdAt`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1688
+}

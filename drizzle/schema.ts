@@ -548,3 +548,60 @@ export const cityPartnerConfig = mysqlTable("cityPartnerConfig", {
 
 export type CityPartnerConfig = typeof cityPartnerConfig.$inferSelect;
 export type InsertCityPartnerConfig = typeof cityPartnerConfig.$inferInsert;
+
+/**
+ * 审计日志表 - 记录重要操作的历史记录
+ */
+export const auditLogs = mysqlTable("auditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  action: mysqlEnum("action", [
+    "order_create", "order_update", "order_delete",
+    "user_create", "user_role_update", "user_status_update", "user_delete",
+    "data_import",
+    "customer_create", "customer_update", "customer_delete",
+    "teacher_create", "teacher_update", "teacher_delete",
+    "schedule_create", "schedule_update", "schedule_delete",
+  ]).notNull(),
+  userId: int("userId").notNull(),
+  userName: varchar("userName", { length: 100 }),
+  userRole: varchar("userRole", { length: 20 }),
+  targetType: varchar("targetType", { length: 50 }),
+  targetId: int("targetId"),
+  targetName: varchar("targetName", { length: 200 }),
+  description: text("description").notNull(),
+  changes: json("changes"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  actionIdx: index("action_idx").on(table.action),
+  userIdx: index("user_idx").on(table.userId),
+  targetIdx: index("target_idx").on(table.targetType),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+/**
+ * 合伙人费审计日志表 - 记录批量计算合伙人费的操作历史
+ */
+export const partnerFeeAuditLogs = mysqlTable("partnerFeeAuditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  operationType: varchar("operationType", { length: 50 }).notNull(), // 操作类型(如"batch_calculate_partner_fee")
+  operationDescription: text("operationDescription").notNull(), // 操作描述
+  operatorId: int("operatorId").notNull(), // 操作人ID
+  operatorName: varchar("operatorName", { length: 100 }).notNull(), // 操作人姓名
+  affectedCount: int("affectedCount").default(0).notNull(), // 影响的记录数
+  details: json("details"), // 详细信息(JSON格式,包含受影响的订单ID列表等)
+  status: mysqlEnum("status", ["success", "failed", "partial"]).default("success").notNull(), // 操作状态
+  errorMessage: text("errorMessage"), // 错误信息(如果失败)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  operationTypeIdx: index("operation_type_idx").on(table.operationType),
+  operatorIdx: index("operator_idx").on(table.operatorId),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type PartnerFeeAuditLog = typeof partnerFeeAuditLogs.$inferSelect;
+export type InsertPartnerFeeAuditLog = typeof partnerFeeAuditLogs.$inferInsert;
