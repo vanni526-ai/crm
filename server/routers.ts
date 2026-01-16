@@ -1435,6 +1435,83 @@ export const appRouter = router({
         return { partnerFee };
       }),
     
+    // 批量重新计算合伙人费(针对选中的订单)
+    batchCalculatePartnerFee: protectedProcedure
+      .input(z.object({
+        orderIds: z.array(z.number())
+      }))
+      .mutation(async ({ input }) => {
+        const { orderIds } = input;
+        
+        let updatedCount = 0;
+        let unchangedCount = 0;
+        let errorCount = 0;
+        const updates: any[] = [];
+        
+        for (const orderId of orderIds) {
+          try {
+            // 获取订单信息
+            const order = await db.getOrderById(orderId);
+            if (!order) {
+              errorCount++;
+              continue;
+            }
+            
+            // 跳过没有必要字段的订单
+            if (!order.deliveryCity || !order.courseAmount || order.teacherFee === null) {
+              unchangedCount++;
+              continue;
+            }
+            
+            const courseAmount = parseFloat(order.courseAmount);
+            const teacherFee = parseFloat(order.teacherFee || "0");
+            
+            // 计算新的合伙人费
+            const newPartnerFee = await db.calculatePartnerFee(
+              order.deliveryCity,
+              courseAmount,
+              teacherFee
+            );
+            
+            const oldPartnerFee = parseFloat(order.partnerFee || "0");
+            
+            // 如果合伙人费有变化，记录更新
+            if (Math.abs(newPartnerFee - oldPartnerFee) > 0.01) {
+              updates.push({
+                orderNo: order.orderNo,
+                customerName: order.customerName,
+                deliveryCity: order.deliveryCity,
+                courseAmount: courseAmount,
+                teacherFee: teacherFee,
+                oldPartnerFee: oldPartnerFee,
+                newPartnerFee: newPartnerFee,
+              });
+              
+              // 更新数据库
+              await db.updateOrder(order.id, {
+                partnerFee: newPartnerFee.toString()
+              });
+              
+              updatedCount++;
+            } else {
+              unchangedCount++;
+            }
+          } catch (error) {
+            console.error(`处理订单 ${orderId} 时出错:`, error);
+            errorCount++;
+          }
+        }
+        
+        return {
+          success: true,
+          totalOrders: orderIds.length,
+          updatedCount,
+          unchangedCount,
+          errorCount,
+          updates,
+        };
+      }),
+    
     recalculateAllPartnerFees: adminProcedure
       .mutation(async () => {
         // 查询所有需要重算的订单

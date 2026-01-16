@@ -118,10 +118,10 @@ ${emailContent}
    * ⚠️ **重要**: 如果没有明确提到渠道订单号,则必须留空(空字符串""),不要填充"1.1"、"1.2"等占位符数字
    * 渠道订单号通常是15位以上的长数字串(如微信支付宝订单号),不会是"1.1"这样的简单数字
 19. 备注 - 保存该订单的完整原始文本信息(从销售人员名开始到该条消息结束的所有内容)
-   ⚠️ 非常重要 - 订单边界隔离:
+   ⚠️ 非常重要 - 订单边界隔离
    * **只保存当前订单的原始文本,不要混入其他订单的信息**
    * 每条订单是一个独立的消息,从发送人+时间戳开始到下一个发送人之前结束
-   * 示例说明 - 如果聊天记录包含两条消息：
+   * 示例说明 - 如果聊天记录包含两条消息
      第一条消息是 瀛姬喵喵 发的，内容是 土豆的福州订单
      第二条消息是 瀛姬觅知音 发的，内容是 天津订单
      那么订单1的备注只包含土豆的福州订单内容，不包含天津订单
@@ -357,7 +357,7 @@ ${emailContent}
         }
       }
       
-      // 策略2: 如果策略1失败,尝试通过销售人员名+日期定位
+      // 策略2: 如果策略1失败,尝试通过销售人员名+日期定位并提取完整消息块
       if (!foundOrderText && order.salesperson && order.classDate) {
         // 从YYYY-MM-DD格式提取月日(如"2026-01-05" -> "1.5")
         let month = '';
@@ -370,6 +370,9 @@ ${emailContent}
         
         if (month && day) {
           const lines = emailContent.split('\n');
+          let startIndex = -1;
+          
+          // 找到匹配的行索引
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             // 匹配销售人员名和日期(支持"1.5"格式)
@@ -380,10 +383,47 @@ ${emailContent}
             const matchesTeacher = order.teacher && line.includes(order.teacher) && line.includes(`${month}.${day}`);
             
             if (matchesSalesperson || matchesCustomer || matchesTeacher) {
-              orderText = line;
-              foundOrderText = true;
+              startIndex = i;
               break;
             }
+          }
+          
+          // 如果找到了匹配的行,提取从该行开始到下一个发送人之前的所有内容
+          if (startIndex >= 0) {
+            // 向前查找发送人+时间戳行(如"瀛姬喵喵12:00-21:00  00:43")
+            let senderLineIndex = startIndex;
+            for (let i = startIndex - 1; i >= 0; i--) {
+              const line = lines[i].trim();
+              // 匹配发送人格式: 包含中文名字和时间(如"12:00")
+              if (line.match(/[\u4e00-\u9fa5]+.*\d{1,2}:\d{2}/)) {
+                senderLineIndex = i;
+                break;
+              }
+              // 如果遇到空行或分隔符,停止向前查找
+              if (line === '' || line.startsWith('---')) {
+                break;
+              }
+            }
+            
+            // 向后查找下一个发送人行或日期分隔符
+            let endIndex = lines.length;
+            for (let i = startIndex + 1; i < lines.length; i++) {
+              const line = lines[i].trim();
+              // 匹配下一个发送人格式
+              if (line.match(/[一-龥]+.*\d{1,2}:\d{2}/)) {
+                endIndex = i;
+                break;
+              }
+              // 如果遇到日期分隔符(如"—————  2026-1-15  —————"),也停止提取
+              if (line.startsWith('—') || line.startsWith('---')) {
+                endIndex = i;
+                break;
+              }
+            }
+            
+            // 提取从发送人行到下一个发送人之前的所有内容
+            orderText = lines.slice(senderLineIndex, endIndex).join('\n').trim();
+            foundOrderText = true;
           }
         }
       }
@@ -407,8 +447,11 @@ ${emailContent}
         // 如果LLM返回的费用为0,使用正则提取的费用
         teacherFee: order.teacherFee > 0 ? order.teacherFee : extractedFees.teacherFee,
         carFee: order.carFee > 0 ? order.carFee : extractedFees.carFee,
+        // ⚠️ 重要修复: notes字段也使用提取的orderText,确保每个订单的备注独立
+        // 如果orderText提取成功,使用orderText;否则使用LLM返回的notes(而不是整个emailContent)
+        notes: orderText || order.notes,
         // 保存该订单的原始文本(仅包含当前订单,不包含其他订单)
-        originalText: orderText || emailContent,
+        originalText: orderText || order.notes,
       });
     }
 

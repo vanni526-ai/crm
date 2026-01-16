@@ -787,6 +787,20 @@ export default function Orders() {
                     批量修正渠道订单号
                   </Button>
                   <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      if (selectedOrderIds.length === 0) {
+                        toast.error("请至少选择一个订单");
+                        return;
+                      }
+                      setCalculatePartnerFeeOpen(true);
+                    }}
+                  >
+                    <Wrench className="mr-1 h-3 w-3" />
+                    批量计算合伙人费
+                  </Button>
+                  <Button 
                     variant="destructive" 
                     size="sm"
                     onClick={handleBatchDelete}
@@ -2248,7 +2262,7 @@ export default function Orders() {
             <div className="space-y-4 py-4">
               <div className="bg-blue-50 p-4 rounded-md border border-blue-200">
                 <p className="text-sm text-blue-900 mb-2">
-                  📊 此操作将根据城市管理中配置的合伙人费比例，重新计算所有订单的合伙人费用。
+                  📊 此操作将根据城市管理中配置的合伙人费比例，重新计算{selectedOrderIds.length > 0 ? `选中的 ${selectedOrderIds.length} 个订单` : '所有订单'}的合伙人费用。
                 </p>
                 <p className="text-sm text-blue-900">
                   计算公式：<strong>合伙人费 = (课程金额 - 老师费用) × 合伙人费比例</strong>
@@ -2256,7 +2270,7 @@ export default function Orders() {
               </div>
               <div className="bg-amber-50 p-3 rounded-md border border-amber-200">
                 <p className="text-sm text-amber-800">
-                  ⚠️ 注意：此操作将更新所有订单的合伙人费用，请确认城市配置中的比例是否正确。
+                  ⚠️ 注意：此操作将更新{selectedOrderIds.length > 0 ? `选中的 ${selectedOrderIds.length} 个订单` : '所有订单'}的合伙人费用，请确认城市配置中的比例是否正确。
                 </p>
               </div>
             </div>
@@ -2272,7 +2286,9 @@ export default function Orders() {
                 onClick={async () => {
                   setIsCalculating(true);
                   try {
-                    const result = await utils.client.orders.batchCalculatePartnerFee.mutate();
+                    // 计算选中的订单的合伙人费
+                    const result = await utils.client.orders.batchCalculatePartnerFee.mutate({ orderIds: selectedOrderIds });
+                    
                     utils.orders.list.invalidate();
                     toast.success(
                       `计算完成！共处理 ${result.totalOrders} 个订单，更新 ${result.updatedCount} 个，未变化 ${result.unchangedCount} 个`,
@@ -2282,6 +2298,7 @@ export default function Orders() {
                       }
                     );
                     setCalculatePartnerFeeOpen(false);
+                    setSelectedOrderIds([]); // 清空选中的订单
                   } catch (error: any) {
                     toast.error(error.message || "计算失败，请重试");
                   } finally {
