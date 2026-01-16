@@ -119,4 +119,27 @@ export const salespersonRouter = router({
     .query(async ({ input }) => {
       return db.getYearlySales(input.salespersonId, input.startYear, input.endYear);
     }),
+
+  // 更新所有销售人员的销售数据
+  updateAllStats: adminProcedure
+    .mutation(async () => {
+      const results = await db.updateAllSalespersonStats();
+      return { 
+        success: true, 
+        data: results,
+        message: `已更新 ${results.length} 位销售人员的数据`
+      };
+    }),
+
+  // 更新单个销售人员的销售数据
+  updateStats: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      const result = await db.updateSalespersonStats(input.id);
+      return { 
+        success: true, 
+        data: result,
+        message: `已更新销售人员 ${result.name} 的数据`
+      };
+    }),
 });

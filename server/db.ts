@@ -2759,3 +2759,98 @@ export async function getUnconfiguredCities() {
     orderCount: cityOrderCounts[city],
   })).sort((a, b) => b.orderCount - a.orderCount);
 }
+
+
+// ========== 销售数据更新 ==========
+
+/**
+ * 更新所有销售人员的销售数据
+ * 从订单表中统计每个销售人员的订单数和销售额
+ */
+export async function updateAllSalespersonStats() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // 获取所有销售人员
+  const allSalespersons = await db.select().from(salespersons);
+  
+  const results = [];
+  
+  for (const salesperson of allSalespersons) {
+    // 统计该销售人员的订单数和销售额
+    // 使用salespersonId或salesPerson字段匹配
+    const stats = await db
+      .select({
+        orderCount: sql<number>`COUNT(*)`,
+        totalAmount: sql<number>`SUM(COALESCE(${orders.courseAmount}, 0))`,
+      })
+      .from(orders)
+      .where(
+        or(
+          eq(orders.salespersonId, salesperson.id),
+          eq(orders.salesPerson, salesperson.name),
+          eq(orders.salesPerson, salesperson.nickname || "")
+        )
+      );
+    
+    const orderCount = stats[0]?.orderCount || 0;
+    const totalAmount = stats[0]?.totalAmount || 0;
+    
+    results.push({
+      salespersonId: salesperson.id,
+      name: salesperson.name,
+      nickname: salesperson.nickname,
+      orderCount,
+      totalAmount,
+    });
+  }
+  
+  return results;
+}
+
+/**
+ * 更新单个销售人员的销售数据
+ */
+export async function updateSalespersonStats(salespersonId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // 获取销售人员信息
+  const salesperson = await db
+    .select()
+    .from(salespersons)
+    .where(eq(salespersons.id, salespersonId))
+    .limit(1);
+  
+  if (!salesperson || salesperson.length === 0) {
+    throw new Error("Salesperson not found");
+  }
+  
+  const sp = salesperson[0];
+  
+  // 统计该销售人员的订单数和销售额
+  const stats = await db
+    .select({
+      orderCount: sql<number>`COUNT(*)`,
+      totalAmount: sql<number>`SUM(COALESCE(${orders.courseAmount}, 0))`,
+    })
+    .from(orders)
+    .where(
+      or(
+        eq(orders.salespersonId, sp.id),
+        eq(orders.salesPerson, sp.name),
+        eq(orders.salesPerson, sp.nickname || "")
+      )
+    );
+  
+  const orderCount = stats[0]?.orderCount || 0;
+  const totalAmount = stats[0]?.totalAmount || 0;
+  
+  return {
+    salespersonId: sp.id,
+    name: sp.name,
+    nickname: sp.nickname,
+    orderCount,
+    totalAmount,
+  };
+}

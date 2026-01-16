@@ -72,6 +72,17 @@ export default function Sales() {
     },
   });
 
+  // 更新所有销售人员的销售数据
+  const updateStatsMutation = trpc.salespersons.updateAllStats.useMutation({
+    onSuccess: (result) => {
+      toast.success(result.message || "销售数据更新成功");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`更新失败: ${error.message}`);
+    },
+  });
+
   // 过滤销售人员
   const filteredSalespersons = salespersons?.filter((sp) => {
     if (!searchKeyword) return true;
@@ -236,6 +247,15 @@ export default function Sales() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">销售管理</h1>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => updateStatsMutation.mutate()}
+            disabled={updateStatsMutation.isPending}
+          >
+            <TrendingUp className="w-4 h-4 mr-2" />
+            {updateStatsMutation.isPending ? "更新中..." : "更新销售数据"}
+          </Button>
           <Button variant="outline" size="sm" onClick={() => setIsSmartRegisterOpen(true)}>
             <Zap className="w-4 h-4 mr-2" />
             智能登记
