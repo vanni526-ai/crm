@@ -1,0 +1,110 @@
+{
+  "query": "\nSELECT id, customerName, deliveryCity, paymentAmount, courseAmount, teacherFee, partnerFee, createdAt\nFROM orders\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 1 HOUR)\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT id, customerName, deliveryCity, paymentAmount, courseAmount, teacherFee, partnerFee, createdAt\nFROM orders\nWHERE createdAt >= DATE_SUB(NOW(), INTERVAL 1 HOUR)\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "rows": [
+    {
+      "id": "1710036",
+      "customerName": "ivy",
+      "deliveryCity": "深圳",
+      "paymentAmount": "2250.00",
+      "courseAmount": "2250.00",
+      "teacherFee": "450.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:59"
+    },
+    {
+      "id": "1710037",
+      "customerName": "",
+      "deliveryCity": "郑州",
+      "paymentAmount": "1600.00",
+      "courseAmount": "1600.00",
+      "teacherFee": "300.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:59"
+    },
+    {
+      "id": "1710040",
+      "customerName": "Grace",
+      "deliveryCity": "泉州",
+      "paymentAmount": "2400.00",
+      "courseAmount": "2400.00",
+      "teacherFee": "400.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:59"
+    },
+    {
+      "id": "1710035",
+      "customerName": "阿司匹林",
+      "deliveryCity": "上海",
+      "paymentAmount": "350.00",
+      "courseAmount": "350.00",
+      "teacherFee": "0.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:49"
+    },
+    {
+      "id": "1710031",
+      "customerName": "",
+      "deliveryCity": "上海",
+      "paymentAmount": "700.00",
+      "courseAmount": "700.00",
+      "teacherFee": "0.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:40"
+    },
+    {
+      "id": "1710034",
+      "customerName": "咿呀咿呀哟",
+      "deliveryCity": "上海",
+      "paymentAmount": "2400.00",
+      "courseAmount": "2400.00",
+      "teacherFee": "400.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:40"
+    },
+    {
+      "id": "1710027",
+      "customerName": "阿司匹林",
+      "deliveryCity": "上海",
+      "paymentAmount": "4000.00",
+      "courseAmount": "4000.00",
+      "teacherFee": "400.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:39"
+    },
+    {
+      "id": "1710029",
+      "customerName": "Nick",
+      "deliveryCity": "上海",
+      "paymentAmount": "1888.00",
+      "courseAmount": "1888.00",
+      "teacherFee": "400.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:39"
+    },
+    {
+      "id": "1710026",
+      "customerName": "晚晚上",
+      "deliveryCity": "上海",
+      "paymentAmount": "350.00",
+      "courseAmount": "350.00",
+      "teacherFee": "0.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:39"
+    },
+    {
+      "id": "1710030",
+      "customerName": "Asuka",
+      "deliveryCity": "上海",
+      "paymentAmount": "1600.00",
+      "courseAmount": "1600.00",
+      "teacherFee": "300.00",
+      "partnerFee": "0.00",
+      "createdAt": "2026-01-14 11:49:39"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcustomerName\tdeliveryCity\tpaymentAmount\tcourseAmount\tteacherFee\tpartnerFee\tcreatedAt\n1710036\tivy\t深圳\t2250.00\t2250.00\t450.00\t0.00\t2026-01-14 11:49:59\n1710037\t\t郑州\t1600.00\t1600.00\t300.00\t0.00\t2026-01-14 11:49:59\n1710040\tGrace\t泉州\t2400.00\t2400.00\t400.00\t0.00\t2026-01-14 11:49:59\n1710035\t阿司匹林\t上海\t350.00\t350.00\t0.00\t0.00\t2026-01-14 11:49:49\n1710031\t\t上海\t700.00\t700.00\t0.00\t0.00\t2026-01-14 11:49:40\n1710034\t咿呀咿呀哟\t上海\t2400.00\t2400.00\t400.00\t0.00\t2026-01-14 11:49:40\n1710027\t阿司匹林\t上海\t4000.00\t4000.00\t400.00\t0.00\t2026-01-14 11:49:39\n1710029\tNick\t上海\t1888.00\t1888.00\t400.00\t0.00\t2026-01-14 11:49:39\n1710026\t晚晚上\t上海\t350.00\t350.00\t0.00\t0.00\t2026-01-14 11:49:39\n1710030\tAsuka\t上海\t1600.00\t1600.00\t300.00\t0.00\t2026-01-14 11:49:39\n",
+  "stderr": "",
+  "execution_time_ms": 1539
+}

@@ -1,0 +1,32 @@
+{
+  "query": "\nSELECT * FROM cityPartnerConfig WHERE city IN ('深圳', '郑州', '泉州');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT * FROM cityPartnerConfig WHERE city IN ('深圳', '郑州', '泉州');\n",
+  "rows": [
+    {
+      "id": "6",
+      "city": "郑州",
+      "partnerFeeRate": "30.00",
+      "description": "(课程金额-老师费用)×30%",
+      "isActive": "1",
+      "updatedBy": "1",
+      "updatedAt": "2025-12-27 12:04:15",
+      "createdAt": "2025-12-27 12:04:15",
+      "areaCode": "NULL"
+    },
+    {
+      "id": "60001",
+      "city": "泉州",
+      "partnerFeeRate": "30.00",
+      "description": "泉州合伙人费比例",
+      "isActive": "1",
+      "updatedBy": "1",
+      "updatedAt": "2026-01-13 05:22:47",
+      "createdAt": "2026-01-07 11:16:41",
+      "areaCode": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcity\tpartnerFeeRate\tdescription\tisActive\tupdatedBy\tupdatedAt\tcreatedAt\tareaCode\n6\t郑州\t30.00\t(课程金额-老师费用)×30%\t1\t1\t2025-12-27 12:04:15\t2025-12-27 12:04:15\tNULL\n60001\t泉州\t30.00\t泉州合伙人费比例\t1\t1\t2026-01-13 05:22:47\t2026-01-07 11:16:41\t\n",
+  "stderr": "",
+  "execution_time_ms": 1524
+}

@@ -1,0 +1,9 @@
+{
+  "query": "\nINSERT INTO cityPartnerConfig (city, areaCode, partnerFeeRate, description, isActive, updatedBy, updatedAt, createdAt)\nVALUES ('深圳', '', '0.00', '金串全资,无合伙人', true, 1, NOW(), NOW());\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nINSERT INTO cityPartnerConfig (city, areaCode, partnerFeeRate, description, isActive, updatedBy, updatedAt, createdAt)\nVALUES ('深圳', '', '0.00', '金串全资,无合伙人', true, 1, NOW(), NOW());\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1525
+}

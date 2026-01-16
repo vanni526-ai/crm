@@ -1,0 +1,9 @@
+{
+  "query": "\nDELETE FROM orders\nWHERE salesPerson IN ('土豆', '山竹')\nAND createdAt >= '2026-01-14 14:00:00'\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nDELETE FROM orders\nWHERE salesPerson IN ('土豆', '山竹')\nAND createdAt >= '2026-01-14 14:00:00'\nLIMIT 10;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1559
+}

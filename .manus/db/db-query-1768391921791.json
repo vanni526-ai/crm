@@ -1,0 +1,66 @@
+{
+  "query": "\nSELECT \n  id,\n  salesPerson,\n  LENGTH(notes) as notes_length,\n  SUBSTRING(notes, 1, 150) as notes_preview\nFROM orders\nORDER BY createdAt DESC\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  id,\n  salesPerson,\n  LENGTH(notes) as notes_length,\n  SUBSTRING(notes, 1, 150) as notes_preview\nFROM orders\nORDER BY createdAt DESC\nLIMIT 5;\n",
+  "rows": [
+    {
+      "id": "1710040",
+      "salesPerson": "Grace",
+      "notes_length": "1302",
+      "notes_preview": "泉州教室第四次使用"
+    },
+    {
+      "id": "1710036",
+      "salesPerson": "ivy",
+      "notes_length": "1302",
+      "notes_preview": "深圳教室第一次使用"
+    },
+    {
+      "id": "1710037",
+      "salesPerson": "嘟嘟",
+      "notes_length": "1302",
+      "notes_preview": "郑州教室第一次使用"
+    },
+    {
+      "id": "1710035",
+      "salesPerson": "嘟嘟",
+      "notes_length": "287",
+      "notes_preview": ""
+    },
+    {
+      "id": "1710034",
+      "salesPerson": "夏鑫",
+      "notes_length": "2142",
+      "notes_preview": "贝丝"
+    }
+  ],
+  "messages": [
+    "原始文本: Dear:",
+    "微信群\"瀛姬合伙店打款群\"的聊天记录如下:",
+    "—————  2026-1-13  —————",
+    "瀛姬小咩 12-20点 周天周一休息  13:45",
+    "ivy 1.13 15.00-16.30 埃及艳后1.5h 米妮上（深圳） ⭐️王予志 全款2250已",
+    "原始文本: Dear:",
+    "微信群\"瀛姬合伙店打款群\"的聊天记录如下:",
+    "—————  2026-1-13  —————",
+    "瀛姬小咩 12-20点 周天周一休息  13:45",
+    "ivy 1.13 15.00-16.30 埃及艳后1.5h 米妮上（深圳） ⭐️王予志 全款2250已",
+    "原始文本: Dear:",
+    "微信群\"瀛姬合伙店打款群\"的聊天记录如下:",
+    "—————  2026-1-13  —————",
+    "瀛姬小咩 12-20点 周天周一休息  13:45",
+    "ivy 1.13 15.00-16.30 埃及艳后1.5h 米妮上（深圳） ⭐️王予志 全款2250已",
+    "原始文本: Dear:",
+    "微信群\"本部及巡游打款群\"的聊天记录如下:",
+    "—————  2026-1-14  —————",
+    "瀛姬小颖  11:41",
+    "嘟嘟 1.13 15:20-15:50 线上理论课 瑶瑶上 上海捷运大厦16D  阿司匹林 350已付 交易单号420000291520260113",
+    "原始文本: Dear:",
+    "微信群\"本部及巡游打款群\"的聊天记录如下:",
+    "—————  2026-1-13  —————",
+    "瀛姬月芽 12-20点 周天周一休息  14:00",
+    "ivy 1.13 17.00-17.30 线上理论课一节 晚晚上（上海16D）全款350已付 交易编号4200002"
+  ],
+  "stdout": "id\tsalesPerson\tnotes_length\tnotes_preview\n1710040\tGrace\t1302\t泉州教室第四次使用\n\n原始文本: Dear:\n\n微信群\"瀛姬合伙店打款群\"的聊天记录如下:\n\n—————  2026-1-13  —————\n\n瀛姬小咩 12-20点 周天周一休息  13:45\n\nivy 1.13 15.00-16.30 埃及艳后1.5h 米妮上（深圳） ⭐️王予志 全款2250已\n1710036\tivy\t1302\t深圳教室第一次使用\n\n原始文本: Dear:\n\n微信群\"瀛姬合伙店打款群\"的聊天记录如下:\n\n—————  2026-1-13  —————\n\n瀛姬小咩 12-20点 周天周一休息  13:45\n\nivy 1.13 15.00-16.30 埃及艳后1.5h 米妮上（深圳） ⭐️王予志 全款2250已\n1710037\t嘟嘟\t1302\t郑州教室第一次使用\n\n原始文本: Dear:\n\n微信群\"瀛姬合伙店打款群\"的聊天记录如下:\n\n—————  2026-1-13  —————\n\n瀛姬小咩 12-20点 周天周一休息  13:45\n\nivy 1.13 15.00-16.30 埃及艳后1.5h 米妮上（深圳） ⭐️王予志 全款2250已\n1710035\t嘟嘟\t287\t\n\n原始文本: Dear:\n\n微信群\"本部及巡游打款群\"的聊天记录如下:\n\n—————  2026-1-14  —————\n\n瀛姬小颖  11:41\n\n嘟嘟 1.13 15:20-15:50 线上理论课 瑶瑶上 上海捷运大厦16D  阿司匹林 350已付 交易单号420000291520260113\n1710034\t夏鑫\t2142\t贝丝\n\n原始文本: Dear:\n\n微信群\"本部及巡游打款群\"的聊天记录如下:\n\n—————  2026-1-13  —————\n\n瀛姬月芽 12-20点 周天周一休息  14:00\n\nivy 1.13 17.00-17.30 线上理论课一节 晚晚上（上海16D）全款350已付 交易编号4200002\n",
+  "stderr": "",
+  "execution_time_ms": 1561
+}

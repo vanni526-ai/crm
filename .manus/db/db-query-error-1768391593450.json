@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT id, salesPerson, customerName, deliveryCity, course, teacher, classDate, classTime, notes, createdAt\nFROM orders\nWHERE salesPerson IN ('土豆', '山竹') \n  AND classDate >= '2026-01-12'\nORDER BY createdAt DESC\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT id, salesPerson, customerName, deliveryCity, course, teacher, classDate, classTime, notes, createdAt\nFROM orders\nWHERE salesPerson IN ('土豆', '山竹') \n  AND classDate >= '2026-01-12'\nORDER BY createdAt DESC\nLIMIT 5;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'course' in 'field list'"
+  ]
+}
