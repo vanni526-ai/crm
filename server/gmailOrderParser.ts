@@ -95,16 +95,15 @@ ${emailContent}
 10. 支付金额 - 总支付金额(定金+尾款)
 11. 课程金额 - 课程总价
 12. 首付金额 - 定金金额
-13. 尾款金额 - 尾款金额
-14. 老师费用 - 老师的费用,常见表达:
+13. 尾款金额 - 尾款金14. 老师费用 - 老师的费用,常见表达:
    * "给老师XXX" (如"给老师300"、"给老师400"、"给老师600")
-   * "给XXX(老师名)XXX" (如"给橘子1300"、"给云云500")
+   * "给XXX(老师名)XXX" (如"给桔子130 0"、"给云云500")
    * "给老师XXX+XXX" (如"给老师1260+240+100=1600")
    * "已给老师XXX再给老师XXX" (如"已给老师4210再给老师450",总计4660)
-   * "课时费XXX" (如"课时费4660")
+   * "课时费XXX" (如"课时费 4660")
    * ⚠️ 注意:"给老师XXX"是老师费用,不是车费!
-   * 如果没有明确提到老师费用,则塡0
-15. 车费 - 报销的车费/交通费,常见表达:
+   * ⚠️ **特别规则**:如果课程名称包含"理论课"关键词,且没有明确标注老师费用,则老师费用默认为0
+   * 如果没有明确提到老师费用,则塑 015. 车费 - 报销的车费/交通费,常见表达:
    * "报销老师XXX车费" (如"报销老师100车费")
    * "老师打车XXX" (如"100老师打车")
    * "酒店车费XXX" (如"酒店车费加课时费4660"中的车费部分)
@@ -163,6 +162,7 @@ ${emailContent}
   * 如果有多次给老师费用,需要相加(如"已给老师4210再给老师450" = 4660)
   * 如果有加号表达式,需要计算总和(如"给老师1260+240+100" = 1600)
   * 注意: 老师名通常是2-3个字(如嫩嫩、嘴嘴、姜一、云云、声声),金额是紧跟其后的数字
+  * ⚠️ **特别规则**:如果课程名称包含"理论课"关键词,且没有明确标注老师费用,则teacherFee=0
 - 车费提取规则(⚠️ 非常重要):
   * 只有明确包含"报销"、"车费"、"打车"、"酒店"等关键词才是车费
   * "报销老师100车费" → carFee=100
@@ -274,7 +274,7 @@ ${emailContent}
     };
 
     // 费用后处理函数:从原始文本中提取老师费用和车费
-    const extractFees = (text: string): { teacherFee: number; carFee: number } => {
+    const extractFees = (text: string, courseName: string): { teacherFee: number; carFee: number } => {
       let teacherFee = 0;
       let carFee = 0;
       
@@ -316,6 +316,15 @@ ${emailContent}
       const carFeePattern3 = /酒店车费\s*(\d+(?:\.\d+)?)/g;
       while ((match = carFeePattern3.exec(text)) !== null) {
         carFee += parseFloat(match[1]);
+      }
+      
+      // ⚠️ 特别规则:如果课程名称包含"理论课"关键词,且没有明确标注老师费用,则老师费用默认为0
+      if (courseName && courseName.includes("理论课")) {
+        // 检查文本中是否明确标注了老师费用
+        const hasExplicitTeacherFee = /给(?:老师|[一-龥]{2,3})\s*\d+|课时费\s*\d+/.test(text);
+        if (!hasExplicitTeacherFee) {
+          teacherFee = 0;
+        }
       }
       
       return { teacherFee, carFee };
@@ -436,7 +445,7 @@ ${emailContent}
         console.warn(`[Gmail解析] 未找到订单原始文本: 销售=${order.salesperson}, 客户=${customerName}, 日期=${order.classDate}, 将使用LLM解析的费用`);
       }
       
-      const extractedFees = extractFees(orderText);
+      const extractedFees = extractFees(orderText, order.course);
       
       orders.push({
         ...order,
