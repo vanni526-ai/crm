@@ -65,8 +65,12 @@ export const orders = mysqlTable("orders", {
   // 费用明细
   teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }).default("0.00"), // 老师费用
   transportFee: decimal("transportFee", { precision: 10, scale: 2 }).default("0.00"), // 车费
-  otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
   partnerFee: decimal("partnerFee", { precision: 10, scale: 2 }).default("0.00"), // 合伙人费用
+  consumablesFee: decimal("consumablesFee", { precision: 10, scale: 2 }).default("0.00"), // 耗材费用
+  rentFee: decimal("rentFee", { precision: 10, scale: 2 }).default("0.00"), // 房租费用
+  propertyFee: decimal("propertyFee", { precision: 10, scale: 2 }).default("0.00"), // 物业费用
+  utilityFee: decimal("utilityFee", { precision: 10, scale: 2 }).default("0.00"), // 水电费用
+  otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
   finalAmount: decimal("finalAmount", { precision: 10, scale: 2 }).default("0.00"), // 金串到账金额
   
   // 交付信息

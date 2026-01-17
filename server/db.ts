@@ -376,8 +376,12 @@ export async function getCityFinancialStats(dateRange?: string) {
     totalRevenue: number;
     teacherFee: number;
     transportFee: number;
-    otherFee: number;
     partnerFee: number;
+    consumablesFee: number;
+    rentFee: number;
+    propertyFee: number;
+    utilityFee: number;
+    otherFee: number;
     totalExpense: number;
     profit: number;
     profitMargin: number;
@@ -393,8 +397,12 @@ export async function getCityFinancialStats(dateRange?: string) {
         totalRevenue: 0,
         teacherFee: 0,
         transportFee: 0,
-        otherFee: 0,
         partnerFee: 0,
+        consumablesFee: 0,
+        rentFee: 0,
+        propertyFee: 0,
+        utilityFee: 0,
+        otherFee: 0,
         totalExpense: 0,
         profit: 0,
         profitMargin: 0,
@@ -404,16 +412,24 @@ export async function getCityFinancialStats(dateRange?: string) {
     const revenue = parseFloat(order.paymentAmount || '0');
     const teacherFee = parseFloat(order.teacherFee || '0');
     const transportFee = parseFloat(order.transportFee || '0');
-    const otherFee = parseFloat(order.otherFee || '0');
     const partnerFee = parseFloat(order.partnerFee || '0');
-    const totalExpense = teacherFee + transportFee + otherFee + partnerFee;
+    const consumablesFee = parseFloat(order.consumablesFee || '0');
+    const rentFee = parseFloat(order.rentFee || '0');
+    const propertyFee = parseFloat(order.propertyFee || '0');
+    const utilityFee = parseFloat(order.utilityFee || '0');
+    const otherFee = parseFloat(order.otherFee || '0');
+    const totalExpense = teacherFee + transportFee + partnerFee + consumablesFee + rentFee + propertyFee + utilityFee + otherFee;
 
     cityStats[city].orderCount += 1;
     cityStats[city].totalRevenue += revenue;
     cityStats[city].teacherFee += teacherFee;
     cityStats[city].transportFee += transportFee;
-    cityStats[city].otherFee += otherFee;
     cityStats[city].partnerFee += partnerFee;
+    cityStats[city].consumablesFee += consumablesFee;
+    cityStats[city].rentFee += rentFee;
+    cityStats[city].propertyFee += propertyFee;
+    cityStats[city].utilityFee += utilityFee;
+    cityStats[city].otherFee += otherFee;
     cityStats[city].totalExpense += totalExpense;
     cityStats[city].profit += revenue - totalExpense;
   });

@@ -48,6 +48,11 @@ export const financeRouter = router({
             totalSales: number;
             teacherFee: number;
             transportFee: number;
+            partnerFee: number;
+            consumablesFee: number;
+            rentFee: number;
+            propertyFee: number;
+            utilityFee: number;
             otherFee: number;
           }
         >();
@@ -59,6 +64,11 @@ export const financeRouter = router({
             totalSales: 0,
             teacherFee: 0,
             transportFee: 0,
+            partnerFee: 0,
+            consumablesFee: 0,
+            rentFee: 0,
+            propertyFee: 0,
+            utilityFee: 0,
             otherFee: 0,
           };
 
@@ -66,8 +76,12 @@ export const financeRouter = router({
           stats.totalSales += parseFloat(order.paymentAmount || "0");
           stats.teacherFee += parseFloat(order.teacherFee || "0");
           stats.transportFee += parseFloat(order.transportFee || "0");
-          // 其他费用 = 总销售额 - 老师费用 - 车费
-          // 这里暂时不计算,因为需要更详细的费用数据
+          stats.partnerFee += parseFloat(order.partnerFee || "0");
+          stats.consumablesFee += parseFloat(order.consumablesFee || "0");
+          stats.rentFee += parseFloat(order.rentFee || "0");
+          stats.propertyFee += parseFloat(order.propertyFee || "0");
+          stats.utilityFee += parseFloat(order.utilityFee || "0");
+          stats.otherFee += parseFloat(order.otherFee || "0");
 
           cityStats.set(city, stats);
         });
@@ -85,6 +99,11 @@ export const financeRouter = router({
           { header: "销售额", key: "totalSales", width: 15 },
           { header: "老师费用", key: "teacherFee", width: 15 },
           { header: "车费", key: "transportFee", width: 12 },
+          { header: "合伙人费", key: "partnerFee", width: 15 },
+          { header: "耗材费用", key: "consumablesFee", width: 15 },
+          { header: "房租费用", key: "rentFee", width: 15 },
+          { header: "物业费用", key: "propertyFee", width: 15 },
+          { header: "水电费用", key: "utilityFee", width: 15 },
           { header: "其他费用", key: "otherFee", width: 15 },
           { header: "总费用", key: "totalCost", width: 15 },
           { header: "净利润", key: "netProfit", width: 15 },
@@ -94,7 +113,9 @@ export const financeRouter = router({
         // 填充城市统计数据
         cityStats.forEach((stats, city) => {
           const totalCost =
-            stats.teacherFee + stats.transportFee + stats.otherFee;
+            stats.teacherFee + stats.transportFee + stats.partnerFee + 
+            stats.consumablesFee + stats.rentFee + stats.propertyFee + 
+            stats.utilityFee + stats.otherFee;
           const netProfit = stats.totalSales - totalCost;
           const profitRate =
             stats.totalSales > 0
@@ -104,12 +125,17 @@ export const financeRouter = router({
           citySheet.addRow({
             city,
             orderCount: stats.orderCount,
-            totalSales: `¥${stats.totalSales.toFixed(2)}`,
-            teacherFee: `¥${stats.teacherFee.toFixed(2)}`,
-            transportFee: `¥${stats.transportFee.toFixed(2)}`,
-            otherFee: `¥${stats.otherFee.toFixed(2)}`,
-            totalCost: `¥${totalCost.toFixed(2)}`,
-            netProfit: `¥${netProfit.toFixed(2)}`,
+            totalSales: `￥${stats.totalSales.toFixed(2)}`,
+            teacherFee: `￥${stats.teacherFee.toFixed(2)}`,
+            transportFee: `￥${stats.transportFee.toFixed(2)}`,
+            partnerFee: `￥${stats.partnerFee.toFixed(2)}`,
+            consumablesFee: `￥${stats.consumablesFee.toFixed(2)}`,
+            rentFee: `￥${stats.rentFee.toFixed(2)}`,
+            propertyFee: `￥${stats.propertyFee.toFixed(2)}`,
+            utilityFee: `￥${stats.utilityFee.toFixed(2)}`,
+            otherFee: `￥${stats.otherFee.toFixed(2)}`,
+            totalCost: `￥${totalCost.toFixed(2)}`,
+            netProfit: `￥${netProfit.toFixed(2)}`,
             profitRate,
           });
         });

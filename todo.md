@@ -308,3 +308,14 @@
 - [x] 实现前端导出按钮和下载功能(调用后端API)
 - [x] 测试验证导出功能(Excel格式,数据正确)
 - [x] 保存检查点
+
+
+### 113. 将财务管理页面"其他费用"拆分为详细费用项
+- [x] 分析当前数据库schema中的费用字段(partnerFee, otherFee等)
+- [x] 分析当前财务统计API的费用计算逻辑
+- [x] 添加详细费用字段到orders表(consumablesFee, rentFee, propertyFee, utilityFee)
+- [x] 修改后端财务统计API支持详细费用项(db.ts - getCityFinancialStats)
+- [x] 修改前端城市财务统计表显示详细费用列(Finance.tsx)
+- [x] 更新Excel导出功能包含详细费用项(financeRouter.ts)
+- [x] 测试验证详细费用显示(页面和Excel导出均正常)
+- [x] 保存检查点

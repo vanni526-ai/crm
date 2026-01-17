@@ -634,6 +634,11 @@ export default function Finance() {
                         <TableHead className="text-right">销售额</TableHead>
                         <TableHead className="text-right">老师费用</TableHead>
                         <TableHead className="text-right">车费</TableHead>
+                        <TableHead className="text-right">合伙人费</TableHead>
+                        <TableHead className="text-right">耗材</TableHead>
+                        <TableHead className="text-right">房租</TableHead>
+                        <TableHead className="text-right">物业</TableHead>
+                        <TableHead className="text-right">水电</TableHead>
                         <TableHead className="text-right">其他费用</TableHead>
                         <TableHead className="text-right">总费用</TableHead>
                         <TableHead className="text-right">净利润</TableHead>
@@ -660,7 +665,22 @@ export default function Finance() {
                             ￥{stat.transportFee.toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right">
-                            ￥{(stat.otherFee + stat.partnerFee).toFixed(2)}
+                            ￥{stat.partnerFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.consumablesFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.rentFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.propertyFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.utilityFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.otherFee.toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right text-red-600">
                             ￥{stat.totalExpense.toFixed(2)}

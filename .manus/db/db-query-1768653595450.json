@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE orders \nADD COLUMN consumablesFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '耗材费用',\nADD COLUMN rentFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '房租费用',\nADD COLUMN propertyFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '物业费用',\nADD COLUMN utilityFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '水电费用';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE orders \nADD COLUMN consumablesFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '耗材费用',\nADD COLUMN rentFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '房租费用',\nADD COLUMN propertyFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '物业费用',\nADD COLUMN utilityFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '水电费用';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2778
+}
