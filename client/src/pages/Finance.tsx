@@ -7,6 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
 import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle, MapPin, RefreshCw } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -47,6 +52,8 @@ export default function Finance() {
   });
   
   const [dateRange, setDateRange] = useState("thisMonth");
+  const [customDateFrom, setCustomDateFrom] = useState<Date | undefined>(undefined);
+  const [customDateTo, setCustomDateTo] = useState<Date | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSales, setSelectedSales] = useState<string>("all");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("all");
@@ -97,12 +104,37 @@ export default function Finance() {
     if (!orders) return [];
 
     const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+    
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
 
-    if (dateRange === "thisMonth") {
+    if (dateRange === "today") {
+      return orders.filter((order) => {
+        if (!order.classDate) return false;
+        const classDate = new Date(order.classDate);
+        return classDate >= startOfToday && classDate <= endOfToday;
+      });
+    } else if (dateRange === "thisWeek") {
+      return orders.filter((order) => {
+        if (!order.classDate) return false;
+        const classDate = new Date(order.classDate);
+        return classDate >= startOfWeek && classDate <= endOfWeek;
+      });
+    } else if (dateRange === "thisMonth") {
       return orders.filter((order) => {
         if (!order.classDate) return false;
         const classDate = new Date(order.classDate);
@@ -114,10 +146,26 @@ export default function Finance() {
         const classDate = new Date(order.classDate);
         return classDate >= startOfLastMonth && classDate <= endOfLastMonth;
       });
+    } else if (dateRange === "thisYear") {
+      return orders.filter((order) => {
+        if (!order.classDate) return false;
+        const classDate = new Date(order.classDate);
+        return classDate >= startOfYear && classDate <= endOfYear;
+      });
+    } else if (dateRange === "custom" && customDateFrom && customDateTo) {
+      return orders.filter((order) => {
+        if (!order.classDate) return false;
+        const classDate = new Date(order.classDate);
+        const from = new Date(customDateFrom);
+        from.setHours(0, 0, 0, 0);
+        const to = new Date(customDateTo);
+        to.setHours(23, 59, 59, 999);
+        return classDate >= from && classDate <= to;
+      });
     }
 
     return orders;
-  }, [orders, dateRange]);
+  }, [orders, dateRange, customDateFrom, customDateTo]);
 
   // 计算财务统计数据
   const financialStats = useMemo(() => {
@@ -608,6 +656,8 @@ export default function Finance() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">全部时间</SelectItem>
+                  <SelectItem value="today">今日</SelectItem>
+                  <SelectItem value="thisWeek">本周</SelectItem>
                   <SelectItem value="thisMonth">本月</SelectItem>
                   <SelectItem value="thisQuarter">本季度</SelectItem>
                   <SelectItem value="thisYear">本年</SelectItem>
@@ -1027,11 +1077,50 @@ export default function Finance() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部时间</SelectItem>
+                    <SelectItem value="today">今日</SelectItem>
+                    <SelectItem value="thisWeek">本周</SelectItem>
                     <SelectItem value="thisMonth">本月</SelectItem>
                     <SelectItem value="lastMonth">上月</SelectItem>
                     <SelectItem value="thisYear">今年</SelectItem>
+                    <SelectItem value="custom">自定义</SelectItem>
                   </SelectContent>
                 </Select>
+                {dateRange === "custom" && (
+                  <>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {customDateFrom ? format(customDateFrom, "yyyy-MM-dd", { locale: zhCN }) : "开始日期"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={customDateFrom}
+                          onSelect={setCustomDateFrom}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-[140px] justify-start text-left font-normal">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {customDateTo ? format(customDateTo, "yyyy-MM-dd", { locale: zhCN }) : "结束日期"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={customDateTo}
+                          onSelect={setCustomDateTo}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </>
+                )}
                 <Select value={selectedSales} onValueChange={setSelectedSales}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="筛选销售" />
