@@ -11,6 +11,7 @@ import { transportFeeFixRouter } from "./transportFeeFixRouter";
 import { parsingLearningRouter } from "./parsingLearningRouter";
 import { reconciliationRouter } from "./reconciliationRouter";
 import { customerRouter } from "./customerRouter";
+import { financeRouter } from "./financeRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -49,6 +50,7 @@ export const appRouter = router({
   system: systemRouter,
   salespersons: salespersonRouter,
   customers: customerRouter,
+  finance: financeRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,

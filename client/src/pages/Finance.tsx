@@ -438,96 +438,52 @@ export default function Finance() {
   };
   
   // 导出Excel
+  const exportExcel = trpc.finance.exportExcel.useMutation();
+  
   const handleExport = async () => {
     try {
-      const ExcelJS = (await import("exceljs")).default;
-      const workbook = new ExcelJS.Workbook();
+      toast.info("正在生成财务报表...");
       
-      // 财务概览
-      const summarySheet = workbook.addWorksheet("财务概览");
-      summarySheet.columns = [
-        { header: "指标", key: "metric", width: 20 },
-        { header: "数值", key: "value", width: 20 },
-      ];
-      summarySheet.addRows([
-        { metric: "总收入", value: `¥${financialStats.totalIncome.toFixed(2)}` },
-        { metric: "总支出", value: `¥${financialStats.totalExpense.toFixed(2)}` },
-        { metric: "净利润", value: `¥${financialStats.profit.toFixed(2)}` },
-        { metric: "利润率", value: `${financialStats.profitMargin.toFixed(2)}%` },
-        { metric: "订单数量", value: financialStats.orderCount },
-      ]);
-
-      // 收入明细
-      const incomeSheet = workbook.addWorksheet("收入明细");
-      incomeSheet.columns = [
-        { header: "日期", key: "date", width: 15 },
-        { header: "订单号", key: "orderNo", width: 20 },
-        { header: "支付渠道", key: "channel", width: 15 },
-        { header: "描述", key: "description", width: 30 },
-        { header: "金额", key: "amount", width: 15 },
-      ];
-      incomeSheet.addRows(
-        filteredIncomeRecords.map((record) => ({
-          date: record.date ? new Date(record.date).toLocaleDateString() : "-",
-          orderNo: record.orderNo,
-          channel: record.channel,
-          description: record.description,
-          amount: `¥${record.amount.toFixed(2)}`,
-        }))
-      );
-
-      // 支出明细
-      const expenseSheet = workbook.addWorksheet("支出明细");
-      expenseSheet.columns = [
-        { header: "日期", key: "date", width: 15 },
-        { header: "订单号", key: "orderNo", width: 20 },
-        { header: "费用类别", key: "category", width: 15 },
-        { header: "描述", key: "description", width: 30 },
-        { header: "金额", key: "amount", width: 15 },
-      ];
-      expenseSheet.addRows(
-        filteredExpenseRecords.map((record) => ({
-          date: record.date ? new Date(record.date).toLocaleDateString() : "-",
-          orderNo: record.orderNo,
-          category: record.category,
-          description: record.description,
-          amount: `¥${record.amount.toFixed(2)}`,
-        }))
-      );
-
-      // 销售业绩
-      const salesSheet = workbook.addWorksheet("销售业绩");
-      salesSheet.columns = [
-        { header: "销售人员", key: "name", width: 15 },
-        { header: "订单数", key: "orderCount", width: 10 },
-        { header: "总收入", key: "income", width: 15 },
-        { header: "总支出", key: "expense", width: 15 },
-        { header: "净利润", key: "profit", width: 15 },
-      ];
-      salesSheet.addRows(
-        salesStats.map((stat) => ({
-          name: stat.name,
-          orderCount: stat.orderCount,
-          income: `¥${stat.income.toFixed(2)}`,
-          expense: `¥${stat.expense.toFixed(2)}`,
-          profit: `¥${stat.profit.toFixed(2)}`,
-        }))
-      );
-
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      // 准备日期范围参数
+      let startDate: string | undefined;
+      let endDate: string | undefined;
+      
+      if (dateRange === "custom" && customDateFrom && customDateTo) {
+        startDate = customDateFrom.toISOString();
+        endDate = customDateTo.toISOString();
+      }
+      
+      // 调用后端API导出Excel
+      const result = await exportExcel.mutateAsync({
+        startDate,
+        endDate,
       });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `财务报表_${new Date().toLocaleDateString()}.xlsx`;
-      a.click();
-      URL.revokeObjectURL(url);
       
-      toast.success("导出成功");
+      if (result.success && result.data) {
+        // 将Base64字符串转换为Blob
+        const binaryString = atob(result.data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        
+        // 下载文件
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = result.filename;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        toast.success("导出成功");
+      } else {
+        toast.error("导出失败");
+      }
     } catch (error) {
-      toast.error("导出失败");
+      toast.error("导出失败，请重试");
       console.error(error);
     }
   };
