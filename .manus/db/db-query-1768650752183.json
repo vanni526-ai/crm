@@ -1,0 +1,70 @@
+{
+  "query": "\n-- 查询清淼的订单\nSELECT customerName, paymentAmount, classDate FROM orders WHERE customerName = '清淼' ORDER BY classDate;\n\n-- 查询JoeGong的订单\nSELECT customerName, paymentAmount, classDate FROM orders WHERE customerName = 'JoeGong' ORDER BY classDate;\n\n-- 查询涛涛的订单\nSELECT customerName, paymentAmount, classDate FROM orders WHERE customerName = '涛涛' ORDER BY classDate;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询清淼的订单\nSELECT customerName, paymentAmount, classDate FROM orders WHERE customerName = '清淼' ORDER BY classDate;\n\n-- 查询JoeGong的订单\nSELECT customerName, paymentAmount, classDate FROM orders WHERE customerName = 'JoeGong' ORDER BY classDate;\n\n-- 查询涛涛的订单\nSELECT customerName, paymentAmount, classDate FROM orders WHERE customerName = '涛涛' ORDER BY classDate;\n",
+  "rows": [
+    {
+      "customerName": "清淼",
+      "paymentAmount": "4888.00",
+      "classDate": "2026-01-03"
+    },
+    {
+      "customerName": "清淼",
+      "paymentAmount": "4888.00",
+      "classDate": "2026-01-03"
+    },
+    {
+      "customerName": "customerName",
+      "paymentAmount": "paymentAmount",
+      "classDate": "classDate"
+    },
+    {
+      "customerName": "JoeGong",
+      "paymentAmount": "2800.00",
+      "classDate": "2025-12-20"
+    },
+    {
+      "customerName": "JoeGong",
+      "paymentAmount": "1200.00",
+      "classDate": "2025-12-20"
+    },
+    {
+      "customerName": "JoeGong",
+      "paymentAmount": "1200.00",
+      "classDate": "2025-12-20"
+    },
+    {
+      "customerName": "JoeGong",
+      "paymentAmount": "1200.00",
+      "classDate": "2025-12-20"
+    },
+    {
+      "customerName": "JoeGong",
+      "paymentAmount": "1200.00",
+      "classDate": "2025-12-20"
+    },
+    {
+      "customerName": "JoeGong",
+      "paymentAmount": "1200.00",
+      "classDate": "2025-12-20"
+    },
+    {
+      "customerName": "customerName",
+      "paymentAmount": "paymentAmount",
+      "classDate": "classDate"
+    },
+    {
+      "customerName": "涛涛",
+      "paymentAmount": "2400.00",
+      "classDate": "2026-01-16"
+    },
+    {
+      "customerName": "涛涛",
+      "paymentAmount": "2400.00",
+      "classDate": "2026-01-17"
+    }
+  ],
+  "messages": [],
+  "stdout": "customerName\tpaymentAmount\tclassDate\n清淼\t4888.00\t2026-01-03\n清淼\t4888.00\t2026-01-03\ncustomerName\tpaymentAmount\tclassDate\nJoeGong\t2800.00\t2025-12-20\nJoeGong\t1200.00\t2025-12-20\nJoeGong\t1200.00\t2025-12-20\nJoeGong\t1200.00\t2025-12-20\nJoeGong\t1200.00\t2025-12-20\nJoeGong\t1200.00\t2025-12-20\ncustomerName\tpaymentAmount\tclassDate\n涛涛\t2400.00\t2026-01-16\n涛涛\t2400.00\t2026-01-17\n",
+  "stderr": "",
+  "execution_time_ms": 1981
+}

@@ -1,0 +1,8 @@
+{
+  "query": "\n-- 查询清淼的订单\nSELECT customerName, paymentAmount, courseDate FROM orders WHERE customerName = '清淼' ORDER BY courseDate;\n\n-- 查询JoeGong的订单\nSELECT customerName, paymentAmount, courseDate FROM orders WHERE customerName = 'JoeGong' ORDER BY courseDate;\n\n-- 查询涛涛的订单\nSELECT customerName, paymentAmount, courseDate FROM orders WHERE customerName = '涛涛' ORDER BY courseDate;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询清淼的订单\nSELECT customerName, paymentAmount, courseDate FROM orders WHERE customerName = '清淼' ORDER BY courseDate;\n\n-- 查询JoeGong的订单\nSELECT customerName, paymentAmount, courseDate FROM orders WHERE customerName = 'JoeGong' ORDER BY courseDate;\n\n-- 查询涛涛的订单\nSELECT customerName, paymentAmount, courseDate FROM orders WHERE customerName = '涛涛' ORDER BY courseDate;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 3: Unknown column 'coursedate' in 'field list'"
+  ]
+}

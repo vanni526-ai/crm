@@ -10,6 +10,7 @@ import { trafficSourceConfigRouter } from "./trafficSourceConfigRouter";
 import { transportFeeFixRouter } from "./transportFeeFixRouter";
 import { parsingLearningRouter } from "./parsingLearningRouter";
 import { reconciliationRouter } from "./reconciliationRouter";
+import { customerRouter } from "./customerRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -47,6 +48,7 @@ const financeOrAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
 export const appRouter = router({
   system: systemRouter,
   salespersons: salespersonRouter,
+  customers: customerRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,

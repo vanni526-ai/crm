@@ -93,6 +93,18 @@ export default function Customers() {
     },
   });
 
+  const refreshAllStats = trpc.customers.refreshAllStats.useMutation({
+    onSuccess: (data) => {
+      utils.customers.list.invalidate();
+      toast.success(
+        `刷新成功！总客户数: ${data.totalCustomers}, 有消费记录: ${data.customersWithSpending}`
+      );
+    },
+    onError: (error) => {
+      toast.error(error.message || "刷新失败");
+    },
+  });
+
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -235,6 +247,14 @@ export default function Customers() {
                 批量删除 ({selectedCustomerIds.length})
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={() => refreshAllStats.mutate()}
+              disabled={refreshAllStats.isPending}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {refreshAllStats.isPending ? "刷新中..." : "更新客户数据"}
+            </Button>
             <Button
               variant="outline"
               onClick={() => cleanupTeacherNames.mutate()}
