@@ -1,0 +1,20 @@
+{
+  "query": "\nSELECT \n  city,\n  partnerFeeRate,\n  isActive\nFROM cityPartnerConfig \nWHERE city IN ('天津', '武汉');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  city,\n  partnerFeeRate,\n  isActive\nFROM cityPartnerConfig \nWHERE city IN ('天津', '武汉');\n",
+  "rows": [
+    {
+      "city": "天津",
+      "partnerFeeRate": "50.00",
+      "isActive": "1"
+    },
+    {
+      "city": "武汉",
+      "partnerFeeRate": "40.00",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "city\tpartnerFeeRate\tisActive\n天津\t50.00\t1\n武汉\t40.00\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1525
+}

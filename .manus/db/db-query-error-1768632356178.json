@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  cityName,\n  partnerFeeRate,\n  status\nFROM cityPartnerFees \nWHERE cityName IN ('天津', '武汉');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  cityName,\n  partnerFeeRate,\n  status\nFROM cityPartnerFees \nWHERE cityName IN ('天津', '武汉');\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 2: Table 'jtcsa4dgw9wmnzinvrevwf.cityPartnerFees' doesn't exist"
+  ]
+}

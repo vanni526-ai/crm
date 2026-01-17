@@ -1,0 +1,85 @@
+{
+  "query": "SHOW TABLES;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SHOW TABLES;",
+  "rows": [
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "__drizzle_migrations"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "accountTransactions"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "auditLogs"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "cityPartnerConfig"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "customers"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "fieldMappings"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "gmailImportConfig"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "gmailImportHistory"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "gmailImportLogs"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "gmail_error_feedback"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "gmail_import_config"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "importLogs"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "matchedScheduleOrders"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "orders"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "parsingCorrections"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "parsingLearningConfig"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "partnerFeeAuditLogs"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "promptOptimizationHistory"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "reconciliations"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "salespersons"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "schedules"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "smartRegisterHistory"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "teacherPayments"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "teachers"
+    },
+    {
+      "Tables_in_jtCSa4Dgw9WMNzinVreVWF": "users"
+    }
+  ],
+  "messages": [],
+  "stdout": "Tables_in_jtCSa4Dgw9WMNzinVreVWF\n__drizzle_migrations\naccountTransactions\nauditLogs\ncityPartnerConfig\ncustomers\nfieldMappings\ngmailImportConfig\ngmailImportHistory\ngmailImportLogs\ngmail_error_feedback\ngmail_import_config\nimportLogs\nmatchedScheduleOrders\norders\nparsingCorrections\nparsingLearningConfig\npartnerFeeAuditLogs\npromptOptimizationHistory\nreconciliations\nsalespersons\nschedules\nsmartRegisterHistory\nteacherPayments\nteachers\nusers\n",
+  "stderr": "",
+  "execution_time_ms": 1558
+}

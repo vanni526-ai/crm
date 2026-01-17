@@ -1,0 +1,100 @@
+{
+  "query": "\nSELECT \n  id,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  partnerFee,\n  paymentDate,\n  createdAt\nFROM orders \nWHERE deliveryCity IN ('天津', '武汉')\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  id,\n  deliveryCity,\n  courseAmount,\n  teacherFee,\n  partnerFee,\n  paymentDate,\n  createdAt\nFROM orders \nWHERE deliveryCity IN ('天津', '武汉')\nORDER BY createdAt DESC\nLIMIT 10;\n",
+  "rows": [
+    {
+      "id": "1770011",
+      "deliveryCity": "武汉",
+      "courseAmount": "1800.00",
+      "teacherFee": "400.00",
+      "partnerFee": "0.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-17 06:42:54"
+    },
+    {
+      "id": "1770009",
+      "deliveryCity": "武汉",
+      "courseAmount": "1200.00",
+      "teacherFee": "200.00",
+      "partnerFee": "0.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-17 06:42:54"
+    },
+    {
+      "id": "1770010",
+      "deliveryCity": "天津",
+      "courseAmount": "1200.00",
+      "teacherFee": "200.00",
+      "partnerFee": "0.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-17 06:42:54"
+    },
+    {
+      "id": "1740005",
+      "deliveryCity": "天津",
+      "courseAmount": "5600.00",
+      "teacherFee": "700.00",
+      "partnerFee": "0.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-16 10:21:08"
+    },
+    {
+      "id": "1710016",
+      "deliveryCity": "天津",
+      "courseAmount": "2800.00",
+      "teacherFee": "600.00",
+      "partnerFee": "1100.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-14 11:45:56"
+    },
+    {
+      "id": "1710003",
+      "deliveryCity": "天津",
+      "courseAmount": "1500.00",
+      "teacherFee": "300.00",
+      "partnerFee": "600.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-14 11:45:01"
+    },
+    {
+      "id": "1560075",
+      "deliveryCity": "天津",
+      "courseAmount": "4000.00",
+      "teacherFee": "700.00",
+      "partnerFee": "1650.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-10 07:56:43"
+    },
+    {
+      "id": "1560072",
+      "deliveryCity": "天津",
+      "courseAmount": "1800.00",
+      "teacherFee": "400.00",
+      "partnerFee": "700.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-10 07:56:43"
+    },
+    {
+      "id": "1560074",
+      "deliveryCity": "武汉",
+      "courseAmount": "2400.00",
+      "teacherFee": "400.00",
+      "partnerFee": "800.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-10 07:56:43"
+    },
+    {
+      "id": "1560066",
+      "deliveryCity": "武汉",
+      "courseAmount": "900.00",
+      "teacherFee": "200.00",
+      "partnerFee": "280.00",
+      "paymentDate": "NULL",
+      "createdAt": "2026-01-10 07:56:21"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdeliveryCity\tcourseAmount\tteacherFee\tpartnerFee\tpaymentDate\tcreatedAt\n1770011\t武汉\t1800.00\t400.00\t0.00\tNULL\t2026-01-17 06:42:54\n1770009\t武汉\t1200.00\t200.00\t0.00\tNULL\t2026-01-17 06:42:54\n1770010\t天津\t1200.00\t200.00\t0.00\tNULL\t2026-01-17 06:42:54\n1740005\t天津\t5600.00\t700.00\t0.00\tNULL\t2026-01-16 10:21:08\n1710016\t天津\t2800.00\t600.00\t1100.00\tNULL\t2026-01-14 11:45:56\n1710003\t天津\t1500.00\t300.00\t600.00\tNULL\t2026-01-14 11:45:01\n1560075\t天津\t4000.00\t700.00\t1650.00\tNULL\t2026-01-10 07:56:43\n1560072\t天津\t1800.00\t400.00\t700.00\tNULL\t2026-01-10 07:56:43\n1560074\t武汉\t2400.00\t400.00\t800.00\tNULL\t2026-01-10 07:56:43\n1560066\t武汉\t900.00\t200.00\t280.00\tNULL\t2026-01-10 07:56:21\n",
+  "stderr": "",
+  "execution_time_ms": 1533
+}

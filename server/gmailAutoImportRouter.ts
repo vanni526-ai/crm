@@ -10,6 +10,7 @@ import {
   checkChannelOrderNoExists,
   getOrderByChannelOrderNo,
   getDb,
+  calculatePartnerFee,
 } from "./db";
 import { gmailImportLogs } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
@@ -235,6 +236,13 @@ export const gmailAutoImportRouter = router({
               continue;
             }
             
+            // 计算合伙人费
+            const partnerFee = await calculatePartnerFee(
+              orderData.city || "",
+              orderData.courseAmount || 0,
+              orderData.teacherFee || 0
+            );
+            
             // 验证渠道订单号
             let channelOrderNo = orderData.channelOrderNo || "";
             let paymentChannel = orderData.paymentMethod || "";
@@ -279,6 +287,7 @@ export const gmailAutoImportRouter = router({
               accountBalance: orderData.accountBalance?.toString() || "0",
               teacherFee: orderData.teacherFee?.toString() || "0",
               transportFee: orderData.carFee?.toString() || "0",
+              partnerFee: partnerFee.toString(),
               channelOrderNo,
               paymentChannel,
               deliveryCity: orderData.city || "",
@@ -391,6 +400,13 @@ export const gmailAutoImportRouter = router({
               continue;
             }
             
+            // 计算合伙人费
+            const partnerFee = await calculatePartnerFee(
+              orderData.city || "",
+              orderData.courseAmount || 0,
+              orderData.teacherFee || 0
+            );
+            
             // 验证渠道订单号格式并识别支付渠道
             let channelOrderNo = orderData.channelOrderNo || "";
             let paymentChannel = orderData.paymentMethod || "";
@@ -443,6 +459,7 @@ export const gmailAutoImportRouter = router({
               accountBalance: orderData.accountBalance?.toString() || "0",
               teacherFee: orderData.teacherFee?.toString() || "0",
               transportFee: orderData.carFee?.toString() || "0",
+              partnerFee: partnerFee.toString(),
               channelOrderNo,
               paymentChannel,
               deliveryCity: orderData.city || "",
