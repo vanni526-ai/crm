@@ -173,13 +173,13 @@ export async function getAllCustomers() {
           orderCount: sql<number>`COUNT(*)`,
         })
         .from(orders)
-        .where(eq(orders.customerName, customer.name));
+        .where(sql`LOWER(${orders.customerName}) = LOWER(${customer.name})`);
       
       // 获取最新订单的账户余额
       const latestOrder = await db
         .select({ accountBalance: orders.accountBalance })
         .from(orders)
-        .where(eq(orders.customerName, customer.name))
+        .where(sql`LOWER(${orders.customerName}) = LOWER(${customer.name})`)
         .orderBy(desc(orders.createdAt))
         .limit(1);
       
