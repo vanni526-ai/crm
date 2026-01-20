@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, MapPin, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Edit, Trash2, MapPin, ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Cities() {
@@ -26,6 +26,7 @@ export default function Cities() {
   const createMutation = trpc.analytics.createCityConfig.useMutation();
   const updateMutation = trpc.analytics.updateCityPartnerConfig.useMutation();
   const deleteMutation = trpc.analytics.deleteCityConfig.useMutation();
+  const exportCities = trpc.city.exportCities.useQuery(undefined, { enabled: false });
 
   const [formData, setFormData] = useState({
     city: "",
@@ -33,6 +34,38 @@ export default function Cities() {
     partnerFeeRate: "",
     description: "",
   });
+
+  const handleExport = async () => {
+    try {
+      const result = await exportCities.refetch();
+      if (result.data) {
+        // 将Base64数据转换为Blob
+        const byteCharacters = atob(result.data.data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        // 创建下载链接
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = result.data.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        toast.success("导出成功");
+      }
+    } catch (error) {
+      toast.error("导出失败");
+    }
+  };
 
   const handleCreate = async () => {
     if (!formData.city || !formData.partnerFeeRate) {
@@ -188,14 +221,23 @@ export default function Cities() {
             管理所有城市配置和统计数据
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              添加城市
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={exportCities.isLoading}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {exportCities.isLoading ? "导出中..." : "导出城市报表"}
+          </Button>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                添加城市
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
             <DialogHeader>
               <DialogTitle>添加新城市</DialogTitle>
               <DialogDescription>
@@ -249,8 +291,9 @@ export default function Cities() {
                 {createMutation.isPending ? "创建中..." : "创建"}
               </Button>
             </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* 汇总统计卡片 */}

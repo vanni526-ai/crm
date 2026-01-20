@@ -12,6 +12,7 @@ import { parsingLearningRouter } from "./parsingLearningRouter";
 import { reconciliationRouter } from "./reconciliationRouter";
 import { customerRouter } from "./customerRouter";
 import { financeRouter } from "./financeRouter";
+import { cityRouter } from "./cityRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -51,6 +52,7 @@ export const appRouter = router({
   salespersons: salespersonRouter,
   customers: customerRouter,
   finance: financeRouter,
+  city: cityRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,
@@ -160,171 +162,6 @@ export const appRouter = router({
       }),
   }),
 
-  // 客户管理
-  customers: router({
-    list: protectedProcedure.query(async () => {
-      return db.getAllCustomers();
-    }),
-    
-    search: protectedProcedure
-      .input(z.object({ keyword: z.string() }))
-      .query(async ({ input }) => {
-        return db.searchCustomers(input.keyword);
-      }),
-    
-    create: salesOrAdminProcedure
-      .input(z.object({
-        name: z.string(),
-        wechatId: z.string().optional(),
-        phone: z.string().optional(),
-        trafficSource: z.string().optional(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        // 验证客户名不能是老师名
-        const teacherNames = await db.getAllTeacherNames();
-        if (teacherNames.includes(input.name)) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `客户名不能使用老师名字: ${input.name}`,
-          });
-        }
-        
-        const id = await db.createCustomer({
-          ...input,
-          createdBy: ctx.user.id,
-        });
-        return { id, success: true };
-      }),
-    
-    getById: protectedProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return db.getCustomerById(input.id);
-      }),
-    
-    update: salesOrAdminProcedure
-      .input(z.object({
-        id: z.number(),
-        name: z.string().optional(),
-        wechatId: z.string().optional(),
-        phone: z.string().optional(),
-        trafficSource: z.string().optional(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        const { id, ...data } = input;
-        await db.updateCustomer(id, data);
-        return { success: true };
-      }),
-    
-    delete: salesOrAdminProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.deleteCustomer(input.id);
-        return { success: true };
-      }),
-    
-    batchDelete: salesOrAdminProcedure
-      .input(z.object({ ids: z.array(z.number()) }))
-      .mutation(async ({ input }) => {
-        let count = 0;
-        for (const id of input.ids) {
-          await db.deleteCustomer(id);
-          count++;
-        }
-        return { success: true, count };
-      }),
-    
-    // 获取客户账户流水
-    getTransactions: protectedProcedure
-      .input(z.object({ customerId: z.number() }))
-      .query(async ({ input }) => {
-        return db.getCustomerTransactions(input.customerId);
-      }),
-    
-    // 客户充值
-    recharge: salesOrAdminProcedure
-      .input(z.object({
-        customerId: z.number(),
-        amount: z.number().positive(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const result = await db.rechargeCustomerAccount({
-          customerId: input.customerId,
-          amount: input.amount,
-          notes: input.notes,
-          operatorId: ctx.user.id,
-          operatorName: ctx.user.name || ctx.user.nickname || "未知",
-        });
-        return { success: true, ...result };
-      }),
-    
-    // 从订单创建客户
-    createFromOrder: salesOrAdminProcedure
-      .input(z.object({
-        name: z.string().min(1, "客户名不能为空"),
-        trafficSource: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        // 验证客户名不能是老师名
-        const teacherNames = await db.getAllTeacherNames();
-        if (teacherNames.includes(input.name)) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `客户名不能使用老师名字: ${input.name}`,
-          });
-        }
-        
-        // 检查客户是否已存在
-        const existingCustomer = await db.searchCustomers(input.name);
-        if (existingCustomer.length > 0) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "客户已存在，请勿重复创建",
-          });
-        }
-        
-        const id = await db.createCustomer({
-          name: input.name,
-          trafficSource: input.trafficSource,
-          createdBy: ctx.user.id,
-        });
-        return { id, success: true };
-      }),
-    
-    // 更新客户标签
-    updateTags: salesOrAdminProcedure
-      .input(z.object({
-        customerId: z.number(),
-        tags: z.array(z.string()),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateCustomer(input.customerId, {
-          tags: JSON.stringify(input.tags),
-        });
-        return { success: true };
-      }),
-    
-    // 从订单批量导入客户
-    importFromOrders: salesOrAdminProcedure
-      .mutation(async ({ ctx }) => {
-        const result = await db.importCustomersFromOrders(ctx.user.id);
-        return result;
-      }),
-    
-    // 清理客户表中的老师名
-    cleanupTeacherNames: protectedProcedure
-      .mutation(async () => {
-        const deletedCount = await db.deleteCustomersWithTeacherNames();
-        return { 
-          success: true, 
-          deletedCount,
-          message: `已清理${deletedCount}个老师名客户记录`
-        };
-      }),
-  }),
 
   // 订单管理
   orders: router({
