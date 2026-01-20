@@ -789,21 +789,33 @@ export const appRouter = router({
         };
       }),
 
-    // 批量计算合伙人费用
-    batchCalculatePartnerFee: salesOrAdminProcedure
-      .mutation(async () => {
-        // 查询所有需要计算的订单
-        const allOrders = await db.getAllOrders();
+    // 批量重新计算合伙人费(针对选中的订单)
+    batchCalculatePartnerFee: protectedProcedure
+      .input(z.object({
+        orderIds: z.array(z.number())
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { orderIds } = input;
         
         let updatedCount = 0;
         let unchangedCount = 0;
         let errorCount = 0;
         const updates: any[] = [];
+        const errorMessages: string[] = [];
         
-        for (const order of allOrders) {
+        for (const orderId of orderIds) {
           try {
+            // 获取订单信息
+            const order = await db.getOrderById(orderId);
+            if (!order) {
+              errorCount++;
+              errorMessages.push(`订单ID ${orderId} 不存在`);
+              continue;
+            }
+            
             // 跳过没有必要字段的订单
             if (!order.deliveryCity || !order.courseAmount || order.teacherFee === null) {
+              unchangedCount++;
               continue;
             }
             
@@ -822,6 +834,7 @@ export const appRouter = router({
             // 如果合伙人费有变化，记录更新
             if (Math.abs(newPartnerFee - oldPartnerFee) > 0.01) {
               updates.push({
+                orderId: order.id,
                 orderNo: order.orderNo,
                 customerName: order.customerName,
                 deliveryCity: order.deliveryCity,
@@ -841,20 +854,23 @@ export const appRouter = router({
               unchangedCount++;
             }
           } catch (error) {
-            console.error(`处理订单 ${order.orderNo} 时出错:`, error);
+            console.error(`处理订单 ${orderId} 时出错:`, error);
             errorCount++;
+            errorMessages.push(`订单ID ${orderId}: ${error instanceof Error ? error.message : '未知错误'}`);
           }
         }
         
         return {
           success: true,
-          totalOrders: allOrders.length,
+          totalOrders: orderIds.length,
           updatedCount,
           unchangedCount,
           errorCount,
           updates,
+          errorMessages,
         };
       }),
+
   }),
 
   // 老师管理

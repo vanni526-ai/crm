@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, MapPin, ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react";
+import { Plus, Edit, Trash2, MapPin, ArrowUpDown, ArrowUp, ArrowDown, Download, TrendingUp } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
 
 export default function Cities() {
@@ -27,6 +28,8 @@ export default function Cities() {
   const updateMutation = trpc.analytics.updateCityPartnerConfig.useMutation();
   const deleteMutation = trpc.analytics.deleteCityConfig.useMutation();
   const exportCities = trpc.city.exportCities.useQuery(undefined, { enabled: false });
+  const { data: cityTrends } = trpc.city.getCityMonthlyTrends.useQuery();
+  const [selectedTrendCity, setSelectedTrendCity] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     city: "",
@@ -213,6 +216,135 @@ export default function Cities() {
           setShowOrdersDialog(true);
         }} />
       </div>
+
+      {/* 城市业绩趋势图表 */}
+      {cityTrends && cityTrends.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  城市业绩趋势
+                </CardTitle>
+                <CardDescription>
+                  各城市月度订单量、销售额和利润变化趋势
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <select
+                  className="px-3 py-2 border rounded-md text-sm"
+                  value={selectedTrendCity || ""}
+                  onChange={(e) => setSelectedTrendCity(e.target.value || null)}
+                >
+                  <option value="">所有城市</option>
+                  {cityTrends.map((trend) => (
+                    <option key={trend.city} value={trend.city}>
+                      {trend.city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {(() => {
+              // 准备图表数据
+              const displayTrends = selectedTrendCity
+                ? cityTrends.filter((t) => t.city === selectedTrendCity)
+                : cityTrends;
+
+              // 合并所有城市的月度数据
+              const monthlyDataMap: Record<string, {
+                month: string;
+                orderCount: number;
+                revenue: number;
+                profit: number;
+              }> = {};
+
+              displayTrends.forEach((trend) => {
+                trend.monthlyData.forEach((data) => {
+                  if (!monthlyDataMap[data.month]) {
+                    monthlyDataMap[data.month] = {
+                      month: data.month,
+                      orderCount: 0,
+                      revenue: 0,
+                      profit: 0,
+                    };
+                  }
+                  monthlyDataMap[data.month].orderCount += data.orderCount;
+                  monthlyDataMap[data.month].revenue += data.revenue;
+                  monthlyDataMap[data.month].profit += data.profit;
+                });
+              });
+
+              const chartData = Object.values(monthlyDataMap)
+                .sort((a, b) => a.month.localeCompare(b.month))
+                .map((data) => ({
+                  month: data.month,
+                  "订单量": data.orderCount,
+                  "销售额": Math.round(data.revenue),
+                  "利润": Math.round(data.profit),
+                }));
+
+              return (
+                <div className="space-y-6">
+                  {/* 订单量趋势 */}
+                  <div>
+                    <h3 className="text-sm font-medium mb-3">订单量趋势</h3>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line
+                          type="monotone"
+                          dataKey="订单量"
+                          stroke="#8884d8"
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* 销售额和利润趋势 */}
+                  <div>
+                    <h3 className="text-sm font-medium mb-3">销售额与利润趋势</h3>
+                    <ResponsiveContainer width="100%" height={250}>
+                      <LineChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip
+                          formatter={(value: number) => `¥${value.toLocaleString()}`}
+                        />
+                        <Legend />
+                        <Line
+                          type="monotone"
+                          dataKey="销售额"
+                          stroke="#82ca9d"
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="利润"
+                          stroke="#ffc658"
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      )}
       
       <div className="flex items-center justify-between mb-6">
         <div>

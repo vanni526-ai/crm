@@ -4,6 +4,11 @@ import * as db from "./db";
 import { cityPartnerConfig } from "../drizzle/schema";
 
 export const cityRouter = router({
+  // 获取城市月度业绩趋势数据
+  getCityMonthlyTrends: protectedProcedure.query(async () => {
+    const monthlyTrends = await db.getCityMonthlyTrends();
+    return monthlyTrends;
+  }),
   exportCities: protectedProcedure.query(async () => {
     // 获取所有城市的财务统计数据
     const cityStats = await db.getCityFinancialStats();

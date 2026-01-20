@@ -18,7 +18,7 @@ import Import from "./pages/Import";
 import CustomerOverview from "./pages/CustomerOverview";
 import Sales from "./pages/Sales";
 import GmailImport from "./pages/GmailImport";
-import GmailImportConfig from "./pages/GmailImportConfig";
+// import GmailImportConfig from "./pages/GmailImportConfig";
 import ChannelOrderNoManagement from "./pages/ChannelOrderNoManagement";
 import ReconciliationExport from "./pages/ReconciliationExport";
 import TransportFeeFixTool from "./pages/TransportFeeFixTool";
@@ -48,7 +48,7 @@ function Router() {
       <Route path={"/customer-overview"} component={CustomerOverview} />
       <Route path={"/sales"} component={Sales} />
       <Route path={"/gmail-import"} component={GmailImport} />
-      <Route path={"/gmail-import/config"} component={GmailImportConfig} />
+      {/* <Route path={"/gmail-import/config"} component={GmailImportConfig} /> */}
       <Route path={"/channel-orderno-management"} component={ChannelOrderNoManagement} />
       <Route path={"/reconciliation-export"} component={ReconciliationExport} />
       <Route path={"/transport-fee-fix"} component={TransportFeeFixTool} />

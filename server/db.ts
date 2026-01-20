@@ -2872,3 +2872,92 @@ export async function updateSalespersonStats(salespersonId: number) {
 }
 
 
+
+// ========== 城市月度业绩趋势 ==========
+
+export async function getCityMonthlyTrends() {
+  const db = await getDb();
+  if (!db) return [];
+
+  // 获取所有订单
+  const allOrders = await db.select().from(orders);
+
+  // 按城市和月份聚合统计
+  const trendsMap: Record<string, Record<string, {
+    month: string;
+    city: string;
+    orderCount: number;
+    revenue: number;
+    profit: number;
+  }>> = {};
+
+  allOrders.forEach((order) => {
+    const city = order.deliveryCity || '未知城市';
+    const classDate = order.classDate;
+    
+    if (!classDate) return;
+
+    // 提取年月 (YYYY-MM格式)
+    // classDate可能是Date类型或字符串类型
+    const dateStr = typeof classDate === 'string' ? classDate : classDate.toISOString().split('T')[0];
+    const month = dateStr.substring(0, 7);
+
+    if (!trendsMap[city]) {
+      trendsMap[city] = {};
+    }
+
+    if (!trendsMap[city][month]) {
+      trendsMap[city][month] = {
+        month,
+        city,
+        orderCount: 0,
+        revenue: 0,
+        profit: 0,
+      };
+    }
+
+    const revenue = parseFloat(order.paymentAmount || '0');
+    const teacherFee = parseFloat(order.teacherFee || '0');
+    const transportFee = parseFloat(order.transportFee || '0');
+    const partnerFee = parseFloat(order.partnerFee || '0');
+    const consumablesFee = parseFloat(order.consumablesFee || '0');
+    const rentFee = parseFloat(order.rentFee || '0');
+    const propertyFee = parseFloat(order.propertyFee || '0');
+    const utilityFee = parseFloat(order.utilityFee || '0');
+    const otherFee = parseFloat(order.otherFee || '0');
+    
+    const totalExpense = teacherFee + transportFee + partnerFee + consumablesFee + rentFee + propertyFee + utilityFee + otherFee;
+    const profit = revenue - totalExpense;
+
+    trendsMap[city][month].orderCount += 1;
+    trendsMap[city][month].revenue += revenue;
+    trendsMap[city][month].profit += profit;
+  });
+
+  // 转换为数组格式
+  const trends: Array<{
+    city: string;
+    monthlyData: Array<{
+      month: string;
+      orderCount: number;
+      revenue: number;
+      profit: number;
+    }>;
+  }> = [];
+
+  Object.keys(trendsMap).forEach((city) => {
+    const monthlyData = Object.values(trendsMap[city]).sort((a, b) => 
+      a.month.localeCompare(b.month)
+    );
+    
+    trends.push({
+      city,
+      monthlyData,
+    });
+  });
+
+  // 按城市名称排序
+  trends.sort((a, b) => a.city.localeCompare(b.city));
+
+  return trends;
+}

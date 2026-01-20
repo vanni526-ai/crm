@@ -145,15 +145,7 @@ export default function Orders() {
     },
   });
 
-  const createCustomerFromOrder = trpc.customers.createFromOrder.useMutation({
-    onSuccess: () => {
-      utils.customers.list.invalidate();
-      toast.success("客户创建成功");
-    },
-    onError: (error) => {
-      toast.error(error.message || "创建失败");
-    },
-  });
+  // 客户创建功能已移除,客户数据通过订单自动创建
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -325,18 +317,7 @@ export default function Orders() {
     }
   };
 
-  const handleCopyToCustomer = (order: any) => {
-    if (!order.customerName) {
-      toast.error("订单中没有客户名，无法创建客户");
-      return;
-    }
-    if (confirm(`确定要将客户“${order.customerName}”复制到客户管理吗？`)) {
-      createCustomerFromOrder.mutate({
-        name: order.customerName,
-        trafficSource: order.trafficSource,
-      });
-    }
-  };
+  // 客户创建功能已移除,客户数据通过订单自动创建
 
   const handleBatchDelete = () => {
     if (selectedOrderIds.length === 0) {
@@ -1080,14 +1061,7 @@ export default function Orders() {
                               <Button variant="ghost" size="sm" onClick={() => handleEdit(order)}>
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleCopyToCustomer(order)}
-                                title="复制到客户管理"
-                              >
-                                <UserPlus className="h-4 w-4 text-blue-600" />
-                              </Button>
+
                               <Button
                                 variant="ghost"
                                 size="sm"
