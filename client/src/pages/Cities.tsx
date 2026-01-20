@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, MapPin } from "lucide-react";
+import { Plus, Edit, Trash2, MapPin, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Cities() {
@@ -19,6 +19,8 @@ export default function Cities() {
   const [editingCity, setEditingCity] = useState<any>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [showOrdersDialog, setShowOrdersDialog] = useState(false);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   const { data: cities, isLoading, refetch } = trpc.analytics.getAllCitiesWithStats.useQuery();
   const createMutation = trpc.analytics.createCityConfig.useMutation();
@@ -91,8 +93,62 @@ export default function Cities() {
   };
 
   const formatCurrency = (value: number) => {
-    return `¥${value.toFixed(2)}`;
+    return `￥${value.toFixed(2)}`;
   };
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      // 如果已经按该字段排序,切换排序顺序
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // 否则设置新的排序字段,默认降序
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
+
+  const getSortIcon = (field: string) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    }
+    return sortOrder === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />;
+  };
+
+  // 排序后的城市数据
+  const sortedCities = cities ? [...cities].sort((a, b) => {
+    if (!sortField) return 0;
+    
+    let aValue: any = a[sortField as keyof typeof a];
+    let bValue: any = b[sortField as keyof typeof b];
+    
+    // 处理特殊字段
+    if (sortField === 'city') {
+      aValue = a.city;
+      bValue = b.city;
+    } else if (sortField === 'orderCount') {
+      aValue = a.orderCount;
+      bValue = b.orderCount;
+    } else if (sortField === 'totalSales') {
+      aValue = a.totalSales;
+      bValue = b.totalSales;
+    } else if (sortField === 'totalExpense') {
+      aValue = a.totalExpense;
+      bValue = b.totalExpense;
+    } else if (sortField === 'profit') {
+      aValue = a.profit;
+      bValue = b.profit;
+    } else if (sortField === 'profitRate') {
+      aValue = a.totalSales > 0 ? (a.profit / a.totalSales) * 100 : 0;
+      bValue = b.totalSales > 0 ? (b.profit / b.totalSales) * 100 : 0;
+    }
+    
+    // 比较
+    if (typeof aValue === 'string') {
+      return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    } else {
+      return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+  }) : [];
 
   if (isLoading) {
     return (
@@ -248,20 +304,50 @@ export default function Cities() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>城市名称</TableHead>
+                <TableHead>
+                  <Button variant="ghost" onClick={() => handleSort('city')} className="h-8 p-0 hover:bg-transparent">
+                    城市名称
+                    {getSortIcon('city')}
+                  </Button>
+                </TableHead>
                 <TableHead>区号</TableHead>
                 <TableHead>合伙人费比例</TableHead>
-                <TableHead className="text-right">订单数</TableHead>
-                <TableHead className="text-right">销售额</TableHead>
-                <TableHead className="text-right">总费用</TableHead>
-                <TableHead className="text-right">利润</TableHead>
-                <TableHead className="text-right">利润率</TableHead>
+                <TableHead className="text-right">
+                  <Button variant="ghost" onClick={() => handleSort('orderCount')} className="h-8 p-0 hover:bg-transparent">
+                    订单数
+                    {getSortIcon('orderCount')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-right">
+                  <Button variant="ghost" onClick={() => handleSort('totalSales')} className="h-8 p-0 hover:bg-transparent">
+                    销售额
+                    {getSortIcon('totalSales')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-right">
+                  <Button variant="ghost" onClick={() => handleSort('totalExpense')} className="h-8 p-0 hover:bg-transparent">
+                    总费用
+                    {getSortIcon('totalExpense')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-right">
+                  <Button variant="ghost" onClick={() => handleSort('profit')} className="h-8 p-0 hover:bg-transparent">
+                    利润
+                    {getSortIcon('profit')}
+                  </Button>
+                </TableHead>
+                <TableHead className="text-right">
+                  <Button variant="ghost" onClick={() => handleSort('profitRate')} className="h-8 p-0 hover:bg-transparent">
+                    利润率
+                    {getSortIcon('profitRate')}
+                  </Button>
+                </TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead className="text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cities?.map((city) => (
+              {sortedCities.map((city) => (
                 <TableRow key={city.id}>
                   <TableCell className="font-medium">{city.city}</TableCell>
                   <TableCell>{city.areaCode || "-"}</TableCell>
