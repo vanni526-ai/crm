@@ -330,6 +330,27 @@ export async function deleteOrder(id: number) {
   await db.delete(orders).where(eq(orders.id, id));
 }
 
+/**
+ * 根据渠道订单号删除订单
+ * @param channelOrderNo - 渠道订单号
+ * @returns 删除的订单信息
+ */
+export async function deleteOrderByChannelOrderNo(channelOrderNo: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // 先获取订单信息用于返回
+  const order = await getOrderByChannelOrderNo(channelOrderNo);
+  if (!order) {
+    return null;
+  }
+  
+  // 删除订单
+  await db.delete(orders).where(eq(orders.channelOrderNo, channelOrderNo));
+  
+  return order;
+}
+
 // ========== 城市财务统计 ==========
 
 export async function getCityFinancialStats(dateRange?: string) {

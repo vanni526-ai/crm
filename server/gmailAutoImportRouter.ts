@@ -99,6 +99,27 @@ export const gmailAutoImportRouter = router({
           parsedOrders.map(async (orderData) => {
             const warnings: string[] = [];
             
+            // 检查是否为作废订单
+            const isVoidOrder = orderData.customerName?.startsWith("作废");
+            
+            if (isVoidOrder) {
+              // 作废订单标记
+              if (orderData.channelOrderNo) {
+                const existingOrder = await getOrderByChannelOrderNo(orderData.channelOrderNo);
+                if (existingOrder) {
+                  warnings.push(
+                    `🗑️ 作废订单: 将删除原订单 ${existingOrder.orderNo} (客户: ${existingOrder.customerName || '未知'})`
+                  );
+                } else {
+                  warnings.push(
+                    `⚠️ 作废订单: 未找到匹配的原订单 (渠道订单号: ${orderData.channelOrderNo})`
+                  );
+                }
+              } else {
+                warnings.push("⚠️ 作废订单: 缺少渠道订单号,无法匹配原订单");
+              }
+            }
+            
             // 验证老师费用
             const teacherFeeValidation = validateTeacherFee(
               orderData.teacherFee || 0,
@@ -212,6 +233,28 @@ export const gmailAutoImportRouter = router({
         
         for (const orderData of input.orders) {
           try {
+            // 检查是否为作废订单
+            const isVoidOrder = orderData.customerName?.startsWith("作废");
+            
+            if (isVoidOrder && orderData.channelOrderNo) {
+              // 作废订单处理: 根据渠道订单号删除原订单
+              const { deleteOrderByChannelOrderNo } = await import("./db");
+              const deletedOrder = await deleteOrderByChannelOrderNo(orderData.channelOrderNo);
+              
+              if (deletedOrder) {
+                successCount++;
+                warnings.push(
+                  `✅ 已删除作废订单: 渠道订单号 ${orderData.channelOrderNo}, ` +
+                  `原订单号 ${deletedOrder.orderNo}, 客户 ${deletedOrder.customerName || '未知'}`
+                );
+              } else {
+                errorMessages.push(
+                  `⚠️ 未找到需要作废的订单: 渠道订单号 ${orderData.channelOrderNo}`
+                );
+              }
+              continue;
+            }
+            
             // 生成订单号
             const orderNo = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
             
