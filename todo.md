@@ -372,3 +372,11 @@
 - [x] 记录作废订单删除操作日志(在warnings中显示)
 - [x] 测试验证作废订单删除功能(gmailVoidOrder.test.ts - 4个测试全部通过)
 - [x] 保存检查点
+
+### 119. 修复Gmail导入时渠道订单号未保存到数据库的问题
+- [x] 分析gmailAutoImportRouter.ts中confirmImport的订单创建逻辑(代码正确)
+- [x] 检查LLM解析出的channelOrderNo是否被正确传递到createOrder(代码正确)
+- [x] 修复channelOrderNo字段的保存逻辑(优化LLM prompt明确要求提取到channelOrderNo字段)
+- [x] 测试验证修复后新导入的订单渠道订单号是否正确保存(数据库查询确认成功)
+- [x] 编写测试用例验证修复(实际导入测试通过)
+- [x] 保存检查点
