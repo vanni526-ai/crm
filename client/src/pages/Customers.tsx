@@ -27,7 +27,8 @@ type CustomerFormData = z.infer<typeof customerSchema>;
 
 export default function Customers() {
   const utils = trpc.useUtils();
-  const { data: customers, isLoading } = trpc.customers.list.useQuery();
+  const [filterParams, setFilterParams] = useState<any>({});
+  const { data: customers, isLoading } = trpc.customers.list.useQuery(filterParams);
   const createCustomer = trpc.customers.create.useMutation({
     onSuccess: () => {
       utils.customers.list.invalidate();
@@ -35,7 +36,7 @@ export default function Customers() {
       setCreateOpen(false);
       reset();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "创建失败");
     },
   });
@@ -46,7 +47,7 @@ export default function Customers() {
       setEditOpen(false);
       reset();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "更新失败");
     },
   });
@@ -55,7 +56,7 @@ export default function Customers() {
       utils.customers.list.invalidate();
       toast.success("客户删除成功");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "删除失败");
     },
   });
@@ -66,7 +67,7 @@ export default function Customers() {
       toast.success(`批量删除成功，共删除 ${data.count} 个客户`);
       setSelectedCustomerIds([]);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "批量删除失败");
     },
   });
@@ -78,7 +79,7 @@ export default function Customers() {
         `导入完成！成功: ${data.success} 个，跳过: ${data.skipped} 个，失败: ${data.failed} 个`
       );
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "导入失败");
     },
   });
@@ -88,7 +89,7 @@ export default function Customers() {
       utils.customers.list.invalidate();
       toast.success(data.message || `已清理${data.deletedCount}个老师名客户记录`);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "清理失败");
     },
   });
@@ -100,7 +101,7 @@ export default function Customers() {
         `刷新成功！总客户数: ${data.totalCustomers}, 有消费记录: ${data.customersWithSpending}`
       );
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "刷新失败");
     },
   });
@@ -113,6 +114,13 @@ export default function Customers() {
   const [selectedCustomerIds, setSelectedCustomerIds] = useState<number[]>([]);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [showFilters, setShowFilters] = useState(false);
+  const [minSpent, setMinSpent] = useState<number | undefined>();
+  const [maxSpent, setMaxSpent] = useState<number | undefined>();
+  const [minClassCount, setMinClassCount] = useState<number | undefined>();
+  const [maxClassCount, setMaxClassCount] = useState<number | undefined>();
+  const [lastConsumptionDays, setLastConsumptionDays] = useState<number | undefined>();
+  const [trafficSource, setTrafficSource] = useState<string>("");
 
   const {
     register,
@@ -168,12 +176,58 @@ export default function Customers() {
   };
 
   const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
+    const newOrder = sortField === field && sortOrder === 'desc' ? 'asc' : 'desc';
+    setSortField(field);
+    setSortOrder(newOrder);
+    setFilterParams({
+      ...filterParams,
+      sortBy: field,
+      sortOrder: newOrder,
+    });
+  };
+
+  const applyFilters = () => {
+    setFilterParams({
+      minSpent,
+      maxSpent,
+      minClassCount,
+      maxClassCount,
+      lastConsumptionDays,
+      trafficSource: trafficSource || undefined,
+      sortBy: sortField || undefined,
+      sortOrder: sortOrder,
+    });
+  };
+
+  const resetFilters = () => {
+    setMinSpent(undefined);
+    setMaxSpent(undefined);
+    setMinClassCount(undefined);
+    setMaxClassCount(undefined);
+    setLastConsumptionDays(undefined);
+    setTrafficSource("");
+    setSortField(null);
+    setFilterParams({});
+  };
+
+  const showHighValueCustomers = () => {
+    setFilterParams({
+      highValue: true,
+      sortBy: "totalSpent",
+      sortOrder: "desc",
+    });
+    setSortField("totalSpent");
+    setSortOrder("desc");
+  };
+
+  const showChurnedCustomers = () => {
+    setFilterParams({
+      churned: true,
+      sortBy: "lastOrderDate",
+      sortOrder: "asc",
+    });
+    setSortField("lastOrderDate");
+    setSortOrder("asc");
   };
 
   const getSortIcon = (field: string) => {
@@ -185,46 +239,13 @@ export default function Customers() {
       <ArrowDown className="h-4 w-4 ml-1 inline" />;
   };
 
-  const filteredCustomers = customers
-    ?.filter(
-      (customer) =>
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        customer.wechatId?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (!sortField) return 0;
-      
-      let aValue: any;
-      let bValue: any;
-      
-      switch (sortField) {
-        case 'totalSpent':
-          aValue = parseFloat(a.totalSpent || '0');
-          bValue = parseFloat(b.totalSpent || '0');
-          break;
-        case 'accountBalance':
-          aValue = parseFloat(a.accountBalance || '0');
-          bValue = parseFloat(b.accountBalance || '0');
-          break;
-        case 'firstOrderDate':
-          aValue = a.firstOrderDate ? new Date(a.firstOrderDate).getTime() : 0;
-          bValue = b.firstOrderDate ? new Date(b.firstOrderDate).getTime() : 0;
-          break;
-        case 'lastOrderDate':
-          aValue = a.lastOrderDate ? new Date(a.lastOrderDate).getTime() : 0;
-          bValue = b.lastOrderDate ? new Date(b.lastOrderDate).getTime() : 0;
-          break;
-        default:
-          return 0;
-      }
-      
-      if (sortOrder === 'asc') {
-        return aValue - bValue;
-      } else {
-        return bValue - aValue;
-      }
-    });
+  // 前端只做文本搜索筛选,其他筛选和排序由后端处理
+  const filteredCustomers = customers?.filter(
+    (customer) =>
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.wechatId?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
@@ -283,14 +304,125 @@ export default function Customers() {
 
         <Card className="glass-card">
           <CardHeader>
-            <div className="flex items-center space-x-2">
-              <Search className="h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="搜索客户姓名、电话、微信..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Search className="h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="搜索客户姓名、电话、微信..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="max-w-sm"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={showHighValueCustomers}
+                  >
+                    高价值客户
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={showChurnedCustomers}
+                  >
+                    流失客户
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFilters(!showFilters)}
+                  >
+                    {showFilters ? "隐藏筛选" : "高级筛选"}
+                  </Button>
+                  {(minSpent || maxSpent || minClassCount || maxClassCount || lastConsumptionDays || trafficSource) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetFilters}
+                    >
+                      清除筛选
+                    </Button>
+                  )}
+                </div>
+              </div>
+              
+              {showFilters && (
+                <div className="grid grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
+                  <div className="space-y-2">
+                    <Label>累计消费范围</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        placeholder="最小"
+                        value={minSpent || ""}
+                        onChange={(e) => setMinSpent(e.target.value ? Number(e.target.value) : undefined)}
+                        className="w-24"
+                      />
+                      <span>-</span>
+                      <Input
+                        type="number"
+                        placeholder="最大"
+                        value={maxSpent || ""}
+                        onChange={(e) => setMaxSpent(e.target.value ? Number(e.target.value) : undefined)}
+                        className="w-24"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>上课次数范围</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        placeholder="最小"
+                        value={minClassCount || ""}
+                        onChange={(e) => setMinClassCount(e.target.value ? Number(e.target.value) : undefined)}
+                        className="w-24"
+                      />
+                      <span>-</span>
+                      <Input
+                        type="number"
+                        placeholder="最大"
+                        value={maxClassCount || ""}
+                        onChange={(e) => setMaxClassCount(e.target.value ? Number(e.target.value) : undefined)}
+                        className="w-24"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>最后消费时间</Label>
+                    <select
+                      value={lastConsumptionDays || ""}
+                      onChange={(e) => setLastConsumptionDays(e.target.value ? Number(e.target.value) : undefined)}
+                      className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                    >
+                      <option value="">全部</option>
+                      <option value="7">7天内</option>
+                      <option value="30">30天内</option>
+                      <option value="90">90天内</option>
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>流量来源</Label>
+                    <Input
+                      placeholder="输入销售人员名称"
+                      value={trafficSource}
+                      onChange={(e) => setTrafficSource(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="col-span-2 flex items-end">
+                    <Button onClick={applyFilters} className="w-full">
+                      应用筛选
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -840,7 +972,7 @@ function RechargeButton({ customerId, customerName }: { customerId: number; cust
       setNotes("");
       utils.customers.list.invalidate();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(error.message || "充值失败");
     },
   });
