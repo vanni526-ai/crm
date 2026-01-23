@@ -424,3 +424,16 @@
 - [x] 实现筛选条件的实时应用
 - [x] 测试各种筛选和排序组合(高价值、流失、累计消费排序均正常)
 - [x] 保存检查点
+
+
+### 123. 将Web应用打包成可构建Android App的项目
+- [ ] 安装@capacitor/core和@capacitor/cli依赖
+- [ ] 初始化Capacitor项目
+- [ ] 添加Android平台支持
+- [ ] 配置capacitor.config.ts
+- [ ] 配置Android项目(包名、应用名、图标等)
+- [ ] 构建Web应用(pnpm build)
+- [ ] 同步Web资源到Android项目(cap sync)
+- [ ] 创建Android构建说明文档(BUILD_ANDROID.md)
+- [ ] 打包整个项目为压缩包
+- [ ] 交付压缩包和构建指南
