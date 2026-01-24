@@ -117,6 +117,8 @@ export default function Teachers() {
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [batchStatusDialogOpen, setBatchStatusDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [teacherToDelete, setTeacherToDelete] = useState<any>(null);
   const [selectedTeacher, setSelectedTeacher] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -769,6 +771,17 @@ export default function Teachers() {
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setTeacherToDelete(teacher);
+                              setDeleteDialogOpen(true);
+                            }}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -944,6 +957,41 @@ export default function Teachers() {
             )}
             <DialogFooter>
               <Button onClick={() => setDetailOpen(false)}>关闭</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 删除确认对话框 */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>确认删除</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm">
+                确定要删除老师 <span className="font-bold">{teacherToDelete?.name}</span> 吗?
+              </p>
+              <p className="text-sm text-red-600">
+                ⚠️ 此操作不可撤销,删除后相关数据将无法恢复。
+              </p>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                取消
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => {
+                  if (teacherToDelete) {
+                    batchDeleteMutation.mutate({ ids: [teacherToDelete.id] });
+                    setDeleteDialogOpen(false);
+                    setTeacherToDelete(null);
+                  }
+                }}
+                disabled={batchDeleteMutation.isPending}
+              >
+                {batchDeleteMutation.isPending ? "删除中..." : "确认删除"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
