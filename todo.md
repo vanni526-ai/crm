@@ -427,13 +427,20 @@
 
 
 ### 123. 将Web应用打包成可构建Android App的项目
-- [ ] 安装@capacitor/core和@capacitor/cli依赖
-- [ ] 初始化Capacitor项目
-- [ ] 添加Android平台支持
-- [ ] 配置capacitor.config.ts
-- [ ] 配置Android项目(包名、应用名、图标等)
-- [ ] 构建Web应用(pnpm build)
-- [ ] 同步Web资源到Android项目(cap sync)
-- [ ] 创建Android构建说明文档(BUILD_ANDROID.md)
-- [ ] 打包整个项目为压缩包
-- [ ] 交付压缩包和构建指南
+- [x] 安装@capacitor/core和@capacitor/cli依赖
+- [x] 初始化Capacitor项目
+- [x] 添加Android平台支持
+- [x] 配置capacitor.config.ts
+- [x] 配置Android项目(包名、应用名、图标等)
+- [x] 构建Web应用(pnpm build)
+- [x] 同步Web资源到Android项目(cap sync)
+- [x] 创建Android构建说明文档(BUILD_ANDROID.md)
+- [x] 打包整个项目为压缩包
+- [x] 交付压缩包和构建指南
+
+### 124. 修复订单导入中销售名和客户名识别错误的问题
+- [x] 检查当前Gmail导入的LLM解析逻辑
+- [x] 分析为什么会把"山竹"和"HxL"识别成"山竹"和"辛辛"
+- [x] 修复销售名和客户名的识别规则(优化LLM prompt,明确客户名在老师名之后的位置规则)
+- [x] 测试修复后的导入功能(创建6个测试用例,全部通过)
+- [ ] 保存检查点
