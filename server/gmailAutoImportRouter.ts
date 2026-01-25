@@ -589,26 +589,4 @@ export const gmailAutoImportRouter = router({
       // 简单实现,后续可以扩展
       return { successCount: 1, failCount: 0 };
     }),
-
-  /**
-   * 获取所有配置
-   */
-  getAllConfigs: protectedProcedure.query(async () => {
-    // 返回空配置,后续可以扩展
-    return [] as Array<{ configKey: string; configValue: any }>;
-  }),
-
-  /**
-   * 保存或更新配置
-   */
-  upsertConfig: protectedProcedure
-    .input(z.object({
-      configKey: z.string(),
-      configValue: z.any(),
-      description: z.string().optional(),
-    }))
-    .mutation(async ({ input }) => {
-      // 简单实现,后续可以扩展
-      return { success: true };
-    }),
 });

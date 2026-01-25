@@ -1,0 +1,110 @@
+{
+  "query": "SELECT customerName, accountBalance, paymentAmount, courseAmount, createdAt \nFROM orders \nWHERE customerName = '清茶' \nORDER BY createdAt DESC \nLIMIT 10;\n\nSELECT DISTINCT customerName, COUNT(*) as order_count, SUM(courseAmount) as total_amount\nFROM orders \nGROUP BY customerName\nHAVING total_amount > 5000\nORDER BY total_amount DESC\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT customerName, accountBalance, paymentAmount, courseAmount, createdAt \nFROM orders \nWHERE customerName = '清茶' \nORDER BY createdAt DESC \nLIMIT 10;\n\nSELECT DISTINCT customerName, COUNT(*) as order_count, SUM(courseAmount) as total_amount\nFROM orders \nGROUP BY customerName\nHAVING total_amount > 5000\nORDER BY total_amount DESC\nLIMIT 20;",
+  "rows": [
+    {
+      "customerName": "",
+      "order_count": "36",
+      "total_amount": "109900.00"
+    },
+    {
+      "customerName": "sky",
+      "order_count": "2",
+      "total_amount": "21600.00"
+    },
+    {
+      "customerName": "JoeGong",
+      "order_count": "6",
+      "total_amount": "16800.00"
+    },
+    {
+      "customerName": "MaR1n",
+      "order_count": "1",
+      "total_amount": "13200.00"
+    },
+    {
+      "customerName": "魍魉君",
+      "order_count": "2",
+      "total_amount": "11200.00"
+    },
+    {
+      "customerName": "卐ᯤ⁶ᴳ",
+      "order_count": "1",
+      "total_amount": "10900.00"
+    },
+    {
+      "customerName": "顾俊",
+      "order_count": "1",
+      "total_amount": "10200.00"
+    },
+    {
+      "customerName": "清淼",
+      "order_count": "2",
+      "total_amount": "9776.00"
+    },
+    {
+      "customerName": "影子鱼",
+      "order_count": "3",
+      "total_amount": "9550.00"
+    },
+    {
+      "customerName": "充值",
+      "order_count": "1",
+      "total_amount": "9000.00"
+    },
+    {
+      "customerName": "aq",
+      "order_count": "3",
+      "total_amount": "8100.00"
+    },
+    {
+      "customerName": "hjl",
+      "order_count": "1",
+      "total_amount": "7800.00"
+    },
+    {
+      "customerName": "Hasten",
+      "order_count": "1",
+      "total_amount": "7300.00"
+    },
+    {
+      "customerName": "水月",
+      "order_count": "1",
+      "total_amount": "6700.00"
+    },
+    {
+      "customerName": "Sirius",
+      "order_count": "1",
+      "total_amount": "6000.00"
+    },
+    {
+      "customerName": "D.司准只佬",
+      "order_count": "1",
+      "total_amount": "6000.00"
+    },
+    {
+      "customerName": "剑桃",
+      "order_count": "1",
+      "total_amount": "6000.00"
+    },
+    {
+      "customerName": "凯",
+      "order_count": "2",
+      "total_amount": "5950.00"
+    },
+    {
+      "customerName": "列斯卡农",
+      "order_count": "1",
+      "total_amount": "5500.00"
+    },
+    {
+      "customerName": "Jacko",
+      "order_count": "1",
+      "total_amount": "5300.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "customerName\torder_count\ttotal_amount\n\t36\t109900.00\nsky\t2\t21600.00\nJoeGong\t6\t16800.00\nMaR1n\t1\t13200.00\n魍魉君\t2\t11200.00\n卐ᯤ⁶ᴳ\t1\t10900.00\n顾俊\t1\t10200.00\n清淼\t2\t9776.00\n影子鱼\t3\t9550.00\n充值\t1\t9000.00\naq\t3\t8100.00\nhjl\t1\t7800.00\nHasten\t1\t7300.00\n水月\t1\t6700.00\nSirius\t1\t6000.00\nD.司准只佬\t1\t6000.00\n剑桃\t1\t6000.00\n凯\t2\t5950.00\n列斯卡农\t1\t5500.00\nJacko\t1\t5300.00\n",
+  "stderr": "",
+  "execution_time_ms": 1734
+}

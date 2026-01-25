@@ -1,0 +1,27 @@
+{
+  "query": "SELECT customerName, accountBalance, paymentAmount, courseAmount, createdAt \nFROM orders \nWHERE customerName LIKE '%清%' \nORDER BY createdAt DESC \nLIMIT 10;\n\nSELECT id, name, accountBalance \nFROM customers \nWHERE name LIKE '%清%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT customerName, accountBalance, paymentAmount, courseAmount, createdAt \nFROM orders \nWHERE customerName LIKE '%清%' \nORDER BY createdAt DESC \nLIMIT 10;\n\nSELECT id, name, accountBalance \nFROM customers \nWHERE name LIKE '%清%';",
+  "rows": [
+    {
+      "customerName": "清淼",
+      "accountBalance": "0.00",
+      "paymentAmount": "4888.00",
+      "courseAmount": "4888.00",
+      "createdAt": "2026-01-10 07:54:00"
+    },
+    {
+      "customerName": "清淼",
+      "accountBalance": "0.00",
+      "paymentAmount": "4888.00",
+      "courseAmount": "4888.00",
+      "createdAt": "2026-01-10 07:54:00"
+    }
+  ],
+  "messages": [
+    "id\tname\taccountBalance",
+    "330021\t清淼\t0.00"
+  ],
+  "stdout": "customerName\taccountBalance\tpaymentAmount\tcourseAmount\tcreatedAt\n清淼\t0.00\t4888.00\t4888.00\t2026-01-10 07:54:00\n清淼\t0.00\t4888.00\t4888.00\t2026-01-10 07:54:00\nid\tname\taccountBalance\n330021\t清淼\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 1727
+}

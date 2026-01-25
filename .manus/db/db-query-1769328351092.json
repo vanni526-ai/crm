@@ -1,0 +1,31 @@
+{
+  "query": "SELECT COUNT(*) as total_transactions FROM accountTransactions;\nSELECT * FROM accountTransactions LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as total_transactions FROM accountTransactions;\nSELECT * FROM accountTransactions LIMIT 5;",
+  "rows": [
+    {
+      "total_transactions": "7"
+    },
+    {
+      "total_transactions": "id\tcustomerId\tcustomerName\ttype\tamount\tbalanceBefore\tbalanceAfter\trelatedOrderId\trelatedOrderNo\tnotes\toperatorId\toperatorName\tcreatedAt"
+    },
+    {
+      "total_transactions": "1\t180001\t测试客户-余额管理\trecharge\t1000.00\t0.00\t1000.00\tNULL\tNULL\t测试充值\t1\t测试操作员\t2025-12-17 16:51:03"
+    },
+    {
+      "total_transactions": "2\t180001\t测试客户-余额管理\tconsume\t-300.00\t1000.00\t700.00\t210001\tTEST-ACCOUNT-001\t订单消费:TEST-ACCOUNT-001\t1\t测试操作员\t2025-12-17 16:51:04"
+    },
+    {
+      "total_transactions": "3\t180001\t测试客户-余额管理\trefund\t300.00\t700.00\t1000.00\t210001\tTEST-ACCOUNT-001\t订单退款:TEST-ACCOUNT-001\t1\t测试操作员\t2025-12-17 16:51:06"
+    },
+    {
+      "total_transactions": "30001\t210015\t测试客户-余额管理\trecharge\t1000.00\t0.00\t1000.00\tNULL\tNULL\t测试充值\t1\t测试操作员\t2025-12-17 18:03:37"
+    },
+    {
+      "total_transactions": "30002\t210015\t测试客户-余额管理\tconsume\t-1000.00\t1000.00\t0.00\tNULL\tTEST-ACCOUNT-002\t订单消费:TEST-ACCOUNT-002\t1\t测试操作员\t2025-12-17 18:03:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_transactions\n7\nid\tcustomerId\tcustomerName\ttype\tamount\tbalanceBefore\tbalanceAfter\trelatedOrderId\trelatedOrderNo\tnotes\toperatorId\toperatorName\tcreatedAt\n1\t180001\t测试客户-余额管理\trecharge\t1000.00\t0.00\t1000.00\tNULL\tNULL\t测试充值\t1\t测试操作员\t2025-12-17 16:51:03\n2\t180001\t测试客户-余额管理\tconsume\t-300.00\t1000.00\t700.00\t210001\tTEST-ACCOUNT-001\t订单消费:TEST-ACCOUNT-001\t1\t测试操作员\t2025-12-17 16:51:04\n3\t180001\t测试客户-余额管理\trefund\t300.00\t700.00\t1000.00\t210001\tTEST-ACCOUNT-001\t订单退款:TEST-ACCOUNT-001\t1\t测试操作员\t2025-12-17 16:51:06\n30001\t210015\t测试客户-余额管理\trecharge\t1000.00\t0.00\t1000.00\tNULL\tNULL\t测试充值\t1\t测试操作员\t2025-12-17 18:03:37\n30002\t210015\t测试客户-余额管理\tconsume\t-1000.00\t1000.00\t0.00\tNULL\tTEST-ACCOUNT-002\t订单消费:TEST-ACCOUNT-002\t1\t测试操作员\t2025-12-17 18:03:38\n",
+  "stderr": "",
+  "execution_time_ms": 2443
+}

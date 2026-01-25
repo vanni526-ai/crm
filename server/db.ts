@@ -175,20 +175,34 @@ export async function getAllCustomers() {
         .from(orders)
         .where(sql`LOWER(${orders.customerName}) = LOWER(${customer.name})`);
       
-      // 获取最新订单的账户余额
-      const latestOrder = await db
-        .select({ accountBalance: orders.accountBalance })
-        .from(orders)
-        .where(sql`LOWER(${orders.customerName}) = LOWER(${customer.name})`)
-        .orderBy(desc(orders.createdAt))
+      // 优先从账户流水表获取最新的账户余额
+      const latestTransaction = await db
+        .select({ balanceAfter: accountTransactions.balanceAfter })
+        .from(accountTransactions)
+        .where(eq(accountTransactions.customerId, customer.id))
+        .orderBy(desc(accountTransactions.createdAt))
         .limit(1);
+      
+      // 如果没有流水记录,从订单表获取最新的账户余额
+      let accountBalance = "0.00";
+      if (latestTransaction[0]?.balanceAfter) {
+        accountBalance = latestTransaction[0].balanceAfter;
+      } else {
+        const latestOrder = await db
+          .select({ accountBalance: orders.accountBalance })
+          .from(orders)
+          .where(sql`LOWER(${orders.customerName}) = LOWER(${customer.name})`)
+          .orderBy(desc(orders.createdAt))
+          .limit(1);
+        accountBalance = latestOrder[0]?.accountBalance || "0.00";
+      }
       
       return {
         ...customer,
         totalSpent: customerOrders[0]?.totalAmount || "0.00",
         lastOrderDate: customerOrders[0]?.lastOrderDate || null,
         firstOrderDate: customerOrders[0]?.firstOrderDate || null,
-        accountBalance: latestOrder[0]?.accountBalance || "0.00",
+        accountBalance,
         classCount: customerOrders[0]?.orderCount || 0,
       };
     })
