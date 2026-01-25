@@ -2996,3 +2996,118 @@ export async function getCityMonthlyTrends() {
 
   return trends;
 }
+
+/**
+ * 从订单表重新计算并更新所有客户的统计信息
+ * 包括:累计消费、上课次数、首次上课时间、最后上课时间
+ */
+export async function refreshCustomerStats() {
+  const dbInstance = await getDb();
+  if (!dbInstance) {
+    return {
+      success: false,
+      message: '数据库连接不可用',
+      totalCustomers: 0,
+      updatedCount: 0,
+      createdCount: 0,
+      skippedCount: 0,
+    };
+  }
+
+  // 1. 从订单表统计每个客户的数据
+  const customerStats = await dbInstance
+    .select({
+      customerName: orders.customerName,
+      totalSpent: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`,
+      classCount: sql<number>`COUNT(*)`,
+      firstOrderDate: sql<string>`MIN(${orders.classTime})`,
+      lastOrderDate: sql<string>`MAX(${orders.classTime})`,
+    })
+    .from(orders)
+    .where(
+      and(
+        isNotNull(orders.customerName),
+        sql`TRIM(${orders.customerName}) != ''`
+      )
+    )
+    .groupBy(orders.customerName);
+
+  let updatedCount = 0;
+  let createdCount = 0;
+  let skippedCount = 0;
+
+  // 2. 获取所有老师名单(排除老师)
+  const teachersList = await dbInstance.select({ name: teachers.name }).from(teachers);
+  const teacherNames = new Set(teachersList.map((t: { name: string }) => t.name.toLowerCase()));
+
+  // 3. 更新或创建客户记录
+  for (const stat of customerStats) {
+    // 跳过空客户名
+    if (!stat.customerName || stat.customerName.trim() === '') {
+      skippedCount++;
+      continue;
+    }
+
+    // 跳过老师
+    if (teacherNames.has(stat.customerName.toLowerCase())) {
+      skippedCount++;
+      continue;
+    }
+
+    // 检查客户是否已存在
+    const existing = await dbInstance
+      .select()
+      .from(customers)
+      .where(sql`LOWER(${customers.name}) = LOWER(${stat.customerName})`)
+      .limit(1);
+
+    if (existing.length > 0) {
+      // 更新现有客户
+      await dbInstance
+        .update(customers)
+        .set({
+          // 注意:不更新accountBalance,因为它应该从 accountTransactions 或 orders.accountBalance 获取
+          // totalSpent, classCount等字段在getAllCustomers中实时计算,这里不需要更新
+          updatedAt: new Date(),
+        })
+        .where(eq(customers.id, existing[0].id));
+      updatedCount++;
+    } else {
+      // 创建新客户 - 需要createdBy字段
+      // 使用系统用户ID(1)作为创建者
+      // 处理时间格式问题
+      let createdAtDate: Date;
+      try {
+        createdAtDate = stat.firstOrderDate ? new Date(stat.firstOrderDate) : new Date();
+        // 验证日期是否有效
+        if (isNaN(createdAtDate.getTime())) {
+          createdAtDate = new Date();
+        }
+      } catch {
+        createdAtDate = new Date();
+      }
+
+      await dbInstance.insert(customers).values({
+        name: stat.customerName,
+        createdBy: 1, // 系统自动创建
+        wechatId: null,
+        phone: null,
+        trafficSource: null,
+        accountBalance: "0.00",
+        notes: null,
+        createdAt: createdAtDate,
+        updatedAt: new Date(),
+      });
+      createdCount++;
+    }
+  }
+
+  return {
+    success: true,
+    totalCustomers: customerStats.length,
+    updatedCount,
+    createdCount,
+    skippedCount,
+    message: `成功处理${customerStats.length}个客户:更新${updatedCount}个,新建${createdCount}个,跳过${skippedCount}个(老师)`,
+  };
+}
