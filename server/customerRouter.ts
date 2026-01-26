@@ -1,6 +1,7 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import * as progressTracker from "./progressTracker";
 
 export const customerRouter = router({
   // 获取客户列表(支持筛选和排序)
@@ -119,11 +120,34 @@ export const customerRouter = router({
       return customers;
     }),
 
-  // 刷新所有客户数据(重新计算累计消费)
+  // 刷新所有客户数据(重新计算累计消费) - 异步执行
   refreshAllStats: protectedProcedure.mutation(async () => {
-    // 从订单表重新计算所有客户的统计信息
-    const result = await db.refreshCustomerStats();
+    // 生成taskId
+    const taskId = progressTracker.generateTaskId();
+    progressTracker.createTask(taskId);
     
-    return result;
+    // 异步执行更新任务
+    (async () => {
+      try {
+        await db.refreshCustomerStats((progress) => {
+          progressTracker.updateProgress(taskId, progress);
+        });
+        progressTracker.completeTask(taskId, '客户数据更新完成');
+      } catch (error: any) {
+        progressTracker.failTask(taskId, error.message || '更新失败');
+      } finally {
+        progressTracker.cleanupTask(taskId);
+      }
+    })();
+    
+    return { taskId };
   }),
+
+  // 获取任务进度
+  getProgress: protectedProcedure
+    .input(z.object({ taskId: z.string() }))
+    .query(async ({ input }) => {
+      const progress = progressTracker.getProgress(input.taskId);
+      return progress;
+    }),
 });

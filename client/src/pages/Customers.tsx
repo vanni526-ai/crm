@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2, Eye, Phone, Mail, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search, Edit, Trash2, Eye, Phone, Mail, Download, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -94,17 +95,52 @@ export default function Customers() {
     },
   });
 
+  const [refreshTaskId, setRefreshTaskId] = useState<string | null>(null);
+  const [refreshProgress, setRefreshProgress] = useState<{ current: number; total: number; message: string } | null>(null);
+
   const refreshAllStats = trpc.customers.refreshAllStats.useMutation({
     onSuccess: (data) => {
-      utils.customers.list.invalidate();
-      toast.success(
-        `刷新成功！总客户数: ${data.totalCustomers}, 有消费记录: ${data.customersWithSpending}`
-      );
+      // 开始轮询进度
+      setRefreshTaskId(data.taskId);
+      setRefreshProgress({ current: 0, total: 100, message: '开始更新...' });
     },
     onError: (error: any) => {
       toast.error(error.message || "刷新失败");
     },
   });
+
+  // 轮询进度
+  const { data: progressData } = trpc.customers.getProgress.useQuery(
+    { taskId: refreshTaskId! },
+    {
+      enabled: !!refreshTaskId,
+      refetchInterval: 500, // 每500ms轮询一次
+    }
+  );
+
+  // 更新进度
+  React.useEffect(() => {
+    if (progressData) {
+      setRefreshProgress({
+        current: progressData.current,
+        total: progressData.total,
+        message: progressData.message,
+      });
+
+      // 如果任务完成
+      if (progressData.completed) {
+        setRefreshTaskId(null);
+        if (progressData.error) {
+          toast.error(progressData.error);
+        } else {
+          toast.success('客户数据更新完成!');
+          utils.customers.list.invalidate();
+        }
+        // 2秒后清除进度信息
+        setTimeout(() => setRefreshProgress(null), 2000);
+      }
+    }
+  }, [progressData, utils]);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -271,10 +307,10 @@ export default function Customers() {
             <Button
               variant="outline"
               onClick={() => refreshAllStats.mutate()}
-              disabled={refreshAllStats.isPending}
+              disabled={!!refreshTaskId}
             >
-              <Download className="mr-2 h-4 w-4" />
-              {refreshAllStats.isPending ? "刷新中..." : "更新客户数据"}
+              <RefreshCw className={`mr-2 h-4 w-4 ${refreshTaskId ? 'animate-spin' : ''}`} />
+              {refreshTaskId ? "更新中..." : "更新客户数据"}
             </Button>
             <Button
               variant="outline"
@@ -301,6 +337,23 @@ export default function Customers() {
             </Button>
           </div>
         </div>
+
+        {/* 进度条显示 */}
+        {refreshProgress && (
+          <Card className="glass-card mb-4">
+            <CardContent className="pt-6">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">{refreshProgress.message}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {refreshProgress.current}%
+                  </span>
+                </div>
+                <Progress value={refreshProgress.current} className="h-2" />
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="glass-card">
           <CardHeader>

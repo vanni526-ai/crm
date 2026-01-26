@@ -2998,10 +2998,13 @@ export async function getCityMonthlyTrends() {
 }
 
 /**
- * 从订单表重新计算并更新所有客户的统计信息
+ * 从订单表重新计算并更新所有客户的统计信息(优化版)
  * 包括:累计消费、上课次数、首次上课时间、最后上课时间
+ * @param onProgress 进度回调函数
  */
-export async function refreshCustomerStats() {
+export async function refreshCustomerStats(
+  onProgress?: (progress: { current: number; total: number; message: string }) => void
+) {
   const dbInstance = await getDb();
   if (!dbInstance) {
     return {
@@ -3013,6 +3016,8 @@ export async function refreshCustomerStats() {
       skippedCount: 0,
     };
   }
+
+  onProgress?.({ current: 0, total: 100, message: '开始统计订单数据...' });
 
   // 1. 从订单表统计每个客户的数据
   const customerStats = await dbInstance
@@ -3032,6 +3037,9 @@ export async function refreshCustomerStats() {
     )
     .groupBy(orders.customerName);
 
+  const totalCustomers = customerStats.length;
+  onProgress?.({ current: 20, total: 100, message: `统计完成,共${totalCustomers}个客户` });
+
   let updatedCount = 0;
   let createdCount = 0;
   let skippedCount = 0;
@@ -3040,46 +3048,76 @@ export async function refreshCustomerStats() {
   const teachersList = await dbInstance.select({ name: teachers.name }).from(teachers);
   const teacherNames = new Set(teachersList.map((t: { name: string }) => t.name.toLowerCase()));
 
-  // 3. 更新或创建客户记录
-  for (const stat of customerStats) {
-    // 跳过空客户名
+  onProgress?.({ current: 30, total: 100, message: '开始处理客户数据...' });
+
+  // 3. 过滤掉空客户名和老师
+  const validStats = customerStats.filter(stat => {
     if (!stat.customerName || stat.customerName.trim() === '') {
       skippedCount++;
-      continue;
+      return false;
     }
-
-    // 跳过老师
     if (teacherNames.has(stat.customerName.toLowerCase())) {
       skippedCount++;
-      continue;
+      return false;
     }
+    return true;
+  });
 
-    // 检查客户是否已存在
-    const existing = await dbInstance
-      .select()
-      .from(customers)
-      .where(sql`LOWER(${customers.name}) = LOWER(${stat.customerName})`)
-      .limit(1);
+  onProgress?.({ current: 40, total: 100, message: `过滤完成,有效客户${validStats.length}个` });
 
-    if (existing.length > 0) {
-      // 更新现有客户
-      await dbInstance
-        .update(customers)
-        .set({
-          // 注意:不更新accountBalance,因为它应该从 accountTransactions 或 orders.accountBalance 获取
-          // totalSpent, classCount等字段在getAllCustomers中实时计算,这里不需要更新
-          updatedAt: new Date(),
-        })
-        .where(eq(customers.id, existing[0].id));
-      updatedCount++;
+  if (validStats.length === 0) {
+    onProgress?.({ current: 100, total: 100, message: '没有需要处理的客户' });
+    return {
+      success: true,
+      totalCustomers,
+      updatedCount: 0,
+      createdCount: 0,
+      skippedCount,
+      message: '没有需要处理的客户数据',
+    };
+  }
+
+  // 4. 批量获取现有客户(一次性查询所有)
+  const customerNames = validStats.map(s => s.customerName!.toLowerCase());
+  const existingCustomers = await dbInstance
+    .select({
+      id: customers.id,
+      name: customers.name,
+      nameLower: sql<string>`LOWER(${customers.name})`,
+    })
+    .from(customers);
+
+  const existingMap = new Map<string, number>();
+  existingCustomers.forEach(c => {
+    existingMap.set(c.nameLower, c.id);
+  });
+
+  onProgress?.({ current: 50, total: 100, message: '查询现有客户完成...' });
+
+  // 5. 分离需要更新和创建的客户
+  const toUpdate: number[] = [];
+  const toCreate: Array<{
+    name: string;
+    createdBy: number;
+    wechatId: string | null;
+    phone: string | null;
+    trafficSource: string | null;
+    accountBalance: string;
+    notes: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }> = [];
+
+  for (const stat of validStats) {
+    const existingId = existingMap.get(stat.customerName!.toLowerCase());
+    
+    if (existingId) {
+      toUpdate.push(existingId);
     } else {
-      // 创建新客户 - 需要createdBy字段
-      // 使用系统用户ID(1)作为创建者
       // 处理时间格式问题
       let createdAtDate: Date;
       try {
         createdAtDate = stat.firstOrderDate ? new Date(stat.firstOrderDate) : new Date();
-        // 验证日期是否有效
         if (isNaN(createdAtDate.getTime())) {
           createdAtDate = new Date();
         }
@@ -3087,9 +3125,9 @@ export async function refreshCustomerStats() {
         createdAtDate = new Date();
       }
 
-      await dbInstance.insert(customers).values({
-        name: stat.customerName,
-        createdBy: 1, // 系统自动创建
+      toCreate.push({
+        name: stat.customerName!,
+        createdBy: 1,
         wechatId: null,
         phone: null,
         trafficSource: null,
@@ -3098,9 +3136,40 @@ export async function refreshCustomerStats() {
         createdAt: createdAtDate,
         updatedAt: new Date(),
       });
-      createdCount++;
     }
   }
+
+  onProgress?.({ current: 60, total: 100, message: `准备更新${toUpdate.length}个客户,创建${toCreate.length}个客户` });
+
+  // 6. 批量更新现有客户(分批处理)
+  const BATCH_SIZE = 100;
+  const updateTime = new Date();
+
+  for (let i = 0; i < toUpdate.length; i += BATCH_SIZE) {
+    const batch = toUpdate.slice(i, i + BATCH_SIZE);
+    
+    // 使用 IN 查询批量更新
+    await dbInstance
+      .update(customers)
+      .set({ updatedAt: updateTime })
+      .where(sql`${customers.id} IN (${sql.join(batch.map(id => sql`${id}`), sql`, `)})`);
+    
+    updatedCount += batch.length;
+    const progress = 60 + Math.floor((updatedCount / toUpdate.length) * 20);
+    onProgress?.({ current: progress, total: 100, message: `已更新${updatedCount}/${toUpdate.length}个客户` });
+  }
+
+  // 7. 批量创建新客户(分批处理)
+  for (let i = 0; i < toCreate.length; i += BATCH_SIZE) {
+    const batch = toCreate.slice(i, i + BATCH_SIZE);
+    await dbInstance.insert(customers).values(batch);
+    
+    createdCount += batch.length;
+    const progress = 80 + Math.floor((createdCount / toCreate.length) * 20);
+    onProgress?.({ current: progress, total: 100, message: `已创建${createdCount}/${toCreate.length}个客户` });
+  }
+
+  onProgress?.({ current: 100, total: 100, message: '更新完成!' });
 
   return {
     success: true,
