@@ -1,0 +1,12 @@
+{
+  "query": "SELECT orderNo, customerName, salesPerson, deliveryCourse, deliveryTeacher, paymentAmount, notes, originalText \nFROM orders \nWHERE orderNo = 'ORD1769234555645602';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT orderNo, customerName, salesPerson, deliveryCourse, deliveryTeacher, paymentAmount, notes, originalText \nFROM orders \nWHERE orderNo = 'ORD1769234555645602';",
+  "rows": [],
+  "messages": [
+    "ORD1769234555645602\t充值\tivy\t面销充值六送一\t淼淼\t9000.00\tivy 1.22 15.00-17.00 淼淼面销充值六送一 收款9000 给淼淼课费600+面销900=1500 支付宝交易单号A2026012216553210044220",
+    "原始文本: ivy 1.22 15.00-17.00 淼淼面销充值六送一 收款9000 给淼淼课费600+面销900=1500 支付宝交易单号A2026012216553210044220\tNULL"
+  ],
+  "stdout": "orderNo\tcustomerName\tsalesPerson\tdeliveryCourse\tdeliveryTeacher\tpaymentAmount\tnotes\toriginalText\nORD1769234555645602\t充值\tivy\t面销充值六送一\t淼淼\t9000.00\tivy 1.22 15.00-17.00 淼淼面销充值六送一 收款9000 给淼淼课费600+面销900=1500 支付宝交易单号A2026012216553210044220\n\n原始文本: ivy 1.22 15.00-17.00 淼淼面销充值六送一 收款9000 给淼淼课费600+面销900=1500 支付宝交易单号A2026012216553210044220\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1589
+}

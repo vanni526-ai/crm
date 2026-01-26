@@ -1,0 +1,17 @@
+{
+  "query": "SELECT orderNo, customerName, salesPerson, deliveryCourse, deliveryTeacher \nFROM orders \nWHERE orderNo = 'ORD1769234555645602';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT orderNo, customerName, salesPerson, deliveryCourse, deliveryTeacher \nFROM orders \nWHERE orderNo = 'ORD1769234555645602';",
+  "rows": [
+    {
+      "orderNo": "ORD1769234555645602",
+      "customerName": "NULL",
+      "salesPerson": "ivy",
+      "deliveryCourse": "面销充值六送一",
+      "deliveryTeacher": "淼淼"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tsalesPerson\tdeliveryCourse\tdeliveryTeacher\nORD1769234555645602\tNULL\tivy\t面销充值六送一\t淼淼\n",
+  "stderr": "",
+  "execution_time_ms": 1550
+}
