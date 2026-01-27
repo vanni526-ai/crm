@@ -13,6 +13,7 @@ import { reconciliationRouter } from "./reconciliationRouter";
 import { customerRouter } from "./customerRouter";
 import { financeRouter } from "./financeRouter";
 import { cityRouter } from "./cityRouter";
+import { accountRouter } from "./accountRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -53,6 +54,7 @@ export const appRouter = router({
   customers: customerRouter,
   finance: financeRouter,
   city: cityRouter,
+  accounts: accountRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,

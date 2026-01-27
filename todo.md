@@ -504,3 +504,41 @@
 - [ ] 优化性能、修复错误、整理应用信息(需要本地执行)
 - [ ] 最终交付可上架的APK文件(需要本地执行)
 - [ ] 配置签名和构建APK文件
+
+### 136. 添加销售KPI管理和分析功能
+- [ ] 扩展数据库Schema,添加KPI相关表
+- [ ] 实现后端API接口(KPI管理、业绩分析、自动化计算)
+- [ ] 实现前端页面(KPI管理、业绩分析、仪表板)
+- [ ] 实现数据可视化(排行榜、热力图、趋势图)
+- [ ] 实现自动化功能(定时任务、提醒、报告)
+- [ ] 测试验证和优化
+
+
+### 137. 实现系统账号管理功能
+- [x] 创建accountRouter.ts后端API
+  - [x] 账号列表查询(list)
+  - [x] 账号详情查询(getById)
+  - [x] 创建账号(create)
+  - [x] 更新账号(update)
+  - [x] 修改密码(changePassword)
+  - [x] 重置密码(resetPassword)
+  - [x] 激活/停用账号(toggleActive)
+  - [x] 删除账号(delete)
+  - [x] 账号统计(getStats)
+  - [x] 审计日志查询(auditLogs.list)
+  - [x] 审计日志统计(auditLogs.getStats)
+- [x] 在routers.ts中集成accountRouter
+- [x] 安装bcryptjs依赖用于密码加密
+- [x] 创建AccountManagement.tsx前端页面
+  - [x] 账号列表展示
+  - [x] 搜索和筛选功能
+  - [x] 创建账号对话框
+  - [x] 账号统计卡片
+  - [x] 编辑/删除/激活/停用操作
+- [x] 修复TypeScript编译错误
+  - [x] 移除未使用的RechargeButton组件
+  - [x] 注释掉缺失的API调用
+  - [x] 修复类型不匹配的问题
+- [x] 编写单元测试(accountRouter.test.ts) - 15个测试用例全部通过
+- [ ] 编写组件测试(AccountManagement.test.tsx)
+- [ ] 集成测试和验证

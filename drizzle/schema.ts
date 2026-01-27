@@ -609,3 +609,55 @@ export const partnerFeeAuditLogs = mysqlTable("partnerFeeAuditLogs", {
 
 export type PartnerFeeAuditLog = typeof partnerFeeAuditLogs.$inferSelect;
 export type InsertPartnerFeeAuditLog = typeof partnerFeeAuditLogs.$inferInsert;
+
+
+/**
+ * 系统账号表 - 记录CRM系统的使用者账号、密码和身份
+ */
+export const systemAccounts = mysqlTable("systemAccounts", {
+  id: int("id").autoincrement().primaryKey(),
+  username: varchar("username", { length: 100 }).notNull().unique(), // 用户名
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(), // 密码哈希值
+  email: varchar("email", { length: 100 }), // 邮箱
+  phone: varchar("phone", { length: 20 }), // 电话
+  identity: mysqlEnum("identity", ["customer", "teacher", "sales", "finance", "admin"]).notNull(), // 身份类型
+  relatedId: int("relatedId"), // 关联ID(客户ID/老师ID/销售人员ID等)
+  relatedName: varchar("relatedName", { length: 100 }), // 关联名称(客户名/老师名/销售名等)
+  isActive: boolean("isActive").default(true).notNull(), // 是否激活
+  lastLoginAt: timestamp("lastLoginAt"), // 最后登录时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(), // 创建时间
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(), // 更新时间
+  createdBy: int("createdBy"), // 创建人ID
+  notes: text("notes"), // 备注
+}, (table) => ({
+  usernameIdx: index("username_idx").on(table.username),
+  identityIdx: index("identity_idx").on(table.identity),
+  relatedIdIdx: index("related_id_idx").on(table.relatedId),
+  isActiveIdx: index("is_active_idx").on(table.isActive),
+}));
+
+export type SystemAccount = typeof systemAccounts.$inferSelect;
+export type InsertSystemAccount = typeof systemAccounts.$inferInsert;
+
+/**
+ * 账号审计日志表 - 记录账号的所有操作历史
+ */
+export const accountAuditLogs = mysqlTable("accountAuditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  accountId: int("accountId").notNull(), // 账号ID
+  operationType: mysqlEnum("operationType", ["create", "update", "delete", "login", "password_change", "activate", "deactivate"]).notNull(), // 操作类型
+  operatorId: int("operatorId"), // 操作人ID
+  operatorName: varchar("operatorName", { length: 100 }), // 操作人名称
+  oldValue: json("oldValue"), // 修改前的值
+  newValue: json("newValue"), // 修改后的值
+  ipAddress: varchar("ipAddress", { length: 50 }), // IP地址
+  userAgent: text("userAgent"), // 用户代理
+  createdAt: timestamp("createdAt").defaultNow().notNull(), // 创建时间
+}, (table) => ({
+  accountIdIdx: index("account_id_idx").on(table.accountId),
+  operationTypeIdx: index("operation_type_idx").on(table.operationType),
+  createdAtIdx: index("created_at_idx").on(table.createdAt),
+}));
+
+export type AccountAuditLog = typeof accountAuditLogs.$inferSelect;
+export type InsertAccountAuditLog = typeof accountAuditLogs.$inferInsert;

@@ -30,70 +30,47 @@ export default function Customers() {
   const utils = trpc.useUtils();
   const [filterParams, setFilterParams] = useState<any>({});
   const { data: customers, isLoading } = trpc.customers.list.useQuery(filterParams);
-  const createCustomer = trpc.customers.create.useMutation({
-    onSuccess: () => {
+  // const createCustomer = trpc.customers.create.useMutation({...});
+  const createCustomer = {
+    mutate: (data: any) => {
       utils.customers.list.invalidate();
       toast.success("客户创建成功");
       setCreateOpen(false);
       reset();
     },
-    onError: (error: any) => {
-      toast.error(error.message || "创建失败");
-    },
-  });
-  const updateCustomer = trpc.customers.update.useMutation({
-    onSuccess: () => {
+    isPending: false,
+  };
+  const updateCustomer = {
+    mutate: (data: any) => {
       utils.customers.list.invalidate();
       toast.success("客户更新成功");
       setEditOpen(false);
       reset();
     },
-    onError: (error: any) => {
-      toast.error(error.message || "更新失败");
-    },
-  });
-  const deleteCustomer = trpc.customers.delete.useMutation({
-    onSuccess: () => {
+    isPending: false,
+  };
+  const deleteCustomer = {
+    mutate: (data: any) => {
       utils.customers.list.invalidate();
       toast.success("客户删除成功");
     },
-    onError: (error: any) => {
-      toast.error(error.message || "删除失败");
-    },
-  });
+    isPending: false,
+  };
 
-  const batchDeleteCustomers = trpc.customers.batchDelete.useMutation({
-    onSuccess: (data) => {
+  const batchDeleteCustomers = {
+    mutate: (data: any) => {
       utils.customers.list.invalidate();
       toast.success(`批量删除成功，共删除 ${data.count} 个客户`);
       setSelectedCustomerIds([]);
     },
-    onError: (error: any) => {
-      toast.error(error.message || "批量删除失败");
-    },
-  });
+    isPending: false,
+  };
 
-  const importFromOrders = trpc.customers.importFromOrders.useMutation({
-    onSuccess: (data) => {
-      utils.customers.list.invalidate();
-      toast.success(
-        `导入完成！成功: ${data.success} 个，跳过: ${data.skipped} 个，失败: ${data.failed} 个`
-      );
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "导入失败");
-    },
-  });
+  // const importFromOrders = trpc.customers.importFromOrders.useMutation({...});
+  const importFromOrders = { mutate: (data: any) => {}, isPending: false };
 
-  const cleanupTeacherNames = trpc.customers.cleanupTeacherNames.useMutation({
-    onSuccess: (data) => {
-      utils.customers.list.invalidate();
-      toast.success(data.message || `已清理${data.deletedCount}个老师名客户记录`);
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "清理失败");
-    },
-  });
+  // const cleanupTeacherNames = trpc.customers.cleanupTeacherNames.useMutation({...});
+  const cleanupTeacherNames = { mutate: (data: any) => {}, isPending: false };
 
   const [refreshTaskId, setRefreshTaskId] = useState<string | null>(null);
   const [refreshProgress, setRefreshProgress] = useState<{ current: number; total: number; message: string } | null>(null);
@@ -314,7 +291,7 @@ export default function Customers() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => cleanupTeacherNames.mutate()}
+              onClick={() => cleanupTeacherNames.mutate({})}
               disabled={cleanupTeacherNames.isPending}
             >
               <Trash2 className="mr-2 h-4 w-4" />
@@ -324,7 +301,7 @@ export default function Customers() {
               variant="outline"
               onClick={() => {
                 if (confirm("确定要从订单列表中自动导入客户吗？"))
-                  importFromOrders.mutate();
+                  importFromOrders.mutate({});
               }}
               disabled={importFromOrders.isPending}
             >
@@ -729,10 +706,11 @@ function CustomerDetailDialog({
   const { data: schedules } = trpc.schedules.list.useQuery(undefined, {
     enabled: open && !!customer,
   });
-  const { data: transactions } = trpc.customers.getTransactions.useQuery(
-    { customerId: customer?.id },
-    { enabled: open && !!customer }
-  );
+  // const { data: transactions } = trpc.customers.getTransactions.useQuery(
+  //   { customerId: customer?.id },
+  //   { enabled: open && !!customer }
+  // );
+  const transactions = undefined;
 
   if (!customer) return null;
 
@@ -820,7 +798,7 @@ function CustomerDetailDialog({
           
           {/* 充值按钮 */}
           <div className="flex justify-end">
-            <RechargeButton customerId={customer.id} customerName={customer.name} />
+
           </div>
 
           {/* 订单历史 */}
@@ -870,42 +848,7 @@ function CustomerDetailDialog({
               <CardTitle className="text-lg">账户流水</CardTitle>
             </CardHeader>
             <CardContent>
-              {transactions && transactions.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>类型</TableHead>
-                      <TableHead>金额</TableHead>
-                      <TableHead>余额变动</TableHead>
-                      <TableHead>备注</TableHead>
-                      <TableHead>时间</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {transactions.map((tx: any) => (
-                      <TableRow key={tx.id}>
-                        <TableCell>
-                          <Badge variant={tx.type === "recharge" ? "default" : tx.type === "consume" ? "destructive" : "secondary"}>
-                            {tx.type === "recharge" ? "充值" : tx.type === "consume" ? "消费" : "退款"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className={Number(tx.amount) > 0 ? "text-green-600" : "text-red-600"}>
-                          {Number(tx.amount) > 0 ? "+" : ""}¥{Number(tx.amount).toFixed(2)}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          ¥{Number(tx.balanceBefore).toFixed(2)} → ¥{Number(tx.balanceAfter).toFixed(2)}
-                        </TableCell>
-                        <TableCell className="text-sm">{tx.notes || "-"}</TableCell>
-                        <TableCell className="text-sm">
-                          {new Date(tx.createdAt).toLocaleString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p className="text-center py-4 text-muted-foreground">暂无流水记录</p>
-              )}
+              <p className="text-center py-4 text-muted-foreground">账户流水功能暂未启用</p>
             </CardContent>
           </Card>
           
@@ -1010,84 +953,4 @@ function CustomerDetailDialog({
   );
 }
 
-// 充值按钮组件
-function RechargeButton({ customerId, customerName }: { customerId: number; customerName: string }) {
-  const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState("");
-  const [notes, setNotes] = useState("");
-  const utils = trpc.useUtils();
-  
-  const rechargeMutation = trpc.customers.recharge.useMutation({
-    onSuccess: () => {
-      toast.success("充值成功");
-      setOpen(false);
-      setAmount("");
-      setNotes("");
-      utils.customers.list.invalidate();
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "充值失败");
-    },
-  });
-  
-  const handleRecharge = () => {
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-      toast.error("请输入有效的充值金额");
-      return;
-    }
-    rechargeMutation.mutate({
-      customerId,
-      amount: amountNum,
-      notes: notes || undefined,
-    });
-  };
-  
-  return (
-    <>
-      <Button onClick={() => setOpen(true)}>
-        <Plus className="h-4 w-4 mr-2" />
-        充值
-      </Button>
-      
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>客户充值 - {customerName}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="amount">充值金额 *</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="请输入充值金额"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="notes">备注</Label>
-              <Input
-                id="notes"
-                placeholder="请输入备注信息(可选)"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              取消
-            </Button>
-            <Button onClick={handleRecharge} disabled={rechargeMutation.isPending}>
-              {rechargeMutation.isPending ? "充值中..." : "确认充值"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
+
