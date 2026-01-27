@@ -550,3 +550,18 @@
 - [x] 添加合适的图标(Shield图标)
 - [x] 测试菜单项点点击跳转功能
 - [ ] 保存检查点
+
+
+### 139. 为账号管理页面增加权限控制和权限编辑功能
+- [x] 在数据库schema中添加accountPermissions表(存储账号权限)
+- [x] 创建权限检查中间件(checkAdminRole)
+- [x] 在AccountManagement.tsx中添加权限检查
+- [x] 为非管理员用户显示权限不足提示
+- [x] 创建了permissionRouter.ts处理权限管理API
+  - [x] 获取账号权限(getPermissions)
+  - [x] 更新账号权限(updatePermissions)
+  - [x] 获取所有可用权限(getAvailablePermissions)
+- [x] 在AccountManagement.tsx中添加权限编辑对话框
+- [x] 实现菜单权限多选功能(所有导航菜单项)
+- [ ] 测试权限控制功能
+- [ ] 保存检查点

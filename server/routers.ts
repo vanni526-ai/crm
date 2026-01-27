@@ -14,6 +14,7 @@ import { customerRouter } from "./customerRouter";
 import { financeRouter } from "./financeRouter";
 import { cityRouter } from "./cityRouter";
 import { accountRouter } from "./accountRouter";
+import { permissionRouter } from "./permissionRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -55,6 +56,7 @@ export const appRouter = router({
   finance: financeRouter,
   city: cityRouter,
   accounts: accountRouter,
+  permissions: permissionRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,

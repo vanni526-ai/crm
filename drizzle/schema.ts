@@ -661,3 +661,24 @@ export const accountAuditLogs = mysqlTable("accountAuditLogs", {
 
 export type AccountAuditLog = typeof accountAuditLogs.$inferSelect;
 export type InsertAccountAuditLog = typeof accountAuditLogs.$inferInsert;
+
+
+/**
+ * 账号权限表 - 存储每个系统账号的菜单权限
+ */
+export const accountPermissions = mysqlTable("accountPermissions", {
+  id: int("id").autoincrement().primaryKey(),
+  accountId: int("accountId").notNull(), // 系统账号ID
+  permissionKey: varchar("permissionKey", { length: 100 }).notNull(), // 权限标识(菜单路径)
+  permissionName: varchar("permissionName", { length: 100 }).notNull(), // 权限名称(菜单名)
+  isGranted: boolean("isGranted").default(true).notNull(), // 是否授予该权限
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  accountIdIdx: index("account_id_permission_idx").on(table.accountId),
+  permissionKeyIdx: index("permission_key_idx").on(table.permissionKey),
+  uniqueAccountPermission: unique("unique_account_permission").on(table.accountId, table.permissionKey),
+}));
+
+export type AccountPermission = typeof accountPermissions.$inferSelect;
+export type InsertAccountPermission = typeof accountPermissions.$inferInsert;
