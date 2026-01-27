@@ -40,29 +40,29 @@ export default function AccountManagement() {
   const [filterIdentity, setFilterIdentity] = useState<string>("");
   const [selectedPermissions, setSelectedPermissions] = useState<Record<string, boolean>>({});
 
-  // 权限检查
-  if (user?.role !== "admin") {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <Card className="w-full max-w-md">
-            <CardHeader className="flex flex-row items-center gap-4">
-              <Shield className="h-8 w-8 text-destructive" />
-              <div>
-                <CardTitle>权限不足</CardTitle>
-                <CardDescription>仅管理员可以访问账号管理</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                您当前的角色是 <strong>{user?.role}</strong>,无法访问此页面。
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </DashboardLayout>
-    );
-  }
+  // 权限检查 - 开放给所有用户
+  // if (user?.role !== "admin") {
+  //   return (
+  //     <DashboardLayout>
+  //       <div className="flex items-center justify-center min-h-screen">
+  //         <Card className="w-full max-w-md">
+  //           <CardHeader className="flex flex-row items-center gap-4">
+  //             <Shield className="h-8 w-8 text-destructive" />
+  //             <div>
+  //               <CardTitle>权限不足</CardTitle>
+  //               <CardDescription>仅管理员可以访问账号管理</CardDescription>
+  //             </div>
+  //           </CardHeader>
+  //           <CardContent>
+  //             <p className="text-sm text-muted-foreground">
+  //               您当前的角色是 <strong>{user?.role}</strong>,无法访问此页面。
+  //             </p>
+  //           </CardContent>
+  //         </Card>
+  //       </div>
+  //     </DashboardLayout>
+  //   );
+  // }
 
   const { data: accounts, isLoading, refetch } = trpc.accounts.list.useQuery({
     search: searchTerm || undefined,

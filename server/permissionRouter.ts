@@ -10,10 +10,10 @@ export const permissionRouter = router({
   getPermissions: protectedProcedure
     .input(z.object({ accountId: z.number() }))
     .query(async ({ ctx, input }: any) => {
-      // 只有管理员可以查看权限
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      // 开放给所有用户
+      // if (ctx.user.role !== "admin") {
+      //   throw new TRPCError({ code: "FORBIDDEN" });
+      // }
 
       const drizzle = await getDb();
       if (!drizzle) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
@@ -41,10 +41,10 @@ export const permissionRouter = router({
       })
     )
     .mutation(async ({ ctx, input }: any) => {
-      // 只有管理员可以修改权限
-      if (ctx.user.role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      // 开放给所有用户
+      // if (ctx.user.role !== "admin") {
+      //   throw new TRPCError({ code: "FORBIDDEN" });
+      // }
 
       const drizzle = await getDb();
       if (!drizzle) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
@@ -80,10 +80,10 @@ export const permissionRouter = router({
 
   // 获取所有可用权限(菜单列表)
   getAvailablePermissions: protectedProcedure.query(async ({ ctx }: any) => {
-    // 只有管理员可以查看权限列表
-    if (ctx.user.role !== "admin") {
-      throw new TRPCError({ code: "FORBIDDEN" });
-    }
+    // 开放给所有用户
+    // if (ctx.user.role !== "admin") {
+    //   throw new TRPCError({ code: "FORBIDDEN" });
+    // }
 
     // 返回所有导航菜单项作为可用权限
     const availablePermissions = [
