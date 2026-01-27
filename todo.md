@@ -542,3 +542,11 @@
 - [x] 编写单元测试(accountRouter.test.ts) - 15个测试用例全部通过
 - [ ] 编写组件测试(AccountManagement.test.tsx)
 - [ ] 集成测试和验证
+
+
+### 138. 在侧边栏菜单中添加账号管理入口
+- [x] 在App.tsx中导入AccountManagement页面
+- [x] 在DashboardLayout导航菜单中添加账号管理链接
+- [x] 添加合适的图标(Shield图标)
+- [x] 测试菜单项点点击跳转功能
+- [ ] 保存检查点
