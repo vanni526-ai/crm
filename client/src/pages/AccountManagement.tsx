@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Edit2, Trash2, Lock, CheckCircle, XCircle, Shield } from "lucide-react";
+import { Plus, Edit2, Trash2, Lock, CheckCircle, XCircle, Shield, ChevronDown, ChevronUp } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,30 +39,8 @@ export default function AccountManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterIdentity, setFilterIdentity] = useState<string>("");
   const [selectedPermissions, setSelectedPermissions] = useState<Record<string, boolean>>({});
-
-  // 权限检查 - 开放给所有用户
-  // if (user?.role !== "admin") {
-  //   return (
-  //     <DashboardLayout>
-  //       <div className="flex items-center justify-center min-h-screen">
-  //         <Card className="w-full max-w-md">
-  //           <CardHeader className="flex flex-row items-center gap-4">
-  //             <Shield className="h-8 w-8 text-destructive" />
-  //             <div>
-  //               <CardTitle>权限不足</CardTitle>
-  //               <CardDescription>仅管理员可以访问账号管理</CardDescription>
-  //             </div>
-  //           </CardHeader>
-  //           <CardContent>
-  //             <p className="text-sm text-muted-foreground">
-  //               您当前的角色是 <strong>{user?.role}</strong>,无法访问此页面。
-  //             </p>
-  //           </CardContent>
-  //         </Card>
-  //       </div>
-  //     </DashboardLayout>
-  //   );
-  // }
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  const [selectedPreset, setSelectedPreset] = useState<string>("");
 
   const { data: accounts, isLoading, refetch } = trpc.accounts.list.useQuery({
     search: searchTerm || undefined,
@@ -71,6 +49,7 @@ export default function AccountManagement() {
 
   const { data: stats } = trpc.accounts.getStats.useQuery();
   const { data: availablePermissions } = trpc.permissions.getAvailablePermissions.useQuery();
+  const { data: permissionPresets } = trpc.permissions.getPermissionPresets.useQuery();
   const { data: accountPermissions } = trpc.permissions.getPermissions.useQuery(
     { accountId: selectedAccount?.id },
     { enabled: !!selectedAccount }
@@ -151,28 +130,49 @@ export default function AccountManagement() {
 
   const handlePermissions = (account: any) => {
     setSelectedAccount(account);
+    setSelectedPreset("");
+    
     // 初始化权限选择
     const permissionsMap: Record<string, boolean> = {};
     if (availablePermissions) {
-      availablePermissions.forEach((perm: any) => {
-        const hasPermission = accountPermissions?.some(
-          (p: any) => p.permissionKey === perm.key && p.isGranted
-        );
-        permissionsMap[perm.key] = hasPermission || false;
+      availablePermissions.forEach((category: any) => {
+        category.permissions.forEach((perm: any) => {
+          const hasPermission = accountPermissions?.some(
+            (p: any) => p.permissionKey === perm.key && p.isGranted
+          );
+          permissionsMap[perm.key] = hasPermission || false;
+        });
       });
     }
     setSelectedPermissions(permissionsMap);
+    
+    // 初始化展开状态
+    const expandedMap: Record<string, boolean> = {};
+    if (availablePermissions) {
+      availablePermissions.forEach((category: any) => {
+        expandedMap[category.category] = true;
+      });
+    }
+    setExpandedCategories(expandedMap);
+    
     setIsPermissionOpen(true);
   };
 
   const handleSavePermissions = () => {
     if (!selectedAccount) return;
 
-    const permissions = (availablePermissions || []).map((perm: any) => ({
-      permissionKey: perm.key,
-      permissionName: perm.name,
-      isGranted: selectedPermissions[perm.key] || false,
-    }));
+    const permissions: any[] = [];
+    if (availablePermissions) {
+      availablePermissions.forEach((category: any) => {
+        category.permissions.forEach((perm: any) => {
+          permissions.push({
+            permissionKey: perm.key,
+            permissionName: perm.name,
+            isGranted: selectedPermissions[perm.key] || false,
+          });
+        });
+      });
+    }
 
     updatePermissionsMutation.mutate({
       accountId: selectedAccount.id,
@@ -185,6 +185,54 @@ export default function AccountManagement() {
       ...prev,
       [key]: !prev[key],
     }));
+  };
+
+  const handleToggleCategory = (category: string) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  };
+
+  const handleApplyPreset = (presetName: string) => {
+    const preset = permissionPresets?.find((p: any) => p.name === presetName);
+    if (preset) {
+      const newPermissions: Record<string, boolean> = {};
+      if (availablePermissions) {
+        availablePermissions.forEach((category: any) => {
+          category.permissions.forEach((perm: any) => {
+            newPermissions[perm.key] = preset.permissions.includes(perm.key);
+          });
+        });
+      }
+      setSelectedPermissions(newPermissions);
+      setSelectedPreset(presetName);
+      toast.success(`已应用"${presetName}"预设`);
+    }
+  };
+
+  const handleSelectAll = () => {
+    const allPermissions: Record<string, boolean> = {};
+    if (availablePermissions) {
+      availablePermissions.forEach((category: any) => {
+        category.permissions.forEach((perm: any) => {
+          allPermissions[perm.key] = true;
+        });
+      });
+    }
+    setSelectedPermissions(allPermissions);
+  };
+
+  const handleClearAll = () => {
+    const allPermissions: Record<string, boolean> = {};
+    if (availablePermissions) {
+      availablePermissions.forEach((category: any) => {
+        category.permissions.forEach((perm: any) => {
+          allPermissions[perm.key] = false;
+        });
+      });
+    }
+    setSelectedPermissions(allPermissions);
   };
 
   return (
@@ -423,29 +471,95 @@ export default function AccountManagement() {
 
       {/* 权限编辑对话框 */}
       <Dialog open={isPermissionOpen} onOpenChange={setIsPermissionOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>编辑账号权限</DialogTitle>
             <DialogDescription>
               为 <strong>{selectedAccount?.username}</strong> 分配菜单权限
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
-            {availablePermissions?.map((perm: any) => (
-              <div key={perm.key} className="flex items-center gap-3 p-3 border rounded-lg">
-                <Checkbox
-                  id={perm.key}
-                  checked={selectedPermissions[perm.key] || false}
-                  onCheckedChange={() => handleTogglePermission(perm.key)}
-                />
-                <Label htmlFor={perm.key} className="flex-1 cursor-pointer">
-                  <span className="font-medium">{perm.name}</span>
-                  <span className="text-xs text-muted-foreground ml-2">({perm.key})</span>
-                </Label>
+
+          {/* 权限预设快速选择 */}
+          {permissionPresets && (
+            <div className="space-y-3 border-b pb-4">
+              <Label className="text-sm font-semibold">快速应用权限预设</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {permissionPresets.map((preset: any) => (
+                  <Button
+                    key={preset.name}
+                    size="sm"
+                    variant={selectedPreset === preset.name ? "default" : "outline"}
+                    onClick={() => handleApplyPreset(preset.name)}
+                    className="justify-start"
+                  >
+                    {preset.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 全选/取消全选按钮 */}
+          <div className="flex gap-2 mb-4">
+            <Button size="sm" variant="outline" onClick={handleSelectAll}>
+              全选
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleClearAll}>
+              取消全选
+            </Button>
+          </div>
+
+          {/* 权限分类显示 */}
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {availablePermissions?.map((category: any) => (
+              <div key={category.category} className="border rounded-lg">
+                {/* 分类标题 */}
+                <button
+                  onClick={() => handleToggleCategory(category.category)}
+                  className="w-full flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{category.icon === "Home" && "🏠"}</span>
+                    <span className="text-lg">{category.icon === "ShoppingCart" && "🛒"}</span>
+                    <span className="text-lg">{category.icon === "BookOpen" && "📚"}</span>
+                    <span className="text-lg">{category.icon === "Settings" && "⚙️"}</span>
+                    <span className="text-lg">{category.icon === "DollarSign" && "💰"}</span>
+                    <span className="text-lg">{category.icon === "Database" && "🗄️"}</span>
+                    <span className="text-lg">{category.icon === "Shield" && "🛡️"}</span>
+                    <span className="font-semibold">{category.category}</span>
+                  </div>
+                  {expandedCategories[category.category] ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </button>
+
+                {/* 权限项目 */}
+                {expandedCategories[category.category] && (
+                  <div className="border-t p-3 space-y-2 bg-muted/20">
+                    {category.permissions.map((perm: any) => (
+                      <div key={perm.key} className="flex items-start gap-3 p-2 rounded hover:bg-muted/50 transition-colors">
+                        <Checkbox
+                          id={perm.key}
+                          checked={selectedPermissions[perm.key] || false}
+                          onCheckedChange={() => handleTogglePermission(perm.key)}
+                          className="mt-1"
+                        />
+                        <label htmlFor={perm.key} className="flex-1 cursor-pointer">
+                          <div className="font-medium">{perm.name}</div>
+                          <div className="text-xs text-muted-foreground">{perm.description}</div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>
-          <div className="flex gap-2 justify-end">
+
+          {/* 保存按钮 */}
+          <div className="flex gap-2 justify-end border-t pt-4">
             <Button type="button" variant="outline" onClick={() => setIsPermissionOpen(false)}>
               取消
             </Button>
