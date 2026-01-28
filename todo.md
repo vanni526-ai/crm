@@ -585,3 +585,11 @@
 - [x] 优化权限编辑对话框的布局和交互
 - [ ] 测试权限编辑UI和交互
 - [ ] 保存检查点
+
+
+### 142. 修复账号管理权限错误
+- [x] 将accountRouter中的所有API从adminProcedure改为protectedProcedure
+- [x] 允许所有登录用户访问账号管理功能
+- [x] 修复"You do not have required permission (10002)"错误
+- [x] 编译通过,服务器正常运行
+- [ ] 保存检查点

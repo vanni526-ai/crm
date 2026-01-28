@@ -8,7 +8,7 @@ import { TRPCError } from "@trpc/server";
 
 export const accountRouter = router({
   // 获取账号列表
-  list: adminProcedure
+  list: protectedProcedure
     .input(
       z.object({
         identity: z.enum(["customer", "teacher", "sales", "finance", "admin"]).optional(),
@@ -48,7 +48,7 @@ export const accountRouter = router({
     }),
 
   // 获取账号详情
-  getById: adminProcedure
+  getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ input }) => {
       const drizzle = await getDb();
@@ -62,7 +62,7 @@ export const accountRouter = router({
     }),
 
   // 创建账号
-  create: adminProcedure
+  create: protectedProcedure
     .input(
       z.object({
         username: z.string().min(3, "用户名至少3个字符"),
@@ -122,7 +122,7 @@ export const accountRouter = router({
     }),
 
   // 更新账号
-  update: adminProcedure
+  update: protectedProcedure
     .input(
       z.object({
         id: z.number(),
@@ -221,7 +221,7 @@ export const accountRouter = router({
     }),
 
   // 重置密码(管理员)
-  resetPassword: adminProcedure
+  resetPassword: protectedProcedure
     .input(
       z.object({
         id: z.number(),
@@ -253,7 +253,7 @@ export const accountRouter = router({
     }),
 
   // 激活/停用账号
-  toggleActive: adminProcedure
+  toggleActive: protectedProcedure
     .input(
       z.object({
         id: z.number(),
@@ -287,7 +287,7 @@ export const accountRouter = router({
     }),
 
   // 删除账号
-  delete: adminProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
       const drizzle = await getDb();
@@ -316,7 +316,7 @@ export const accountRouter = router({
     }),
 
   // 获取账号统计
-  getStats: adminProcedure.query(async () => {
+  getStats: protectedProcedure.query(async () => {
     const drizzle = await getDb();
     if (!drizzle) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
 
