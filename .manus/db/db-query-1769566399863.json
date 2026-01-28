@@ -1,0 +1,9 @@
+{
+  "query": "DROP TABLE IF EXISTS `accountAuditLogs`;\nCREATE TABLE `accountAuditLogs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `accountId` int NOT NULL,\n  `operationType` varchar(50) NOT NULL,\n  `operatorId` int,\n  `operatorName` varchar(100),\n  `oldValue` text,\n  `newValue` text,\n  `ipAddress` varchar(45),\n  `userAgent` text,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  PRIMARY KEY (`id`),\n  INDEX `account_id_idx` (`accountId`),\n  INDEX `operator_id_idx` (`operatorId`),\n  INDEX `operation_type_idx` (`operationType`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute DROP TABLE IF EXISTS `accountAuditLogs`;\nCREATE TABLE `accountAuditLogs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `accountId` int NOT NULL,\n  `operationType` varchar(50) NOT NULL,\n  `operatorId` int,\n  `operatorName` varchar(100),\n  `oldValue` text,\n  `newValue` text,\n  `ipAddress` varchar(45),\n  `userAgent` text,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  PRIMARY KEY (`id`),\n  INDEX `account_id_idx` (`accountId`),\n  INDEX `operator_id_idx` (`operatorId`),\n  INDEX `operation_type_idx` (`operationType`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2253
+}

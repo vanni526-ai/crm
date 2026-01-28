@@ -1,0 +1,9 @@
+{
+  "query": "DROP TABLE IF EXISTS `accountPermissions`;\nCREATE TABLE `accountPermissions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `accountId` int NOT NULL,\n  `permissionKey` varchar(100) NOT NULL,\n  `permissionName` varchar(100) NOT NULL,\n  `isGranted` boolean DEFAULT true NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `account_permission_unique` (`accountId`, `permissionKey`),\n  INDEX `account_id_idx` (`accountId`),\n  INDEX `permission_key_idx` (`permissionKey`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute DROP TABLE IF EXISTS `accountPermissions`;\nCREATE TABLE `accountPermissions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `accountId` int NOT NULL,\n  `permissionKey` varchar(100) NOT NULL,\n  `permissionName` varchar(100) NOT NULL,\n  `isGranted` boolean DEFAULT true NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `account_permission_unique` (`accountId`, `permissionKey`),\n  INDEX `account_id_idx` (`accountId`),\n  INDEX `permission_key_idx` (`permissionKey`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2297
+}

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `systemAccounts` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `username` varchar(100) NOT NULL UNIQUE,\n  `passwordHash` varchar(255) NOT NULL,\n  `email` varchar(100),\n  `phone` varchar(20),\n  `identity` enum('customer', 'teacher', 'sales', 'finance', 'admin', 'store_partner') NOT NULL,\n  `relatedId` int,\n  `relatedName` varchar(100),\n  `isActive` boolean DEFAULT true NOT NULL,\n  `lastLoginAt` timestamp,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  `createdBy` int,\n  `notes` text,\n  PRIMARY KEY (`id`),\n  INDEX `username_idx` (`username`),\n  INDEX `identity_idx` (`identity`),\n  INDEX `related_id_idx` (`relatedId`),\n  INDEX `is_active_idx` (`isActive`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `systemAccounts` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `username` varchar(100) NOT NULL UNIQUE,\n  `passwordHash` varchar(255) NOT NULL,\n  `email` varchar(100),\n  `phone` varchar(20),\n  `identity` enum('customer', 'teacher', 'sales', 'finance', 'admin', 'store_partner') NOT NULL,\n  `relatedId` int,\n  `relatedName` varchar(100),\n  `isActive` boolean DEFAULT true NOT NULL,\n  `lastLoginAt` timestamp,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  `updatedAt` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,\n  `createdBy` int,\n  `notes` text,\n  PRIMARY KEY (`id`),\n  INDEX `username_idx` (`username`),\n  INDEX `identity_idx` (`identity`),\n  INDEX `related_id_idx` (`relatedId`),\n  INDEX `is_active_idx` (`isActive`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1676
+}

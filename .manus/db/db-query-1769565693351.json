@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `accountPermissions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `accountId` int NOT NULL,\n  `permission` varchar(100) NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `account_permission_unique` (`accountId`, `permission`),\n  INDEX `account_id_idx` (`accountId`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `accountPermissions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `accountId` int NOT NULL,\n  `permission` varchar(100) NOT NULL,\n  `createdAt` timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `account_permission_unique` (`accountId`, `permission`),\n  INDEX `account_id_idx` (`accountId`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1650
+}

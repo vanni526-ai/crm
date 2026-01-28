@@ -22,8 +22,8 @@ export const accountRouter = router({
       const drizzle = await getDb();
       if (!drizzle) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
-      const limit = input?.limit || 50;
-      const offset = input?.offset || 0;
+      const limit = input?.limit ?? 50;
+      const offset = input?.offset ?? 0;
       const conditions: any[] = [];
 
       if (input?.identity) {
@@ -40,7 +40,7 @@ export const accountRouter = router({
 
       let query: any = drizzle.select().from(systemAccounts);
       if (conditions.length > 0) {
-        query = drizzle.select().from(systemAccounts).where(and(...conditions));
+        query = query.where(and(...conditions));
       }
 
       const accounts = await query.orderBy(desc(systemAccounts.createdAt)).limit(limit).offset(offset);

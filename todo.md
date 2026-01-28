@@ -603,3 +603,14 @@
 - [x] 为门店合伙人分配合适的菜单权限(订单、客户、销售、财务、对账)
 - [x] 测试新角色的创建和权限分配
 - [ ] 保存检查点
+
+
+### 144. 实现systemAccounts本地账户登录系统
+- [ ] 在server/routers.ts中添加login和logout API
+- [ ] 创建登录页面(client/src/pages/Login.tsx)
+- [ ] 实现会话管理(localStorage存储token)
+- [ ] 修改App.tsx支持两种登录方式(Manus OAuth和本地账户)
+- [ ] 为已登录用户加载权限信息
+- [ ] 创建登出功能
+- [ ] 测试所有6个测试账号的登录
+- [ ] 保存检查点

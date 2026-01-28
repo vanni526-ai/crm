@@ -15,6 +15,7 @@ import { financeRouter } from "./financeRouter";
 import { cityRouter } from "./cityRouter";
 import { accountRouter } from "./accountRouter";
 import { permissionRouter } from "./permissionRouter";
+import { authRouter } from "./authRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -57,6 +58,7 @@ export const appRouter = router({
   city: cityRouter,
   accounts: accountRouter,
   permissions: permissionRouter,
+  auth: authRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,
@@ -129,15 +131,7 @@ export const appRouter = router({
       return db.getAuditLogStats();
     }),
   }),
-  
-  auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
-    logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return { success: true } as const;
-    }),
-  }),
+
 
   // 用户管理(仅管理员)
   users: router({
