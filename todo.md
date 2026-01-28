@@ -614,3 +614,13 @@
 - [ ] 创建登出功能
 - [ ] 测试所有6个测试账号的登录
 - [ ] 保存检查点
+
+
+### 136. 实现本地账户登录系统
+- [x] 创建authRouter.ts处理本地账户登录(login, verifyToken, me, logout)
+- [x] 安装jsonwebtoken依赖
+- [x] 在routers.ts中注册auth路由
+- [x] 创建LocalLogin.tsx登录页面(清晰的表单、错误提示、加载状态)
+- [x] 在App.tsx中添加/login路由
+- [x] 为登录功能编写单元测试(11个测试全部通过)
+- [ ] 保存检查点
