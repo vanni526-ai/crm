@@ -29,6 +29,13 @@
       "when": 1769516046130,
       "tag": "0003_first_mordo",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1769565464232,
+      "tag": "0004_jittery_jack_flag",
+      "breakpoints": true
     }
   ]
 }

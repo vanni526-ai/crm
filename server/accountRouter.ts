@@ -11,7 +11,7 @@ export const accountRouter = router({
   list: protectedProcedure
     .input(
       z.object({
-        identity: z.enum(["customer", "teacher", "sales", "finance", "admin"]).optional(),
+        identity: z.enum(["customer", "teacher", "sales", "finance", "admin", "store_partner"]).optional(),
         isActive: z.boolean().optional(),
         search: z.string().optional(),
         limit: z.number().optional().default(50),
@@ -69,7 +69,7 @@ export const accountRouter = router({
         password: z.string().min(6, "密码至少6个字符"),
         email: z.string().email().optional(),
         phone: z.string().optional(),
-        identity: z.enum(["customer", "teacher", "sales", "finance", "admin"]),
+        identity: z.enum(["customer", "teacher", "sales", "finance", "admin", "store_partner"]),
         relatedId: z.number().optional(),
         relatedName: z.string().optional(),
         notes: z.string().optional(),
@@ -128,7 +128,7 @@ export const accountRouter = router({
         id: z.number(),
         email: z.string().email().optional(),
         phone: z.string().optional(),
-        identity: z.enum(["customer", "teacher", "sales", "finance", "admin"]).optional(),
+        identity: z.enum(["customer", "teacher", "sales", "finance", "admin", "store_partner"]).optional(),
         relatedId: z.number().optional(),
         relatedName: z.string().optional(),
         notes: z.string().optional(),

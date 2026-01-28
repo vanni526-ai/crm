@@ -181,6 +181,12 @@ export const permissionRouter = router({
         identity: "viewer",
         permissions: ["/", "/orders", "/customers", "/sales", "/schedules", "/finance"],
       },
+      {
+        name: "门店合伙人权限",
+        description: "门店合伙人的标准权限",
+        identity: "store_partner",
+        permissions: ["/", "/orders", "/customers", "/sales", "/finance", "/reconciliation-match"],
+      },
     ];
 
     return presets;

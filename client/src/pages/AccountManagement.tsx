@@ -23,7 +23,7 @@ const createAccountSchema = z.object({
   password: z.string().min(6, "密码至少6个字符"),
   email: z.string().email().optional().or(z.literal("")),
   phone: z.string().optional(),
-  identity: z.enum(["customer", "teacher", "sales", "finance", "admin"]),
+  identity: z.enum(["customer", "teacher", "sales", "finance", "admin", "store_partner"]),
   relatedName: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -310,12 +310,13 @@ export default function AccountManagement() {
                   onChange={(e) => setFilterIdentity(e.target.value)}
                   className="w-full px-3 py-2 border rounded-md"
                 >
-                  <option value="">全部</option>
+                  <option value=""></option>
                   <option value="admin">管理员</option>
                   <option value="sales">销售</option>
                   <option value="finance">财务</option>
                   <option value="teacher">老师</option>
                   <option value="customer">客户</option>
+                  <option value="store_partner">门店合伙人</option>
                 </select>
               </div>
             </div>

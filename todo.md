@@ -593,3 +593,13 @@
 - [x] 修复"You do not have required permission (10002)"错误
 - [x] 编译通过,服务器正常运行
 - [ ] 保存检查点
+
+
+### 143. 增加"门店合伙人"角色类型
+- [x] 在drizzle schema中的identity枚举中添加"store_partner"
+- [x] 在accountRouter中的角色选项中添加"store_partner"
+- [x] 在前端AccountManagement页面中添加"门店合伙人"选项
+- [x] 在permissionRouter中为门店合伙人添加权限预设
+- [x] 为门店合伙人分配合适的菜单权限(订单、客户、销售、财务、对账)
+- [x] 测试新角色的创建和权限分配
+- [ ] 保存检查点

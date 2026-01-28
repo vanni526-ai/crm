@@ -1,0 +1,1 @@
+ALTER TABLE `systemAccounts` MODIFY COLUMN `identity` enum('customer','teacher','sales','finance','admin','store_partner') NOT NULL;

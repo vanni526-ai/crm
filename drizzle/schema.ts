@@ -620,7 +620,7 @@ export const systemAccounts = mysqlTable("systemAccounts", {
   passwordHash: varchar("passwordHash", { length: 255 }).notNull(), // 密码哈希值
   email: varchar("email", { length: 100 }), // 邮箱
   phone: varchar("phone", { length: 20 }), // 电话
-  identity: mysqlEnum("identity", ["customer", "teacher", "sales", "finance", "admin"]).notNull(), // 身份类型
+  identity: mysqlEnum("identity", ["customer", "teacher", "sales", "finance", "admin", "store_partner"]).notNull(), // 身份类型
   relatedId: int("relatedId"), // 关联ID(客户ID/老师ID/销售人员ID等)
   relatedName: varchar("relatedName", { length: 100 }), // 关联名称(客户名/老师名/销售名等)
   isActive: boolean("isActive").default(true).notNull(), // 是否激活
