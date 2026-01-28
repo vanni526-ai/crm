@@ -633,3 +633,16 @@
 - [x] 验证编辑表单的数据绑定
 - [x] 测试编辑功能是否正常工作
 - [ ] 保存检查点
+
+### 148. 配置后端个CORS中间件
+- [x] 检查后端入口文件(server/_core/index.ts)
+- [x] 安装cors包
+- [x] 安装@types/cors类型定义
+- [x] 添加CORS中间件配置
+- [x] 允许前端URL: https://8081-iv9oi1inydtghwvjvmhw2-80474770.sg1.manus.computer
+- [x] 允许HTTP方法: GET, POST, PUT, DELETE, OPTIONS
+- [x] 允许请求头: Content-Type, Authorization
+- [x] 启用credentials: true
+- [x] 重启后端服务器
+- [ ] 测试跨域请求
+- [ ] 保存检查点
