@@ -470,6 +470,73 @@ export default function AccountManagement() {
         </DialogContent>
       </Dialog>
 
+      {/* 编辑账号对话框 */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>编辑账号</DialogTitle>
+            <DialogDescription>修改账号信息</DialogDescription>
+          </DialogHeader>
+          {selectedAccount && (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                updateAccountMutation.mutate({
+                  id: selectedAccount.id,
+                  email: formData.get("email") as string || undefined,
+                  phone: formData.get("phone") as string || undefined,
+                  identity: formData.get("identity") as any,
+                  relatedName: formData.get("relatedName") as string || undefined,
+                  notes: formData.get("notes") as string || undefined,
+                });
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <Label>用户名</Label>
+                <Input value={selectedAccount.username} disabled />
+              </div>
+              <div>
+                <Label>邮箱</Label>
+                <Input name="email" defaultValue={selectedAccount.email || ""} type="email" placeholder="输入邮箱" />
+              </div>
+              <div>
+                <Label>电话</Label>
+                <Input name="phone" defaultValue={selectedAccount.phone || ""} placeholder="输入电话" />
+              </div>
+              <div>
+                <Label>角色</Label>
+                <select name="identity" defaultValue={selectedAccount.identity} className="w-full px-3 py-2 border rounded-md">
+                  <option value="admin">管理员</option>
+                  <option value="sales">销售</option>
+                  <option value="finance">财务</option>
+                  <option value="teacher">老师</option>
+                  <option value="customer">客户</option>
+                  <option value="store_partner">门店合伙人</option>
+                </select>
+              </div>
+              <div>
+                <Label>关联名称</Label>
+                <Input name="relatedName" defaultValue={selectedAccount.relatedName || ""} placeholder="输入关联名称" />
+              </div>
+              <div>
+                <Label>备注</Label>
+                <Input name="notes" defaultValue={selectedAccount.notes || ""} placeholder="输入备注" />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
+                  取消
+                </Button>
+                <Button type="submit" disabled={updateAccountMutation.isPending}>
+                  {updateAccountMutation.isPending ? "保存中..." : "保存"}
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* 权限编辑对话框 */}
       <Dialog open={isPermissionOpen} onOpenChange={setIsPermissionOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
