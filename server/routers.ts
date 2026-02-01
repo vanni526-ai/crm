@@ -869,6 +869,123 @@ export const appRouter = router({
         };
       }),
 
+    // 导出Excel
+    exportExcel: protectedProcedure
+      .input(
+        z.object({
+          orderIds: z.array(z.number()).optional(), // 可选:指定订单ID列表
+          startDate: z.string().optional(), // 可选:开始日期
+          endDate: z.string().optional(), // 可选:结束日期
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          const ExcelJS = (await import("exceljs")).default;
+          
+          // 获取订单数据
+          let orders;
+          if (input.orderIds && input.orderIds.length > 0) {
+            // 按ID列表获取
+            orders = await db.getOrdersByIds(input.orderIds);
+          } else if (input.startDate && input.endDate) {
+            // 按日期范围获取
+            orders = await db.getOrdersByDateRange(input.startDate, input.endDate);
+          } else {
+            // 获取所有订单
+            orders = await db.getAllOrders();
+          }
+
+          // 创建Excel工作簿
+          const workbook = new ExcelJS.Workbook();
+          workbook.creator = "课程交付CRM系统";
+          workbook.created = new Date();
+
+          const sheet = workbook.addWorksheet("订单列表");
+
+          // 设置表头
+          sheet.columns = [
+            { header: "订单号", key: "orderNo", width: 20 },
+            { header: "销售人", key: "salesPerson", width: 12 },
+            { header: "流量来源", key: "trafficSource", width: 15 },
+            { header: "客户名", key: "customerName", width: 15 },
+            { header: "支付金额", key: "paymentAmount", width: 12 },
+            { header: "课程金额", key: "courseAmount", width: 12 },
+            { header: "账户余额", key: "accountBalance", width: 12 },
+            { header: "支付城市", key: "paymentCity", width: 12 },
+            { header: "渠道订单号", key: "channelOrderNo", width: 25 },
+            { header: "老师费用", key: "teacherFee", width: 12 },
+            { header: "车费", key: "transportFee", width: 10 },
+            { header: "其他费用", key: "otherFee", width: 12 },
+            { header: "合伙人费", key: "partnerFee", width: 12 },
+            { header: "金串到账金额", key: "finalAmount", width: 15 },
+            { header: "支付日期", key: "paymentDate", width: 12 },
+            { header: "支付时间", key: "paymentTime", width: 12 },
+            { header: "交付城市", key: "deliveryCity", width: 12 },
+            { header: "交付教室", key: "deliveryRoom", width: 20 },
+            { header: "交付老师", key: "deliveryTeacher", width: 15 },
+            { header: "交付课程", key: "deliveryCourse", width: 20 },
+            { header: "上课日期", key: "classDate", width: 12 },
+            { header: "上课时间", key: "classTime", width: 12 },
+            { header: "备注", key: "notes", width: 30 },
+          ];
+
+          // 填充数据
+          orders.forEach((order: any) => {
+            sheet.addRow({
+              orderNo: order.orderNo || "",
+              salesPerson: order.salesPerson || "",
+              trafficSource: order.trafficSource || "",
+              customerName: order.customerName || "",
+              paymentAmount: order.paymentAmount || "",
+              courseAmount: order.courseAmount || "",
+              accountBalance: order.accountBalance || "",
+              paymentCity: order.paymentCity || "",
+              channelOrderNo: order.channelOrderNo || "",
+              teacherFee: order.teacherFee || "",
+              transportFee: order.transportFee || "",
+              otherFee: order.otherFee || "",
+              partnerFee: order.partnerFee || "",
+              finalAmount: order.finalAmount || "",
+              paymentDate: order.paymentDate || "",
+              paymentTime: order.paymentTime || "",
+              deliveryCity: order.deliveryCity || "",
+              deliveryRoom: order.deliveryRoom || "",
+              deliveryTeacher: order.deliveryTeacher || "",
+              deliveryCourse: order.deliveryCourse || "",
+              classDate: order.classDate ? new Date(order.classDate).toLocaleDateString("zh-CN") : "",
+              classTime: order.classTime || "",
+              notes: order.notes || "",
+            });
+          });
+
+          // 设置表头样式
+          sheet.getRow(1).font = { bold: true };
+          sheet.getRow(1).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFE0E0E0" },
+          };
+
+          // 生成Excel文件的Buffer
+          const buffer = await workbook.xlsx.writeBuffer();
+
+          // 将Buffer转换为Base64字符串
+          const base64 = Buffer.from(buffer).toString("base64");
+
+          return {
+            success: true,
+            data: base64,
+            filename: `订单列表_${new Date().toLocaleDateString("zh-CN").replace(/\//g, "-")}.xlsx`,
+          };
+        } catch (error) {
+          console.error("导出Excel失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "导出Excel失败",
+          });
+        }
+      }),
+
   }),
 
   // 老师管理

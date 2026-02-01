@@ -614,87 +614,45 @@ export default function Orders() {
     }
   };
 
+  const exportMutation = trpc.orders.exportExcel.useMutation();
+
   const handleExport = async () => {
     const ordersToExport = getFilteredOrdersByTimeRange();
-    
-    if (ordersToExport.length === 0) {
+
+    if (!ordersToExport || ordersToExport.length === 0) {
       toast.error("没有符合条件的订单数据");
       return;
     }
 
     try {
-      const ExcelJS = (await import("exceljs")).default;
-      const workbook = new ExcelJS.Workbook();
-      const sheet = workbook.addWorksheet("订单列表");
+      // 调用后端API导出Excel
+      const orderIds = ordersToExport.map((order) => order.id);
+      const result = await exportMutation.mutateAsync({ orderIds });
 
-      // 设置所有23个详细字段的表头
-      sheet.columns = [
-        { header: "订单号", key: "orderNo", width: 20 },
-        { header: "销售人", key: "salesPerson", width: 12 },
-        { header: "流量来源", key: "trafficSource", width: 15 },
-        { header: "客户名", key: "customerName", width: 15 },
-        { header: "支付金额", key: "paymentAmount", width: 12 },
-        { header: "课程金额", key: "courseAmount", width: 12 },
-        { header: "账户余额", key: "accountBalance", width: 12 },
-        { header: "支付城市", key: "paymentCity", width: 12 },
-        { header: "渠道订单号", key: "channelOrderNo", width: 25 },
-        { header: "老师费用", key: "teacherFee", width: 12 },
-        { header: "车费", key: "transportFee", width: 10 },
-        { header: "其他费用", key: "otherFee", width: 12 },
-        { header: "合伙人费", key: "partnerFee", width: 12 },
-        { header: "金串到账金额", key: "finalAmount", width: 15 },
-        { header: "支付日期", key: "paymentDate", width: 12 },
-        { header: "支付时间", key: "paymentTime", width: 12 },
-        { header: "交付城市", key: "deliveryCity", width: 12 },
-        { header: "交付教室", key: "deliveryRoom", width: 20 },
-        { header: "交付老师", key: "deliveryTeacher", width: 15 },
-        { header: "交付课程", key: "deliveryCourse", width: 20 },
-        { header: "上课日期", key: "classDate", width: 12 },
-        { header: "上课时间", key: "classTime", width: 12 },
-        { header: "备注", key: "notes", width: 30 },
-      ];
-
-      ordersToExport.forEach((order) => {
-        sheet.addRow({
-          orderNo: order.orderNo,
-          salesPerson: order.salesPerson || "",
-          trafficSource: order.trafficSource || "",
-          customerName: order.customerName || "",
-          paymentAmount: order.paymentAmount || "",
-          courseAmount: order.courseAmount || "",
-          accountBalance: order.accountBalance || "",
-          paymentCity: order.paymentCity || "",
-          channelOrderNo: order.channelOrderNo || "",
-          teacherFee: order.teacherFee || "",
-          transportFee: order.transportFee || "",
-          otherFee: order.otherFee || "",
-          partnerFee: order.partnerFee || "",
-          finalAmount: order.finalAmount || "",
-          paymentDate: order.paymentDate || "",
-          paymentTime: order.paymentTime || "",
-          deliveryCity: order.deliveryCity || "",
-          deliveryRoom: order.deliveryRoom || "",
-          deliveryTeacher: order.deliveryTeacher || "",
-          deliveryCourse: order.deliveryCourse || "",
-          classDate: order.classDate || "",
-          classTime: order.classTime || "",
-          notes: order.notes || "",
+      if (result.success && result.data) {
+        // 将Base64转换为Blob
+        const binaryString = atob(result.data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
-      });
 
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `订单列表_${new Date().toISOString().split("T")[0]}.xlsx`;
-      a.click();
-      window.URL.revokeObjectURL(url);
+        // 下载文件
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = result.filename || `订单列表_${new Date().toISOString().split("T")[0]}.xlsx`;
+        a.click();
+        window.URL.revokeObjectURL(url);
 
-      toast.success(`成功导出 ${ordersToExport.length} 条订单`);
-      setExportOpen(false);
+        toast.success(`成功导出 ${ordersToExport.length} 条订单`);
+        setExportOpen(false);
+      } else {
+        toast.error("导出失败,请重试");
+      }
     } catch (error) {
       console.error("导出失败:", error);
       toast.error("导出失败,请重试");

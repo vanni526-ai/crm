@@ -271,6 +271,12 @@ export async function getOrderById(id: number) {
   return result[0] || null;
 }
 
+export async function getOrdersByIds(ids: number[]) {
+  const db = await getDb();
+  if (!db || ids.length === 0) return [];
+  return db.select().from(orders).where(sql`${orders.id} IN (${sql.join(ids.map(id => sql`${id}`), sql`, `)})`);
+}
+
 export async function getAllOrders() {
   const db = await getDb();
   if (!db) return [];
