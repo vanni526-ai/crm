@@ -35,16 +35,16 @@ describe("老师费用验证", () => {
       expect(result.error).toContain("课程金额");
     });
 
-    it("课程金额为0但老师费用不为0时应该验证失败", () => {
+    it("课程金额为0但老师费用不为0时应该通过验证但给出警告", () => {
       const result = validateTeacherFee(500, 0);
-      expect(result.isValid).toBe(false);
-      expect(result.error).toContain("课程金额为空或0时,不能设置老师费用");
+      expect(result.isValid).toBe(true);
+      expect(result.warning).toContain("课程金额为0但设置了老师费用");
     });
 
-    it("课程金额为null但老师费用不为0时应该验证失败", () => {
+    it("课程金额为null但老师费用不为0时应该通过验证但给出警告", () => {
       const result = validateTeacherFee(500, null);
-      expect(result.isValid).toBe(false);
-      expect(result.error).toContain("课程金额为空或0时,不能设置老师费用");
+      expect(result.isValid).toBe(true);
+      expect(result.warning).toContain("课程金额为0但设置了老师费用");
     });
 
     it("老师费用为负数时应该验证失败", () => {

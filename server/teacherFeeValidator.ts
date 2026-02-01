@@ -24,11 +24,12 @@ export function validateTeacherFee(
     return { isValid: true };
   }
 
-  // 如果课程金额为空或0,但老师费用不为0,这是不合理的
-  if (!courseAmount || courseAmount === 0) {
+  // 允许课程金额为0时设置老师费用(例如:线下活动、内部培训等场景)
+  // 如果课程金额为0但老师费用不为0,给出警告但仍然允许
+  if ((!courseAmount || courseAmount === 0) && teacherFee > 0) {
     return {
-      isValid: false,
-      error: "课程金额为空或0时,不能设置老师费用"
+      isValid: true,
+      warning: "课程金额为0但设置了老师费用,请确认是否为线下活动或内部培训"
     };
   }
 
@@ -41,26 +42,26 @@ export function validateTeacherFee(
   }
 
   // 课程金额不能为负数
-  if (courseAmount < 0) {
+  if (courseAmount !== null && courseAmount !== undefined && courseAmount < 0) {
     return {
       isValid: false,
       error: "课程金额不能为负数"
     };
   }
 
-  // 核心规则:老师费用不能超过课程金额
-  if (teacherFee > courseAmount) {
+  // 核心规则:老师费用不能超过课程金额(只在课程金额>0时检查)
+  if (courseAmount && courseAmount > 0 && teacherFee > courseAmount) {
     return {
       isValid: false,
-      error: `老师费用(¥${teacherFee.toFixed(2)})不能超过课程金额(¥${courseAmount.toFixed(2)})`
+      error: `老师费用(￥${teacherFee.toFixed(2)})不能超过课程金额(￥${courseAmount.toFixed(2)})`
     };
   }
 
-  // 警告:老师费用超过课程金额的80%可能不合理
-  if (teacherFee > courseAmount * 0.8) {
+  // 警告:老师费用超过课程金额的80%可能不合理(只在课程金额>0时检查)
+  if (courseAmount && courseAmount > 0 && teacherFee > courseAmount * 0.8) {
     return {
       isValid: true,
-      warning: `老师费用(¥${teacherFee.toFixed(2)})占课程金额(¥${courseAmount.toFixed(2)})的${((teacherFee / courseAmount) * 100).toFixed(0)}%,比例较高,请确认是否正确`
+      warning: `老师费用(￥${teacherFee.toFixed(2)})占课程金额(￥${courseAmount.toFixed(2)})的${((teacherFee / courseAmount) * 100).toFixed(0)}%,比例较高,请确认是否正确`
     };
   }
 
