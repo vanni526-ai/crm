@@ -294,4 +294,147 @@ describe("元数据API测试", () => {
       });
     });
   });
+
+  describe("老师分类列表API", () => {
+    it("应该能够获取所有唯一老师分类列表", async () => {
+      const categories = await db.getUniqueTeacherCategories();
+
+      expect(categories).toBeDefined();
+      expect(Array.isArray(categories)).toBe(true);
+    });
+
+    it("老师分类列表应该不包含重复项", async () => {
+      const categories = await db.getUniqueTeacherCategories();
+      const uniqueCategories = Array.from(new Set(categories));
+
+      expect(categories.length).toBe(uniqueCategories.length);
+    });
+
+    it("老师分类列表应该按中文排序", async () => {
+      const categories = await db.getUniqueTeacherCategories();
+
+      if (categories.length > 1) {
+        for (let i = 0; i < categories.length - 1; i++) {
+          const comparison = categories[i]!.localeCompare(
+            categories[i + 1]!,
+            "zh-CN"
+          );
+          expect(comparison).toBeLessThanOrEqual(0);
+        }
+      }
+    });
+
+    it("老师分类列表不应该包含null或空字符串", async () => {
+      const categories = await db.getUniqueTeacherCategories();
+
+      categories.forEach((category) => {
+        expect(category).toBeTruthy();
+        expect(category!.trim().length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  describe("课程价格列表API", () => {
+    it("应该能够获取所有唯一课程价格列表", async () => {
+      const amounts = await db.getUniqueCourseAmounts();
+
+      expect(amounts).toBeDefined();
+      expect(Array.isArray(amounts)).toBe(true);
+    });
+
+    it("课程价格列表应该不包含重复项", async () => {
+      const amounts = await db.getUniqueCourseAmounts();
+      const uniqueAmounts = Array.from(new Set(amounts));
+
+      expect(amounts.length).toBe(uniqueAmounts.length);
+    });
+
+    it("课程价格应该按数值从小到大排序", async () => {
+      const amounts = await db.getUniqueCourseAmounts();
+
+      if (amounts.length > 1) {
+        for (let i = 0; i < amounts.length - 1; i++) {
+          const current = parseFloat(amounts[i]!);
+          const next = parseFloat(amounts[i + 1]!);
+          expect(current).toBeLessThanOrEqual(next);
+        }
+      }
+    });
+
+    it("课程价格列表不应该包含0或负数", async () => {
+      const amounts = await db.getUniqueCourseAmounts();
+
+      amounts.forEach((amount) => {
+        const numAmount = parseFloat(amount!);
+        expect(numAmount).toBeGreaterThan(0);
+      });
+    });
+
+    it("课程价格应该是有效的数字字符串", async () => {
+      const amounts = await db.getUniqueCourseAmounts();
+
+      amounts.forEach((amount) => {
+        expect(amount).toBeTruthy();
+        const numAmount = parseFloat(amount!);
+        expect(isNaN(numAmount)).toBe(false);
+      });
+    });
+  });
+
+  describe("完整元数据API测试(包含新字段)", () => {
+    it("getAll应该返回所有元数据包括老师分类和课程价格", async () => {
+      const [
+        cities,
+        courses,
+        classrooms,
+        teacherNames,
+        salespeople,
+        teacherCategories,
+        courseAmounts,
+      ] = await Promise.all([
+        db.getUniqueCities(),
+        db.getUniqueCourses(),
+        db.getUniqueClassrooms(),
+        db.getUniqueTeacherNames(),
+        db.getAllSalespersons(),
+        db.getUniqueTeacherCategories(),
+        db.getUniqueCourseAmounts(),
+      ]);
+
+      // 验证所有查询都返回了数组
+      expect(Array.isArray(cities)).toBe(true);
+      expect(Array.isArray(courses)).toBe(true);
+      expect(Array.isArray(classrooms)).toBe(true);
+      expect(Array.isArray(teacherNames)).toBe(true);
+      expect(Array.isArray(salespeople)).toBe(true);
+      expect(Array.isArray(teacherCategories)).toBe(true);
+      expect(Array.isArray(courseAmounts)).toBe(true);
+    });
+
+    it("所有元数据查询应该能够并发执行(包含新API)", async () => {
+      const startTime = Date.now();
+
+      // 并发执行所有查询(包含新增的两个)
+      const results = await Promise.all([
+        db.getUniqueCities(),
+        db.getUniqueCourses(),
+        db.getUniqueClassrooms(),
+        db.getUniqueTeacherNames(),
+        db.getAllSalespersons(),
+        db.getUniqueTeacherCategories(),
+        db.getUniqueCourseAmounts(),
+      ]);
+
+      const endTime = Date.now();
+      const duration = endTime - startTime;
+
+      // 并发执行应该在合理时间内完成(小于5秒)
+      expect(duration).toBeLessThan(5000);
+
+      // 所有查询都应该成功
+      results.forEach((result) => {
+        expect(Array.isArray(result)).toBe(true);
+      });
+    });
+  });
 });

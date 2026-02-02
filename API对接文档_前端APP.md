@@ -106,7 +106,25 @@ const { data } = trpc.metadata.getSalespeople.useQuery();
 
 **数据来源:** 从users表中查询所有销售人员(完整用户信息)
 
-#### 6. 一次性获取所有元数据(推荐)
+#### 6. 获取老师分类列表(新增)
+```typescript
+const { data } = trpc.metadata.getTeacherCategories.useQuery();
+// 返回: { success: true, data: string[], count: number }
+// 示例: { success: true, data: ["M", "M+S", "S", "SW"], count: 4 }
+```
+
+**数据来源:** 从teachers表的category字段中提取所有唯一老师分类(S/M/SW等)
+
+#### 7. 获取课程价格列表(新增)
+```typescript
+const { data } = trpc.metadata.getCourseAmounts.useQuery();
+// 返回: { success: true, data: string[], count: number }
+// 示例: { success: true, data: ["800", "1200", "1888", "2800", "3500"], count: 15 }
+```
+
+**数据来源:** 从orders表的courseAmount字段中提取所有唯一课程金额,按数值从小到大排序
+
+#### 8. 一次性获取所有元数据(推荐)
 ```typescript
 const { data } = trpc.metadata.getAll.useQuery();
 // 返回: {
@@ -116,14 +134,18 @@ const { data } = trpc.metadata.getAll.useQuery();
 //     courses: string[],
 //     classrooms: string[],
 //     teacherNames: string[],
-//     salespeople: User[]
+//     salespeople: User[],
+//     teacherCategories: string[],  // 新增
+//     courseAmounts: string[]        // 新增
 //   },
 //   counts: {
 //     cities: number,
 //     courses: number,
 //     classrooms: number,
 //     teacherNames: number,
-//     salespeople: number
+//     salespeople: number,
+//     teacherCategories: number,    // 新增
+//     courseAmounts: number          // 新增
 //   }
 // }
 ```
@@ -134,9 +156,10 @@ const { data } = trpc.metadata.getAll.useQuery();
 
 ✅ **自动去重** - 所有列表自动去除重复项  
 ✅ **中文排序** - 字符串列表按中文拼音排序  
-✅ **过滤空值** - 自动过滤null和空字符串  
+✅ **数值排序** - 课程价格按数值从小到大排序  
+✅ **过滤空值** - 自动过滤null、空字符串和0值  
 ✅ **并发优化** - 支持并发查询,性能测试通过(5秒内完成)  
-✅ **完整测试** - 23个单元测试全部通过,覆盖数据完整性、去重、排序、并发等场景
+✅ **完整测试** - 34个单元测试全部通过,覆盖数据完整性、去重、排序、并发等场景
 
 ---
 
@@ -252,10 +275,12 @@ trpc.auth.logout.useMutation()             // 退出登录
 ```typescript
 trpc.metadata.getCities.useQuery()         // 获取城市列表
 trpc.metadata.getCourses.useQuery()        // 获取课程列表
-trpc.metadata.getClassrooms.useQuery()     // 获取教室列表
-trpc.metadata.getTeacherNames.useQuery()   // 获取老师名称列表
-trpc.metadata.getSalespeople.useQuery()    // 获取销售人员列表
-trpc.metadata.getAll.useQuery()            // 一次性获取所有元数据(推荐)
+trpc.metadata.getClassrooms.useQuery()       // 获取教室列表
+trpc.metadata.getTeacherNames.useQuery()     // 获取老师名称列表
+trpc.metadata.getSalespeople.useQuery()      // 获取销售人员列表
+trpc.metadata.getTeacherCategories.useQuery() // 获取老师分类列表(新增)
+trpc.metadata.getCourseAmounts.useQuery()    // 获取课程价格列表(新增)
+trpc.metadata.getAll.useQuery()              // 一次性获取所有元数据(推荐)
 ```
 
 ### 3. 老师管理

@@ -1737,15 +1737,53 @@ export const appRouter = router({
       }
     }),
 
+    // 获取所有唯一老师分类列表(S、M、SW等)
+    getTeacherCategories: protectedProcedure.query(async () => {
+      try {
+        const categories = await db.getUniqueTeacherCategories();
+        return {
+          success: true,
+          data: categories,
+          count: categories.length,
+        };
+      } catch (error) {
+        console.error("获取老师分类列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取老师分类列表失败",
+        });
+      }
+    }),
+
+    // 获取所有唯一课程价格列表
+    getCourseAmounts: protectedProcedure.query(async () => {
+      try {
+        const amounts = await db.getUniqueCourseAmounts();
+        return {
+          success: true,
+          data: amounts,
+          count: amounts.length,
+        };
+      } catch (error) {
+        console.error("获取课程价格列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取课程价格列表失败",
+        });
+      }
+    }),
+
     // 获取所有元数据(一次性获取所有基础数据)
     getAll: protectedProcedure.query(async () => {
       try {
-        const [cities, courses, classrooms, teacherNames, salespeople] = await Promise.all([
+        const [cities, courses, classrooms, teacherNames, salespeople, teacherCategories, courseAmounts] = await Promise.all([
           db.getUniqueCities(),
           db.getUniqueCourses(),
           db.getUniqueClassrooms(),
           db.getUniqueTeacherNames(),
           db.getAllSalespersons(),
+          db.getUniqueTeacherCategories(),
+          db.getUniqueCourseAmounts(),
         ]);
 
         return {
@@ -1756,6 +1794,8 @@ export const appRouter = router({
             classrooms,
             teacherNames,
             salespeople,
+            teacherCategories,
+            courseAmounts,
           },
           counts: {
             cities: cities.length,
@@ -1763,6 +1803,8 @@ export const appRouter = router({
             classrooms: classrooms.length,
             teacherNames: teacherNames.length,
             salespeople: salespeople.length,
+            teacherCategories: teacherCategories.length,
+            courseAmounts: courseAmounts.length,
           },
         };
       } catch (error) {

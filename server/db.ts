@@ -3385,3 +3385,64 @@ export async function getUniqueTeacherNames() {
     return [];
   }
 }
+
+
+/**
+ * 获取所有唯一老师分类列表
+ * 从teachers表中提取所有不重复的老师分类(S、M、SW等)
+ */
+export async function getUniqueTeacherCategories() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // 从老师表获取分类
+    const teacherCategories = await db
+      .selectDistinct({ category: teachers.category })
+      .from(teachers)
+      .where(sql`${teachers.category} IS NOT NULL AND ${teachers.category} != ''`);
+
+    const uniqueCategories = Array.from(new Set(teacherCategories.map((r) => r.category)))
+      .filter(Boolean)
+      .sort((a, b) => a!.localeCompare(b!, "zh-CN"));
+
+    return uniqueCategories;
+  } catch (error) {
+    console.error("获取唯一老师分类列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 获取所有唯一课程价格列表
+ * 从orders表中提取所有不重复的课程金额,并按数值排序
+ */
+export async function getUniqueCourseAmounts() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // 从订单表获取课程金额
+    const courseAmounts = await db
+      .selectDistinct({ amount: orders.courseAmount })
+      .from(orders)
+      .where(sql`${orders.courseAmount} IS NOT NULL AND ${orders.courseAmount} != '' AND ${orders.courseAmount} != '0'`);
+
+    // 转换为数字并排序
+    const uniqueAmounts = Array.from(
+      new Set(
+        courseAmounts
+          .map((r) => r.amount)
+          .filter(Boolean)
+          .map((amt) => parseFloat(amt!))
+          .filter((amt) => !isNaN(amt) && amt > 0)
+      )
+    ).sort((a, b) => a - b);
+
+    // 转换回字符串格式
+    return uniqueAmounts.map((amt) => amt.toString());
+  } catch (error) {
+    console.error("获取唯一课程价格列表失败:", error);
+    return [];
+  }
+}

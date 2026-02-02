@@ -699,3 +699,14 @@
 - [x] 编写测试验证所有新API(23个测试全部通过)
 - [x] 更新API对接文档(完整的React Native示例代码)
 - [ ] 保存检查点
+
+
+### 154. 补充metadata API - 老师属性和课程价格
+- [x] 在db.ts中添加getUniqueTeacherCategories函数(老师分类)
+- [x] 在db.ts中添加getUniqueCourseAmounts函数(课程价格)
+- [x] 在metadata router中添加getTeacherCategories API
+- [x] 在metadata router中添加getCourseAmounts API
+- [x] 更新metadata.getAll API包含新字段
+- [x] 编写测试验证新API(11个新测试,总计34个测试全部通过)
+- [x] 更新API对接文档(添加老师分类和课程价格说明)
+- [ ] 保存检查点
