@@ -35,6 +35,7 @@ async function startServer() {
   // Configure CORS
   app.use(cors({
     origin: [
+      'https://8081-itemyehshjz3gv4est472-ce4de64b.sg1.manus.computer',
       'https://8081-iv9oi1inydtghwvjvmhw2-80474770.sg1.manus.computer',
       'http://localhost:8081',
       'http://localhost:3000',
