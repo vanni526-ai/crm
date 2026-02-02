@@ -992,11 +992,11 @@ export const appRouter = router({
 
   // 老师管理
   teachers: router({
-    list: protectedProcedure.query(async () => {
+    list: publicProcedure.query(async () => {
       return db.getAllTeachers();
     }),
     
-    getById: protectedProcedure
+    getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
         return db.getTeacherById(input.id);

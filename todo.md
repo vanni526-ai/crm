@@ -773,4 +773,11 @@
 ### 160. 将metadata API改为公开接口
 - [x] 修改metadata router使用publicProcedure替代protectedProcedure
 - [x] 测试未登录状态下可以访问metadata API(8个测试全部通过)
+- [x] 保存检查点
+
+
+### 161. 将teachers.list接口改为公开访问
+- [x] 查找teachers.list接口定义
+- [x] 修改teachers.list和getById为publicProcedure
+- [x] 测试未登录状态下可以访问(2个测试全部通过)
 - [ ] 保存检查点
