@@ -839,5 +839,15 @@
 - [x] 实现Excel批量导入课程后端API(importFromExcel)
 - [x] 在Courses.tsx中添加导入按钮和文件上传功能
 - [x] 测试完整功能(CRUD + 导入)
-- [ ] 保存检查点
+- [x] 保存检查点
 
+
+### 138. 在课程管理中添加“课程介绍”字段
+- [x] 更新drizzle/schema.ts添加introduction字段(varchar 20字符限制)
+- [x] 运行pnpm db:push推送数据库变更
+- [x] 更新server/db.ts中的createCourse和updateCourse函数
+- [x] 更新server/routers.ts中courses相关API的输入验证
+- [x] 更新client/src/pages/Courses.tsx添加课程介绍输入框(带20字限制提示)
+- [x] 更新课程管理API文档.md
+- [x] 测试新增和编辑功能
+- [ ] 保存检查点

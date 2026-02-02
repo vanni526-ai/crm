@@ -1,0 +1,1 @@
+ALTER TABLE `courses` ADD `introduction` varchar(20);

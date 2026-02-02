@@ -29,6 +29,7 @@
   data: Array<{
     id: number;
     name: string;
+    introduction: string | null;  // 课程介绍(限制20字)
     description: string | null;
     price: number | null;
     duration: number | null;  // 课程时长(小时)
@@ -86,6 +87,7 @@ console.log('总数:', result.count);
   data: {
     id: number;
     name: string;
+    introduction: string | null;  // 课程介绍(限制20字)
     description: string | null;
     price: number | null;
     duration: number | null;
@@ -124,6 +126,7 @@ if (result.success) {
 ```typescript
 {
   name: string;              // 必填,课程名称
+  introduction?: string;     // 可选,课程介绍(不超过20字)
   description?: string;      // 可选,课程描述
   price?: number;            // 可选,课程价格
   duration?: number;         // 可选,课程时长(小时)
@@ -138,6 +141,7 @@ if (result.success) {
   data: {
     id: number;              // 新创建的课程ID
     name: string;
+    introduction: string | null;  // 课程介绍(限制20字)
     description: string | null;
     price: number | null;
     duration: number | null;
@@ -183,6 +187,7 @@ if (result.success) {
 {
   id: number;                // 必填,课程ID
   name?: string;             // 可选,课程名称
+  introduction?: string;     // 可选,课程介绍(不超过20字)
   description?: string;      // 可选,课程描述
   price?: number;            // 可选,课程价格
   duration?: number;         // 可选,课程时长
@@ -301,6 +306,7 @@ if (result.success) {
 |--------|------|------|------|
 | id | INTEGER | 课程ID | PRIMARY KEY, AUTO_INCREMENT |
 | name | TEXT | 课程名称 | NOT NULL |
+| introduction | VARCHAR(20) | 课程介绍 | 可选,最多20字 |
 | description | TEXT | 课程描述 | 可选 |
 | price | REAL | 课程价格 | 可选 |
 | duration | REAL | 课程时长(小时) | 可选 |
@@ -475,4 +481,5 @@ async function courseManagementExample() {
 
 ## 更新日志
 
+- **2026-02-02**: 添加课程介绍字段(introduction),限制20字
 - **2025-01-28**: 初始版本,包含完整的课程CRUD功能

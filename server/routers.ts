@@ -1870,6 +1870,7 @@ export const appRouter = router({
       .input(
         z.object({
           name: z.string().min(1, "课程名称不能为空"),
+          introduction: z.string().max(20, "课程介绍不能超过20字").optional(),
           description: z.string().optional(),
           price: z.number().min(0, "课程价格不能为负数"),
           duration: z.number().min(0, "课程时长不能为负数"),
@@ -1880,6 +1881,7 @@ export const appRouter = router({
         try {
           const courseId = await db.createCourse({
             name: input.name,
+            introduction: input.introduction || null,
             description: input.description || null,
             price: input.price.toString(),
             duration: input.duration.toString(),
@@ -1906,6 +1908,7 @@ export const appRouter = router({
         z.object({
           id: z.number(),
           name: z.string().min(1, "课程名称不能为空").optional(),
+          introduction: z.string().max(20, "课程介绍不能超过20字").optional(),
           description: z.string().optional(),
           price: z.number().min(0, "课程价格不能为负数").optional(),
           duration: z.number().min(0, "课程时长不能为负数").optional(),
@@ -1918,6 +1921,7 @@ export const appRouter = router({
           const dataToUpdate: any = {};
           
           if (updateData.name !== undefined) dataToUpdate.name = updateData.name;
+          if (updateData.introduction !== undefined) dataToUpdate.introduction = updateData.introduction;
           if (updateData.description !== undefined) dataToUpdate.description = updateData.description;
           if (updateData.price !== undefined) dataToUpdate.price = updateData.price.toString();
           if (updateData.duration !== undefined) dataToUpdate.duration = updateData.duration.toString();
@@ -1983,6 +1987,7 @@ export const appRouter = router({
           courses: z.array(
             z.object({
               name: z.string().min(1, "课程名称不能为空"),
+              introduction: z.string().max(20, "课程介绍不能超过20字").optional(),
               description: z.string().optional(),
               price: z.number().min(0, "课程价格不能为负数"),
               duration: z.number().min(0, "课程时长不能为负数"),
@@ -2003,6 +2008,7 @@ export const appRouter = router({
             try {
               await db.createCourse({
                 name: course.name,
+                introduction: course.introduction || null,
                 description: course.description || null,
                 price: course.price.toString(),
                 duration: course.duration.toString(),

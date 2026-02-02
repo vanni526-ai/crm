@@ -35,6 +35,7 @@ import * as XLSX from "xlsx";
 type Course = {
   id: number;
   name: string;
+  introduction: string | null;
   description: string | null;
   price: string | null;
   duration: string | null;
@@ -52,6 +53,7 @@ export default function Courses() {
   // 表单状态
   const [formData, setFormData] = useState({
     name: "",
+    introduction: "",
     description: "",
     price: "",
     duration: "",
@@ -115,6 +117,7 @@ export default function Courses() {
     setEditingCourse(null);
     setFormData({
       name: "",
+      introduction: "",
       description: "",
       price: "",
       duration: "",
@@ -128,6 +131,7 @@ export default function Courses() {
     setEditingCourse(course);
     setFormData({
       name: course.name,
+      introduction: course.introduction || "",
       description: course.description || "",
       price: course.price || "",
       duration: course.duration || "",
@@ -140,6 +144,14 @@ export default function Courses() {
   const closeDialog = () => {
     setIsDialogOpen(false);
     setEditingCourse(null);
+    setFormData({
+      name: "",
+      introduction: "",
+      description: "",
+      price: "",
+      duration: "",
+      level: "入门",
+    });
   };
 
   // 提交表单
@@ -153,6 +165,7 @@ export default function Courses() {
 
     const baseData = {
       name: formData.name.trim(),
+      introduction: formData.introduction.trim() || undefined,
       description: formData.description.trim() || undefined,
     };
 
@@ -379,6 +392,25 @@ export default function Courses() {
                   placeholder="请输入课程名称"
                   required
                 />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="introduction">课程介绍</Label>
+                <Input
+                  id="introduction"
+                  value={formData.introduction}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 20) {
+                      setFormData({ ...formData, introduction: value });
+                    }
+                  }}
+                  placeholder="请输入课程介绍(不超过20字)"
+                  maxLength={20}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {formData.introduction.length}/20 字
+                </p>
               </div>
 
               <div className="grid gap-2">

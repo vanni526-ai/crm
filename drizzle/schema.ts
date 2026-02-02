@@ -692,6 +692,7 @@ export type InsertAccountPermission = typeof accountPermissions.$inferInsert;
 export const courses = mysqlTable("courses", {
   id: int("id").autoincrement().primaryKey(),
   name: varchar("name", { length: 100 }).notNull(), // 课程名称
+  introduction: varchar("introduction", { length: 20 }), // 课程介绍(限制20字)
   description: text("description"), // 课程描述
   price: decimal("price", { precision: 10, scale: 2 }).notNull(), // 课程价格
   duration: decimal("duration", { precision: 5, scale: 2 }).notNull(), // 课程时长(小时)
