@@ -684,3 +684,26 @@ export const accountPermissions = mysqlTable("accountPermissions", {
 
 export type AccountPermission = typeof accountPermissions.$inferSelect;
 export type InsertAccountPermission = typeof accountPermissions.$inferInsert;
+
+
+/**
+ * 课程表 - 存储课程信息
+ */
+export const courses = mysqlTable("courses", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(), // 课程名称
+  description: text("description"), // 课程描述
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // 课程价格
+  duration: decimal("duration", { precision: 5, scale: 2 }).notNull(), // 课程时长(小时)
+  level: mysqlEnum("level", ["入门", "深度", "订制", "剧本"]).notNull(), // 课程程度
+  isActive: boolean("isActive").default(true).notNull(), // 是否启用
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  nameIdx: index("name_idx").on(table.name),
+  levelIdx: index("level_idx").on(table.level),
+  isActiveIdx: index("is_active_idx").on(table.isActive),
+}));
+
+export type Course = typeof courses.$inferSelect;
+export type InsertCourse = typeof courses.$inferInsert;

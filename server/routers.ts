@@ -1819,6 +1819,164 @@ export const appRouter = router({
     }),
   }),
 
+  // 课程管理
+  courses: router({
+    // 获取所有课程列表(公开接口)
+    list: publicProcedure.query(async () => {
+      try {
+        const courseList = await db.getAllCourses();
+        return {
+          success: true,
+          data: courseList,
+          count: courseList.length,
+        };
+      } catch (error) {
+        console.error("获取课程列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取课程列表失败",
+        });
+      }
+    }),
+
+    // 根据ID获取课程详情(公开接口)
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        try {
+          const course = await db.getCourseById(input.id);
+          if (!course) {
+            return {
+              success: false,
+              message: `未找到ID为${input.id}的课程`,
+              data: null,
+            };
+          }
+          return {
+            success: true,
+            data: course,
+          };
+        } catch (error) {
+          console.error(`获取课程ID${input.id}失败:`, error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "获取课程详情失败",
+          });
+        }
+      }),
+
+    // 创建课程(需要管理员权限)
+    create: protectedProcedure
+      .input(
+        z.object({
+          name: z.string().min(1, "课程名称不能为空"),
+          description: z.string().optional(),
+          price: z.number().min(0, "课程价格不能为负数"),
+          duration: z.number().min(0, "课程时长不能为负数"),
+          level: z.enum(["入门", "深度", "订制", "剧本"]),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const courseId = await db.createCourse({
+            name: input.name,
+            description: input.description || null,
+            price: input.price.toString(),
+            duration: input.duration.toString(),
+            level: input.level,
+            isActive: true,
+          });
+          return {
+            success: true,
+            data: { id: courseId },
+            message: "课程创建成功",
+          };
+        } catch (error) {
+          console.error("创建课程失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "创建课程失败",
+          });
+        }
+      }),
+
+    // 更新课程(需要管理员权限)
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().min(1, "课程名称不能为空").optional(),
+          description: z.string().optional(),
+          price: z.number().min(0, "课程价格不能为负数").optional(),
+          duration: z.number().min(0, "课程时长不能为负数").optional(),
+          level: z.enum(["入门", "深度", "订制", "剧本"]).optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { id, ...updateData } = input;
+          const dataToUpdate: any = {};
+          
+          if (updateData.name !== undefined) dataToUpdate.name = updateData.name;
+          if (updateData.description !== undefined) dataToUpdate.description = updateData.description;
+          if (updateData.price !== undefined) dataToUpdate.price = updateData.price.toString();
+          if (updateData.duration !== undefined) dataToUpdate.duration = updateData.duration.toString();
+          if (updateData.level !== undefined) dataToUpdate.level = updateData.level;
+
+          await db.updateCourse(id, dataToUpdate);
+          return {
+            success: true,
+            message: "课程更新成功",
+          };
+        } catch (error) {
+          console.error("更新课程失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "更新课程失败",
+          });
+        }
+      }),
+
+    // 切换课程启用状态(需要管理员权限)
+    toggleActive: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const newStatus = await db.toggleCourseActive(input.id);
+          return {
+            success: true,
+            data: { isActive: newStatus },
+            message: `课程已${newStatus ? "启用" : "停用"}`,
+          };
+        } catch (error) {
+          console.error("切换课程状态失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "切换课程状态失败",
+          });
+        }
+      }),
+
+    // 删除课程(需要管理员权限)
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          await db.deleteCourse(input.id);
+          return {
+            success: true,
+            message: "课程删除成功",
+          };
+        } catch (error) {
+          console.error("删除课程失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "删除课程失败",
+          });
+        }
+      }),
+  }),
+
   // 城市合伙人费配置
   cityPartnerConfig: router({
     // 获取所有城市配置(公开接口)

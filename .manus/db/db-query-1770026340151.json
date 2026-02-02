@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, email, role, isActive FROM users WHERE email = 'vanni526@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, email, role, isActive FROM users WHERE email = 'vanni526@gmail.com';",
+  "rows": [
+    {
+      "id": "11040019",
+      "name": "yi han",
+      "email": "vanni526@gmail.com",
+      "role": "admin",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tisActive\n11040019\tyi han\tvanni526@gmail.com\tadmin\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1508
+}

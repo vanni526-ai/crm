@@ -790,4 +790,39 @@
 - [x] 添加getByCity接口(根据城市名获取配置)
 - [x] 设置为公开接口(publicProcedure)
 - [x] 编写测试验证API功能(4个测试全部通过)
+- [x] 保存检查点
+
+
+### 163. 将vanni526@gmail.com设置为管理员权限
+- [x] 查找该邮箱对应的用户记录
+- [x] 更新role字段为admin
+- [x] 验证权限更新成功
+
+
+### 164. 创建完整的课程管理功能
+- [x] 在schema.ts中创建courses表(名称、描述、价格、时长、程度、启用状态)
+- [x] 推送数据库schema变更(直接创u5efaSQL)
+- [x] 在db.ts中添加courses查询函数(getAllCourses/getById/create/update/delete/toggleActive)
+- [x] 在routers.ts中创建courses router(list/getById/create/update/delete/toggleActive)
+- [ ] 创建CoursesManagement.tsx前端页面
+- [ ] 实现课程列表显示和搜索功能
+- [ ] 实现新增/编辑对话框
+- [ ] 实现启用/停用开关
+- [ ] 在DashboardLayout导航栏添加"课程管理"入口(城市管理上方)
+- [ ] 在App.tsx添加路由配置
+- [ ] 编写测试验证API功能
+- [ ] 创建API对接文档
 - [ ] 保存检查点
+
+### 136. 添加课程管理模块(后端API)
+- [x] 创建courses数据库表(包含id、name、description、price、duration、level、isActive、createdAt、updatedAt字段)
+- [x] 在db.ts中添加courses相关的CRUD函数(getAllCourses、getCourseById、createCourse、updateCourse、deleteCourse、toggleCourseActive)
+- [x] 创建coursesRouter.ts实现tRPC API(list、getById、create、update、delete、toggleActive)
+- [x] 在routers.ts中注册courses router
+- [x] 编写8个单元测试验证API功能(全部通过)
+- [x] 创建完整的课程管理API文档(课程管理API文档.md)
+- [ ] 创建前端Courses.tsx页面(列表展示 + 新增/编辑对话框 + 启用/停用开关)
+- [ ] 在App.tsx中添加/courses路由
+- [ ] 在导航栏中添加"课程管理"入口(位于城市管理上方)
+- [x] 保存检查点
+

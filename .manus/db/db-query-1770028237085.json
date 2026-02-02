@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `courses` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name` varchar(100) NOT NULL,\n  `description` text,\n  `price` decimal(10,2) NOT NULL,\n  `duration` decimal(5,2) NOT NULL,\n  `level` enum('入门','深度','订制','剧本') NOT NULL,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `courses_id` PRIMARY KEY(`id`),\n  INDEX `name_idx` (`name`),\n  INDEX `level_idx` (`level`),\n  INDEX `is_active_idx` (`isActive`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `courses` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `name` varchar(100) NOT NULL,\n  `description` text,\n  `price` decimal(10,2) NOT NULL,\n  `duration` decimal(5,2) NOT NULL,\n  `level` enum('入门','深度','订制','剧本') NOT NULL,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `courses_id` PRIMARY KEY(`id`),\n  INDEX `name_idx` (`name`),\n  INDEX `level_idx` (`level`),\n  INDEX `is_active_idx` (`isActive`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1652
+}

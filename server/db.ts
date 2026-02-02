@@ -11,6 +11,8 @@ import {
   InsertTeacher,
   schedules,
   InsertSchedule,
+  courses,
+  InsertCourse,
   teacherPayments,
   InsertTeacherPayment,
   reconciliations,
@@ -3467,5 +3469,118 @@ export async function getAllCityPartnerConfigs() {
   } catch (error) {
     console.error("获取城市合伙人费配置失败:", error);
     return [];
+  }
+}
+
+
+/**
+ * 获取所有课程列表
+ */
+export async function getAllCourses() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const courseList = await db
+      .select()
+      .from(courses)
+      .orderBy(courses.createdAt);
+    
+    return courseList;
+  } catch (error) {
+    console.error("获取课程列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 根据ID获取课程详情
+ */
+export async function getCourseById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [course] = await db
+      .select()
+      .from(courses)
+      .where(eq(courses.id, id))
+      .limit(1);
+    
+    return course || null;
+  } catch (error) {
+    console.error("获取课程详情失败:", error);
+    return null;
+  }
+}
+
+/**
+ * 创建课程
+ */
+export async function createCourse(data: InsertCourse) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    const [result] = await db.insert(courses).values(data);
+    return result.insertId;
+  } catch (error) {
+    console.error("创建课程失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 更新课程
+ */
+export async function updateCourse(id: number, data: Partial<InsertCourse>) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    await db.update(courses).set(data).where(eq(courses.id, id));
+    return true;
+  } catch (error) {
+    console.error("更新课程失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 删除课程
+ */
+export async function deleteCourse(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    await db.delete(courses).where(eq(courses.id, id));
+    return true;
+  } catch (error) {
+    console.error("删除课程失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 切换课程启用状态
+ */
+export async function toggleCourseActive(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    const course = await getCourseById(id);
+    if (!course) throw new Error("课程不存在");
+    
+    await db
+      .update(courses)
+      .set({ isActive: !course.isActive })
+      .where(eq(courses.id, id));
+    
+    return !course.isActive;
+  } catch (error) {
+    console.error("切换课程状态失败:", error);
+    throw error;
   }
 }
