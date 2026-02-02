@@ -32,6 +32,7 @@ import ReconciliationReport from "./pages/ReconciliationReport";
 import AccountManagement from "./pages/AccountManagement";
 import LocalLogin from "./pages/LocalLogin";
 import UserManagement from "./pages/UserManagement";
+import Courses from "./pages/Courses";
 
 
 function Router() {
@@ -65,6 +66,7 @@ function Router() {
       <Route path={"/accounts"} component={AccountManagement} />
       <Route path={"/login"} component={LocalLogin} />
       <Route path={"/user-management"} component={UserManagement} />
+      <Route path={"/courses"} component={Courses} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

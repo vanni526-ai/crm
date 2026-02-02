@@ -1975,6 +1975,60 @@ export const appRouter = router({
           });
         }
       }),
+
+    // 批量导入课程(需要管理员权限)
+    importFromExcel: protectedProcedure
+      .input(
+        z.object({
+          courses: z.array(
+            z.object({
+              name: z.string().min(1, "课程名称不能为空"),
+              description: z.string().optional(),
+              price: z.number().min(0, "课程价格不能为负数"),
+              duration: z.number().min(0, "课程时长不能为负数"),
+              level: z.enum(["入门", "深度", "订制", "剧本"]),
+            })
+          ),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const results = {
+            success: 0,
+            failed: 0,
+            errors: [] as string[],
+          };
+
+          for (const course of input.courses) {
+            try {
+              await db.createCourse({
+                name: course.name,
+                description: course.description || null,
+                price: course.price.toString(),
+                duration: course.duration.toString(),
+                level: course.level,
+                isActive: true,
+              });
+              results.success++;
+            } catch (error: any) {
+              results.failed++;
+              results.errors.push(`${course.name}: ${error.message}`);
+            }
+          }
+
+          return {
+            success: true,
+            data: results,
+            message: `导入完成: 成功 ${results.success} 条, 失败 ${results.failed} 条`,
+          };
+        } catch (error) {
+          console.error("批量导入课程失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "批量导入课程失败",
+          });
+        }
+      }),
   }),
 
   // 城市合伙人费配置
