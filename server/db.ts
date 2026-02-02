@@ -3446,3 +3446,26 @@ export async function getUniqueCourseAmounts() {
     return [];
   }
 }
+
+
+
+/**
+ * 获取所有城市合伙人费配置
+ */
+export async function getAllCityPartnerConfigs() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const configs = await db
+      .select()
+      .from(cityPartnerConfig)
+      .where(eq(cityPartnerConfig.isActive, true))
+      .orderBy(cityPartnerConfig.city);
+    
+    return configs;
+  } catch (error) {
+    console.error("获取城市合伙人费配置失败:", error);
+    return [];
+  }
+}

@@ -780,4 +780,14 @@
 - [x] 查找teachers.list接口定义
 - [x] 修改teachers.list和getById为publicProcedure
 - [x] 测试未登录状态下可以访问(2个测试全部通过)
+- [x] 保存检查点
+
+
+### 162. 创建城市合伙人费配置API
+- [x] 在db.ts中添加getAllCityPartnerConfigs查询函数(已存在getCityPartnerConfigByCity)
+- [x] 在routers.ts中添加cityPartnerConfig router
+- [x] 添加list接口(获取所有城市配置)
+- [x] 添加getByCity接口(根据城市名获取配置)
+- [x] 设置为公开接口(publicProcedure)
+- [x] 编写测试验证API功能(4个测试全部通过)
 - [ ] 保存检查点

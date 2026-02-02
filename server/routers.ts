@@ -1818,6 +1818,53 @@ export const appRouter = router({
       }
     }),
   }),
+
+  // 城市合伙人费配置
+  cityPartnerConfig: router({
+    // 获取所有城市配置(公开接口)
+    list: publicProcedure.query(async () => {
+      try {
+        const configs = await db.getAllCityPartnerConfigs();
+        return {
+          success: true,
+          data: configs,
+          count: configs.length,
+        };
+      } catch (error) {
+        console.error("获取城市合伙人费配置失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取城市合伙人费配置失败",
+        });
+      }
+    }),
+
+    // 根据城市名获取配置(公开接口)
+    getByCity: publicProcedure
+      .input(z.object({ city: z.string() }))
+      .query(async ({ input }) => {
+        try {
+          const config = await db.getCityPartnerConfigByCity(input.city);
+          if (!config) {
+            return {
+              success: false,
+              message: `未找到城市${input.city}的合伙人费配置`,
+              data: null,
+            };
+          }
+          return {
+            success: true,
+            data: config,
+          };
+        } catch (error) {
+          console.error(`获取城市${input.city}的合伙人费配置失败:`, error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "获取配置失败",
+          });
+        }
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
