@@ -9,6 +9,8 @@ export const users = mysqlTable("users", {
   name: text("name"),
   nickname: varchar("nickname", { length: 50 }), // 花名
   email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }), // 手u673au53f7(用于登u5f55)
+  password: varchar("password", { length: 255 }), // 加密后u7684密码
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["admin", "sales", "finance", "user"]).default("user").notNull(),
   isActive: boolean("isActive").default(true).notNull(),
