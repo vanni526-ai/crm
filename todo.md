@@ -768,3 +768,9 @@
 - [x] 在Express服务器中添加CORS中间件
 - [x] 配置允许的前端APP域名
 - [x] 重启服务器验证CORS配置生效
+
+
+### 160. 将metadata API改为公开接口
+- [x] 修改metadata router使用publicProcedure替代protectedProcedure
+- [x] 测试未登录状态下可以访问metadata API(8个测试全部通过)
+- [ ] 保存检查点

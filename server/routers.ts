@@ -1650,7 +1650,7 @@ export const appRouter = router({
   // 元数据查询 - 为前端APP提供基础数据列表
   metadata: router({
     // 获取所有唯一城市列表
-    getCities: protectedProcedure.query(async () => {
+    getCities: publicProcedure.query(async () => {
       try {
         const cities = await db.getUniqueCities();
         return {
@@ -1668,7 +1668,7 @@ export const appRouter = router({
     }),
 
     // 获取所有唯一课程类型列表
-    getCourses: protectedProcedure.query(async () => {
+    getCourses: publicProcedure.query(async () => {
       try {
         const courses = await db.getUniqueCourses();
         return {
@@ -1686,7 +1686,7 @@ export const appRouter = router({
     }),
 
     // 获取所有唯一教室列表
-    getClassrooms: protectedProcedure.query(async () => {
+    getClassrooms: publicProcedure.query(async () => {
       try {
         const classrooms = await db.getUniqueClassrooms();
         return {
@@ -1704,7 +1704,7 @@ export const appRouter = router({
     }),
 
     // 获取所有唯一老师名称列表
-    getTeacherNames: protectedProcedure.query(async () => {
+    getTeacherNames: publicProcedure.query(async () => {
       try {
         const teacherNames = await db.getUniqueTeacherNames();
         return {
@@ -1722,7 +1722,7 @@ export const appRouter = router({
     }),
 
     // 获取所有销售人员列表
-    getSalespeople: protectedProcedure.query(async () => {
+    getSalespeople: publicProcedure.query(async () => {
       try {
         const salespeople = await db.getAllSalespersons();
         return {
@@ -1740,7 +1740,7 @@ export const appRouter = router({
     }),
 
     // 获取所有唯一老师分类列表(S、M、SW等)
-    getTeacherCategories: protectedProcedure.query(async () => {
+    getTeacherCategories: publicProcedure.query(async () => {
       try {
         const categories = await db.getUniqueTeacherCategories();
         return {
@@ -1758,7 +1758,7 @@ export const appRouter = router({
     }),
 
     // 获取所有唯一课程价格列表
-    getCourseAmounts: protectedProcedure.query(async () => {
+    getCourseAmounts: publicProcedure.query(async () => {
       try {
         const amounts = await db.getUniqueCourseAmounts();
         return {
@@ -1776,7 +1776,7 @@ export const appRouter = router({
     }),
 
     // 获取所有元数据(一次性获取所有基础数据)
-    getAll: protectedProcedure.query(async () => {
+    getAll: publicProcedure.query(async () => {
       try {
         const [cities, courses, classrooms, teacherNames, salespeople, teacherCategories, courseAmounts] = await Promise.all([
           db.getUniqueCities(),
