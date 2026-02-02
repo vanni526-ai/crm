@@ -1644,6 +1644,136 @@ export const appRouter = router({
 
   // 数据导入
   import: importRouter,
+
+  // 元数据查询 - 为前端APP提供基础数据列表
+  metadata: router({
+    // 获取所有唯一城市列表
+    getCities: protectedProcedure.query(async () => {
+      try {
+        const cities = await db.getUniqueCities();
+        return {
+          success: true,
+          data: cities,
+          count: cities.length,
+        };
+      } catch (error) {
+        console.error("获取城市列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取城市列表失败",
+        });
+      }
+    }),
+
+    // 获取所有唯一课程类型列表
+    getCourses: protectedProcedure.query(async () => {
+      try {
+        const courses = await db.getUniqueCourses();
+        return {
+          success: true,
+          data: courses,
+          count: courses.length,
+        };
+      } catch (error) {
+        console.error("获取课程列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取课程列表失败",
+        });
+      }
+    }),
+
+    // 获取所有唯一教室列表
+    getClassrooms: protectedProcedure.query(async () => {
+      try {
+        const classrooms = await db.getUniqueClassrooms();
+        return {
+          success: true,
+          data: classrooms,
+          count: classrooms.length,
+        };
+      } catch (error) {
+        console.error("获取教室列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取教室列表失败",
+        });
+      }
+    }),
+
+    // 获取所有唯一老师名称列表
+    getTeacherNames: protectedProcedure.query(async () => {
+      try {
+        const teacherNames = await db.getUniqueTeacherNames();
+        return {
+          success: true,
+          data: teacherNames,
+          count: teacherNames.length,
+        };
+      } catch (error) {
+        console.error("获取老师名称列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取老师名称列表失败",
+        });
+      }
+    }),
+
+    // 获取所有销售人员列表
+    getSalespeople: protectedProcedure.query(async () => {
+      try {
+        const salespeople = await db.getAllSalespersons();
+        return {
+          success: true,
+          data: salespeople,
+          count: salespeople.length,
+        };
+      } catch (error) {
+        console.error("获取销售人员列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取销售人员列表失败",
+        });
+      }
+    }),
+
+    // 获取所有元数据(一次性获取所有基础数据)
+    getAll: protectedProcedure.query(async () => {
+      try {
+        const [cities, courses, classrooms, teacherNames, salespeople] = await Promise.all([
+          db.getUniqueCities(),
+          db.getUniqueCourses(),
+          db.getUniqueClassrooms(),
+          db.getUniqueTeacherNames(),
+          db.getAllSalespersons(),
+        ]);
+
+        return {
+          success: true,
+          data: {
+            cities,
+            courses,
+            classrooms,
+            teacherNames,
+            salespeople,
+          },
+          counts: {
+            cities: cities.length,
+            courses: courses.length,
+            classrooms: classrooms.length,
+            teacherNames: teacherNames.length,
+            salespeople: salespeople.length,
+          },
+        };
+      } catch (error) {
+        console.error("获取元数据失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取元数据失败",
+        });
+      }
+    }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

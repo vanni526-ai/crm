@@ -681,4 +681,21 @@
 - [x] 在db.ts中添加getOrdersByIds函数
 - [x] 修改前端导出功能调用后端API
 - [x] 编写测试验证导出功能(5个测试全部通过)
+- [x] 保存检查点
+
+
+### 153. 实现metadata router为前端APP提供元数据API
+- [x] 在db.ts中添加getUniqueCities函数
+- [x] 在db.ts中添加getUniqueCourses函数
+- [x] 在db.ts中添加getUniqueClassrooms函数
+- [x] 在db.ts中添加getUniqueTeacherNames函数
+- [x] 在routers.ts中添加metadata router
+- [x] 添加getCities API
+- [x] 添加getCourses API
+- [x] 添加getClassrooms API
+- [x] 添加getTeacherNames API
+- [x] 添加getSalespeople API
+- [x] 添加getAll API(一次性获取所有元数据)
+- [x] 编写测试验证所有新API(23个测试全部通过)
+- [x] 更新API对接文档(完整的React Native示例代码)
 - [ ] 保存检查点

@@ -3186,3 +3186,202 @@ export async function refreshCustomerStats(
     message: `成功处理${customerStats.length}个客户:更新${updatedCount}个,新建${createdCount}个,跳过${skippedCount}个(老师)`,
   };
 }
+
+
+// ============ Metadata Queries ============
+
+/**
+ * 获取所有唯一城市列表
+ * 从orders和schedules表中提取所有不重复的城市名称
+ */
+export async function getUniqueCities() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // 从订单表获取交付城市和支付城市
+    const orderDeliveryCities = await db
+      .selectDistinct({ city: orders.deliveryCity })
+      .from(orders)
+      .where(sql`${orders.deliveryCity} IS NOT NULL AND ${orders.deliveryCity} != ''`);
+
+    const orderPaymentCities = await db
+      .selectDistinct({ city: orders.paymentCity })
+      .from(orders)
+      .where(sql`${orders.paymentCity} IS NOT NULL AND ${orders.paymentCity} != ''`);
+
+    // 从排课表获取城市
+    const scheduleCities = await db
+      .selectDistinct({ city: schedules.city })
+      .from(schedules)
+      .where(sql`${schedules.city} IS NOT NULL AND ${schedules.city} != ''`);
+
+    const scheduleDeliveryCities = await db
+      .selectDistinct({ city: schedules.deliveryCity })
+      .from(schedules)
+      .where(sql`${schedules.deliveryCity} IS NOT NULL AND ${schedules.deliveryCity} != ''`);
+
+    // 从老师表获取城市
+    const teacherCities = await db
+      .selectDistinct({ city: teachers.city })
+      .from(teachers)
+      .where(sql`${teachers.city} IS NOT NULL AND ${teachers.city} != ''`);
+
+    // 合并所有城市并去重
+    const allCities = [
+      ...orderDeliveryCities.map((r) => r.city),
+      ...orderPaymentCities.map((r) => r.city),
+      ...scheduleCities.map((r) => r.city),
+      ...scheduleDeliveryCities.map((r) => r.city),
+      ...teacherCities.map((r) => r.city),
+    ];
+
+    const uniqueCities = Array.from(new Set(allCities))
+      .filter(Boolean)
+      .sort((a, b) => a!.localeCompare(b!, "zh-CN"));
+
+    return uniqueCities;
+  } catch (error) {
+    console.error("获取唯一城市列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 获取所有唯一课程类型列表
+ * 从schedules和orders表中提取所有不重复的课程名称
+ */
+export async function getUniqueCourses() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // 从排课表获取课程类型
+    const scheduleCourses = await db
+      .selectDistinct({ course: schedules.courseType })
+      .from(schedules)
+      .where(sql`${schedules.courseType} IS NOT NULL AND ${schedules.courseType} != ''`);
+
+    const scheduleDeliveryCourses = await db
+      .selectDistinct({ course: schedules.deliveryCourse })
+      .from(schedules)
+      .where(sql`${schedules.deliveryCourse} IS NOT NULL AND ${schedules.deliveryCourse} != ''`);
+
+    // 从订单表获取交付课程
+    const orderCourses = await db
+      .selectDistinct({ course: orders.deliveryCourse })
+      .from(orders)
+      .where(sql`${orders.deliveryCourse} IS NOT NULL AND ${orders.deliveryCourse} != ''`);
+
+    // 合并所有课程并去重
+    const allCourses = [
+      ...scheduleCourses.map((r) => r.course),
+      ...scheduleDeliveryCourses.map((r) => r.course),
+      ...orderCourses.map((r) => r.course),
+    ];
+
+    const uniqueCourses = Array.from(new Set(allCourses))
+      .filter(Boolean)
+      .sort((a, b) => a!.localeCompare(b!, "zh-CN"));
+
+    return uniqueCourses;
+  } catch (error) {
+    console.error("获取唯一课程列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 获取所有唯一教室列表
+ * 从schedules和orders表中提取所有不重复的教室名称
+ */
+export async function getUniqueClassrooms() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // 从排课表获取教室
+    const scheduleLocations = await db
+      .selectDistinct({ classroom: schedules.location })
+      .from(schedules)
+      .where(sql`${schedules.location} IS NOT NULL AND ${schedules.location} != ''`);
+
+    const scheduleClassrooms = await db
+      .selectDistinct({ classroom: schedules.deliveryClassroom })
+      .from(schedules)
+      .where(sql`${schedules.deliveryClassroom} IS NOT NULL AND ${schedules.deliveryClassroom} != ''`);
+
+    // 从订单表获取交付教室
+    const orderClassrooms = await db
+      .selectDistinct({ classroom: orders.deliveryRoom })
+      .from(orders)
+      .where(sql`${orders.deliveryRoom} IS NOT NULL AND ${orders.deliveryRoom} != ''`);
+
+    // 合并所有教室并去重
+    const allClassrooms = [
+      ...scheduleLocations.map((r) => r.classroom),
+      ...scheduleClassrooms.map((r) => r.classroom),
+      ...orderClassrooms.map((r) => r.classroom),
+    ];
+
+    const uniqueClassrooms = Array.from(new Set(allClassrooms))
+      .filter(Boolean)
+      .sort((a, b) => a!.localeCompare(b!, "zh-CN"));
+
+    return uniqueClassrooms;
+  } catch (error) {
+    console.error("获取唯一教室列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 获取所有唯一老师名称列表
+ * 从teachers、schedules和orders表中提取所有不重复的老师名称
+ */
+export async function getUniqueTeacherNames() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    // 从老师表获取老师名称
+    const teacherNames = await db
+      .selectDistinct({ name: teachers.name })
+      .from(teachers)
+      .where(sql`${teachers.name} IS NOT NULL AND ${teachers.name} != ''`);
+
+    // 从排课表获取老师名称
+    const scheduleTeacherNames = await db
+      .selectDistinct({ name: schedules.teacherName })
+      .from(schedules)
+      .where(sql`${schedules.teacherName} IS NOT NULL AND ${schedules.teacherName} != ''`);
+
+    const scheduleDeliveryTeachers = await db
+      .selectDistinct({ name: schedules.deliveryTeacher })
+      .from(schedules)
+      .where(sql`${schedules.deliveryTeacher} IS NOT NULL AND ${schedules.deliveryTeacher} != ''`);
+
+    // 从订单表获取交付老师
+    const orderTeachers = await db
+      .selectDistinct({ name: orders.deliveryTeacher })
+      .from(orders)
+      .where(sql`${orders.deliveryTeacher} IS NOT NULL AND ${orders.deliveryTeacher} != ''`);
+
+    // 合并所有老师名称并去重
+    const allTeacherNames = [
+      ...teacherNames.map((r) => r.name),
+      ...scheduleTeacherNames.map((r) => r.name),
+      ...scheduleDeliveryTeachers.map((r) => r.name),
+      ...orderTeachers.map((r) => r.name),
+    ];
+
+    const uniqueTeacherNames = Array.from(new Set(allTeacherNames))
+      .filter(Boolean)
+      .sort((a, b) => a!.localeCompare(b!, "zh-CN"));
+
+    return uniqueTeacherNames;
+  } catch (error) {
+    console.error("获取唯一老师名称列表失败:", error);
+    return [];
+  }
+}
