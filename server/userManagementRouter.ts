@@ -231,6 +231,20 @@ export const userManagementRouter = router({
         });
       }
 
+      // 检查用户是否存在
+      const [existingUser] = await drizzle
+        .select()
+        .from(users)
+        .where(eq(users.id, input.id))
+        .limit(1);
+
+      if (!existingUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "用户不存在",
+        });
+      }
+
       await drizzle.delete(users).where(eq(users.id, input.id));
 
       return {
