@@ -1087,6 +1087,52 @@ export default function Teachers() {
                 <Label htmlFor="edit-notes">备注</Label>
                 <Textarea id="edit-notes" {...register("notes")} rows={3} />
               </div>
+              
+              {/* 头像上传 */}
+              <div>
+                <Label>老师头像</Label>
+                <div className="flex items-center gap-4 mt-2">
+                  {(avatarPreview || selectedTeacher?.avatarUrl) && (
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={avatarPreview || selectedTeacher?.avatarUrl || DEFAULT_AVATAR_URL} />
+                      <AvatarFallback>{selectedTeacher?.name?.[0]}</AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div className="flex-1">
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => avatarInputRef.current?.click()}
+                      >
+                        选择图片
+                      </Button>
+                      {avatarFile && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => handleUploadAvatar()}
+                          disabled={uploadingAvatar}
+                        >
+                          {uploadingAvatar ? "上传中..." : "上传"}
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      支持 JPG、PNG 格式，大小不超过2MB，选择后可裁剪调整
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
                   取消
