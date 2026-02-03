@@ -1245,6 +1245,20 @@ export const appRouter = router({
           const startTime = new Date(`${input.scheduledDate}T${input.scheduledTime}:00`);
           const endTime = new Date(startTime.getTime() + parseFloat(course.duration) * 60 * 60 * 1000);
           
+          // 检查老师时间冲突
+          const hasConflict = await db.checkTeacherTimeConflict(
+            input.teacherId,
+            startTime,
+            endTime
+          );
+          
+          if (hasConflict) {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "该老师在此时间段已有其他预约,请选择其他时间或老师",
+            });
+          }
+          
           // 创建预约记录
           const scheduleId = await db.createSchedule({
             customerId: input.userId,
@@ -1275,6 +1289,67 @@ export const appRouter = router({
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "创建预约失败",
+          });
+        }
+      }),
+    
+    // 查询用户预约列表(用于前端App)
+    listAppointments: publicProcedure
+      .input(z.object({
+        userId: z.number(),
+        status: z.enum(["scheduled", "completed", "cancelled"]).optional(),
+        startDate: z.string().optional(), // YYYY-MM-DD
+        endDate: z.string().optional(), // YYYY-MM-DD
+      }))
+      .query(async ({ input }) => {
+        try {
+          const schedules = await db.getSchedulesByUserId(input.userId, {
+            status: input.status,
+            startDate: input.startDate,
+            endDate: input.endDate,
+          });
+          
+          return {
+            success: true,
+            data: schedules,
+            count: schedules.length,
+          };
+        } catch (error) {
+          console.error("查询预约列表失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "查询预约列表失败",
+          });
+        }
+      }),
+    
+    // 取消预约(用于前端App)
+    cancelAppointment: publicProcedure
+      .input(z.object({
+        scheduleId: z.number(),
+        userId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          await db.cancelSchedule(input.scheduleId, input.userId);
+          
+          return {
+            success: true,
+            message: "预约已取消",
+          };
+        } catch (error) {
+          console.error("取消预约失败:", error);
+          
+          if (error instanceof Error) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: error.message,
+            });
+          }
+          
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "取消预约失败",
           });
         }
       }),

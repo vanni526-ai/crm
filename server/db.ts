@@ -778,6 +778,160 @@ export async function deleteSchedule(id: number) {
   await db.delete(schedules).where(eq(schedules.id, id));
 }
 
+export async function getSchedulesByUserId(
+  userId: number,
+  filters?: {
+    status?: "scheduled" | "completed" | "cancelled";
+    startDate?: string;
+    endDate?: string;
+  }
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db
+    .select({
+      id: schedules.id,
+      cityId: schedules.city,
+      teacherId: schedules.teacherId,
+      teacherName: schedules.teacherName,
+      courseType: schedules.courseType,
+      scheduledDate: schedules.classDate,
+      scheduledTime: schedules.classTime,
+      startTime: schedules.startTime,
+      endTime: schedules.endTime,
+      status: schedules.status,
+      contactName: schedules.customerName,
+      contactPhone: schedules.wechatId,
+      notes: schedules.notes,
+      createdAt: schedules.createdAt,
+    })
+    .from(schedules)
+    .where(eq(schedules.customerId, userId));
+
+  // 应用筛选条件
+  const conditions = [eq(schedules.customerId, userId)];
+
+  if (filters?.status) {
+    conditions.push(eq(schedules.status, filters.status));
+  }
+
+  if (filters?.startDate) {
+    conditions.push(gte(schedules.startTime, new Date(filters.startDate)));
+  }
+
+  if (filters?.endDate) {
+    const endDate = new Date(filters.endDate);
+    endDate.setHours(23, 59, 59, 999); // 设置为当天的最后一刻
+    conditions.push(lte(schedules.startTime, endDate));
+  }
+
+  if (conditions.length > 1) {
+    query = db
+      .select({
+        id: schedules.id,
+        cityId: schedules.city,
+        teacherId: schedules.teacherId,
+        teacherName: schedules.teacherName,
+        courseType: schedules.courseType,
+        scheduledDate: schedules.classDate,
+        scheduledTime: schedules.classTime,
+        startTime: schedules.startTime,
+        endTime: schedules.endTime,
+        status: schedules.status,
+        contactName: schedules.customerName,
+        contactPhone: schedules.wechatId,
+        notes: schedules.notes,
+        createdAt: schedules.createdAt,
+      })
+      .from(schedules)
+      .where(and(...conditions));
+  }
+
+  return query.orderBy(desc(schedules.startTime));
+}
+
+export async function cancelSchedule(scheduleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // 验证预约是否存在且属于该用户
+  const schedule = await db
+    .select()
+    .from(schedules)
+    .where(and(eq(schedules.id, scheduleId), eq(schedules.customerId, userId)))
+    .limit(1);
+
+  if (!schedule || schedule.length === 0) {
+    throw new Error("预约不存在或无权取消");
+  }
+
+  if (schedule[0].status === "cancelled") {
+    throw new Error("预约已取消");
+  }
+
+  if (schedule[0].status === "completed") {
+    throw new Error("已完成的预约无法取消");
+  }
+
+  // 检查取消时限(预约开始时间前24小时)
+  const now = new Date();
+  const startTime = new Date(schedule[0].startTime);
+  const hoursDiff = (startTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+  if (hoursDiff < 24) {
+    throw new Error("预约开始前24小时内无法取消");
+  }
+
+  // 更新状态为cancelled
+  await db
+    .update(schedules)
+    .set({
+      status: "cancelled",
+      updatedAt: new Date(),
+    })
+    .where(eq(schedules.id, scheduleId));
+
+  return true;
+}
+
+export async function checkTeacherTimeConflict(
+  teacherId: number,
+  startTime: Date,
+  endTime: Date,
+  excludeScheduleId?: number
+) {
+  const db = await getDb();
+  if (!db) return false;
+
+  let query = db
+    .select()
+    .from(schedules)
+    .where(
+      and(
+        eq(schedules.teacherId, teacherId),
+        eq(schedules.status, "scheduled"),
+        or(
+          // 新预约的开始时间在现有预约时间范围内
+          and(gte(schedules.startTime, startTime), lte(schedules.startTime, endTime)),
+          // 新预约的结束时间在现有预约时间范围内
+          and(gte(schedules.endTime, startTime), lte(schedules.endTime, endTime)),
+          // 新预约完全包含现有预约
+          and(lte(schedules.startTime, startTime), gte(schedules.endTime, endTime))
+        )
+      )
+    );
+
+  const conflicts = await query;
+
+  // 如果是更新操作,排除当前预约
+  if (excludeScheduleId) {
+    return conflicts.filter((s) => s.id !== excludeScheduleId).length > 0;
+  }
+
+  return conflicts.length > 0;
+}
+
 // ========== 老师费用 ==========
 
 export async function createTeacherPayment(payment: InsertTeacherPayment) {

@@ -903,4 +903,17 @@
 - [x] 测试teachers.list接口返回激活的老师数据
 - [x] 使用正确的老师ID测试schedules.createAppointment接口
 - [x] 生成完整的接口测试数据文档(包含可用的cityId, teacherId, courseId)
+- [x] 保存检查点
+
+### 145. 实现schedules.list、schedules.cancel接口和预约时间冲突检测
+- [x] 在server/db.ts中添加getSchedulesByUserId函数(支持状态和日期筛选)
+- [x] 在server/routers.ts中添加schedules.listAppointments API
+- [x] 测试schedules.listAppointments接口
+- [x] 在server/db.ts中添加cancelSchedule函数
+- [x] 在server/routers.ts中添加schedules.cancelAppointment API
+- [x] 测试schedules.cancelAppointment接口
+- [x] 在schedules.createAppointment中添加老师时间冲突检测逻辑
+- [x] 测试时间冲突检测功能
+- [x] 更新课程预约API文档
+- [x] 更新接口测试数据文档
 - [ ] 保存检查点
