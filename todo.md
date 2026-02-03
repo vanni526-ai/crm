@@ -1139,3 +1139,15 @@
 - [x] 修复AvatarEditDialog组件,确保先上传到S3再保存URL
 - [x] 测试修复后的头像编辑功能
 - [x] 保存检查点
+
+### 146. 修复后端teachers.list API未返回avatarUrl字段的问题
+- [x] 检查后端teachers.list API的返回数据结构
+- [x] 检查数据库查询是否包含avatarUrl字段
+- [x] 修复后端接口确保返回avatarUrl字段
+- [x] 测试验证修复效果
+- [x] 保存检查点
+
+### 147. 后端API返回默认头像URL
+- [x] 修改getAllTeachers函数,当avatarUrl为null时返回默认头像URL
+- [x] 测试验证默认头像返回
+- [x] 保存检查点

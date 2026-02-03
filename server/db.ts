@@ -505,7 +505,8 @@ export async function getTeacherById(id: number) {
 export async function getAllTeachers() {
   const db = await getDb();
   if (!db) return [];
-  return db.select({
+  const DEFAULT_AVATAR_URL = "https://api.dicebear.com/7.x/avataaars/svg?seed=";
+  const results = await db.select({
     id: teachers.id,
     name: teachers.name,
     customerType: teachers.customerType,
@@ -514,6 +515,12 @@ export async function getAllTeachers() {
     isActive: teachers.isActive,
     avatarUrl: teachers.avatarUrl,
   }).from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
+  
+  // 如果avatarUrl为null,使用默认头像
+  return results.map(teacher => ({
+    ...teacher,
+    avatarUrl: teacher.avatarUrl || `${DEFAULT_AVATAR_URL}${encodeURIComponent(teacher.name || 'teacher')}`
+  }));
 }
 
 // 用于内部解析器的完整老师列表(包含aliases等字段)

@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, name, avatarUrl FROM teachers WHERE isActive = 1 LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, avatarUrl FROM teachers WHERE isActive = 1 LIMIT 10;",
+  "rows": [
+    {
+      "id": "120001",
+      "name": "安雅",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120002",
+      "name": "姜一",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120003",
+      "name": "冷月",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120004",
+      "name": "黑桃",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120005",
+      "name": "嘟嘟",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120006",
+      "name": "水水",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120007",
+      "name": "唐泽",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120008",
+      "name": "无浪",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120009",
+      "name": "米妮",
+      "avatarUrl": "NULL"
+    },
+    {
+      "id": "120010",
+      "name": "nicy",
+      "avatarUrl": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tavatarUrl\n120001\t安雅\tNULL\n120002\t姜一\tNULL\n120003\t冷月\tNULL\n120004\t黑桃\tNULL\n120005\t嘟嘟\tNULL\n120006\t水水\tNULL\n120007\t唐泽\tNULL\n120008\t无浪\tNULL\n120009\t米妮\tNULL\n120010\tnicy\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1736
+}
