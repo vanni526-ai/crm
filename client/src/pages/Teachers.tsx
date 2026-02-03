@@ -19,6 +19,7 @@ import { z } from "zod";
 import * as XLSX from "xlsx";
 import DashboardLayout from "@/components/DashboardLayout";
 import { ImageCropDialog } from "@/components/ImageCropDialog";
+import AvatarEditDialog from "@/components/AvatarEditDialog";
 
 // 默认头像URL
 const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/HXEdLrUBRLbZoGqS.png";
@@ -164,6 +165,8 @@ export default function Teachers() {
   const [showCropDialog, setShowCropDialog] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarEditOpen, setAvatarEditOpen] = useState(false);
+  const [avatarEditTeacher, setAvatarEditTeacher] = useState<any>(null);
   
   // 处理时间范围切换
   const handleDateRangeChange = (range: 'all' | 'month' | 'quarter' | 'year') => {
@@ -336,6 +339,11 @@ export default function Teachers() {
   const handleViewDetail = (teacher: any) => {
     setSelectedTeacher(teacher);
     setDetailOpen(true);
+  };
+
+  const handleAvatarClick = (teacher: any) => {
+    setAvatarEditTeacher(teacher);
+    setAvatarEditOpen(true);
   };
 
   const handleToggleActive = (teacherId: number, isActive: boolean) => {
@@ -847,7 +855,10 @@ export default function Teachers() {
                         />
                       </TableCell>
                       <TableCell>
-                        <Avatar className="w-10 h-10">
+                        <Avatar 
+                          className="w-10 h-10 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => handleAvatarClick(teacher)}
+                        >
                           <AvatarImage src={teacher.avatarUrl || DEFAULT_AVATAR_URL} alt={teacher.name} />
                           <AvatarFallback>{teacher.name?.[0] || '?'}</AvatarFallback>
                         </Avatar>
@@ -1231,6 +1242,16 @@ export default function Teachers() {
           onOpenChange={setShowCropDialog}
           imageSrc={imageToCrop || ""}
           onCropComplete={handleCropComplete}
+        />
+
+        {/* 头像编辑对话框 */}
+        <AvatarEditDialog
+          open={avatarEditOpen}
+          onOpenChange={setAvatarEditOpen}
+          teacher={avatarEditTeacher}
+          onSuccess={() => {
+            utils.teachers.list.invalidate();
+          }}
         />
       </div>
     </DashboardLayout>
