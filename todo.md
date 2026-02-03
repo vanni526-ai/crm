@@ -873,4 +873,17 @@
 - [x] 添加若干老师测试数据
 - [x] 测试cityPartnerConfig.list接口返回正确数据
 - [x] 测试teachers.list接口返回正确数据
+- [x] 保存检查点
+
+### 142. 按照API对接指南实现所有接口
+- [x] 检查当前接口实现状态(auth.login, cityPartnerConfig.list, teachers.list, courses.list)
+- [x] 更新CORS配置,添加新的前端域名(8081和9000端口)
+- [x] 修改users表schema添加password和phone字段
+- [x] 推送数据库schema变更
+- [x] 创建测试账号test/123456(使用bcrypt加密密码)
+- [x] 调整cityPartnerConfig.list响应格式符合API文档
+- [x] 调整teachers.list响应格式符合API文档
+- [x] 调整courses.list响应格式符合API文档
+- [x] 测试auth.login接口
+- [x] 测试所有业务数据接口
 - [ ] 保存检查点

@@ -69,14 +69,14 @@ export const authRouter = router({
       );
 
       return {
+        success: true,
         token,
         user: {
           id: user.id,
-          username: user.username,
+          name: user.username,
+          nickname: user.relatedName,
           email: user.email,
-          identity: user.identity,
-          relatedName: user.relatedName,
-          isActive: user.isActive,
+          role: user.identity,
         },
       };
     }),

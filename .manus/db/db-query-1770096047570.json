@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name, phone, password, role, isActive FROM users WHERE name = 'test' OR phone = 'test' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, password, role, isActive FROM users WHERE name = 'test' OR phone = 'test' LIMIT 5;",
+  "rows": [
+    {
+      "id": "13860029",
+      "name": "test",
+      "phone": "13800138001",
+      "password": "$2b$10$M45ZPszb0Kb1kwe8TGs4OO.c9TWO1Yt6DOYRawrtV3lW2jfRoK3iW",
+      "role": "user",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tpassword\trole\tisActive\n13860029\ttest\t13800138001\t$2b$10$M45ZPszb0Kb1kwe8TGs4OO.c9TWO1Yt6DOYRawrtV3lW2jfRoK3iW\tuser\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1605
+}

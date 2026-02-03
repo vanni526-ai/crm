@@ -35,11 +35,19 @@ async function startServer() {
   // Configure CORS
   app.use(cors({
     origin: [
+      // 课程预约App前端域名
+      'https://8081-iw7ezl9uw107lltdk8rzb-9b5da5a1.sg1.manus.computer',
+      'https://9000-iw7ezl9uw107lltdk8rzb-9b5da5a1.sg1.manus.computer',
+      // 其他前端域名
       'https://8081-i1381rqve5c61pysqmyzt-9b5da5a1.sg1.manus.computer',
       'https://8081-itemyehshjz3gv4est472-ce4de64b.sg1.manus.computer',
       'https://8081-iv9oi1inydtghwvjvmhw2-80474770.sg1.manus.computer',
+      // 本地开发
       'http://localhost:8081',
       'http://localhost:3000',
+      'http://localhost:9000',
+      // Expo Go应用
+      'app://*',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
