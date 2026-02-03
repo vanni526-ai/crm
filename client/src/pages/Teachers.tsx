@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import * as XLSX from "xlsx";
 import DashboardLayout from "@/components/DashboardLayout";
+import { ImageCropDialog } from "@/components/ImageCropDialog";
+
+// 默认头像URL
+const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/HXEdLrUBRLbZoGqS.png";
 
 const teacherSchema = z.object({
   name: z.string().min(1, "老师姓名不能为空"),
@@ -156,6 +161,8 @@ export default function Teachers() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showCropDialog, setShowCropDialog] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   
   // 处理时间范围切换
@@ -272,25 +279,42 @@ export default function Teachers() {
       return;
     }
 
-    // 验证文件大小(5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("图片大小不能超过5MB");
+    // 验证文件大小(2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("图片大小不能超过2MB，请选择更小的图片");
       return;
     }
 
-    setAvatarFile(file);
+    // 读取图片并打开裁剪对话框
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImageToCrop(reader.result as string);
+      setShowCropDialog(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // 处理裁剪完成
+  const handleCropComplete = async (croppedImageBlob: Blob) => {
+    // 将Blob转换为File
+    const croppedFile = new File([croppedImageBlob], "avatar.jpg", { type: "image/jpeg" });
+    setAvatarFile(croppedFile);
 
     // 预览
     const reader = new FileReader();
     reader.onloadend = () => {
       setAvatarPreview(reader.result as string);
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(croppedFile);
+
+    // 自动上传
+    await handleUploadAvatar(croppedFile);
   };
 
   // 上传头像
-  const handleUploadAvatar = async () => {
-    if (!avatarFile) {
+  const handleUploadAvatar = async (fileToUpload?: File) => {
+    const file = fileToUpload || avatarFile;
+    if (!file) {
       toast.error("请选择头像文件");
       return;
     }
@@ -303,10 +327,10 @@ export default function Teachers() {
       const base64Data = reader.result as string;
       uploadAvatarMutation.mutate({
         base64Data,
-        fileName: avatarFile.name,
+        fileName: file.name,
       });
     };
-    reader.readAsDataURL(avatarFile);
+    reader.readAsDataURL(file);
   };
 
   const handleViewDetail = (teacher: any) => {
@@ -746,6 +770,7 @@ export default function Teachers() {
                         onCheckedChange={handleSelectAll}
                       />
                     </TableHead>
+                    <TableHead className="w-16">头像</TableHead>
                     <TableHead>
                       <Button 
                         variant="ghost" 
@@ -820,6 +845,12 @@ export default function Teachers() {
                           checked={selectedIds.includes(teacher.id)}
                           onCheckedChange={(checked) => handleSelectOne(teacher.id, checked as boolean)}
                         />
+                      </TableCell>
+                      <TableCell>
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={teacher.avatarUrl || DEFAULT_AVATAR_URL} alt={teacher.name} />
+                          <AvatarFallback>{teacher.name?.[0] || '?'}</AvatarFallback>
+                        </Avatar>
                       </TableCell>
                       <TableCell className="font-medium">{teacher.name}</TableCell>
                       <TableCell>{teacher.phone || '-'}</TableCell>
@@ -966,7 +997,7 @@ export default function Teachers() {
                         <Button
                           type="button"
                           size="sm"
-                          onClick={handleUploadAvatar}
+                          onClick={() => handleUploadAvatar()}
                           disabled={uploadingAvatar}
                         >
                           {uploadingAvatar ? "上传中..." : "上传"}
@@ -974,7 +1005,7 @@ export default function Teachers() {
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">
-                      支持 JPG、PNG 格式，大小不超过5MB
+                      支持 JPG、PNG 格式，大小不超过2MB，选择后可裁剪调整
                     </p>
                   </div>
                 </div>
@@ -1147,6 +1178,14 @@ export default function Teachers() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* 图片裁剪对话框 */}
+        <ImageCropDialog
+          open={showCropDialog}
+          onOpenChange={setShowCropDialog}
+          imageSrc={imageToCrop || ""}
+          onCropComplete={handleCropComplete}
+        />
       </div>
     </DashboardLayout>
   );
