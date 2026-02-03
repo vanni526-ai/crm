@@ -24,7 +24,14 @@ const teacherSchema = z.object({
   customerType: z.string().optional(),
   notes: z.string().optional(),
   category: z.string().optional(),
-  city: z.string().optional(),
+  city: z.string().min(1, "城市不能为空").refine(
+    (val) => {
+      // 验证城市格式:支持单个城市或多个城市(分号分隔)
+      const cities = val.split(';').map(c => c.trim()).filter(c => c !== '');
+      return cities.length > 0;
+    },
+    { message: "请输入有效的城市名称,多个城市用分号分隔" }
+  ),
   aliases: z.string().optional(), // 别名(逗号分隔)
   contractEndDate: z.string().optional(), // 合同到期时间
   joinDate: z.string().optional(), // 入职时间
@@ -805,8 +812,15 @@ export default function Teachers() {
                   <Input id="category" {...register("category")} placeholder="本部老师/合伙店老师" />
                 </div>
                 <div>
-                  <Label htmlFor="city">城市</Label>
-                  <Input id="city" {...register("city")} />
+                  <Label htmlFor="city">城市 *</Label>
+                  <Input 
+                    id="city" 
+                    {...register("city")} 
+                    placeholder="如:北京 或 北京;上海;深圳"
+                  />
+                  {errors.city && (
+                    <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="customerType">受众客户类型</Label>
@@ -856,7 +870,14 @@ export default function Teachers() {
                 </div>
                 <div>
                   <Label htmlFor="edit-city">城市</Label>
-                  <Input id="edit-city" {...register("city")} />
+                  <Input 
+                    id="edit-city" 
+                    {...register("city")} 
+                    placeholder="如:北京 或 北京;上海;深圳"
+                  />
+                  {errors.city && (
+                    <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="edit-customerType">受众客户类型</Label>

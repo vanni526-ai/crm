@@ -1010,7 +1010,14 @@ export const appRouter = router({
         customerType: z.string().optional(),
         notes: z.string().optional(),
         category: z.string().optional(),
-        city: z.string().optional(),
+        city: z.string().min(1, "城市不能为空").refine(
+          (val) => {
+            // 验证城市格式:支持单个城市或多个城市(分号分隔)
+            const cities = val.split(';').map(c => c.trim()).filter(c => c !== '');
+            return cities.length > 0;
+          },
+          { message: "请输入有效的城市名称,多个城市用分号分隔" }
+        ),
         // 兼容旧字段
         nickname: z.string().optional(),
         email: z.string().optional(),
@@ -1034,7 +1041,15 @@ export const appRouter = router({
           customerType: z.string().optional(),
           notes: z.string().optional(),
           category: z.string().optional(),
-          city: z.string().optional(),
+          city: z.string().optional().refine(
+            (val) => {
+              // 如果提供了city值,验证格式
+              if (!val || val.trim() === '') return true; // 空值允许(编辑时可选)
+              const cities = val.split(';').map(c => c.trim()).filter(c => c !== '');
+              return cities.length > 0;
+            },
+            { message: "请输入有效的城市名称,多个城市用分号分隔" }
+          ),
           contractEndDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
           joinDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
           aliases: z.string().optional(), // 别名(逗号分隔)
@@ -1082,7 +1097,15 @@ export const appRouter = router({
           customerType: z.string().optional(),
           notes: z.string().optional(),
           category: z.string().optional(),
-          city: z.string().optional(),
+          city: z.string().optional().refine(
+            (val) => {
+              // 如果提供了city值,验证格式
+              if (!val || val.trim() === '') return true; // 空值允许(编辑时可选)
+              const cities = val.split(';').map(c => c.trim()).filter(c => c !== '');
+              return cities.length > 0;
+            },
+            { message: "请输入有效的城市名称,多个城市用分号分隔" }
+          ),
           contractEndDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
           joinDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
         })),
