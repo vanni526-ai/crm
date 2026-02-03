@@ -505,7 +505,7 @@ export async function getTeacherById(id: number) {
 export async function getAllTeachers() {
   const db = await getDb();
   if (!db) return [];
-  const DEFAULT_AVATAR_URL = "https://api.dicebear.com/7.x/avataaars/svg?seed=";
+  const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/JopHWzeEmqAYxCyT.png";
   const results = await db.select({
     id: teachers.id,
     name: teachers.name,
@@ -516,10 +516,10 @@ export async function getAllTeachers() {
     avatarUrl: teachers.avatarUrl,
   }).from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
   
-  // 如果avatarUrl为null,使用默认头像
+  // 如果avatarUrl为null,使用统一默认头像
   return results.map(teacher => ({
     ...teacher,
-    avatarUrl: teacher.avatarUrl || `${DEFAULT_AVATAR_URL}${encodeURIComponent(teacher.name || 'teacher')}`
+    avatarUrl: teacher.avatarUrl || DEFAULT_AVATAR_URL
   }));
 }
 
