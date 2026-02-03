@@ -118,11 +118,24 @@ export default function AvatarEditDialog({ open, onOpenChange, teacher, onSucces
     reader.readAsDataURL(file);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!teacher) return;
 
+    // 如果有新选择的文件但还没上传,先上传到S3
+    if (avatarFile && !avatarPreview) {
+      toast.error("请先上传头像到服务器");
+      return;
+    }
+
+    // 如果avatarPreview是base64数据,说明还没上传到S3
+    if (avatarPreview && avatarPreview.startsWith('data:')) {
+      toast.error("请先上传头像到服务器");
+      return;
+    }
+
+    // avatarPreview应该是S3的URL
     if (!avatarPreview) {
-      toast.error("请先上传头像");
+      toast.error("请先选择并上传头像");
       return;
     }
 
