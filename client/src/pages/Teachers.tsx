@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Plus, Search, Eye, Edit, Upload, Download, Trash2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -105,6 +106,26 @@ export default function Teachers() {
     },
     onError: (error) => {
       toast.error(error.message || "批量更新失败");
+    },
+  });
+
+  const toggleActiveMutation = trpc.teachers.update.useMutation({
+    onSuccess: (_, variables) => {
+      // 乐观更新
+      utils.teachers.list.setData(undefined, (old) => {
+        if (!old) return old;
+        return old.map((t: any) => 
+          t.id === variables.id 
+            ? { ...t, isActive: variables.data.isActive } 
+            : t
+        );
+      });
+      toast.success(variables.data.isActive ? "已激活" : "已停用");
+    },
+    onError: (error, variables) => {
+      // 回滚
+      utils.teachers.list.invalidate();
+      toast.error(error.message || "状态切换失败");
     },
   });
 
@@ -224,6 +245,13 @@ export default function Teachers() {
   const handleViewDetail = (teacher: any) => {
     setSelectedTeacher(teacher);
     setDetailOpen(true);
+  };
+
+  const handleToggleActive = (teacherId: number, isActive: boolean) => {
+    toggleActiveMutation.mutate({
+      id: teacherId,
+      data: { isActive },
+    });
   };
 
   // 多选功能
@@ -667,6 +695,7 @@ export default function Teachers() {
                     </TableHead>
                     <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
+                    <TableHead>激活</TableHead>
                     <TableHead>分类</TableHead>
                     <TableHead>城市</TableHead>
                     <TableHead>合同到期</TableHead>
@@ -731,6 +760,12 @@ export default function Teachers() {
                         <Badge variant={teacher.status === '活跃' ? 'default' : 'secondary'}>
                           {teacher.status || '活跃'}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Switch
+                          checked={teacher.isActive ?? true}
+                          onCheckedChange={(checked) => handleToggleActive(teacher.id, checked)}
+                        />
                       </TableCell>
                       <TableCell>{teacher.category || '-'}</TableCell>
                       <TableCell>{teacher.city || '-'}</TableCell>
