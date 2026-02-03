@@ -1,4 +1,4 @@
-import DashboardLayout from "@/components/DashboardLayout";
+
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,7 +28,7 @@ const customerSchema = z.object({
 
 type CustomerFormData = z.infer<typeof customerSchema>;
 
-export default function Customers() {
+export default function CustomersContent() {
   const utils = trpc.useUtils();
   const [filterParams, setFilterParams] = useState<any>({});
   const { data: customers, isLoading } = trpc.customers.list.useQuery(filterParams);
@@ -263,13 +263,8 @@ export default function Customers() {
   );
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold">客户管理</h1>
-            <p className="text-muted-foreground mt-2">管理客户档案和消费记录</p>
-          </div>
+        <div className="flex justify-end items-center">
           <div className="flex gap-2">
             {selectedCustomerIds.length > 0 && (
               <Button
@@ -622,7 +617,7 @@ export default function Customers() {
               </div>
               <div>
                 <Label htmlFor="trafficSource">流量来源</Label>
-                <Input id="trafficSource" {...register("trafficSource")} placeholder="请输入流量来源" />
+                <Input id="trafficSource" {...register("trafficSource")} placeholder="请输入流量来源(如:App、微信、朋友圈等)" />
               </div>
               <div>
                 <Label htmlFor="notes">备注</Label>
@@ -663,7 +658,7 @@ export default function Customers() {
               </div>
               <div>
                 <Label htmlFor="edit-trafficSource">流量来源</Label>
-                <Input id="edit-trafficSource" {...register("trafficSource")} placeholder="请输入流量来源" />
+                <Input id="edit-trafficSource" {...register("trafficSource")} placeholder="请输入流量来源(如:App、微信、朋友圈等)" />
               </div>
               <div>
                 <Label htmlFor="edit-notes">备注</Label>
@@ -688,7 +683,6 @@ export default function Customers() {
           customer={selectedCustomer}
         />
       </div>
-    </DashboardLayout>
   );
 }
 

@@ -32,6 +32,7 @@ import ReconciliationReport from "./pages/ReconciliationReport";
 import AccountManagement from "./pages/AccountManagement";
 import LocalLogin from "./pages/LocalLogin";
 import UserManagement from "./pages/UserManagement";
+import CustomerManagement from "./pages/CustomerManagement";
 import Courses from "./pages/Courses";
 
 
@@ -40,6 +41,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/orders"} component={Orders} />
+      <Route path={"/customer-management"} component={CustomerManagement} />
       <Route path={"/customers"} component={Customers} />
       <Route path={"/teachers"} component={Teachers} />
       <Route path={"/schedules"} component={Schedules} />
@@ -65,7 +67,7 @@ function Router() {
       <Route path={"/reconciliation-report"} component={ReconciliationReport} />
       <Route path={"/accounts"} component={AccountManagement} />
       <Route path={"/login"} component={LocalLogin} />
-      <Route path={"/user-management"} component={UserManagement} />
+      {/* <Route path={"/user-management"} component={UserManagement} /> */}
       <Route path={"/courses"} component={Courses} />
 
       <Route path={"/404"} component={NotFound} />

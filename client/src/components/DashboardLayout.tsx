@@ -30,7 +30,7 @@ import { Button } from "./ui/button";
 const menuItems = [
   { icon: LayoutDashboard, label: "首页", path: "/" },
   { icon: ShoppingCart, label: "订单管理", path: "/orders" },
-  { icon: Users, label: "客户管理", path: "/customers" },
+  { icon: Users, label: "客户管理", path: "/customer-management" },
   { icon: TrendingUp, label: "销售管理", path: "/sales" },
   { icon: GraduationCap, label: "课程排课", path: "/schedules" },
   { icon: UserCheck, label: "老师管理", path: "/teachers" },
@@ -42,7 +42,7 @@ const menuItems = [
   { icon: Mail, label: "Gmail导入", path: "/gmail-import" },
   { icon: Brain, label: "解析学习", path: "/parsing-learning" },
   { icon: Shield, label: "账号管理", path: "/accounts" },
-  { icon: UserCog, label: "登录管理", path: "/user-management" },
+  // { icon: UserCog, label: "登录管理", path: "/user-management" }, // 已合并到客户管理
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
