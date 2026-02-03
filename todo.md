@@ -896,4 +896,11 @@
 - [x] 在server/routers.ts中添加schedules.createAppointment API
 - [x] 测试schedules.createAppointment接口
 - [x] 生成schedules接口文档
+- [x] 保存检查点
+
+### 144. 激活所有老师数据并提供正确的接口测试数据
+- [x] 激活teachers表中所有老师(设置isActive = 1)
+- [x] 测试teachers.list接口返回激活的老师数据
+- [x] 使用正确的老师ID测试schedules.createAppointment接口
+- [x] 生成完整的接口测试数据文档(包含可用的cityId, teacherId, courseId)
 - [ ] 保存检查点
