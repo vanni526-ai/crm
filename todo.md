@@ -1157,3 +1157,17 @@
 - [x] 修改后端代码使用统一默认头像URL
 - [x] 测试验证默认头像显示
 - [x] 保存检查点
+
+### 149. 修复后端API返回null而不是默认头像URL的问题
+- [ ] 检查后端db.ts中getAllTeachers函数的实现
+- [ ] 修复代码确保avatarUrl为null时返回默认头像URL
+- [ ] 测试验证API返回正确的默认头像URL
+- [ ] 保存检查点
+
+### 136. 修复老师头像功能-默认头像显示问题
+- [x] 诊断API返回null而非默认头像URL的原因
+- [x] 检查server/db.ts中getAllTeachers函数的实现(发现逻辑正确但S3 URL常量未定义)
+- [x] 上传默认头像到S3并获取永久URL
+- [x] 修改getAllTeachers函数,使用正确的S3 URL常量
+- [x] 测试验证API返回正确的默认头像URL(所有老师显示统一默认头像)
+- [x] 保存检查点
