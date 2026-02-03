@@ -117,6 +117,7 @@ export const teachers = mysqlTable("teachers", {
   notes: text("notes"), // 备注
   category: varchar("category", { length: 50 }), // 分类(本部老师/合伙店老师)
   city: varchar("city", { length: 50 }), // 所在城市(合伙店老师使用)
+  avatarUrl: varchar("avatarUrl", { length: 500 }), // 头像URL(S3存储)
   // 保留原有字段以兼容
   nickname: varchar("nickname", { length: 50 }), // 花名
   email: varchar("email", { length: 320 }),

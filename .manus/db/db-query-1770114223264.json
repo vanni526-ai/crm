@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE teachers ADD COLUMN avatarUrl VARCHAR(500) COMMENT '头像URL(S3存储)';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE teachers ADD COLUMN avatarUrl VARCHAR(500) COMMENT '头像URL(S3存储)';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2009
+}

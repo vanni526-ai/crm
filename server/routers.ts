@@ -17,6 +17,7 @@ import { accountRouter } from "./accountRouter";
 import { permissionRouter } from "./permissionRouter";
 import { authRouter } from "./authRouter";
 import { userManagementRouter } from "./userManagementRouter";
+import { uploadRouter } from "./uploadRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -61,6 +62,7 @@ export const appRouter = router({
   permissions: permissionRouter,
   auth: authRouter,
   userManagement: userManagementRouter,
+  upload: uploadRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,
@@ -1025,6 +1027,7 @@ export const appRouter = router({
         hourlyRate: z.string().optional(),
         bankAccount: z.string().optional(),
         bankName: z.string().optional(),
+        avatarUrl: z.string().optional(), // 头像URL
       }))
       .mutation(async ({ input }) => {
         const id = await db.createTeacher(input);
@@ -1061,6 +1064,7 @@ export const appRouter = router({
           bankAccount: z.string().optional(),
           bankName: z.string().optional(),
           isActive: z.boolean().optional(),
+          avatarUrl: z.string().optional(), // 头像URL
         }),
       }))
       .mutation(async ({ input }) => {

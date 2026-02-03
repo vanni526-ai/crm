@@ -512,6 +512,7 @@ export async function getAllTeachers() {
     notes: teachers.notes,
     city: teachers.city,
     isActive: teachers.isActive,
+    avatarUrl: teachers.avatarUrl,
   }).from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
 }
 

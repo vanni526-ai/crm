@@ -43,6 +43,7 @@ const teacherSchema = z.object({
   hourlyRate: z.string().optional(),
   bankAccount: z.string().optional(),
   bankName: z.string().optional(),
+  avatarUrl: z.string().optional(), // 头像URL
 });
 
 type TeacherFormData = z.infer<typeof teacherSchema>;
@@ -152,6 +153,10 @@ export default function Teachers() {
   const [newStatus, setNewStatus] = useState("活跃");
   const [sortField, setSortField] = useState<'name' | 'classCount' | 'totalHours' | 'totalIncome' | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   
   // 处理时间范围切换
   const handleDateRangeChange = (range: 'all' | 'month' | 'quarter' | 'year') => {
@@ -240,6 +245,68 @@ export default function Teachers() {
       id: selectedTeacher.id,
       data: updateData,
     });
+  };
+
+  // 头像上传mutation
+  const uploadAvatarMutation = trpc.upload.uploadAvatar.useMutation({
+    onSuccess: (data) => {
+      setValue("avatarUrl", data.url);
+      setAvatarPreview(data.url);
+      setUploadingAvatar(false);
+      toast.success("头像上传成功");
+    },
+    onError: (error) => {
+      setUploadingAvatar(false);
+      toast.error(error.message || "头像上传失败");
+    },
+  });
+
+  // 处理头像文件选择
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 验证文件类型
+    if (!file.type.startsWith('image/')) {
+      toast.error("请选择图片文件");
+      return;
+    }
+
+    // 验证文件大小(5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("图片大小不能超过5MB");
+      return;
+    }
+
+    setAvatarFile(file);
+
+    // 预览
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // 上传头像
+  const handleUploadAvatar = async () => {
+    if (!avatarFile) {
+      toast.error("请选择头像文件");
+      return;
+    }
+
+    setUploadingAvatar(true);
+
+    // 读取文件为base64
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64Data = reader.result as string;
+      uploadAvatarMutation.mutate({
+        base64Data,
+        fileName: avatarFile.name,
+      });
+    };
+    reader.readAsDataURL(avatarFile);
   };
 
   const handleViewDetail = (teacher: any) => {
@@ -866,6 +933,53 @@ export default function Teachers() {
                 <Label htmlFor="notes">备注</Label>
                 <Textarea id="notes" {...register("notes")} rows={3} />
               </div>
+              
+              {/* 头像上传 */}
+              <div>
+                <Label>老师头像</Label>
+                <div className="flex items-center gap-4 mt-2">
+                  {avatarPreview && (
+                    <img 
+                      src={avatarPreview} 
+                      alt="头像预览" 
+                      className="w-20 h-20 rounded-full object-cover border-2 border-border"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => avatarInputRef.current?.click()}
+                      >
+                        选择图片
+                      </Button>
+                      {avatarFile && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleUploadAvatar}
+                          disabled={uploadingAvatar}
+                        >
+                          {uploadingAvatar ? "上传中..." : "上传"}
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      支持 JPG、PNG 格式，大小不超过5MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
                   取消

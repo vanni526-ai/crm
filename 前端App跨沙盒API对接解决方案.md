@@ -352,6 +352,7 @@ app.use(cors({
 
 ## 📚 相关文档
 
+- [老师头像上传API调用示例](./老师头像上传API调用示例.md) - 新增
 - [课程预约API文档](./课程预约API文档-完整版.md)
 - [接口测试数据](./接口测试数据-完整版.md)
 - [Manus项目发布指南](https://docs.manus.im/publish)
