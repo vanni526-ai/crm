@@ -886,4 +886,14 @@
 - [x] 调整courses.list响应格式符合API文档
 - [x] 测试auth.login接口
 - [x] 测试所有业务数据接口
+- [x] 保存检查点
+
+### 143. 实现schedules.create接口
+- [x] 设计schedules表结构(userId, cityId, teacherId, courseId, scheduledDate, scheduledTime, status等)
+- [x] 在drizzle/schema.ts中添加schedules表定义
+- [x] 运行pnpm db:push推送数据库变更
+- [x] 在server/db.ts中添加createSchedule函数
+- [x] 在server/routers.ts中添加schedules.createAppointment API
+- [x] 测试schedules.createAppointment接口
+- [x] 生成schedules接口文档
 - [ ] 保存检查点

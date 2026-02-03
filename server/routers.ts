@@ -1205,6 +1205,80 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    // 课程预约接口(用于前端App)
+    createAppointment: publicProcedure
+      .input(z.object({
+        userId: z.number().optional(), // 用户ID(可选,未登录时为null)
+        cityId: z.number(), // 城市ID
+        teacherId: z.number(), // 老师ID
+        courseId: z.number(), // 课程ID
+        scheduledDate: z.string(), // 预约日期(YYYY-MM-DD)
+        scheduledTime: z.string(), // 预约时间(HH:mm)
+        contactName: z.string(), // 联系人姓名
+        contactPhone: z.string(), // 联系电话
+        notes: z.string().optional(), // 备注
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // 查询城市信息(通过cityId查询)
+          const allCityConfigs = await db.getAllCityPartnerConfigs();
+          const cityConfig = allCityConfigs.find(c => c.id === input.cityId);
+          if (!cityConfig) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "城市不存在" });
+          }
+          
+          // 查询老师信息
+          const allTeachers = await db.getAllTeachers();
+          const teacher = allTeachers.find(t => t.id === input.teacherId);
+          if (!teacher) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "老师不存在" });
+          }
+          
+          // 查询课程信息
+          const allCourses = await db.getAllCourses();
+          const course = allCourses.find(c => c.id === input.courseId);
+          if (!course) {
+            throw new TRPCError({ code: "NOT_FOUND", message: "课程不存在" });
+          }
+          
+          // 构建开始和结束时间
+          const startTime = new Date(`${input.scheduledDate}T${input.scheduledTime}:00`);
+          const endTime = new Date(startTime.getTime() + parseFloat(course.duration) * 60 * 60 * 1000);
+          
+          // 创建预约记录
+          const scheduleId = await db.createSchedule({
+            customerId: input.userId,
+            customerName: input.contactName,
+            wechatId: input.contactPhone, // 使用wechatId字段存储联系电话
+            teacherId: input.teacherId,
+            teacherName: teacher.name,
+            courseType: course.name,
+            city: cityConfig.city,
+            classDate: new Date(input.scheduledDate),
+            classTime: input.scheduledTime,
+            startTime,
+            endTime,
+            status: "scheduled",
+            notes: input.notes,
+          });
+          
+          return {
+            success: true,
+            scheduleId,
+            message: "预约成功",
+          };
+        } catch (error) {
+          console.error("创建预约失败:", error);
+          if (error instanceof TRPCError) {
+            throw error;
+          }
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "创建预约失败",
+          });
+        }
+      }),
+    
     // 月度合伙人费用统计
     getMonthlyPartnerSettlement: protectedProcedure
       .input(z.object({
