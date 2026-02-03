@@ -22,40 +22,15 @@ interface AvatarEditDialogProps {
 export default function AvatarEditDialog({ open, onOpenChange, teacher, onSuccess }: AvatarEditDialogProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [cropDialogOpen, setCropDialogOpen] = useState(false);
   const [imageToCrop, setImageToCrop] = useState<string>("");
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const utils = trpc.useUtils();
 
-  const uploadAvatarMutation = trpc.upload.uploadAvatar.useMutation({
-    onSuccess: (data) => {
-      setAvatarPreview(data.url);
-      toast.success("头像上传成功");
-      setUploadingAvatar(false);
-      setAvatarFile(null);
-    },
-    onError: (error) => {
-      toast.error(`头像上传失败: ${error.message}`);
-      setUploadingAvatar(false);
-    },
-  });
-
-  const updateTeacherMutation = trpc.teachers.update.useMutation({
-    onSuccess: () => {
-      toast.success("头像更新成功");
-      utils.teachers.list.invalidate();
-      onSuccess?.();
-      onOpenChange(false);
-      // 重置状态
-      setAvatarFile(null);
-      setAvatarPreview("");
-    },
-    onError: (error) => {
-      toast.error(`头像更新失败: ${error.message}`);
-    },
-  });
+  const uploadAvatarMutation = trpc.upload.uploadAvatar.useMutation();
+  const updateTeacherMutation = trpc.teachers.update.useMutation();
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -90,6 +65,8 @@ export default function AvatarEditDialog({ open, onOpenChange, teacher, onSucces
       type: croppedBlob.type,
     });
     setAvatarFile(croppedFile);
+    
+    // 显示裁剪后的预览
     const reader = new FileReader();
     reader.onload = () => {
       setAvatarPreview(reader.result as string);
@@ -98,53 +75,60 @@ export default function AvatarEditDialog({ open, onOpenChange, teacher, onSucces
     setCropDialogOpen(false);
   };
 
-  const handleUploadAvatar = async (fileToUpload?: File) => {
-    const file = fileToUpload || avatarFile;
-    if (!file) {
-      toast.error("请先选择图片");
-      return;
-    }
-
-    setUploadingAvatar(true);
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = reader.result as string;
-      uploadAvatarMutation.mutate({
-        base64Data: base64,
-        fileName: file.name,
-      });
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleSave = async () => {
     if (!teacher) return;
 
-    // 如果有新选择的文件但还没上传,先上传到S3
-    if (avatarFile && !avatarPreview) {
-      toast.error("请先上传头像到服务器");
-      return;
-    }
+    setSaving(true);
 
-    // 如果avatarPreview是base64数据,说明还没上传到S3
-    if (avatarPreview && avatarPreview.startsWith('data:')) {
-      toast.error("请先上传头像到服务器");
-      return;
-    }
+    try {
+      // 如果有新选择的文件,先上传到S3
+      if (avatarFile) {
+        toast.info("正在上传头像...");
+        
+        const reader = new FileReader();
+        const uploadPromise = new Promise<string>((resolve, reject) => {
+          reader.onload = async () => {
+            try {
+              const base64 = reader.result as string;
+              const result = await uploadAvatarMutation.mutateAsync({
+                base64Data: base64,
+                fileName: avatarFile.name,
+              });
+              resolve(result.url);
+            } catch (error) {
+              reject(error);
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(avatarFile);
+        });
 
-    // avatarPreview应该是S3的URL
-    if (!avatarPreview) {
-      toast.error("请先选择并上传头像");
-      return;
-    }
+        const uploadedUrl = await uploadPromise;
+        
+        // 上传成功后,更新老师信息
+        await updateTeacherMutation.mutateAsync({
+          id: teacher.id,
+          data: {
+            avatarUrl: uploadedUrl,
+          },
+        });
 
-    updateTeacherMutation.mutate({
-      id: teacher.id,
-      data: {
-        avatarUrl: avatarPreview,
-      },
-    });
+        toast.success("头像更新成功");
+        utils.teachers.list.invalidate();
+        onSuccess?.();
+        onOpenChange(false);
+        
+        // 重置状态
+        setAvatarFile(null);
+        setAvatarPreview("");
+      } else {
+        toast.error("请先选择新头像");
+      }
+    } catch (error: any) {
+      toast.error(`头像更新失败: ${error.message || '未知错误'}`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const currentAvatarUrl = avatarPreview || teacher?.avatarUrl || DEFAULT_AVATAR_URL;
@@ -187,20 +171,10 @@ export default function AvatarEditDialog({ open, onOpenChange, teacher, onSucces
                 variant="outline"
                 onClick={() => avatarInputRef.current?.click()}
                 className="w-full"
+                disabled={saving}
               >
                 选择新头像
               </Button>
-
-              {avatarFile && !avatarPreview && (
-                <Button
-                  type="button"
-                  onClick={() => handleUploadAvatar()}
-                  disabled={uploadingAvatar}
-                  className="w-full"
-                >
-                  {uploadingAvatar ? "上传中..." : "上传到服务器"}
-                </Button>
-              )}
 
               <p className="text-sm text-muted-foreground text-center">
                 支持 JPG、PNG 格式，大小不超过2MB
@@ -209,15 +183,15 @@ export default function AvatarEditDialog({ open, onOpenChange, teacher, onSucces
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
               取消
             </Button>
             <Button 
               type="button" 
               onClick={handleSave}
-              disabled={!avatarPreview || updateTeacherMutation.isPending}
+              disabled={!avatarFile || saving}
             >
-              {updateTeacherMutation.isPending ? "保存中..." : "保存头像"}
+              {saving ? "保存中..." : "保存头像"}
             </Button>
           </DialogFooter>
         </DialogContent>
