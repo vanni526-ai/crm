@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, sql, between, isNotNull, isNull, ne, like, or, inArray, count } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, between, isNotNull, isNull, ne, like, or, inArray, count, not } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -503,6 +503,18 @@ export async function getTeacherById(id: number) {
 }
 
 export async function getAllTeachers() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    id: teachers.id,
+    name: teachers.name,
+    customerType: teachers.customerType,
+    notes: teachers.notes,
+  }).from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
+}
+
+// 用于内部解析器的完整老师列表(包含aliases等字段)
+export async function getAllTeachersForParser() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
@@ -3460,9 +3472,21 @@ export async function getAllCityPartnerConfigs() {
 
   try {
     const configs = await db
-      .select()
+      .select({
+        id: cityPartnerConfig.id,
+        city: cityPartnerConfig.city,
+        partnerFeeRate: cityPartnerConfig.partnerFeeRate,
+        areaCode: cityPartnerConfig.areaCode,
+        isActive: cityPartnerConfig.isActive,
+      })
       .from(cityPartnerConfig)
-      .where(eq(cityPartnerConfig.isActive, true))
+      .where(
+        and(
+          eq(cityPartnerConfig.isActive, true),
+          isNotNull(cityPartnerConfig.partnerFeeRate),
+          not(like(cityPartnerConfig.city, '%测试%'))
+        )
+      )
       .orderBy(cityPartnerConfig.city);
     
     return configs;

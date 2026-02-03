@@ -850,4 +850,27 @@
 - [x] 更新client/src/pages/Courses.tsx添加课程介绍输入框(带20字限制提示)
 - [x] 更新课程管理API文档.md
 - [x] 测试新增和编辑功能
+- [x] 保存检查点
+
+### 139. 修复auth.login接口配置问题
+- [x] 检查routers.ts中auth路由的定义,找到被覆盖的问题
+- [x] 修复routers.ts中的auth路由,确保使用authRouter而不是重新定义
+- [x] 重启后端服务
+- [x] 测试auth.login接口是否正常工作
+
+### 140. 配置后端CORS允许前端跨域访问
+- [x] 查找后端Express服务器的CORS配置位置
+- [x] 添加CORS中间件配置,允许前端域名https://8081-i1381rqve5c61pysqmyzt-9b5da5a1.sg1.manus.computer访问
+- [x] 重启后端服务
+- [x] 测试前端是否可以成功跨域访问后端API
+
+### 141. 修复cityPartnerConfig.list和teachers.list接口
+- [x] 检查routers.ts中cityPartnerConfig和teachers router是否存在
+- [x] 检查数据库中cityPartnerConfig和teachers表是否有数据
+- [x] 实现或修复cityPartnerConfig.list接口
+- [x] 实现或修复teachers.list接口
+- [x] 添加至少10个城市测试数据
+- [x] 添加若干老师测试数据
+- [x] 测试cityPartnerConfig.list接口返回正确数据
+- [x] 测试teachers.list接口返回正确数据
 - [ ] 保存检查点

@@ -1,5 +1,5 @@
 import { invokeLLM } from "./_core/llm";
-import { getAllSalespersons, getAllTeachers, isTeacherName } from "./db";
+import { getAllSalespersons, getAllTeachersForParser, isTeacherName } from "./db";
 
 /**
  * 从ICS解析出的订单信息(与Gmail导入格式一致)
@@ -44,7 +44,7 @@ export async function parseICSOrderContent(
 ): Promise<ParsedICSOrder[]> {
   // 获取销售人员和老师列表
   const salespersons = await getAllSalespersons();
-  const teachers = await getAllTeachers();
+  const teachers = await getAllTeachersForParser();
 
   const salespersonList = salespersons.map(s => `${s.name}${s.aliases ? ` (别名: ${s.aliases})` : ""}`).join(", ");
   const teacherList = teachers.map(t => `${t.name}${t.aliases ? ` (别名: ${t.aliases})` : ""}`).join(", ");
