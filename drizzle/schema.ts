@@ -77,7 +77,8 @@ export const orders = mysqlTable("orders", {
   
   // 交付信息
   deliveryCity: varchar("deliveryCity", { length: 50 }), // 交付城市
-  deliveryRoom: varchar("deliveryRoom", { length: 100 }), // 交付教室
+  deliveryRoom: varchar("deliveryRoom", { length: 100 }), // 交付教室(旧字段,保留兼容)
+  deliveryClassroomId: int("deliveryClassroomId"), // 关联classrooms表
   deliveryTeacher: varchar("deliveryTeacher", { length: 100 }), // 交付老师
   deliveryCourse: varchar("deliveryCourse", { length: 200 }), // 交付课程
   classDate: date("classDate"), // 上课日期

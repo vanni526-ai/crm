@@ -299,8 +299,11 @@ export default function Schedules() {
                                       {schedule.teacherName && (
                                         <div>老师: {schedule.teacherName}</div>
                                       )}
-                                      {schedule.location && (
-                                        <div>地点: {schedule.location}</div>
+                                      {schedule.matchedOrder?.deliveryCity && (
+                                        <div>城市: {schedule.matchedOrder.deliveryCity}</div>
+                                      )}
+                                      {schedule.matchedOrder?.deliveryRoom && (
+                                        <div>教室: {schedule.matchedOrder.deliveryRoom}</div>
                                       )}
                                       {schedule.salesName && (
                                         <div>销售: {schedule.salesName}</div>
@@ -574,9 +577,10 @@ function ScheduleTable({
             <TableHead>课程类型</TableHead>
             <TableHead>客户</TableHead>
             <TableHead>老师</TableHead>
+            <TableHead>交付城市</TableHead>
+            <TableHead>交付教室</TableHead>
             <TableHead>开始时间</TableHead>
             <TableHead>结束时间</TableHead>
-            <TableHead>地点</TableHead>
             <TableHead>渠道订单号</TableHead>
             <TableHead>订单信息</TableHead>
             <TableHead>操作</TableHead>
@@ -591,9 +595,10 @@ function ScheduleTable({
                 </TableCell>
                 <TableCell>{schedule.customerName || "-"}</TableCell>
                 <TableCell>{schedule.teacherName || "-"}</TableCell>
+                <TableCell>{schedule.matchedOrder?.deliveryCity || "-"}</TableCell>
+                <TableCell>{schedule.matchedOrder?.deliveryRoom || "-"}</TableCell>
                 <TableCell>{new Date(schedule.startTime).toLocaleString()}</TableCell>
                 <TableCell>{new Date(schedule.endTime).toLocaleString()}</TableCell>
-                <TableCell>{schedule.location || "-"}</TableCell>
                 <TableCell>
                   {schedule.channelOrderNo ? (
                     <span className="text-sm">{schedule.channelOrderNo}</span>
