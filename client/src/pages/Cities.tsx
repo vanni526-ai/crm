@@ -2,6 +2,7 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { CityMap } from "@/components/CityMap";
 import { CityOrdersDialog } from "@/components/CityOrdersDialog";
+import { ClassroomManagement } from "@/components/ClassroomManagement";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, MapPin, ArrowUpDown, ArrowUp, ArrowDown, Download, TrendingUp } from "lucide-react";
+import { Plus, Edit, Trash2, MapPin, ArrowUpDown, ArrowUp, ArrowDown, Download, TrendingUp, Building2 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
 
@@ -30,6 +31,7 @@ export default function Cities() {
   const exportCities = trpc.city.exportCities.useQuery(undefined, { enabled: false });
   const { data: cityTrends } = trpc.city.getCityMonthlyTrends.useQuery();
   const [selectedTrendCity, setSelectedTrendCity] = useState<string | null>(null);
+  const [classroomManagementCity, setClassroomManagementCity] = useState<{ id: number; name: string } | null>(null);
 
   const [formData, setFormData] = useState({
     city: "",
@@ -553,6 +555,14 @@ export default function Cities() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        onClick={() => setClassroomManagementCity({ id: city.id, name: city.city })}
+                        title="教室管理"
+                      >
+                        <Building2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleDelete(city.id, city.city)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -622,6 +632,16 @@ export default function Cities() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 教室管理对话框 */}
+      {classroomManagementCity && (
+        <ClassroomManagement
+          cityId={classroomManagementCity.id}
+          cityName={classroomManagementCity.name}
+          open={!!classroomManagementCity}
+          onOpenChange={(open) => !open && setClassroomManagementCity(null)}
+        />
+      )}
     </div>
     </DashboardLayout>
   );

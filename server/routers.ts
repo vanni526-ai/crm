@@ -2213,6 +2213,159 @@ export const appRouter = router({
       }),
   }),
 
+  // 教室管理
+  classrooms: router({    // 获取所有教室列表(公开接口)
+    list: publicProcedure.query(async () => {
+      try {
+        const classroomList = await db.getAllClassrooms();
+        return classroomList;
+      } catch (error) {
+        console.error("获取教室列表失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取教室列表失败",
+        });
+      }
+    }),
+
+    // 根据城市ID获取教室列表(公开接口)
+    getByCityId: publicProcedure
+      .input(z.object({ cityId: z.number() }))
+      .query(async ({ input }) => {
+        try {
+          const classroomList = await db.getClassroomsByCityId(input.cityId);
+          return classroomList;
+        } catch (error) {
+          console.error(`获取城市ID${input.cityId}的教室列表失败:`, error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "获取教室列表失败",
+          });
+        }
+      }),
+
+    // 根据ID获取教室详情(公开接口)
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        try {
+          const classroom = await db.getClassroomById(input.id);
+          if (!classroom) {
+            throw new TRPCError({
+              code: "NOT_FOUND",
+              message: `未找到ID为${input.id}的教室`,
+            });
+          }
+          return classroom;
+        } catch (error) {
+          console.error(`获取教室ID${input.id}失败:`, error);
+          throw error;
+        }
+      }),
+
+    // 创建教室(需要管理员权限)
+    create: protectedProcedure
+      .input(
+        z.object({
+          cityId: z.number(),
+          cityName: z.string(),
+          name: z.string().min(1, "教室名称不能为空"),
+          address: z.string().min(1, "教室地址不能为空"),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const classroomId = await db.createClassroom({
+            cityId: input.cityId,
+            cityName: input.cityName,
+            name: input.name,
+            address: input.address,
+            notes: input.notes || null,
+            isActive: true,
+            sortOrder: 0,
+          });
+          return {
+            success: true,
+            data: { id: classroomId },
+            message: "教室创建成功",
+          };
+        } catch (error) {
+          console.error("创建教室失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "创建教室失败",
+          });
+        }
+      }),
+
+    // 更新教室(需要管理员权限)
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().min(1, "教室名称不能为空").optional(),
+          address: z.string().min(1, "教室地址不能为空").optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { id, ...updateData } = input;
+          await db.updateClassroom(id, updateData);
+          return {
+            success: true,
+            message: "教室更新成功",
+          };
+        } catch (error) {
+          console.error("更新教室失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "更新教室失败",
+          });
+        }
+      }),
+
+    // 切换教室启用状态(需要管理员权限)
+    toggleActive: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const newStatus = await db.toggleClassroomActive(input.id);
+          return {
+            success: true,
+            data: { isActive: newStatus },
+            message: `教室已${newStatus ? "启用" : "停用"}`,
+          };
+        } catch (error) {
+          console.error("切换教室状态失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "切换教室状态失败",
+          });
+        }
+      }),
+
+    // 删除教室(需要管理员权限)
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          await db.deleteClassroom(input.id);
+          return {
+            success: true,
+            message: "教室删除成功",
+          };
+        } catch (error) {
+          console.error("删除教室失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "删除教室失败",
+          });
+        }
+      }),
+  }),
+
   // 城市合伙人费配置
   cityPartnerConfig: router({
     // 获取所有城市配置(公开接口)

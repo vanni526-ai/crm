@@ -709,3 +709,45 @@ export const courses = mysqlTable("courses", {
 
 export type Course = typeof courses.$inferSelect;
 export type InsertCourse = typeof courses.$inferInsert;
+
+/**
+ * 城市表 - 存储运营城市信息
+ */
+export const cities = mysqlTable("cities", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 50 }).notNull().unique(), // 城市名称
+  areaCode: varchar("areaCode", { length: 10 }), // 电话区号
+  isActive: boolean("isActive").default(true).notNull(), // 是否启用
+  sortOrder: int("sortOrder").default(0), // 排序顺序
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  nameIdx: index("city_name_idx").on(table.name),
+  activeIdx: index("city_active_idx").on(table.isActive),
+}));
+
+export type City = typeof cities.$inferSelect;
+export type InsertCity = typeof cities.$inferInsert;
+
+/**
+ * 教室表 - 存储各城市的教室信息
+ */
+export const classrooms = mysqlTable("classrooms", {
+  id: int("id").autoincrement().primaryKey(),
+  cityId: int("cityId").notNull(), // 关联城市ID
+  cityName: varchar("cityName", { length: 50 }).notNull(), // 城市名称(冗余字段,方便查询)
+  name: varchar("name", { length: 100 }).notNull(), // 教室名称(如"404教室")
+  address: text("address").notNull(), // 教室详细地址
+  isActive: boolean("isActive").default(true).notNull(), // 是否启用
+  sortOrder: int("sortOrder").default(0), // 排序顺序
+  notes: text("notes"), // 备注
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  cityIdIdx: index("classroom_city_idx").on(table.cityId),
+  cityNameIdx: index("classroom_city_name_idx").on(table.cityName),
+  activeIdx: index("classroom_active_idx").on(table.isActive),
+}));
+
+export type Classroom = typeof classrooms.$inferSelect;
+export type InsertClassroom = typeof classrooms.$inferInsert;

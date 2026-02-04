@@ -1,4 +1,4 @@
-import { eq, and, gte, lte, desc, sql, between, isNotNull, isNull, ne, like, or, inArray, count, not } from "drizzle-orm";
+import { eq, and, gte, lte, desc, asc, sql, between, isNotNull, isNull, ne, like, or, inArray, count, not } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   InsertUser,
@@ -34,6 +34,10 @@ import {
   cityPartnerConfig,
   auditLogs,
   partnerFeeAuditLogs,
+  cities,
+  classrooms,
+  InsertCity,
+  InsertClassroom,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
@@ -3769,6 +3773,235 @@ export async function toggleCourseActive(id: number) {
     return !course.isActive;
   } catch (error) {
     console.error("切换课程状态失败:", error);
+    throw error;
+  }
+}
+
+// ==================== 城市管理 ====================
+
+/**
+ * 获取所有城市列表
+ */
+export async function getAllCities() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const cityList = await db
+      .select()
+      .from(cities)
+      .orderBy(asc(cities.sortOrder), asc(cities.name));
+    
+    return cityList;
+  } catch (error) {
+    console.error("获取城市列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 根据ID获取城市详情
+ */
+export async function getCityById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [city] = await db
+      .select()
+      .from(cities)
+      .where(eq(cities.id, id))
+      .limit(1);
+    
+    return city || null;
+  } catch (error) {
+    console.error("获取城市详情失败:", error);
+    return null;
+  }
+}
+
+/**
+ * 创建城市
+ */
+export async function createCity(data: InsertCity) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    const [result] = await db.insert(cities).values(data);
+    return result.insertId;
+  } catch (error) {
+    console.error("创建城市失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 更新城市
+ */
+export async function updateCity(id: number, data: Partial<InsertCity>) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    await db.update(cities).set(data).where(eq(cities.id, id));
+    return true;
+  } catch (error) {
+    console.error("更新城市失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 删除城市
+ */
+export async function deleteCity(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    // 先删除该城市的所有教室
+    await db.delete(classrooms).where(eq(classrooms.cityId, id));
+    // 再删除城市
+    await db.delete(cities).where(eq(cities.id, id));
+    return true;
+  } catch (error) {
+    console.error("删除城市失败:", error);
+    throw error;
+  }
+}
+
+// ==================== 教室管理 ====================
+
+/**
+ * 获取所有教室列表
+ */
+export async function getAllClassrooms() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const classroomList = await db
+      .select()
+      .from(classrooms)
+      .orderBy(asc(classrooms.cityName), asc(classrooms.sortOrder));
+    
+    return classroomList;
+  } catch (error) {
+    console.error("获取教室列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 根据城市ID获取教室列表
+ */
+export async function getClassroomsByCityId(cityId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const classroomList = await db
+      .select()
+      .from(classrooms)
+      .where(eq(classrooms.cityId, cityId))
+      .orderBy(asc(classrooms.sortOrder), asc(classrooms.name));
+    
+    return classroomList;
+  } catch (error) {
+    console.error("获取教室列表失败:", error);
+    return [];
+  }
+}
+
+/**
+ * 根据ID获取教室详情
+ */
+export async function getClassroomById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const [classroom] = await db
+      .select()
+      .from(classrooms)
+      .where(eq(classrooms.id, id))
+      .limit(1);
+    
+    return classroom || null;
+  } catch (error) {
+    console.error("获取教室详情失败:", error);
+    return null;
+  }
+}
+
+/**
+ * 创建教室
+ */
+export async function createClassroom(data: InsertClassroom) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    const [result] = await db.insert(classrooms).values(data);
+    return result.insertId;
+  } catch (error) {
+    console.error("创建教室失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 更新教室
+ */
+export async function updateClassroom(id: number, data: Partial<InsertClassroom>) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    await db.update(classrooms).set(data).where(eq(classrooms.id, id));
+    return true;
+  } catch (error) {
+    console.error("更新教室失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 删除教室
+ */
+export async function deleteClassroom(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    await db.delete(classrooms).where(eq(classrooms.id, id));
+    return true;
+  } catch (error) {
+    console.error("删除教室失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 切换教室启用状态
+ */
+export async function toggleClassroomActive(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  try {
+    const classroom = await getClassroomById(id);
+    if (!classroom) throw new Error("教室不存在");
+    
+    await db
+      .update(classrooms)
+      .set({ isActive: !classroom.isActive })
+      .where(eq(classrooms.id, id));
+    
+    return !classroom.isActive;
+  } catch (error) {
+    console.error("切换教室状态失败:", error);
     throw error;
   }
 }
