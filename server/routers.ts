@@ -18,6 +18,8 @@ import { permissionRouter } from "./permissionRouter";
 import { authRouter } from "./authRouter";
 import { userManagementRouter } from "./userManagementRouter";
 import { uploadRouter } from "./uploadRouter";
+import { excelReportRouter } from "./excelReportRouter";
+import { contentGeneratorRouter } from "./contentGeneratorRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -63,6 +65,8 @@ export const appRouter = router({
   auth: authRouter,
   userManagement: userManagementRouter,
   upload: uploadRouter,
+  excelReport: excelReportRouter,
+  contentGenerator: contentGeneratorRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,
