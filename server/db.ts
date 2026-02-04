@@ -4005,3 +4005,10 @@ export async function toggleClassroomActive(id: number) {
     throw error;
   }
 }
+
+// 根据城市名称获取教室列表
+export async function getClassroomsByCityName(cityName: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  return db.select().from(classrooms).where(eq(classrooms.cityName, cityName)).orderBy(asc(classrooms.sortOrder), asc(classrooms.name));
+}

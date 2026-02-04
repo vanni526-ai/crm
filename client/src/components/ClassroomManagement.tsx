@@ -26,10 +26,7 @@ export function ClassroomManagement({ cityId, cityName, open, onOpenChange }: Cl
     notes: "",
   });
 
-  const { data: classrooms, isLoading, refetch } = trpc.classrooms.getByCityId.useQuery(
-    { cityId },
-    { enabled: open }
-  );
+  const { data: classrooms, isLoading, refetch } = trpc.classrooms.getByCityName.useQuery({ cityName });
   const createMutation = trpc.classrooms.create.useMutation();
   const updateMutation = trpc.classrooms.update.useMutation();
   const deleteMutation = trpc.classrooms.delete.useMutation();

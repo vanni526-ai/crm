@@ -2244,6 +2244,22 @@ export const appRouter = router({
         }
       }),
 
+    // 根据城市名称获取教室列表(公开接口)
+    getByCityName: publicProcedure
+      .input(z.object({ cityName: z.string() }))
+      .query(async ({ input }) => {
+        try {
+          const classroomList = await db.getClassroomsByCityName(input.cityName);
+          return classroomList;
+        } catch (error) {
+          console.error(`获取城市${input.cityName}的教室列表失败:`, error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "获取教室列表失败",
+          });
+        }
+      }),
+
     // 根据ID获取教室详情(公开接口)
     getById: publicProcedure
       .input(z.object({ id: z.number() }))

@@ -1,0 +1,78 @@
+{
+  "query": "SELECT id, name FROM cities ORDER BY id LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name FROM cities ORDER BY id LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "上海"
+    },
+    {
+      "id": "2",
+      "name": "苏州"
+    },
+    {
+      "id": "3",
+      "name": "重庆"
+    },
+    {
+      "id": "4",
+      "name": "天津"
+    },
+    {
+      "id": "5",
+      "name": "济南"
+    },
+    {
+      "id": "6",
+      "name": "武汉"
+    },
+    {
+      "id": "7",
+      "name": "郑州"
+    },
+    {
+      "id": "8",
+      "name": "太原"
+    },
+    {
+      "id": "9",
+      "name": "石家庄"
+    },
+    {
+      "id": "10",
+      "name": "大连"
+    },
+    {
+      "id": "11",
+      "name": "东莞"
+    },
+    {
+      "id": "12",
+      "name": "南京"
+    },
+    {
+      "id": "13",
+      "name": "福州"
+    },
+    {
+      "id": "14",
+      "name": "泉州"
+    },
+    {
+      "id": "15",
+      "name": "无锡"
+    },
+    {
+      "id": "16",
+      "name": "深圳"
+    },
+    {
+      "id": "17",
+      "name": "宁波"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\t上海\n2\t苏州\n3\t重庆\n4\t天津\n5\t济南\n6\t武汉\n7\t郑州\n8\t太原\n9\t石家庄\n10\t大连\n11\t东莞\n12\t南京\n13\t福州\n14\t泉州\n15\t无锡\n16\t深圳\n17\t宁波\n",
+  "stderr": "",
+  "execution_time_ms": 1534
+}
