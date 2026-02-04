@@ -259,9 +259,47 @@ class SDKServer {
   async authenticateRequest(req: Request): Promise<User> {
     const signedInAt = new Date();
     
-    // Strategy 1: Try JWT Token from Authorization header (for App login)
-    const authHeader = req.headers.authorization;
-    if (authHeader?.startsWith('Bearer ')) {
+    // Strategy 1: Try JWT Token from URL query parameter (for App login, bypasses Cloudflare)
+    const tokenFromQuery = (req.query?.token as string) || (req.query?.auth_token as string);
+    if (tokenFromQuery) {
+      try {
+        const secretKey = this.getSessionSecret();
+        const { payload } = await jwtVerify(tokenFromQuery, secretKey, {
+          algorithms: ["HS256"],
+        });
+        
+        console.log('[Auth] Authenticated via URL Token:', payload.name || payload.openId);
+        
+        // Check if it's an App Login Token (has id field)
+        if (payload.id) {
+          const user = await db.getUserById(payload.id as number);
+          if (!user) {
+            throw new Error('User not found');
+          }
+          return user;
+        }
+        
+        // Otherwise it's a Manus OAuth Token (has openId field)
+        if (payload.openId) {
+          const user = await db.getUserByOpenId(payload.openId as string);
+          if (!user) {
+            throw new Error('User not found');
+          }
+          return user;
+        }
+      } catch (error) {
+        console.error('[Auth] URL Token verification failed:', error);
+        // Continue to next strategy
+      }
+    }
+    
+    // Strategy 2: Try JWT Token from Authorization header or X-Auth-Token header (for App login)
+    let authHeader = req.headers.authorization || req.headers['x-auth-token'];
+    // Handle array case (Express can return string[])
+    if (Array.isArray(authHeader)) {
+      authHeader = authHeader[0];
+    }
+    if (typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       try {
         const secretKey = this.getSessionSecret();

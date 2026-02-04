@@ -1322,3 +1322,12 @@
 - [x] 实现Token认证支持作为备用方案
 - [x] 测试Cookie认证和Token认证两种方式
 - [x] 生成问题修复报告并交付给用户
+
+### 146. 修复orders.list接口Token认证失败的问题
+- [x] 分析Token认证失败的根本原因
+- [x] 检查orders.list接口是否使用protectedProcedure
+- [x] 检查createContext函数是否正确解析Authorization头
+- [x] 添加调试日志验证Token传递和解析过程
+- [x] 修复认证配置问题
+- [x] 测试验证Token认证是否正常工作
+- [x] 生成修复报告并交付给用户
