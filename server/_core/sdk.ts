@@ -257,17 +257,63 @@ class SDKServer {
   }
 
   async authenticateRequest(req: Request): Promise<User> {
-    // Regular authentication flow
+    const signedInAt = new Date();
+    
+    // Strategy 1: Try JWT Token from Authorization header (for App login)
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const secretKey = this.getSessionSecret();
+        const { payload } = await jwtVerify(token, secretKey, {
+          algorithms: ["HS256"],
+        });
+        
+        // Strategy 1a: App Login Token (contains id field)
+        const userId = payload.id;
+        if (typeof userId === 'number') {
+          const user = await db.getUserById(userId);
+          if (user) {
+            // Update last signed in time
+            await db.upsertUser({
+              openId: user.openId,
+              lastSignedIn: signedInAt,
+            });
+            console.log('[Auth] Authenticated via App Login Token:', user.name);
+            return user;
+          }
+        }
+        
+        // Strategy 1b: Manus OAuth Token (contains openId field)
+        const openId = payload.openId;
+        if (typeof openId === 'string' && openId.length > 0) {
+          const user = await db.getUserByOpenId(openId);
+          if (user) {
+            // Update last signed in time
+            await db.upsertUser({
+              openId: user.openId,
+              lastSignedIn: signedInAt,
+            });
+            console.log('[Auth] Authenticated via Manus OAuth Token:', user.name);
+            return user;
+          }
+        }
+      } catch (error) {
+        console.warn('[Auth] JWT Token verification failed:', String(error));
+        // Fall through to try Cookie authentication
+      }
+    }
+    
+    // Strategy 2: Try Session Cookie (for Manus OAuth)
     const cookies = this.parseCookies(req.headers.cookie);
     const sessionCookie = cookies.get(COOKIE_NAME);
     const session = await this.verifySession(sessionCookie);
 
     if (!session) {
-      throw ForbiddenError("Invalid session cookie");
+      throw ForbiddenError("Invalid session cookie or token");
     }
 
     const sessionUserId = session.openId;
-    const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
 
     // If user not in DB, sync from OAuth server automatically
@@ -296,7 +342,8 @@ class SDKServer {
       openId: user.openId,
       lastSignedIn: signedInAt,
     });
-
+    
+    console.log('[Auth] Authenticated via Session Cookie:', user.name);
     return user;
   }
 }

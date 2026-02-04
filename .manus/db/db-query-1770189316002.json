@@ -1,0 +1,43 @@
+{
+  "query": "SELECT id, openId, name, nickname, email, phone, role, isActive, createdAt FROM users WHERE name IN ('appuser', 'testuser') OR phone IN ('13800138000', '13900139000') OR email IN ('appuser@test.com', 'testuser@test.com');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, openId, name, nickname, email, phone, role, isActive, createdAt FROM users WHERE name IN ('appuser', 'testuser') OR phone IN ('13800138000', '13900139000') OR email IN ('appuser@test.com', 'testuser@test.com');",
+  "rows": [
+    {
+      "id": "13860030",
+      "openId": "user_1770021458966_of5o2q",
+      "name": "admin",
+      "nickname": "管理员",
+      "email": "admin@example.com",
+      "phone": "13800138000",
+      "role": "admin",
+      "isActive": "1",
+      "createdAt": "2026-02-02 08:37:39"
+    },
+    {
+      "id": "13860073",
+      "openId": "user_1770022158055_gxi21",
+      "name": "test_user_management",
+      "nickname": "测试用户",
+      "email": "test@example.com",
+      "phone": "13800138000",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-02 08:49:18"
+    },
+    {
+      "id": "14430227",
+      "openId": "test_app_user_002",
+      "name": "testuser",
+      "nickname": "测试用户2",
+      "email": "testuser@test.com",
+      "phone": "13900139000",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-04 07:06:07"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\tnickname\temail\tphone\trole\tisActive\tcreatedAt\n13860030\tuser_1770021458966_of5o2q\tadmin\t管理员\tadmin@example.com\t13800138000\tadmin\t1\t2026-02-02 08:37:39\n13860073\tuser_1770022158055_gxi21\ttest_user_management\t测试用户\ttest@example.com\t13800138000\tuser\t1\t2026-02-02 08:49:18\n14430227\ttest_app_user_002\ttestuser\t测试用户2\ttestuser@test.com\t13900139000\tuser\t1\t2026-02-04 07:06:07\n",
+  "stderr": "",
+  "execution_time_ms": 1603
+}
