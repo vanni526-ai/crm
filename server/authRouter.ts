@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import { hashPassword, verifyPassword } from "./passwordUtils";
 import { or } from "drizzle-orm";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const TOKEN_EXPIRY = "24h";
@@ -320,6 +321,99 @@ export const authRouter = router({
           phone: user.phone || "",
           role: user.role,
           isActive: user.isActive,
+        },
+      };
+    }),
+
+  // 新用户注册(手机号+密码)
+  register: publicProcedure
+    .input(
+      z.object({
+        phone: z.string()
+          .min(11, "手机号格式错误")
+          .max(11, "手机号格式错误")
+          .regex(/^1[3-9]\d{9}$/, "请输入正确的手机号"),
+        password: z.string()
+          .min(6, "密码至少6位")
+          .max(20, "密码最多20位"),
+        name: z.string().optional(),
+        nickname: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+
+      // 1. 检查手机号是否已注册
+      const existingUser = await drizzle
+        .select()
+        .from(users)
+        .where(eq(users.phone, input.phone))
+        .limit(1);
+
+      if (existingUser.length > 0) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "该手机号已被注册",
+        });
+      }
+
+      // 2. 加密密码
+      const hashedPassword = await hashPassword(input.password);
+
+      // 3. 生成唯一标识
+      const openId = `user_${uuidv4().replace(/-/g, '').substring(0, 16)}`;
+
+      // 4. 创建用户
+      const result = await drizzle.insert(users).values({
+        openId,
+        phone: input.phone,
+        password: hashedPassword,
+        name: input.name || input.phone,
+        nickname: input.nickname,
+        role: "user",
+        isActive: true,
+        loginMethod: "phone",
+      });
+
+      // 获取插入的用户ID
+      const userId = (result[0] as any).insertId;
+
+      // 5. 生成JWT Token(注册后自动登录)
+      const token = jwt.sign(
+        {
+          id: userId,
+          openId,
+          name: input.name || input.phone,
+          role: "user",
+        },
+        JWT_SECRET,
+        { expiresIn: TOKEN_EXPIRY }
+      );
+
+      // 6. 设置session cookie(Web端使用)
+      ctx.res?.cookie("session", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7天
+      });
+
+      return {
+        success: true,
+        message: "注册成功",
+        token,
+        user: {
+          id: userId,
+          openId,
+          phone: input.phone,
+          name: input.name || input.phone,
+          role: "user",
         },
       };
     }),

@@ -42,6 +42,26 @@ export interface ApiClientConfig {
   debug?: boolean;
 }
 
+export interface RegisterInput {
+  phone: string;      // 手机号(11位)
+  password: string;   // 密码(6-20位)
+  name?: string;      // 用户名(可选)
+  nickname?: string;  // 昵称(可选)
+}
+
+export interface RegisterResult {
+  success: boolean;
+  message: string;
+  token?: string;
+  user?: {
+    id: number;
+    openId: string;
+    phone: string;
+    name: string;
+    role: string;
+  };
+}
+
 export interface LoginInput {
   username: string;
   password: string;
@@ -481,6 +501,26 @@ class AuthApi {
   constructor(trpc: TrpcClient, tokenStorage: TokenStorage) {
     this.trpc = trpc;
     this.tokenStorage = tokenStorage;
+  }
+
+  /**
+   * 新用户注册(手机号+密码)
+   */
+  async register(input: RegisterInput): Promise<RegisterResult> {
+    try {
+      const result = await this.trpc.mutate<RegisterResult>('auth.register', input);
+      
+      if (result.success && result.token) {
+        await this.tokenStorage.setToken(result.token);
+      }
+
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        message: (err as Error).message,
+      };
+    }
   }
 
   /**
