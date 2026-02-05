@@ -1357,3 +1357,22 @@
 - [x] 集成compact-content-generation内容生成功能(contentGenerator.ts + contentGeneratorRouter.ts)
 - [x] 测试验证所有功能
 - [x] 保存检查点
+
+### 149. 修复vanni526@gmail.com账号无法登录的问题
+- [ ] 检查服务器日志和认证流程
+- [ ] 排查登录失败的根本原因
+- [ ] 修复问题并测试验证
+
+### 150. 创建用户下单API接口
+- [ ] 分析当前订单创建接口的权限配置
+- [ ] 创建新的用户下单API接口(允许所有登录用户创建订单)
+- [ ] 编写测试验证新接口
+- [ ] 交付给用户
+
+
+### 150. 创建用户下单API接口
+- [x] 分析当前订单创建接口的权限配置(orders.create使用salesOrAdminProcedure)
+- [x] 创建新的用户下单API接口orders.userCreate(允许所有登录用户创建订单)
+- [x] 创建用户订单列表API接口orders.myOrders(查询当前用户的订单)
+- [x] 编写测试验证新接口(8个测试用例全部通过)
+- [x] 交付结果给用户

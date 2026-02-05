@@ -233,6 +233,115 @@ export const appRouter = router({
         return { success: true, data: results };
       }),
     
+    // 用户下单接口 - 允许所有登录用户创建订单
+    userCreate: protectedProcedure
+      .input(z.object({
+        customerName: z.string(), // 客户名(必填)
+        customerPhone: z.string().optional(), // 客户电话
+        customerWechat: z.string().optional(), // 客户微信
+        paymentAmount: z.string(), // 支付金额(必填)
+        courseAmount: z.string(), // 课程金额(必填)
+        paymentChannel: z.string().optional(), // 支付渠道
+        channelOrderNo: z.string().optional(), // 渠道订单号
+        paymentDate: z.string().optional(), // 支付日期
+        paymentTime: z.string().optional(), // 支付时间
+        deliveryCity: z.string().optional(), // 交付城市
+        deliveryRoom: z.string().optional(), // 交付教室
+        deliveryClassroomId: z.number().optional(), // 交付教室ID
+        deliveryTeacher: z.string().optional(), // 交付老师
+        deliveryCourse: z.string().optional(), // 交付课程
+        classDate: z.string().optional(), // 上课日期
+        classTime: z.string().optional(), // 上课时间
+        notes: z.string().optional(), // 备注
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // 生成订单号
+        let orderNo = generateOrderNo(input.deliveryCity);
+        
+        // 查重验证
+        let suffix = 1;
+        while (await db.checkOrderNoExists(orderNo)) {
+          const suffixStr = String(suffix).padStart(3, '0');
+          orderNo = generateOrderNo(input.deliveryCity, suffixStr);
+          suffix++;
+          if (suffix > 999) {
+            throw new TRPCError({ 
+              code: "INTERNAL_SERVER_ERROR", 
+              message: "订单号生成失败，请稍后重试" 
+            });
+          }
+        }
+        
+        // 检查渠道订单号是否重复
+        if (input.channelOrderNo && input.channelOrderNo.trim() !== '') {
+          const exists = await db.checkChannelOrderNoExists(input.channelOrderNo);
+          if (exists) {
+            const existingOrder = await db.getOrderByChannelOrderNo(input.channelOrderNo);
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `渠道订单号已存在: ${input.channelOrderNo}\n关联订单: ${existingOrder?.orderNo || '未知'} (客户: ${existingOrder?.customerName || '未知'})`,
+            });
+          }
+        }
+        
+        // 创建订单数据
+        const orderData: any = {
+          orderNo,
+          customerName: input.customerName,
+          salesId: ctx.user.id, // 记录下单用户ID
+          salesPerson: ctx.user.name || ctx.user.nickname || '用户下单', // 记录下单用户名
+          trafficSource: 'App用户下单', // 标记来源
+          paymentAmount: input.paymentAmount,
+          courseAmount: input.courseAmount,
+          paymentChannel: input.paymentChannel || undefined,
+          channelOrderNo: input.channelOrderNo || undefined,
+          paymentDate: input.paymentDate ? new Date(input.paymentDate) : undefined,
+          paymentTime: input.paymentTime || undefined,
+          deliveryCity: input.deliveryCity || undefined,
+          deliveryRoom: input.deliveryRoom || undefined,
+          deliveryClassroomId: input.deliveryClassroomId || undefined,
+          deliveryTeacher: input.deliveryTeacher || undefined,
+          deliveryCourse: input.deliveryCourse || undefined,
+          classDate: input.classDate ? new Date(input.classDate) : undefined,
+          classTime: input.classTime || undefined,
+          status: 'pending', // 默认待处理状态
+          notes: input.notes || undefined,
+        };
+        
+        const result = await db.createOrder(orderData);
+        const id = typeof result === 'object' && result.id ? result.id : result;
+        return { id, orderNo, success: true };
+      }),
+    
+    // 获取当前用户的订单列表
+    myOrders: protectedProcedure
+      .input(z.object({
+        status: z.enum(["all", "pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        // 获取当前用户创建的订单
+        const allOrders = await db.getOrdersBySales(ctx.user.id);
+        
+        // 按状态筛选
+        let filteredOrders = allOrders;
+        if (input?.status && input.status !== 'all') {
+          filteredOrders = allOrders.filter(o => o.status === input.status);
+        }
+        
+        // 分页
+        const limit = input?.limit || 50;
+        const offset = input?.offset || 0;
+        const paginatedOrders = filteredOrders.slice(offset, offset + limit);
+        
+        return {
+          orders: paginatedOrders,
+          total: filteredOrders.length,
+          hasMore: offset + limit < filteredOrders.length,
+        };
+      }),
+
     create: salesOrAdminProcedure
       .input(z.object({
         orderNo: z.string().optional(),
