@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, orderNo, customerId, customerName, salesId, salesPerson, trafficSource, paymentAmount, status, createdAt \nFROM orders \nWHERE orderNo = '20260205085420-000';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, orderNo, customerId, customerName, salesId, salesPerson, trafficSource, paymentAmount, status, createdAt \nFROM orders \nWHERE orderNo = '20260205085420-000';",
+  "rows": [
+    {
+      "id": "2280047",
+      "orderNo": "20260205085420-000",
+      "customerId": "NULL",
+      "customerName": "15921456877",
+      "salesId": "14790117",
+      "salesPerson": "15921456877",
+      "trafficSource": "App用户下单",
+      "paymentAmount": "1500.00",
+      "status": "pending",
+      "createdAt": "2026-02-05 08:54:20"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNo\tcustomerId\tcustomerName\tsalesId\tsalesPerson\ttrafficSource\tpaymentAmount\tstatus\tcreatedAt\n2280047\t20260205085420-000\tNULL\t15921456877\t14790117\t15921456877\tApp用户下单\t1500.00\tpending\t2026-02-05 08:54:20\n",
+  "stderr": "",
+  "execution_time_ms": 1603
+}
