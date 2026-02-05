@@ -539,17 +539,83 @@ class AuthApi {
 
   /**
    * 刷新Token
+   * @returns 刷新结果,包含新Token和过期时间
    */
-  async refreshToken(): Promise<boolean> {
+  async refreshToken(): Promise<{ success: boolean; token?: string; expiresIn?: number }> {
     try {
-      const result = await this.trpc.mutate<{ token: string }>('auth.refreshToken');
-      if (result.token) {
-        await this.tokenStorage.setToken(result.token);
-        return true;
+      const currentToken = await this.tokenStorage.getToken();
+      if (!currentToken) {
+        return { success: false };
       }
-      return false;
+
+      const result = await this.trpc.mutate<{ success: boolean; token: string; expiresIn: number }>(
+        'auth.refreshToken',
+        { token: currentToken }
+      );
+      
+      if (result.success && result.token) {
+        await this.tokenStorage.setToken(result.token);
+        return {
+          success: true,
+          token: result.token,
+          expiresIn: result.expiresIn,
+        };
+      }
+      return { success: false };
     } catch {
-      return false;
+      return { success: false };
+    }
+  }
+
+  /**
+   * 检查Token是否即将过期(小于1小时)
+   */
+  async isTokenExpiringSoon(): Promise<boolean> {
+    const token = await this.tokenStorage.getToken();
+    if (!token) return true;
+
+    try {
+      // 解析JWT获取过期时间
+      const parts = token.split('.');
+      if (parts.length !== 3) return true;
+
+      const payload = JSON.parse(atob(parts[1]));
+      const exp = payload.exp * 1000; // 转换为毫秒
+      const now = Date.now();
+      const oneHour = 60 * 60 * 1000;
+
+      return exp - now < oneHour;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * 自动刷新Token(如果即将过期)
+   * 建议在App启动时和每次API调用前调用
+   */
+  async autoRefreshIfNeeded(): Promise<void> {
+    if (await this.isTokenExpiringSoon()) {
+      await this.refreshToken();
+    }
+  }
+
+  /**
+   * 获取Token过期时间
+   * @returns 过期时间戳(毫秒),如果无Token则返回null
+   */
+  async getTokenExpiry(): Promise<number | null> {
+    const token = await this.tokenStorage.getToken();
+    if (!token) return null;
+
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+
+      const payload = JSON.parse(atob(parts[1]));
+      return payload.exp * 1000;
+    } catch {
+      return null;
     }
   }
 }

@@ -120,7 +120,106 @@ export const authRouter = router({
     return { success: true };
   }),
 
-  // 用户账号登录(支u6301用户名/手u673au53f7/邮u7bb1登录)
+  // 刷新Token
+  refreshToken: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1, "请提供当前Token"),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        // 1. 验证当前Token(允许过期的Token,但不允许无效签名)
+        const decoded = jwt.verify(input.token, JWT_SECRET, {
+          ignoreExpiration: true, // 允许过期的Token刷新
+        }) as any;
+
+        const drizzle = await getDb();
+        if (!drizzle) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "数据库连接失败",
+          });
+        }
+
+        // 2. 检查用户是否仍然存在且激活
+        const userList = await drizzle
+          .select()
+          .from(users)
+          .where(eq(users.id, decoded.id))
+          .limit(1);
+
+        if (userList.length === 0) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "用户不存在",
+          });
+        }
+
+        const user = userList[0];
+
+        if (!user.isActive) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "账号已被禁用",
+          });
+        }
+
+        // 3. 检查Token是否在允许刷新的时间范围内(过期后7天内可刷新)
+        const tokenExp = decoded.exp * 1000; // 转换为毫秒
+        const now = Date.now();
+        const maxRefreshWindow = 7 * 24 * 60 * 60 * 1000; // 7天
+
+        if (now - tokenExp > maxRefreshWindow) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Token已过期太久,请重新登录",
+          });
+        }
+
+        // 4. 生成新Token
+        const newToken = jwt.sign(
+          {
+            id: user.id,
+            openId: user.openId,
+            name: user.name,
+            role: user.role,
+          },
+          JWT_SECRET,
+          { expiresIn: TOKEN_EXPIRY }
+        );
+
+        // 5. 更新session cookie
+        ctx.res?.cookie("session", newToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7天
+        });
+
+        return {
+          success: true,
+          token: newToken,
+          expiresIn: 24 * 60 * 60, // 24小时(秒)
+          user: {
+            id: user.id,
+            openId: user.openId || "",
+            name: user.name || "",
+            role: user.role,
+          },
+        };
+      } catch (error) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Token无效,请重新登录",
+        });
+      }
+    }),
+
+  // 用户账号登录(支u6301用户名/手u673au53f7/邮u7bb1登u5f55)
   loginWithUserAccount: publicProcedure
     .input(
       z.object({
