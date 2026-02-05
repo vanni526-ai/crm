@@ -252,6 +252,30 @@ if (expiry) {
 
 ## API接口清单
 
+### 接口概览
+
+| 模块 | 接口 | 说明 | 需要登录 |
+|------|------|------|----------|
+| auth | login | 用户登录 | 否 |
+| auth | isLoggedIn | 检查登录状态 | 否 |
+| auth | me | 获取当前用户信息 | 是 |
+| auth | logout | 登出 | 是 |
+| auth | refreshToken | 刷新Token | 是 |
+| orders | userCreate | 创建订单 | 是 |
+| orders | myOrders | 获取我的订单 | 是 |
+| orders | getById | 获取订单详情 | 是 |
+| courses | list | 获取课程列表 | 否 |
+| courses | getById | 获取课程详情 | 否 |
+| teachers | list | 获取老师列表 | 否 |
+| teachers | getById | 获取老师详情 | 否 |
+| cities | list | 获取城市列表 | 否 |
+| cities | getPartnerConfigs | 获取城市合伙人配置 | 否 |
+| classrooms | list | 获取教室列表 | 否 |
+| classrooms | getByCityId | 按城市ID获取教室 | 否 |
+| classrooms | getByCityName | 按城市名获取教室 | 否 |
+| metadata | getAll | 获取所有元数据 | 否 |
+| metadata | getCities | 获取城市列表 | 否 |
+
 ### 认证接口 (auth)
 
 | 接口 | 方法 | 说明 | 参数 |
@@ -296,6 +320,99 @@ if (expiry) {
 | `status` | string | 'all' | 订单状态: all/pending/paid/completed/cancelled/refunded |
 | `limit` | number | 20 | 每页数量 |
 | `offset` | number | 0 | 偏移量 |
+
+### 课程接口 (courses)
+
+| 接口 | 方法 | 说明 | 参数 |
+|------|------|------|------|
+| `api.courses.list()` | GET | 获取课程列表 | - |
+| `api.courses.getById(id)` | GET | 获取课程详情 | `id: number` |
+
+```typescript
+// 获取课程列表
+const coursesResult = await api.courses.list();
+if (coursesResult.success) {
+  console.log('课程列表:', coursesResult.data);
+}
+
+// 获取课程详情
+const courseDetail = await api.courses.getById(1);
+```
+
+### 老师接口 (teachers)
+
+| 接口 | 方法 | 说明 | 参数 |
+|------|------|------|------|
+| `api.teachers.list()` | GET | 获取老师列表 | - |
+| `api.teachers.getById(id)` | GET | 获取老师详情 | `id: number` |
+
+```typescript
+// 获取老师列表
+const teachers = await api.teachers.list();
+console.log('老师列表:', teachers);
+
+// 获取老师详情
+const teacher = await api.teachers.getById(1);
+```
+
+### 城市接口 (cities)
+
+| 接口 | 方法 | 说明 | 参数 |
+|------|------|------|------|
+| `api.cities.list()` | GET | 获取城市列表 | - |
+| `api.cities.getPartnerConfigs()` | GET | 获取城市合伙人配置 | - |
+| `api.cities.getPartnerConfigByCity(city)` | GET | 按城市名获取配置 | `city: string` |
+
+```typescript
+// 获取城市列表
+const citiesResult = await api.cities.list();
+if (citiesResult.success) {
+  console.log('城市列表:', citiesResult.data); // ['北京', '上海', ...]
+}
+
+// 获取城市合伙人配置
+const configsResult = await api.cities.getPartnerConfigs();
+if (configsResult.success) {
+  configsResult.data.forEach(config => {
+    console.log(`${config.city}: 合伙人费率 ${config.partnerFeeRate}`);
+  });
+}
+```
+
+### 教室接口 (classrooms)
+
+| 接口 | 方法 | 说明 | 参数 |
+|------|------|------|------|
+| `api.classrooms.list()` | GET | 获取所有教室列表 | - |
+| `api.classrooms.getByCityId(cityId)` | GET | 按城市ID获取教室 | `cityId: number` |
+| `api.classrooms.getByCityName(cityName)` | GET | 按城市名获取教室 | `cityName: string` |
+
+```typescript
+// 获取所有教室
+const allClassrooms = await api.classrooms.list();
+
+// 按城市名获取教室
+const shanghaiClassrooms = await api.classrooms.getByCityName('上海');
+```
+
+### 元数据接口 (metadata)
+
+| 接口 | 方法 | 说明 | 参数 |
+|------|------|------|------|
+| `api.metadata.getAll()` | GET | 获取所有元数据 | - |
+| `api.metadata.getCities()` | GET | 获取城市列表 | - |
+
+```typescript
+// 获取所有元数据(推荐在App启动时调用一次)
+const metadataResult = await api.metadata.getAll();
+if (metadataResult.success) {
+  const { cities, courses, classrooms, teacherNames, salespeople } = metadataResult.data;
+  console.log('城市:', cities);
+  console.log('课程:', courses);
+  console.log('教室:', classrooms);
+  console.log('老师:', teacherNames);
+}
+```
 
 ---
 

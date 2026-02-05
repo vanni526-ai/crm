@@ -1391,3 +1391,21 @@
 - [x] 编写测试验证Token刷新功能(6个测试用例全部通过)
 - [x] 生成前端使用的完整MD文档
 - [x] 交付给用户
+
+### 153. 使用skill-creator保存前端API集成解决方案为可复用技能
+- [x] 阅读skill-creator的SKILL.md了解创建流程
+- [x] 创建前端API集成解决方案Skill
+- [x] 验证Skill结构并交付给用户
+
+### 154. 检查并补全SDK中缺失的API接口
+- [ ] 检查后端是否支持cities.list、teachers.list、courses.list等接口
+- [ ] 更新SDK添加缺失的接口
+- [ ] 更新SDK文档和Skill
+- [ ] 交付给用户
+
+
+### 154. 检查并补全SDK中缺失的API接口
+- [x] 检查后端是否支持cities.list、teachers.list、courses.list等接口(全部支持)
+- [x] 更新SDK添加缺失的接口(teachers, classrooms, metadata)
+- [x] 更新SDK文档和Skill
+- [x] 交付结果给用户

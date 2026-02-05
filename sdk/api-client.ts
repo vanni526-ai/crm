@@ -662,9 +662,115 @@ class CoursesApi {
 
   /**
    * 获取课程列表
+   * @returns 课程列表,包含id、name、price、description等字段
+   */
+  async list(): Promise<{ success: boolean; data: any[] }> {
+    return this.trpc.query('courses.list');
+  }
+
+  /**
+   * 根据ID获取课程详情
+   * @param id 课程ID
+   */
+  async getById(id: number): Promise<{ success: boolean; data: any }> {
+    return this.trpc.query('courses.getById', { id });
+  }
+}
+
+class TeachersApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取老师列表
+   * @returns 老师列表,包含id、name、city、customerType、isActive等字段
    */
   async list(): Promise<any[]> {
-    return this.trpc.query('courses.list');
+    return this.trpc.query('teachers.list');
+  }
+
+  /**
+   * 根据ID获取老师详情
+   * @param id 老师ID
+   */
+  async getById(id: number): Promise<any> {
+    return this.trpc.query('teachers.getById', { id });
+  }
+}
+
+class ClassroomsApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取所有教室列表
+   * @returns 教室列表,包含id、name、cityId、cityName、address等字段
+   */
+  async list(): Promise<any[]> {
+    return this.trpc.query('classrooms.list');
+  }
+
+  /**
+   * 根据城市ID获取教室列表
+   * @param cityId 城市ID
+   */
+  async getByCityId(cityId: number): Promise<any[]> {
+    return this.trpc.query('classrooms.getByCityId', { cityId });
+  }
+
+  /**
+   * 根据城市名称获取教室列表
+   * @param cityName 城市名称
+   */
+  async getByCityName(cityName: string): Promise<any[]> {
+    return this.trpc.query('classrooms.getByCityName', { cityName });
+  }
+}
+
+class MetadataApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取所有元数据(城市、课程、教室、老师名、销售人员等)
+   * 推荐在App启动时调用一次,缓存结果
+   */
+  async getAll(): Promise<{
+    success: boolean;
+    data: {
+      cities: string[];
+      courses: string[];
+      classrooms: string[];
+      teacherNames: string[];
+      salespeople: string[];
+      teacherCategories: string[];
+      courseAmounts: string[];
+    };
+    counts: {
+      cities: number;
+      courses: number;
+      classrooms: number;
+      teacherNames: number;
+      salespeople: number;
+    };
+  }> {
+    return this.trpc.query('metadata.getAll');
+  }
+
+  /**
+   * 获取城市列表
+   */
+  async getCities(): Promise<{ success: boolean; data: string[]; count: number }> {
+    return this.trpc.query('metadata.getCities');
   }
 }
 
@@ -676,10 +782,27 @@ class CitiesApi {
   }
 
   /**
-   * 获取城市列表
+   * 获取城市列表(从metadata接口)
+   * @returns 城市名称数组
    */
-  async list(): Promise<any[]> {
-    return this.trpc.query('cities.list');
+  async list(): Promise<{ success: boolean; data: string[]; count: number }> {
+    return this.trpc.query('metadata.getCities');
+  }
+
+  /**
+   * 获取城市合伙人配置列表
+   * @returns 城市配置数组,包含id、city、partnerFeeRate、isActive等字段
+   */
+  async getPartnerConfigs(): Promise<{ success: boolean; data: any[]; count: number }> {
+    return this.trpc.query('cityPartnerConfig.list');
+  }
+
+  /**
+   * 根据城市名获取合伙人配置
+   * @param city 城市名称
+   */
+  async getPartnerConfigByCity(city: string): Promise<{ success: boolean; data: any; message?: string }> {
+    return this.trpc.query('cityPartnerConfig.getByCity', { city });
   }
 }
 
@@ -696,6 +819,9 @@ export class ApiClient {
   public readonly orders: OrdersApi;
   public readonly courses: CoursesApi;
   public readonly cities: CitiesApi;
+  public readonly teachers: TeachersApi;
+  public readonly classrooms: ClassroomsApi;
+  public readonly metadata: MetadataApi;
 
   constructor(config: ApiClientConfig = {}) {
     // 合并默认配置
@@ -733,11 +859,14 @@ export class ApiClient {
       this.config.debug
     );
 
-    // 初始化API模块
+    // 初始API模块
     this.auth = new AuthApi(this.trpc, this.tokenStorage);
     this.orders = new OrdersApi(this.trpc);
     this.courses = new CoursesApi(this.trpc);
     this.cities = new CitiesApi(this.trpc);
+    this.teachers = new TeachersApi(this.trpc);
+    this.classrooms = new ClassroomsApi(this.trpc);
+    this.metadata = new MetadataApi(this.trpc);;
   }
 
   private createTokenStorage(): TokenStorage {
