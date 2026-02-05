@@ -1,0 +1,1 @@
+ALTER TABLE `courses` MODIFY COLUMN `duration` decimal(10,2) NOT NULL;

@@ -697,7 +697,7 @@ export const courses = mysqlTable("courses", {
   introduction: varchar("introduction", { length: 20 }), // 课程介绍(限制20字)
   description: text("description"), // 课程描述
   price: decimal("price", { precision: 10, scale: 2 }).notNull(), // 课程价格
-  duration: decimal("duration", { precision: 5, scale: 2 }).notNull(), // 课程时长(小时)
+  duration: decimal("duration", { precision: 10, scale: 2 }).notNull(), // 课程时长(小时)，支持最大值99999999.99
   level: mysqlEnum("level", ["入门", "深度", "订制", "剧本"]).notNull(), // 课程程度
   isActive: boolean("isActive").default(true).notNull(), // 是否启用
   createdAt: timestamp("createdAt").defaultNow().notNull(),

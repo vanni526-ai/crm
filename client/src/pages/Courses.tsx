@@ -31,6 +31,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
+import DashboardLayout from "@/components/DashboardLayout";
 
 type Course = {
   id: number;
@@ -286,6 +287,7 @@ export default function Courses() {
   }
 
   return (
+    <DashboardLayout>
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -512,5 +514,6 @@ export default function Courses() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }
