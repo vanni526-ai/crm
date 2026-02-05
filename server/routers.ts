@@ -284,10 +284,19 @@ export const appRouter = router({
           }
         }
         
+        // 自动为App用户创建或关联业务客户
+        const { customerId, customerName: resolvedCustomerName } = await db.getOrCreateCustomerForUser({
+          id: ctx.user.id,
+          name: ctx.user.name,
+          nickname: ctx.user.nickname,
+          phone: ctx.user.phone,
+        });
+        
         // 创建订单数据
         const orderData: any = {
           orderNo,
-          customerName: input.customerName,
+          customerId, // 关联业务客户
+          customerName: input.customerName || resolvedCustomerName, // 优先使用输入的客户名
           salesId: ctx.user.id, // 记录下单用户ID
           salesPerson: ctx.user.name || ctx.user.nickname || '用户下单', // 记录下单用户名
           trafficSource: 'App用户下单', // 标记来源

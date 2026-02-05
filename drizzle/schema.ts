@@ -24,6 +24,7 @@ export const users = mysqlTable("users", {
  */
 export const customers = mysqlTable("customers", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // 关联users表(可选,用于App注册用户)
   name: varchar("name", { length: 100 }).notNull(), // 客户名
   wechatId: varchar("wechatId", { length: 100 }), // 微信号
   phone: varchar("phone", { length: 20 }),
@@ -35,6 +36,7 @@ export const customers = mysqlTable("customers", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
+  userIdx: index("user_idx").on(table.userId),
   wechatIdx: index("wechat_idx").on(table.wechatId),
   createdByIdx: index("created_by_idx").on(table.createdBy),
 }));

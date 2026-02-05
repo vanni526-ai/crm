@@ -85,6 +85,13 @@
       "when": 1770275248842,
       "tag": "0011_dapper_norman_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1770282149755,
+      "tag": "0012_heavy_madame_web",
+      "breakpoints": true
     }
   ]
 }

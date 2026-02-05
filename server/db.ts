@@ -240,6 +240,81 @@ export async function searchCustomers(keyword: string) {
     .orderBy(desc(customers.createdAt));
 }
 
+/**
+ * 根据userId获取业务客户
+ */
+export async function getCustomerByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(customers).where(eq(customers.userId, userId)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * 根据手机号获取业务客户
+ */
+export async function getCustomerByPhone(phone: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(customers).where(eq(customers.phone, phone)).limit(1);
+  return result[0] || null;
+}
+
+/**
+ * 为App用户获取或创建业务客户
+ * 如果用户已有关联的业务客户，返回该客户
+ * 如果没有，则自动创建一个新的业务客户并关联
+ */
+export async function getOrCreateCustomerForUser(user: {
+  id: number;
+  name?: string | null;
+  nickname?: string | null;
+  phone?: string | null;
+}): Promise<{ customerId: number; customerName: string; isNew: boolean }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // 1. 先通过userId查找已关联的业务客户
+  const existingByUserId = await getCustomerByUserId(user.id);
+  if (existingByUserId) {
+    return {
+      customerId: existingByUserId.id,
+      customerName: existingByUserId.name,
+      isNew: false,
+    };
+  }
+  
+  // 2. 通过手机号查找已存在的业务客户
+  if (user.phone) {
+    const existingByPhone = await getCustomerByPhone(user.phone);
+    if (existingByPhone) {
+      // 关联现有客户到用户
+      await db.update(customers).set({ userId: user.id }).where(eq(customers.id, existingByPhone.id));
+      return {
+        customerId: existingByPhone.id,
+        customerName: existingByPhone.name,
+        isNew: false,
+      };
+    }
+  }
+  
+  // 3. 创建新的业务客户
+  const customerName = user.name || user.nickname || user.phone || `用户${user.id}`;
+  const customerId = await createCustomer({
+    userId: user.id,
+    name: customerName,
+    phone: user.phone || undefined,
+    trafficSource: "App注册",
+    createdBy: user.id,
+  });
+  
+  return {
+    customerId,
+    customerName,
+    isNew: true,
+  };
+}
+
 export async function updateCustomer(id: number, data: Partial<InsertCustomer>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
