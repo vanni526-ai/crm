@@ -3,7 +3,7 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "./db";
 import { orders, salespersons, salesCommissionConfigs, cities } from "../drizzle/schema";
-import { eq, and, sql, ne } from "drizzle-orm";
+import { eq, and, sql, ne, or } from "drizzle-orm";
 
 // 权限检查:只有管理员可以管理提成配置
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -13,9 +13,88 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
   return next({ ctx });
 });
 
+/**
+ * 根据salesPerson文本字段匹配salespersons表中的销售人员
+ * 返回一个Map: salesPersonText -> { id, name, nickname }
+ */
+function buildSalesPersonMapping(allSalespersons: any[]) {
+  const mapping = new Map<string, { id: number; name: string; nickname: string | null }>();
+  for (const sp of allSalespersons) {
+    // 用name匹配
+    if (sp.name) {
+      mapping.set(sp.name.toLowerCase(), { id: sp.id, name: sp.name, nickname: sp.nickname });
+    }
+    // 用nickname匹配
+    if (sp.nickname && sp.nickname !== sp.name) {
+      mapping.set(sp.nickname.toLowerCase(), { id: sp.id, name: sp.name, nickname: sp.nickname });
+    }
+  }
+  return mapping;
+}
+
+/**
+ * 将原始统计数据按(销售人员ID, 城市)合并
+ * 核心逻辑：通过salesPerson文本字段匹配salespersons表，合并同一销售的数据
+ */
+function mergeStatsBySalesperson(
+  rawStats: any[],
+  salesPersonMapping: Map<string, { id: number; name: string; nickname: string | null }>
+) {
+  const merged = new Map<string, {
+    salespersonId: number | null;
+    salesPerson: string;
+    city: string;
+    orderCount: number;
+    totalAmount: number;
+    totalCourseAmount: number;
+  }>();
+
+  for (const row of rawStats) {
+    const spText = (row.salesPerson || "").trim();
+    const city = row.city || "未知城市";
+
+    // 尝试通过文本匹配找到对应的销售人员
+    let matchedSp = salesPersonMapping.get(spText.toLowerCase());
+
+    // 如果有salespersonId，也尝试直接用ID匹配
+    if (!matchedSp && row.salespersonId) {
+      const entries = Array.from(salesPersonMapping.entries());
+      for (let i = 0; i < entries.length; i++) {
+        if (entries[i][1].id === row.salespersonId) {
+          matchedSp = entries[i][1];
+          break;
+        }
+      }
+    }
+
+    const spId = matchedSp?.id ?? null;
+    const spName = matchedSp?.name || spText || "未知销售";
+    const key = `${spId ?? spText}_${city}`;
+
+    const existing = merged.get(key);
+    if (existing) {
+      existing.orderCount += Number(row.orderCount);
+      existing.totalAmount += Number(row.totalAmount);
+      existing.totalCourseAmount += Number(row.totalCourseAmount || 0);
+    } else {
+      merged.set(key, {
+        salespersonId: spId,
+        salesPerson: spName,
+        city,
+        orderCount: Number(row.orderCount),
+        totalAmount: Number(row.totalAmount),
+        totalCourseAmount: Number(row.totalCourseAmount || 0),
+      });
+    }
+  }
+
+  return Array.from(merged.values());
+}
+
 export const salesCityPerformanceRouter = router({
   /**
    * 获取销售x城市交叉统计数据
+   * 核心修复：通过salesPerson文本匹配salespersons表，合并同一销售的数据
    */
   getCrossStats: protectedProcedure
     .input(z.object({
@@ -28,63 +107,86 @@ export const salesCityPerformanceRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库未连接" });
 
+      // 获取所有销售人员
+      const allSalespersons = await db
+        .select({ id: salespersons.id, name: salespersons.name, nickname: salespersons.nickname, isActive: salespersons.isActive })
+        .from(salespersons);
+
+      const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
+
+      // 构建查询条件
       const conditions: any[] = [
         ne(orders.status, "cancelled"),
         eq(orders.isVoided, false),
       ];
       if (input.startDate) conditions.push(sql`${orders.paymentDate} >= ${input.startDate}`);
       if (input.endDate) conditions.push(sql`${orders.paymentDate} <= ${input.endDate}`);
-      if (input.salespersonId) conditions.push(eq(orders.salespersonId, input.salespersonId));
-      if (input.city) conditions.push(eq(orders.paymentCity, input.city));
+      if (input.city) conditions.push(eq(orders.deliveryCity, input.city));
 
-      const stats = await db
+      // 如果按销售人员筛选，需要同时匹配salespersonId和salesPerson文本
+      if (input.salespersonId) {
+        const targetSp = allSalespersons.find(sp => sp.id === input.salespersonId);
+        if (targetSp) {
+          const spConditions: any[] = [eq(orders.salespersonId, input.salespersonId)];
+          if (targetSp.name) spConditions.push(eq(orders.salesPerson, targetSp.name));
+          if (targetSp.nickname && targetSp.nickname !== targetSp.name) {
+            spConditions.push(eq(orders.salesPerson, targetSp.nickname));
+          }
+          conditions.push(or(...spConditions));
+        } else {
+          conditions.push(eq(orders.salespersonId, input.salespersonId));
+        }
+      }
+
+      // 按salesPerson文本和城市分组（不再按salespersonId分组，避免null和有值的分裂）
+      const rawStats = await db
         .select({
           salespersonId: orders.salespersonId,
           salesPerson: orders.salesPerson,
-          city: orders.paymentCity,
+          city: orders.deliveryCity,
           orderCount: sql<number>`COUNT(*)`.as("orderCount"),
-          totalAmount: sql<string>`COALESCE(SUM(${orders.paymentAmount}), 0)`.as("totalAmount"),
+          totalAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalAmount"),
           totalCourseAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalCourseAmount"),
         })
         .from(orders)
         .where(and(...conditions))
-        .groupBy(orders.salespersonId, orders.salesPerson, orders.paymentCity);
+        .groupBy(orders.salespersonId, orders.salesPerson, orders.deliveryCity);
 
-      const allSalespersons = await db
-        .select({ id: salespersons.id, name: salespersons.name, nickname: salespersons.nickname, isActive: salespersons.isActive })
-        .from(salespersons);
+      // 合并同一销售人员的数据
+      const mergedStats = mergeStatsBySalesperson(rawStats, salesPersonMapping);
 
+      // 获取提成配置
       const commissionConfigs = await db.select().from(salesCommissionConfigs);
-
-      const allCities = await db
-        .select({ name: cities.name })
-        .from(cities)
-        .where(eq(cities.isActive, true));
-
-      const orderCitiesSet = new Set(stats.map((s: any) => s.city).filter(Boolean));
-      const orderCities = Array.from(orderCitiesSet) as string[];
-      const cityCityNames = allCities.map((c: any) => c.name);
-      const allCityNamesSet = new Set([...cityCityNames, ...orderCities]);
-      const allCityNames = Array.from(allCityNamesSet).sort() as string[];
-
       const commissionMap = new Map<string, number>();
       for (const config of commissionConfigs) {
         commissionMap.set(`${config.salespersonId}_${config.city}`, Number(config.commissionRate));
       }
 
-      const crossData = stats.map((s: any) => {
+      // 获取所有城市
+      const allCities = await db
+        .select({ name: cities.name })
+        .from(cities)
+        .where(eq(cities.isActive, true));
+
+      const orderCitiesSet = new Set(mergedStats.map(s => s.city).filter(Boolean));
+      const cityCityNames = allCities.map((c: any) => c.name);
+      const allCityNamesSet = new Set([...cityCityNames, ...Array.from(orderCitiesSet)]);
+      const allCityNames = Array.from(allCityNamesSet).sort() as string[];
+
+      // 计算提成
+      const crossData = mergedStats.map(s => {
         const spId = s.salespersonId;
-        const city = s.city || "未知城市";
+        const city = s.city;
         const commissionRate = spId ? (commissionMap.get(`${spId}_${city}`) ?? 0) : 0;
-        const totalAmount = Number(s.totalAmount);
+        const totalAmount = s.totalAmount;
         const commissionAmount = totalAmount * commissionRate / 100;
         return {
           salespersonId: spId,
-          salesPerson: s.salesPerson || "未知销售",
+          salesPerson: s.salesPerson,
           city,
-          orderCount: Number(s.orderCount),
+          orderCount: s.orderCount,
           totalAmount,
-          totalCourseAmount: Number(s.totalCourseAmount),
+          totalCourseAmount: s.totalCourseAmount,
           commissionRate,
           commissionAmount: Math.round(commissionAmount * 100) / 100,
         };
@@ -117,65 +219,76 @@ export const salesCityPerformanceRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库未连接" });
 
+      // 获取所有销售人员用于名字匹配
+      const allSalespersons = await db
+        .select({ id: salespersons.id, name: salespersons.name, nickname: salespersons.nickname })
+        .from(salespersons);
+      const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
+
       const baseConditions: any[] = [
         ne(orders.status, "cancelled"),
         eq(orders.isVoided, false),
       ];
-      if (input.salespersonId) baseConditions.push(eq(orders.salespersonId, input.salespersonId));
-      if (input.city) baseConditions.push(eq(orders.paymentCity, input.city));
+      if (input.city) baseConditions.push(eq(orders.deliveryCity, input.city));
 
-      const currentStats = await db
-        .select({
-          salespersonId: orders.salespersonId,
-          salesPerson: orders.salesPerson,
-          city: orders.paymentCity,
-          orderCount: sql<number>`COUNT(*)`.as("orderCount"),
-          totalAmount: sql<string>`COALESCE(SUM(${orders.paymentAmount}), 0)`.as("totalAmount"),
-        })
-        .from(orders)
-        .where(and(
-          ...baseConditions,
-          sql`${orders.paymentDate} >= ${input.currentStartDate}`,
-          sql`${orders.paymentDate} <= ${input.currentEndDate}`,
-        ))
-        .groupBy(orders.salespersonId, orders.salesPerson, orders.paymentCity);
+      // 销售人员筛选：同时匹配ID和名字
+      if (input.salespersonId) {
+        const targetSp = allSalespersons.find(sp => sp.id === input.salespersonId);
+        if (targetSp) {
+          const spConditions: any[] = [eq(orders.salespersonId, input.salespersonId)];
+          if (targetSp.name) spConditions.push(eq(orders.salesPerson, targetSp.name));
+          if (targetSp.nickname && targetSp.nickname !== targetSp.name) {
+            spConditions.push(eq(orders.salesPerson, targetSp.nickname));
+          }
+          baseConditions.push(or(...spConditions));
+        }
+      }
 
-      const previousStats = await db
-        .select({
-          salespersonId: orders.salespersonId,
-          salesPerson: orders.salesPerson,
-          city: orders.paymentCity,
-          orderCount: sql<number>`COUNT(*)`.as("orderCount"),
-          totalAmount: sql<string>`COALESCE(SUM(${orders.paymentAmount}), 0)`.as("totalAmount"),
-        })
-        .from(orders)
-        .where(and(
-          ...baseConditions,
-          sql`${orders.paymentDate} >= ${input.previousStartDate}`,
-          sql`${orders.paymentDate} <= ${input.previousEndDate}`,
-        ))
-        .groupBy(orders.salespersonId, orders.salesPerson, orders.paymentCity);
+      const fetchStats = async (startDate: string, endDate: string) => {
+        const rawStats = await db
+          .select({
+            salespersonId: orders.salespersonId,
+            salesPerson: orders.salesPerson,
+            city: orders.deliveryCity,
+            orderCount: sql<number>`COUNT(*)`.as("orderCount"),
+            totalAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalAmount"),
+            totalCourseAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalCourseAmount"),
+          })
+          .from(orders)
+          .where(and(
+            ...baseConditions,
+            sql`${orders.paymentDate} >= ${startDate}`,
+            sql`${orders.paymentDate} <= ${endDate}`,
+          ))
+          .groupBy(orders.salespersonId, orders.salesPerson, orders.deliveryCity);
 
-      const prevMap = new Map<string, { orderCount: number; totalAmount: number }>();
+        return mergeStatsBySalesperson(rawStats, salesPersonMapping);
+      };
+
+      const currentStats = await fetchStats(input.currentStartDate, input.currentEndDate);
+      const previousStats = await fetchStats(input.previousStartDate, input.previousEndDate);
+
+      const prevMap = new Map<string, { orderCount: number; totalAmount: number; salesPerson: string }>();
       for (const s of previousStats) {
-        const key = `${s.salespersonId}_${s.city || "未知城市"}`;
+        const key = `${s.salespersonId ?? s.salesPerson}_${s.city}`;
         prevMap.set(key, {
-          orderCount: Number(s.orderCount),
-          totalAmount: Number(s.totalAmount),
+          orderCount: s.orderCount,
+          totalAmount: s.totalAmount,
+          salesPerson: s.salesPerson,
         });
       }
 
-      const comparisonData = currentStats.map((s: any) => {
-        const key = `${s.salespersonId}_${s.city || "未知城市"}`;
+      const comparisonData = currentStats.map(s => {
+        const key = `${s.salespersonId ?? s.salesPerson}_${s.city}`;
         const prev = prevMap.get(key);
-        const currentAmount = Number(s.totalAmount);
-        const currentCount = Number(s.orderCount);
+        const currentAmount = s.totalAmount;
+        const currentCount = s.orderCount;
         const prevAmount = prev?.totalAmount ?? 0;
         const prevCount = prev?.orderCount ?? 0;
         return {
           salespersonId: s.salespersonId,
-          salesPerson: s.salesPerson || "未知销售",
-          city: s.city || "未知城市",
+          salesPerson: s.salesPerson,
+          city: s.city,
           currentOrderCount: currentCount,
           currentAmount,
           previousOrderCount: prevCount,
@@ -185,17 +298,17 @@ export const salesCityPerformanceRouter = router({
         };
       });
 
+      // 添加仅在上期存在的数据
       const prevEntries = Array.from(prevMap.entries());
-      for (const [key, prev] of prevEntries) {
-        const exists = comparisonData.some((d: any) => `${d.salespersonId}_${d.city}` === key);
+      for (let i = 0; i < prevEntries.length; i++) {
+        const [key, prev] = prevEntries[i];
+        const exists = comparisonData.some(d => `${d.salespersonId ?? d.salesPerson}_${d.city}` === key);
         if (!exists) {
           const parts = key.split("_");
-          const spId = parts[0];
           const city = parts.slice(1).join("_");
-          const prevStat = previousStats.find((s: any) => `${s.salespersonId}_${s.city || "未知城市"}` === key);
           comparisonData.push({
-            salespersonId: Number(spId) || null as any,
-            salesPerson: prevStat?.salesPerson || "未知销售",
+            salespersonId: null as any,
+            salesPerson: prev.salesPerson,
             city,
             currentOrderCount: 0,
             currentAmount: 0,
@@ -328,27 +441,46 @@ export const salesCityPerformanceRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库未连接" });
 
+      // 获取所有销售人员用于名字匹配
+      const allSalespersons = await db
+        .select({ id: salespersons.id, name: salespersons.name, nickname: salespersons.nickname })
+        .from(salespersons);
+      const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
+
       const conditions: any[] = [
         ne(orders.status, "cancelled"),
         eq(orders.isVoided, false),
       ];
       if (input.startDate) conditions.push(sql`${orders.paymentDate} >= ${input.startDate}`);
       if (input.endDate) conditions.push(sql`${orders.paymentDate} <= ${input.endDate}`);
-      if (input.salespersonId) conditions.push(eq(orders.salespersonId, input.salespersonId));
-      if (input.city) conditions.push(eq(orders.paymentCity, input.city));
+      if (input.city) conditions.push(eq(orders.deliveryCity, input.city));
 
-      const stats = await db
+      if (input.salespersonId) {
+        const targetSp = allSalespersons.find(sp => sp.id === input.salespersonId);
+        if (targetSp) {
+          const spConditions: any[] = [eq(orders.salespersonId, input.salespersonId)];
+          if (targetSp.name) spConditions.push(eq(orders.salesPerson, targetSp.name));
+          if (targetSp.nickname && targetSp.nickname !== targetSp.name) {
+            spConditions.push(eq(orders.salesPerson, targetSp.nickname));
+          }
+          conditions.push(or(...spConditions));
+        }
+      }
+
+      const rawStats = await db
         .select({
           salespersonId: orders.salespersonId,
           salesPerson: orders.salesPerson,
-          city: orders.paymentCity,
+          city: orders.deliveryCity,
           orderCount: sql<number>`COUNT(*)`.as("orderCount"),
-          totalAmount: sql<string>`COALESCE(SUM(${orders.paymentAmount}), 0)`.as("totalAmount"),
+          totalAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalAmount"),
           totalCourseAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalCourseAmount"),
         })
         .from(orders)
         .where(and(...conditions))
-        .groupBy(orders.salespersonId, orders.salesPerson, orders.paymentCity);
+        .groupBy(orders.salespersonId, orders.salesPerson, orders.deliveryCity);
+
+      const mergedStats = mergeStatsBySalesperson(rawStats, salesPersonMapping);
 
       const commissionConfigs = await db.select().from(salesCommissionConfigs);
       const commissionMap = new Map<string, number>();
@@ -356,18 +488,18 @@ export const salesCityPerformanceRouter = router({
         commissionMap.set(`${config.salespersonId}_${config.city}`, Number(config.commissionRate));
       }
 
-      return stats.map((s: any) => {
+      return mergedStats.map(s => {
         const spId = s.salespersonId;
-        const city = s.city || "未知城市";
+        const city = s.city;
         const commissionRate = spId ? (commissionMap.get(`${spId}_${city}`) ?? 0) : 0;
-        const totalAmount = Number(s.totalAmount);
+        const totalAmount = s.totalAmount;
         const commissionAmount = Math.round(totalAmount * commissionRate / 100 * 100) / 100;
         return {
-          salesPerson: s.salesPerson || "未知销售",
+          salesPerson: s.salesPerson,
           city,
-          orderCount: Number(s.orderCount),
+          orderCount: s.orderCount,
           totalAmount,
-          totalCourseAmount: Number(s.totalCourseAmount),
+          totalCourseAmount: s.totalCourseAmount,
           commissionRate,
           commissionAmount,
         };

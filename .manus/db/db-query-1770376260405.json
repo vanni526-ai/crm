@@ -1,0 +1,172 @@
+{
+  "query": "SELECT salesPerson, salespersonId, COUNT(*) as cnt, SUM(courseAmount) as totalAmount FROM orders GROUP BY salesPerson, salespersonId ORDER BY cnt DESC LIMIT 30;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT salesPerson, salespersonId, COUNT(*) as cnt, SUM(courseAmount) as totalAmount FROM orders GROUP BY salesPerson, salespersonId ORDER BY cnt DESC LIMIT 30;",
+  "rows": [
+    {
+      "salesPerson": "山竹",
+      "salespersonId": "NULL",
+      "cnt": "104",
+      "totalAmount": "372523.00"
+    },
+    {
+      "salesPerson": "ivy",
+      "salespersonId": "NULL",
+      "cnt": "54",
+      "totalAmount": "150052.00"
+    },
+    {
+      "salesPerson": "嘟嘟",
+      "salespersonId": "NULL",
+      "cnt": "42",
+      "totalAmount": "85731.00"
+    },
+    {
+      "salesPerson": "夏鑫",
+      "salespersonId": "NULL",
+      "cnt": "40",
+      "totalAmount": "100636.00"
+    },
+    {
+      "salesPerson": "NULL",
+      "salespersonId": "NULL",
+      "cnt": "29",
+      "totalAmount": "67250.00"
+    },
+    {
+      "salesPerson": "土豆",
+      "salespersonId": "NULL",
+      "cnt": "28",
+      "totalAmount": "67925.00"
+    },
+    {
+      "salesPerson": "嘟嘟",
+      "salespersonId": "30001",
+      "cnt": "26",
+      "totalAmount": "56793.00"
+    },
+    {
+      "salesPerson": "Grace",
+      "salespersonId": "NULL",
+      "cnt": "13",
+      "totalAmount": "22650.00"
+    },
+    {
+      "salesPerson": "相柳",
+      "salespersonId": "NULL",
+      "cnt": "11",
+      "totalAmount": "11740.00"
+    },
+    {
+      "salesPerson": "测试用户",
+      "salespersonId": "NULL",
+      "cnt": "8",
+      "totalAmount": "17500.00"
+    },
+    {
+      "salesPerson": "土豆",
+      "salespersonId": "30002",
+      "cnt": "7",
+      "totalAmount": "25376.00"
+    },
+    {
+      "salesPerson": "测试销售",
+      "salespersonId": "NULL",
+      "cnt": "6",
+      "totalAmount": "4300.00"
+    },
+    {
+      "salesPerson": "test",
+      "salespersonId": "NULL",
+      "cnt": "5",
+      "totalAmount": "7500.00"
+    },
+    {
+      "salesPerson": "15921456877",
+      "salespersonId": "NULL",
+      "cnt": "5",
+      "totalAmount": "9000.00"
+    },
+    {
+      "salesPerson": "奈落",
+      "salespersonId": "NULL",
+      "cnt": "3",
+      "totalAmount": "3250.00"
+    },
+    {
+      "salesPerson": "觅知音",
+      "salespersonId": "NULL",
+      "cnt": "2",
+      "totalAmount": "4200.00"
+    },
+    {
+      "salesPerson": "张三",
+      "salespersonId": "NULL",
+      "cnt": "2",
+      "totalAmount": "1900.00"
+    },
+    {
+      "salesPerson": "橘子pr单",
+      "salespersonId": "NULL",
+      "cnt": "2",
+      "totalAmount": "2400.00"
+    },
+    {
+      "salesPerson": "Ada",
+      "salespersonId": "NULL",
+      "cnt": "2",
+      "totalAmount": "4100.00"
+    },
+    {
+      "salesPerson": "市场部",
+      "salespersonId": "NULL",
+      "cnt": "2",
+      "totalAmount": "900.00"
+    },
+    {
+      "salesPerson": "苏州单",
+      "salespersonId": "NULL",
+      "cnt": "1",
+      "totalAmount": "2100.00"
+    },
+    {
+      "salesPerson": "曦",
+      "salespersonId": "NULL",
+      "cnt": "1",
+      "totalAmount": "3000.00"
+    },
+    {
+      "salesPerson": "周",
+      "salespersonId": "NULL",
+      "cnt": "1",
+      "totalAmount": "2800.00"
+    },
+    {
+      "salesPerson": "橘子",
+      "salespersonId": "NULL",
+      "cnt": "1",
+      "totalAmount": "1200.00"
+    },
+    {
+      "salesPerson": "李四",
+      "salespersonId": "NULL",
+      "cnt": "1",
+      "totalAmount": "2000.00"
+    },
+    {
+      "salesPerson": "ivy",
+      "salespersonId": "5",
+      "cnt": "1",
+      "totalAmount": "3600.00"
+    },
+    {
+      "salesPerson": "重庆单",
+      "salespersonId": "NULL",
+      "cnt": "1",
+      "totalAmount": "2500.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "salesPerson\tsalespersonId\tcnt\ttotalAmount\n山竹\tNULL\t104\t372523.00\nivy\tNULL\t54\t150052.00\n嘟嘟\tNULL\t42\t85731.00\n夏鑫\tNULL\t40\t100636.00\nNULL\tNULL\t29\t67250.00\n土豆\tNULL\t28\t67925.00\n嘟嘟\t30001\t26\t56793.00\nGrace\tNULL\t13\t22650.00\n相柳\tNULL\t11\t11740.00\n测试用户\tNULL\t8\t17500.00\n土豆\t30002\t7\t25376.00\n测试销售\tNULL\t6\t4300.00\ntest\tNULL\t5\t7500.00\n15921456877\tNULL\t5\t9000.00\n奈落\tNULL\t3\t3250.00\n觅知音\tNULL\t2\t4200.00\n张三\tNULL\t2\t1900.00\n橘子pr单\tNULL\t2\t2400.00\nAda\tNULL\t2\t4100.00\n市场部\tNULL\t2\t900.00\n苏州单\tNULL\t1\t2100.00\n曦\tNULL\t1\t3000.00\n周\tNULL\t1\t2800.00\n橘子\tNULL\t1\t1200.00\n李四\tNULL\t1\t2000.00\nivy\t5\t1\t3600.00\n重庆单\tNULL\t1\t2500.00\n",
+  "stderr": "",
+  "execution_time_ms": 1583
+}

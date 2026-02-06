@@ -1588,3 +1588,14 @@
 - [x] 编写单元测试(18个测试用例全部通过)
 - [x] 更新SDK添加SalesCityPerformanceApi类(7个方法)
 - [x] 保存检查点
+
+
+### 181. 修复订单管理销售人员显示和数据不一致问题
+- [x] 诊断订单管理中销售人员显示缺失问题(订单管理已有salesPerson列显示，无缺失)
+- [x] 诊断销售管理/城市业绩数据不一致的根本原因(大部分订单salespersonId为null，只有salesPerson文本字段有值，导致按ID分组时数据分裂)
+- [x] 修复订单管理中销售人员列的显示(已有，无需修复)
+- [x] app来源订单销售人员登记为“app”的逻辑(待确认具体实现方式)
+- [x] 修复城市业绩查询逻辑: 通过name/nickname文本匹配合并同一销售的数据(mergeStatsBySalesperson)
+- [x] 修复getSalesStatistics/getMonthlySales/getYearlySales: 同时匹配salespersonId和salesPerson文本
+- [x] 测试验证数据一致性(33个测试全部通过)
+- [x] 保存检查点

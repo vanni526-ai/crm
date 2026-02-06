@@ -1918,7 +1918,17 @@ export async function getSalesStatistics(params: {
   const conditions: any[] = [ne(orders.status, "cancelled")];
   
   if (params.salespersonId) {
-    conditions.push(eq(orders.salespersonId, params.salespersonId));
+    // 同时匹配salespersonId和salesPerson文本（name/nickname）
+    const spList = await db.select().from(salespersons).where(eq(salespersons.id, params.salespersonId)).limit(1);
+    const sp = spList[0];
+    if (sp) {
+      const spConditions: any[] = [eq(orders.salespersonId, params.salespersonId)];
+      if (sp.name) spConditions.push(eq(orders.salesPerson, sp.name));
+      if (sp.nickname && sp.nickname !== sp.name) spConditions.push(eq(orders.salesPerson, sp.nickname));
+      conditions.push(or(...spConditions));
+    } else {
+      conditions.push(eq(orders.salespersonId, params.salespersonId));
+    }
   }
   
   if (params.startDate) {
@@ -1964,7 +1974,17 @@ export async function getMonthlySales(salespersonId: number | undefined, year: n
   ];
   
   if (salespersonId) {
-    conditions.push(eq(orders.salespersonId, salespersonId));
+    // 同时匹配salespersonId和salesPerson文本（name/nickname）
+    const spList = await db.select().from(salespersons).where(eq(salespersons.id, salespersonId)).limit(1);
+    const sp = spList[0];
+    if (sp) {
+      const spConditions: any[] = [eq(orders.salespersonId, salespersonId)];
+      if (sp.name) spConditions.push(eq(orders.salesPerson, sp.name));
+      if (sp.nickname && sp.nickname !== sp.name) spConditions.push(eq(orders.salesPerson, sp.nickname));
+      conditions.push(or(...spConditions));
+    } else {
+      conditions.push(eq(orders.salespersonId, salespersonId));
+    }
   }
   
   const orderList = await db
@@ -2014,7 +2034,17 @@ export async function getYearlySales(
   ];
   
   if (salespersonId) {
-    conditions.push(eq(orders.salespersonId, salespersonId));
+    // 同时匹配salespersonId和salesPerson文本（name/nickname）
+    const spList = await db.select().from(salespersons).where(eq(salespersons.id, salespersonId)).limit(1);
+    const sp = spList[0];
+    if (sp) {
+      const spConditions: any[] = [eq(orders.salespersonId, salespersonId)];
+      if (sp.name) spConditions.push(eq(orders.salesPerson, sp.name));
+      if (sp.nickname && sp.nickname !== sp.name) spConditions.push(eq(orders.salesPerson, sp.nickname));
+      conditions.push(or(...spConditions));
+    } else {
+      conditions.push(eq(orders.salespersonId, salespersonId));
+    }
   }
   
   const orderList = await db
