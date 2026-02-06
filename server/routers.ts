@@ -20,6 +20,7 @@ import { userManagementRouter } from "./userManagementRouter";
 import { uploadRouter } from "./uploadRouter";
 import { excelReportRouter } from "./excelReportRouter";
 import { contentGeneratorRouter } from "./contentGeneratorRouter";
+import { notificationRouter } from "./notificationRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -72,6 +73,7 @@ export const appRouter = router({
   upload: uploadRouter,
   excelReport: excelReportRouter,
   contentGenerator: contentGeneratorRouter,
+  notifications: notificationRouter,
   gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,

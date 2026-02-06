@@ -1,0 +1,6 @@
+Screenshot check at 2026-02-06 09:28:
+- Dev server running, homepage loads correctly
+- Navigation sidebar visible with all menu items
+- Need to scroll down to see "申请通知" menu item (it's below "解析学习")
+- No errors in health checks (LSP, TypeScript, dependencies all OK)
+- 15 notification tests passed

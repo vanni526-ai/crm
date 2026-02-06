@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, Home, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Mail, PanelLeft, Brain, MapPin, FileCheck, Shield, UserCog, BookOpen } from "lucide-react";
+import { LayoutDashboard, LogOut, Home, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Mail, PanelLeft, Brain, MapPin, FileCheck, Shield, UserCog, BookOpen, Bell } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -41,6 +41,7 @@ const menuItems = [
   { icon: Upload, label: "数据导入", path: "/import" },
   { icon: Mail, label: "Gmail导入", path: "/gmail-import" },
   { icon: Brain, label: "解析学习", path: "/parsing-learning" },
+  { icon: Bell, label: "申请通知", path: "/notifications" },
   { icon: Shield, label: "账号管理", path: "/accounts" },
   // { icon: UserCog, label: "登录管理", path: "/user-management" }, // 已合并到客户管理
 ];

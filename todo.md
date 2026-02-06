@@ -1530,3 +1530,14 @@
 - [x] 为15921456877充值50000元(余额50100元) + test充值50000元(余额50000元)
 - [x] 业务客户列表最前面增加用户编号列(customer.id)
 - [x] 保存检查点
+
+
+### 175. 增加"申请通知"功能和板块
+- [x] 设计数据库表(userNotifications: id, userId, userName, userPhone, type, title, content, status, adminReply, repliedBy, repliedAt, readAt)
+- [x] 推送数据库迁移(pnpm db:push)
+- [x] 实现后端tRPC接口(10个接口: submit, myList, list, detail, markRead, batchMarkRead, reply, archive, delete, unreadCount)
+- [x] 后台管理页面增加"申请通知"板块(导航栏+Notifications页面: 列表、筛选、详情、回复、归档、删除、批量标记已读)
+- [x] 更新SDK添加NotificationsApi类(submit, myList, list, detail, markRead, batchMarkRead, reply, archive, delete, unreadCount)
+- [x] 编写单元测试(15个测试用例全部通过)
+- [x] 生成前端App接口文档(sdk/申请通知接口文档.md)
+- [x] 保存检查点

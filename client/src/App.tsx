@@ -34,6 +34,7 @@ import LocalLogin from "./pages/LocalLogin";
 import UserManagement from "./pages/UserManagement";
 import CustomerManagement from "./pages/CustomerManagement";
 import Courses from "./pages/Courses";
+import Notifications from "./pages/Notifications";
 
 
 function Router() {
@@ -69,6 +70,7 @@ function Router() {
       <Route path={"/login"} component={LocalLogin} />
       {/* <Route path={"/user-management"} component={UserManagement} /> */}
       <Route path={"/courses"} component={Courses} />
+      <Route path={"/notifications"} component={Notifications} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

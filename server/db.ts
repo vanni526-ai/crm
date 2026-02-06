@@ -28,6 +28,8 @@ import {
   gmailImportLogs,
   InsertGmailImportLog,
   gmailImportConfig,
+  userNotifications,
+  InsertUserNotification,
   gmailImportHistory,
   InsertGmailImportHistory,
   GmailImportHistory,
@@ -4116,4 +4118,161 @@ export async function getClassroomsByCityName(cityName: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   return db.select().from(classrooms).where(eq(classrooms.cityName, cityName)).orderBy(asc(classrooms.sortOrder), asc(classrooms.name));
+}
+
+
+// ==================== 申请通知 ====================
+
+/** 创建用户留言/申请通知 */
+export async function createUserNotification(data: {
+  userId: number;
+  userName?: string;
+  userPhone?: string;
+  type?: string;
+  title?: string;
+  content: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  const result = await db.insert(userNotifications).values({
+    userId: data.userId,
+    userName: data.userName || null,
+    userPhone: data.userPhone || null,
+    type: data.type || "general",
+    title: data.title || null,
+    content: data.content,
+    status: "unread",
+  });
+  return { id: result[0].insertId };
+}
+
+/** 查询通知列表（管理员用，支持分页和筛选） */
+export async function listUserNotifications(params: {
+  status?: string;
+  type?: string;
+  userId?: number;
+  page?: number;
+  pageSize?: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  const { status, type, userId, page = 1, pageSize = 20 } = params;
+
+  const conditions: any[] = [];
+  if (status) conditions.push(eq(userNotifications.status, status));
+  if (type) conditions.push(eq(userNotifications.type, type));
+  if (userId) conditions.push(eq(userNotifications.userId, userId));
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const [items, countResult] = await Promise.all([
+    db.select()
+      .from(userNotifications)
+      .where(whereClause)
+      .orderBy(desc(userNotifications.createdAt))
+      .limit(pageSize)
+      .offset((page - 1) * pageSize),
+    db.select({ count: sql<number>`count(*)` })
+      .from(userNotifications)
+      .where(whereClause),
+  ]);
+
+  return {
+    items,
+    total: countResult[0]?.count || 0,
+    page,
+    pageSize,
+  };
+}
+
+/** 获取单条通知详情 */
+export async function getUserNotificationById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  const result = await db.select().from(userNotifications).where(eq(userNotifications.id, id));
+  return result[0] || null;
+}
+
+/** 标记通知为已读 */
+export async function markNotificationRead(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  await db.update(userNotifications)
+    .set({ status: "read", readAt: new Date() })
+    .where(eq(userNotifications.id, id));
+}
+
+/** 批量标记通知为已读 */
+export async function batchMarkNotificationsRead(ids: number[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  await db.update(userNotifications)
+    .set({ status: "read", readAt: new Date() })
+    .where(inArray(userNotifications.id, ids));
+}
+
+/** 回复通知 */
+export async function replyNotification(id: number, data: { adminReply: string; repliedBy: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  await db.update(userNotifications)
+    .set({
+      adminReply: data.adminReply,
+      repliedBy: data.repliedBy,
+      repliedAt: new Date(),
+      status: "replied",
+    })
+    .where(eq(userNotifications.id, id));
+}
+
+/** 归档通知 */
+export async function archiveNotification(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  await db.update(userNotifications)
+    .set({ status: "archived" })
+    .where(eq(userNotifications.id, id));
+}
+
+/** 删除通知 */
+export async function deleteUserNotification(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  await db.delete(userNotifications).where(eq(userNotifications.id, id));
+}
+
+/** 获取未读通知数量 */
+export async function getUnreadNotificationCount() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  const result = await db.select({ count: sql<number>`count(*)` })
+    .from(userNotifications)
+    .where(eq(userNotifications.status, "unread"));
+  return result[0]?.count || 0;
+}
+
+/** 查询用户自己的留言列表（App用户用） */
+export async function listMyNotifications(userId: number, params: { page?: number; pageSize?: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  const { page = 1, pageSize = 20 } = params;
+
+  const [items, countResult] = await Promise.all([
+    db.select()
+      .from(userNotifications)
+      .where(eq(userNotifications.userId, userId))
+      .orderBy(desc(userNotifications.createdAt))
+      .limit(pageSize)
+      .offset((page - 1) * pageSize),
+    db.select({ count: sql<number>`count(*)` })
+      .from(userNotifications)
+      .where(eq(userNotifications.userId, userId)),
+  ]);
+
+  return {
+    items,
+    total: countResult[0]?.count || 0,
+    page,
+    pageSize,
+  };
 }

@@ -757,3 +757,31 @@ export const classrooms = mysqlTable("classrooms", {
 
 export type Classroom = typeof classrooms.$inferSelect;
 export type InsertClassroom = typeof classrooms.$inferInsert;
+
+
+/**
+ * 申请通知表 - 记录前端App用户提交的留言/申请信息
+ */
+export const userNotifications = mysqlTable("user_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // 提交留言的用户ID
+  userName: varchar("userName", { length: 100 }), // 用户名称(冗余字段,方便查询)
+  userPhone: varchar("userPhone", { length: 20 }), // 用户手机号(冗余字段)
+  type: varchar("type", { length: 50 }).default("general").notNull(), // 留言类型: general(一般留言), complaint(投诉), suggestion(建议), consultation(咨询), application(申请)
+  title: varchar("title", { length: 200 }), // 留言标题(可选)
+  content: text("content").notNull(), // 留言内容
+  status: varchar("status", { length: 20 }).default("unread").notNull(), // 状态: unread(未读), read(已读), replied(已回复), archived(已归档)
+  adminReply: text("adminReply"), // 管理员回复内容
+  repliedBy: int("repliedBy"), // 回复人ID
+  repliedAt: timestamp("repliedAt"), // 回复时间
+  readAt: timestamp("readAt"), // 已读时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdx: index("notification_user_idx").on(table.userId),
+  statusIdx: index("notification_status_idx").on(table.status),
+  typeIdx: index("notification_type_idx").on(table.type),
+  createdAtIdx: index("notification_created_at_idx").on(table.createdAt),
+}));
+export type UserNotification = typeof userNotifications.$inferSelect;
+export type InsertUserNotification = typeof userNotifications.$inferInsert;

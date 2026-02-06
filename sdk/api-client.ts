@@ -1036,6 +1036,151 @@ class AccountApi {
 }
 
 // ============================================================================
+// 申请通知模块
+// ============================================================================
+
+/** 通知类型 */
+export type NotificationType = 'general' | 'complaint' | 'suggestion' | 'consultation' | 'application';
+
+/** 通知状态 */
+export type NotificationStatus = 'unread' | 'read' | 'replied' | 'archived';
+
+/** 提交留言输入 */
+export interface SubmitNotificationInput {
+  userId: number;                  // 用户ID
+  userName?: string;               // 用户名称(可选)
+  userPhone?: string;              // 用户手机号(可选)
+  type?: NotificationType;         // 留言类型(默认general)
+  title?: string;                  // 标题(可选,最多200字)
+  content: string;                 // 留言内容(必填,最多5000字)
+}
+
+/** 通知详情 */
+export interface UserNotification {
+  id: number;
+  userId: number;
+  userName: string | null;
+  userPhone: string | null;
+  type: NotificationType;
+  title: string | null;
+  content: string;
+  status: NotificationStatus;
+  adminReply: string | null;
+  repliedBy: number | null;
+  repliedAt: string | null;
+  readAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 通知列表结果 */
+export interface NotificationListResult {
+  items: UserNotification[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+class NotificationsApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 提交留言/申请通知(App用户调用)
+   * @param input 留言内容
+   * @returns { success: true, id: number }
+   */
+  async submit(input: SubmitNotificationInput): Promise<{ success: boolean; id: number }> {
+    return this.trpc.mutate('notifications.submit', input);
+  }
+
+  /**
+   * 查询当前用户的留言列表(App用户调用)
+   * @param userId 用户ID
+   * @param params 分页参数
+   * @returns { items, total, page, pageSize }
+   */
+  async myList(userId: number, params?: { page?: number; pageSize?: number }): Promise<NotificationListResult> {
+    return this.trpc.query('notifications.myList', { userId, ...params });
+  }
+
+  /**
+   * 查询所有通知列表(管理员调用,需要登录)
+   * @param params 筛选和分页参数
+   * @returns { items, total, page, pageSize }
+   */
+  async list(params?: {
+    status?: NotificationStatus;
+    type?: NotificationType;
+    userId?: number;
+    page?: number;
+    pageSize?: number;
+  }): Promise<NotificationListResult> {
+    return this.trpc.query('notifications.list', params || {});
+  }
+
+  /**
+   * 获取单条通知详情(管理员调用,需要登录)
+   * @param id 通知ID
+   */
+  async detail(id: number): Promise<UserNotification> {
+    return this.trpc.query('notifications.detail', { id });
+  }
+
+  /**
+   * 标记通知为已读(管理员调用,需要登录)
+   * @param id 通知ID
+   */
+  async markRead(id: number): Promise<{ success: boolean }> {
+    return this.trpc.mutate('notifications.markRead', { id });
+  }
+
+  /**
+   * 批量标记通知为已读(管理员调用,需要登录)
+   * @param ids 通知ID数组
+   */
+  async batchMarkRead(ids: number[]): Promise<{ success: boolean; count: number }> {
+    return this.trpc.mutate('notifications.batchMarkRead', { ids });
+  }
+
+  /**
+   * 回复通知(管理员调用,需要登录)
+   * @param id 通知ID
+   * @param adminReply 回复内容
+   */
+  async reply(id: number, adminReply: string): Promise<{ success: boolean }> {
+    return this.trpc.mutate('notifications.reply', { id, adminReply });
+  }
+
+  /**
+   * 归档通知(管理员调用,需要登录)
+   * @param id 通知ID
+   */
+  async archive(id: number): Promise<{ success: boolean }> {
+    return this.trpc.mutate('notifications.archive', { id });
+  }
+
+  /**
+   * 删除通知(管理员调用,需要登录)
+   * @param id 通知ID
+   */
+  async delete(id: number): Promise<{ success: boolean }> {
+    return this.trpc.mutate('notifications.delete', { id });
+  }
+
+  /**
+   * 获取未读通知数量(管理员调用,需要登录)
+   * @returns { count: number }
+   */
+  async unreadCount(): Promise<{ count: number }> {
+    return this.trpc.query('notifications.unreadCount');
+  }
+}
+
+// ============================================================================
 // API客户端主类
 // ============================================================================
 
@@ -1052,6 +1197,7 @@ export class ApiClient {
   public readonly classrooms: ClassroomsApi;
   public readonly metadata: MetadataApi;
   public readonly account: AccountApi;
+  public readonly notifications: NotificationsApi;
 
   constructor(config: ApiClientConfig = {}) {
     // 合并默认配置
@@ -1098,6 +1244,7 @@ export class ApiClient {
     this.classrooms = new ClassroomsApi(this.trpc);
     this.metadata = new MetadataApi(this.trpc);
     this.account = new AccountApi(this.trpc);
+    this.notifications = new NotificationsApi(this.trpc);
   }
 
   private createTokenStorage(): TokenStorage {
