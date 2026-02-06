@@ -339,6 +339,88 @@ export const authRouter = router({
       };
     }),
 
+  // 修改密码(需要登录状态)
+  changePassword: publicProcedure
+    .input(
+      z.object({
+        userId: z.number().int().positive("用户ID无效"),
+        oldPassword: z.string().min(1, "请输入旧密码"),
+        newPassword: z.string()
+          .min(6, "新密码至少6位")
+          .max(20, "新密码最多20位"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+
+      // 1. 查找用户
+      const userList = await drizzle
+        .select()
+        .from(users)
+        .where(eq(users.id, input.userId))
+        .limit(1);
+
+      if (userList.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "用户不存在",
+        });
+      }
+
+      const user = userList[0];
+
+      // 2. 检查账号状态
+      if (!user.isActive) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "账号已被禁用",
+        });
+      }
+
+      // 3. 验证旧密码
+      if (!user.password) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "该账号未设置密码，无法修改",
+        });
+      }
+
+      const isOldPasswordValid = await verifyPassword(input.oldPassword, user.password);
+      if (!isOldPasswordValid) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "旧密码错误",
+        });
+      }
+
+      // 4. 检查新旧密码不能相同
+      const isSamePassword = await verifyPassword(input.newPassword, user.password);
+      if (isSamePassword) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "新密码不能与旧密码相同",
+        });
+      }
+
+      // 5. 加密新密码并更新
+      const hashedNewPassword = await hashPassword(input.newPassword);
+      await drizzle
+        .update(users)
+        .set({ password: hashedNewPassword })
+        .where(eq(users.id, input.userId));
+
+      return {
+        success: true,
+        message: "密码修改成功，请重新登录",
+      };
+    }),
+
   // 新用户注册(手机号+密码)
   register: publicProcedure
     .input(

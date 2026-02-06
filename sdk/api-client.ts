@@ -49,6 +49,17 @@ export interface RegisterInput {
   nickname?: string;  // 昵称(可选)
 }
 
+export interface ChangePasswordInput {
+  userId: number;       // 用户ID
+  oldPassword: string;  // 旧密码
+  newPassword: string;  // 新密码(6-20位)
+}
+
+export interface ChangePasswordResult {
+  success: boolean;
+  message: string;
+}
+
 export interface RegisterResult {
   success: boolean;
   message: string;
@@ -638,6 +649,29 @@ class AuthApi {
   async autoRefreshIfNeeded(): Promise<void> {
     if (await this.isTokenExpiringSoon()) {
       await this.refreshToken();
+    }
+  }
+
+  /**
+   * 修改密码
+   * @param input 包含userId, oldPassword, newPassword
+   * @returns 修改结果，成功后前端应跳转登录页
+   */
+  async changePassword(input: ChangePasswordInput): Promise<ChangePasswordResult> {
+    try {
+      const result = await this.trpc.mutate<ChangePasswordResult>('auth.changePassword', input);
+      
+      // 修改密码成功后清除本地Token，强制重新登录
+      if (result.success) {
+        await this.tokenStorage.removeToken();
+      }
+
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        message: (err as Error).message,
+      };
     }
   }
 

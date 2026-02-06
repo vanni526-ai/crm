@@ -1477,3 +1477,11 @@
 - [x] 接口文档更新：sdk/订单交付状态接口文档.md
 - [x] 测试验证(6个测试用例全部通过)
 - [x] 保存检查点
+
+
+### 170. 后端添加auth.changePassword接口
+- [x] 检查authRouter中现有密码相关逻辑(bcryptjs+passwordUtils)
+- [x] 实现auth.changePassword接口(验证旧密码、检查新旧不同、加密更新)
+- [x] 更新SDK: ChangePasswordInput/ChangePasswordResult类型 + changePassword()方法
+- [x] 编写单元测试(10个测试用例全部通过)
+- [x] 保存检查点
