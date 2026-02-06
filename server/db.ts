@@ -4169,7 +4169,10 @@ export async function listUserNotifications(params: {
     db.select()
       .from(userNotifications)
       .where(whereClause)
-      .orderBy(desc(userNotifications.createdAt))
+      .orderBy(
+        sql`CASE WHEN ${userNotifications.status} = 'unread' THEN 0 WHEN ${userNotifications.status} = 'read' THEN 1 WHEN ${userNotifications.status} = 'replied' THEN 2 WHEN ${userNotifications.status} = 'archived' THEN 3 ELSE 4 END`,
+        desc(userNotifications.createdAt)
+      )
       .limit(pageSize)
       .offset((page - 1) * pageSize),
     db.select({ count: sql<number>`count(*)` })
