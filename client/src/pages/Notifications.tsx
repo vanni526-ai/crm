@@ -2,15 +2,13 @@ import { trpc } from "@/lib/trpc";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Bell, Eye, MessageSquareReply, Archive, Trash2, CheckCheck, Search, RefreshCw, ChevronLeft, ChevronRight, Inbox } from "lucide-react";
-import { useState, useMemo } from "react";
+import { Bell, Eye, Archive, Trash2, CheckCheck, RefreshCw, ChevronLeft, ChevronRight, Inbox, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
 
 const TYPE_MAP: Record<string, { label: string; color: string }> = {
   general: { label: "一般留言", color: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300" },
@@ -24,7 +22,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   unread: { label: "未读", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300" },
   read: { label: "已读", color: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" },
   replied: { label: "已回复", color: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" },
-  archived: { label: "已归档", color: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400" },
+  archived: { label: "已处理", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" },
 };
 
 export default function Notifications() {
@@ -34,8 +32,6 @@ export default function Notifications() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedNotification, setSelectedNotification] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isReplyOpen, setIsReplyOpen] = useState(false);
-  const [replyContent, setReplyContent] = useState("");
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const pageSize = 20;
 
@@ -67,25 +63,14 @@ export default function Notifications() {
     onError: (err) => toast.error(err.message || "操作失败"),
   });
 
-  const replyMutation = trpc.notifications.reply.useMutation({
-    onSuccess: () => {
-      toast.success("回复成功");
-      setIsReplyOpen(false);
-      setReplyContent("");
-      utils.notifications.list.invalidate();
-      utils.notifications.unreadCount.invalidate();
-    },
-    onError: (err) => toast.error(err.message || "回复失败"),
-  });
-
   const archiveMutation = trpc.notifications.archive.useMutation({
     onSuccess: () => {
-      toast.success("已归档");
+      toast.success("已标记为已处理");
       setIsDetailOpen(false);
       utils.notifications.list.invalidate();
       utils.notifications.unreadCount.invalidate();
     },
-    onError: (err) => toast.error(err.message || "归档失败"),
+    onError: (err) => toast.error(err.message || "操作失败"),
   });
 
   const deleteMutation = trpc.notifications.delete.useMutation({
@@ -109,23 +94,6 @@ export default function Notifications() {
     if (notification.status === "unread") {
       markReadMutation.mutate({ id: notification.id });
     }
-  };
-
-  const handleReply = (notification: any) => {
-    setSelectedNotification(notification);
-    setReplyContent(notification.adminReply || "");
-    setIsReplyOpen(true);
-  };
-
-  const handleSubmitReply = () => {
-    if (!replyContent.trim()) {
-      toast.error("请输入回复内容");
-      return;
-    }
-    replyMutation.mutate({
-      id: selectedNotification.id,
-      adminReply: replyContent.trim(),
-    });
   };
 
   const handleBatchMarkRead = () => {
@@ -184,7 +152,7 @@ export default function Notifications() {
         </div>
 
         {/* 统计卡片 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-white/20">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -207,25 +175,14 @@ export default function Notifications() {
               </div>
             </CardContent>
           </Card>
-          <Card className="backdrop-blur-sm bg-green-50/80 dark:bg-green-900/20 border-green-200/50">
+          <Card className="backdrop-blur-sm bg-emerald-50/80 dark:bg-emerald-900/20 border-emerald-200/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-green-700 dark:text-green-300">已回复</p>
-                  <p className="text-2xl font-bold text-green-700 dark:text-green-300">-</p>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-300">已处理</p>
+                  <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">-</p>
                 </div>
-                <MessageSquareReply className="h-8 w-8 text-green-500" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="backdrop-blur-sm bg-gray-50/80 dark:bg-gray-800/80 border-gray-200/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">已归档</p>
-                  <p className="text-2xl font-bold">-</p>
-                </div>
-                <Archive className="h-8 w-8 text-gray-400" />
+                <CheckCircle2 className="h-8 w-8 text-emerald-500" />
               </div>
             </CardContent>
           </Card>
@@ -243,8 +200,7 @@ export default function Notifications() {
                   <SelectItem value="all">全部状态</SelectItem>
                   <SelectItem value="unread">未读</SelectItem>
                   <SelectItem value="read">已读</SelectItem>
-                  <SelectItem value="replied">已回复</SelectItem>
-                  <SelectItem value="archived">已归档</SelectItem>
+                  <SelectItem value="archived">已处理</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -331,7 +287,7 @@ export default function Notifications() {
                         <TableHead className="min-w-[200px]">内容摘要</TableHead>
                         <TableHead className="w-[80px]">状态</TableHead>
                         <TableHead className="w-[150px]">提交时间</TableHead>
-                        <TableHead className="w-[120px]">操作</TableHead>
+                        <TableHead className="w-[100px]">操作</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -384,19 +340,10 @@ export default function Notifications() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-7 w-7"
-                                title="回复"
-                                onClick={() => handleReply(n)}
-                              >
-                                <MessageSquareReply className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                title="归档"
+                                title="标记为已处理"
                                 onClick={() => archiveMutation.mutate({ id: n.id })}
                               >
-                                <Archive className="h-4 w-4" />
+                                <CheckCircle2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </TableCell>
@@ -439,9 +386,9 @@ export default function Notifications() {
           </CardContent>
         </Card>
 
-        {/* 详情弹窗 */}
+        {/* 详情弹窗 - 加大内容框 */}
         <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Bell className="h-5 w-5" />
@@ -452,7 +399,7 @@ export default function Notifications() {
               </DialogDescription>
             </DialogHeader>
             {selectedNotification && (
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">用户</p>
@@ -479,45 +426,29 @@ export default function Notifications() {
                 {selectedNotification.title && (
                   <div>
                     <p className="text-sm text-muted-foreground">标题</p>
-                    <p className="font-medium">{selectedNotification.title}</p>
+                    <p className="font-medium text-base">{selectedNotification.title}</p>
                   </div>
                 )}
 
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">留言内容</p>
-                  <div className="p-4 bg-muted/50 rounded-lg whitespace-pre-wrap text-sm">
+                  <p className="text-sm text-muted-foreground mb-2">留言内容</p>
+                  <div className="p-5 bg-muted/50 rounded-lg whitespace-pre-wrap text-sm leading-relaxed min-h-[200px] max-h-[500px] overflow-y-auto border">
                     {selectedNotification.content}
                   </div>
                 </div>
 
-                {selectedNotification.adminReply && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">管理员回复</p>
-                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg whitespace-pre-wrap text-sm border border-green-200 dark:border-green-800">
-                      {selectedNotification.adminReply}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      回复时间：{formatDate(selectedNotification.repliedAt)}
-                    </p>
-                  </div>
-                )}
-
-                <DialogFooter className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleReply(selectedNotification)}
-                  >
-                    <MessageSquareReply className="h-4 w-4 mr-1" />
-                    {selectedNotification.adminReply ? "修改回复" : "回复"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => archiveMutation.mutate({ id: selectedNotification.id })}
-                    disabled={archiveMutation.isPending}
-                  >
-                    <Archive className="h-4 w-4 mr-1" />
-                    归档
-                  </Button>
+                <DialogFooter className="flex gap-2 pt-2">
+                  {selectedNotification.status !== "archived" && (
+                    <Button
+                      variant="outline"
+                      onClick={() => archiveMutation.mutate({ id: selectedNotification.id })}
+                      disabled={archiveMutation.isPending}
+                      className="text-emerald-600 border-emerald-300 hover:bg-emerald-50 dark:text-emerald-400 dark:border-emerald-700 dark:hover:bg-emerald-900/30"
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-1" />
+                      标记为已处理
+                    </Button>
+                  )}
                   <Button
                     variant="destructive"
                     onClick={() => {
@@ -533,47 +464,6 @@ export default function Notifications() {
                 </DialogFooter>
               </div>
             )}
-          </DialogContent>
-        </Dialog>
-
-        {/* 回复弹窗 */}
-        <Dialog open={isReplyOpen} onOpenChange={setIsReplyOpen}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>回复留言</DialogTitle>
-              <DialogDescription>
-                回复用户 {selectedNotification?.userName || `用户${selectedNotification?.userId}`} 的留言
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">原始留言</p>
-                <div className="p-3 bg-muted/50 rounded-lg text-sm max-h-[120px] overflow-y-auto">
-                  {selectedNotification?.content}
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium mb-1">回复内容</p>
-                <Textarea
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.target.value)}
-                  placeholder="请输入回复内容..."
-                  rows={5}
-                  className="resize-none"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsReplyOpen(false)}>
-                取消
-              </Button>
-              <Button
-                onClick={handleSubmitReply}
-                disabled={replyMutation.isPending || !replyContent.trim()}
-              >
-                {replyMutation.isPending ? "提交中..." : "提交回复"}
-              </Button>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
