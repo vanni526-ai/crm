@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { formatDateTimeBJ } from "@/lib/timezone";
 
 export default function ParsingLearning() {
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -414,7 +415,7 @@ export default function ParsingLearning() {
                           <Badge variant="outline">{correction.correctionType}</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          修正人: {correction.userName} · {correction.createdAt ? new Date(correction.createdAt).toLocaleString() : '未知时间'}
+                          修正人: {correction.userName} · {correction.createdAt ? formatDateTimeBJ(correction.createdAt) : '未知时间'}
                         </p>
                       </div>
                     </div>
@@ -466,7 +467,7 @@ export default function ParsingLearning() {
                           {history.isActive && <Badge variant="default">当前版本</Badge>}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {history.createdAt ? new Date(history.createdAt).toLocaleString() : '未知时间'} · 基于{history.correctionCount}条修正记录
+                          {history.createdAt ? formatDateTimeBJ(history.createdAt) : '未知时间'} · 基于{history.correctionCount}条修正记录
                         </p>
                       </div>
                     </div>

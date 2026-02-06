@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { formatDateBJ } from "@/lib/timezone";
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import * as XLSX from "xlsx";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -347,7 +348,7 @@ export default function Courses() {
                     />
                   </TableCell>
                   <TableCell>
-                    {new Date(course.createdAt).toLocaleDateString("zh-CN")}
+                    {formatDateBJ(course.createdAt)}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">

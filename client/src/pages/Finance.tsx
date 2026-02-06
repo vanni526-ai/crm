@@ -15,6 +15,7 @@ import { zhCN } from "date-fns/locale";
 import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle, MapPin, RefreshCw } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
+import { formatDateBJ } from "@/lib/timezone";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 
 export default function Finance() {
@@ -1156,7 +1157,7 @@ export default function Finance() {
                         filteredIncomeRecords.map((record) => (
                           <TableRow key={record.id}>
                             <TableCell>
-                              {record.date ? new Date(record.date).toLocaleDateString() : "-"}
+                              {record.date ? formatDateBJ(record.date) : "-"}
                             </TableCell>
                             <TableCell className="font-medium">{record.orderNo}</TableCell>
                             <TableCell>
@@ -1197,7 +1198,7 @@ export default function Finance() {
                         filteredExpenseRecords.map((record) => (
                           <TableRow key={record.id}>
                             <TableCell>
-                              {record.date ? new Date(record.date).toLocaleDateString() : "-"}
+                              {record.date ? formatDateBJ(record.date) : "-"}
                             </TableCell>
                             <TableCell className="font-medium">{record.orderNo}</TableCell>
                             <TableCell>

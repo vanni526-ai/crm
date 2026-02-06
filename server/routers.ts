@@ -25,6 +25,7 @@ import { salesCityPerformanceRouter } from "./salesCityPerformanceRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
+import { formatDateBeijing } from "../shared/timezone";
 import * as db from "./db";
 import { getDb, getOrderById } from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
@@ -1145,7 +1146,7 @@ export const appRouter = router({
               deliveryRoom: order.deliveryRoom || "",
               deliveryTeacher: order.deliveryTeacher || "",
               deliveryCourse: order.deliveryCourse || "",
-              classDate: order.classDate ? new Date(order.classDate).toLocaleDateString("zh-CN") : "",
+              classDate: order.classDate ? formatDateBeijing(order.classDate) : "",
               classTime: order.classTime || "",
               notes: order.notes || "",
             });
@@ -1168,7 +1169,7 @@ export const appRouter = router({
           return {
             success: true,
             data: base64,
-            filename: `订单列表_${new Date().toLocaleDateString("zh-CN").replace(/\//g, "-")}.xlsx`,
+            filename: `订单列表_${formatDateBeijing(new Date())}.xlsx`,
           };
         } catch (error) {
           console.error("导出Excel失败:", error);

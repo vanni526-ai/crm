@@ -42,6 +42,7 @@ import {
   InsertClassroom,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { formatDateBeijing, BEIJING_TIMEZONE } from "../shared/timezone";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -513,8 +514,8 @@ export async function getCityFinancialStats(dateRange?: string) {
         startDate = new Date(0); // 全部
     }
 
-    const startDateStr = startDate.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
+    const startDateStr = formatDateBeijing(startDate);
+    const endDateStr = formatDateBeijing(endDate);
     
     query = query.where(
       sql`${orders.classDate} >= ${startDateStr} AND ${orders.classDate} <= ${endDateStr}`
@@ -1221,7 +1222,7 @@ export async function getCityRevenueTrend() {
     })
     .from(orders)
     .where(
-      sql`${orders.status} != 'cancelled' AND ${orders.paymentDate} >= ${sixMonthsAgo.toISOString().split('T')[0]}`
+      sql`${orders.status} != 'cancelled' AND ${orders.paymentDate} >= ${formatDateBeijing(sixMonthsAgo)}`
     );
 
   // 按城市和月份分组计算收益
@@ -1297,9 +1298,7 @@ export async function getCustomerStats() {
     todayReturningCustomers: 0,
   };
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = formatDateBeijing(new Date());
 
   // 累计顾客数(所有客户)
   const totalCustomersResult = await db
@@ -1381,7 +1380,7 @@ export async function getChurnRiskCustomers() {
   // 计算30天前的日期
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0];
+  const thirtyDaysAgoStr = formatDateBeijing(thirtyDaysAgo);
 
   // 查找所有有过订单的客户（老客）
   const allCustomersWithOrders = await db
@@ -2023,7 +2022,7 @@ export async function getYearlySales(
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  const currentYear = new Date().getFullYear();
+  const currentYear = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Shanghai' })).getFullYear();
   const start = startYear || currentYear - 2;
   const end = endYear || currentYear;
   
@@ -3259,7 +3258,7 @@ export async function getCityMonthlyTrends() {
 
     // 提取年月 (YYYY-MM格式)
     // classDate可能是Date类型或字符串类型
-    const dateStr = typeof classDate === 'string' ? classDate : classDate.toISOString().split('T')[0];
+    const dateStr = typeof classDate === 'string' ? classDate : formatDateBeijing(classDate);
     const month = dateStr.substring(0, 7);
 
     if (!trendsMap[city]) {

@@ -15,6 +15,7 @@ import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { SmartRegisterDialog } from "@/components/SmartRegisterDialog";
 import { useForm } from "react-hook-form";
+import { formatDateBJ, formatDateTimeBJ } from "@/lib/timezone";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -1026,13 +1027,13 @@ export default function Orders() {
                           </TableCell>
                           <TableCell>¥{order.partnerFee || "0.00"}</TableCell>
                           <TableCell>¥{order.finalAmount || "0.00"}</TableCell>
-                          <TableCell>{order.paymentDate ? (typeof order.paymentDate === 'string' ? order.paymentDate : new Date(order.paymentDate).toLocaleDateString()) : "-"}</TableCell>
+                          <TableCell>{order.paymentDate ? (typeof order.paymentDate === 'string' ? order.paymentDate : formatDateBJ(order.paymentDate)) : "-"}</TableCell>
                           <TableCell>{order.paymentTime || "-"}</TableCell>
                           <TableCell>{order.deliveryCity || "-"}</TableCell>
                           <TableCell>{order.deliveryRoom || "-"}</TableCell>
                           <TableCell>{order.deliveryTeacher || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.deliveryCourse || "-"}</TableCell>
-                          <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : new Date(order.classDate).toLocaleDateString()) : "-"}</TableCell>
+                          <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : formatDateBJ(order.classDate)) : "-"}</TableCell>
                           <TableCell>{order.classTime || "-"}</TableCell>
                           <TableCell className="max-w-[150px]">
                             {order.notes ? (
@@ -1064,9 +1065,7 @@ export default function Orders() {
                             </Badge>
                           </TableCell>
                           <TableCell>
-                            {order.createdAt instanceof Date 
-                              ? order.createdAt.toLocaleDateString()
-                              : new Date(order.createdAt).toLocaleDateString()}
+                            {formatDateBJ(order.createdAt)}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
@@ -1256,9 +1255,7 @@ export default function Orders() {
                     <div>
                       <p className="text-sm text-muted-foreground">创建时间</p>
                       <p className="font-medium">
-                        {selectedOrder.createdAt instanceof Date 
-                          ? selectedOrder.createdAt.toLocaleString()
-                          : new Date(selectedOrder.createdAt).toLocaleString()}
+                        {formatDateTimeBJ(selectedOrder.createdAt)}
                       </p>
                     </div>
                   </div>
@@ -1287,11 +1284,9 @@ export default function Orders() {
                       <p className="text-sm text-muted-foreground">支付日期</p>
                       <p className="font-medium">
                         {selectedOrder.paymentDate 
-                          ? (selectedOrder.paymentDate instanceof Date 
-                              ? selectedOrder.paymentDate.toLocaleDateString()
-                              : (typeof selectedOrder.paymentDate === 'string' 
-                                  ? selectedOrder.paymentDate 
-                                  : new Date(selectedOrder.paymentDate).toLocaleDateString()))
+                          ? (typeof selectedOrder.paymentDate === 'string' 
+                              ? selectedOrder.paymentDate 
+                              : formatDateBJ(selectedOrder.paymentDate))
                           : "-"}
                       </p>
                     </div>
@@ -1355,11 +1350,9 @@ export default function Orders() {
                       <p className="text-sm text-muted-foreground">上课日期</p>
                       <p className="font-medium">
                         {selectedOrder.classDate 
-                          ? (selectedOrder.classDate instanceof Date 
-                              ? selectedOrder.classDate.toLocaleDateString()
-                              : (typeof selectedOrder.classDate === 'string' 
-                                  ? selectedOrder.classDate 
-                                  : new Date(selectedOrder.classDate).toLocaleDateString()))
+                          ? (typeof selectedOrder.classDate === 'string' 
+                              ? selectedOrder.classDate 
+                              : formatDateBJ(selectedOrder.classDate))
                           : "-"}
                       </p>
                     </div>
@@ -2161,7 +2154,7 @@ export default function Orders() {
                               <p className="text-sm font-medium">{field.label}</p>
                               <p className="text-xs text-muted-foreground mt-1 truncate">
                                 {value instanceof Date 
-                                  ? value.toLocaleDateString()
+                                  ? formatDateBJ(value)
                                   : (value || '(空)')}
                               </p>
                             </div>

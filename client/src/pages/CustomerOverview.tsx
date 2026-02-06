@@ -94,7 +94,7 @@ export default function CustomerOverview() {
                         <td className="p-3">{customer.wechatId || '-'}</td>
                         <td className="p-3">{customer.phone || '-'}</td>
                         <td className="p-3">
-                          {customer.lastOrderDate ? new Date(customer.lastOrderDate).toLocaleDateString('zh-CN') : '-'}
+                          {customer.lastOrderDate ? new Date(customer.lastOrderDate).toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' }) : '-'}
                         </td>
                         <td className="p-3">
                           <span className={customer.daysSinceLastOrder > 60 ? 'text-red-500 font-medium' : 'text-orange-500'}>
@@ -146,7 +146,7 @@ export default function CustomerOverview() {
                         <td className="p-3">{customer.phone || '-'}</td>
                         <td className="p-3">{customer.trafficSource || '-'}</td>
                         <td className="p-3">
-                          {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('zh-CN') : '-'}
+                          {customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' }) : '-'}
                         </td>
                       </tr>
                     ))}

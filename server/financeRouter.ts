@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
+import { formatDateBeijing, formatDateTimeBeijing, BEIJING_TIMEZONE } from "../shared/timezone";
 import ExcelJS from "exceljs";
 import * as db from "./db";
 
@@ -163,7 +164,7 @@ export const financeRouter = router({
         filteredOrders.forEach((order) => {
           // 收入记录
           detailSheet.addRow({
-            date: new Date(order.createdAt).toLocaleDateString("zh-CN"),
+            date: formatDateBeijing(order.createdAt),
             orderNo: order.orderNo,
             paymentChannel: order.paymentChannel || "-",
             description: `订单收款 - ${order.customerName}`,
@@ -174,7 +175,7 @@ export const financeRouter = router({
           // 老师费用支出记录
           if (order.teacherFee && parseFloat(order.teacherFee) > 0) {
             detailSheet.addRow({
-              date: new Date(order.createdAt).toLocaleDateString("zh-CN"),
+              date: formatDateBeijing(order.createdAt),
               orderNo: order.orderNo,
               paymentChannel: "-",
               description: `老师费用 - ${order.deliveryTeacher || "未知"}`,
@@ -186,7 +187,7 @@ export const financeRouter = router({
           // 车费支出记录
           if (order.transportFee && parseFloat(order.transportFee) > 0) {
             detailSheet.addRow({
-              date: new Date(order.createdAt).toLocaleDateString("zh-CN"),
+              date: formatDateBeijing(order.createdAt),
               orderNo: order.orderNo,
               paymentChannel: "-",
               description: `车费`,
@@ -213,7 +214,7 @@ export const financeRouter = router({
         return {
           success: true,
           data: base64,
-          filename: `财务报表_${new Date().toLocaleDateString("zh-CN").replace(/\//g, "-")}.xlsx`,
+          filename: `财务报表_${formatDateBeijing(new Date())}.xlsx`,
         };
       } catch (error) {
         console.error("导出Excel失败:", error);

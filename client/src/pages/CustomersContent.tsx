@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { formatDateBJ, formatDateTimeBJ } from "@/lib/timezone";
 
 const customerSchema = z.object({
   name: z.string().min(1, "客户姓名不能为空"),
@@ -546,7 +547,7 @@ export default function CustomersContent() {
                         </TableCell>
                         <TableCell>
                           {customer.firstOrderDate 
-                            ? new Date(customer.firstOrderDate).toLocaleDateString() 
+                            ? formatDateBJ(customer.firstOrderDate) 
                             : "-"}
                         </TableCell>
                         <TableCell className="font-medium text-blue-600">
@@ -556,7 +557,7 @@ export default function CustomersContent() {
                           {customer.classCount || 0}次
                         </TableCell>
                         <TableCell>
-                          {customer.lastOrderDate ? new Date(customer.lastOrderDate).toLocaleDateString() : "-"}
+                          {customer.lastOrderDate ? formatDateBJ(customer.lastOrderDate) : "-"}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
@@ -820,7 +821,7 @@ function CustomerDetailDialog({
                         <TableCell>￥{order.paymentAmount}</TableCell>
                         <TableCell>
                           {order.paymentDate
-                            ? new Date(order.paymentDate).toLocaleDateString()
+                            ? formatDateBJ(order.paymentDate)
                             : "-"}
                         </TableCell>
                         <TableCell>
@@ -869,7 +870,7 @@ function CustomerDetailDialog({
                       <TableRow key={schedule.id}>
                         <TableCell className="font-medium">{schedule.courseType}</TableCell>
                         <TableCell>
-                          {new Date(schedule.startTime).toLocaleString()}
+                          {formatDateTimeBJ(schedule.startTime)}
                         </TableCell>
                         <TableCell>{schedule.location || "-"}</TableCell>
                         <TableCell>{schedule.teacherName || "-"}</TableCell>
@@ -910,7 +911,7 @@ function CustomerDetailDialog({
                               {order.status === "completed" ? "已完成" : "进行中"}
                             </Badge>
                           </TableCell>
-                          <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                          <TableCell>{formatDateBJ(order.createdAt)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

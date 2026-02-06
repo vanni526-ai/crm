@@ -3,13 +3,14 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, ShoppingCart, Users, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
+import { formatDateBJ, startOfMonthBJ, todayBJ } from "@/lib/timezone";
 
 export default function Home() {
   const { data: user } = trpc.auth.me.useQuery();
   
   // 获取本月数据统计
-  const startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-  const endDate = new Date().toISOString().split('T')[0];
+  const startDate = startOfMonthBJ();
+  const endDate = todayBJ();
   
   const { data: stats } = trpc.analytics.orderStats.useQuery({
     startDate,
@@ -363,7 +364,7 @@ function InactiveCustomersAlert() {
             <div key={customer.customerId} className="flex justify-between items-center p-2 rounded bg-background/50">
               <span className="font-medium">{customer.customerName}</span>
               <span className="text-sm text-muted-foreground">
-                最后消费: {new Date(customer.lastOrderDate).toLocaleDateString()}
+                最后消费: {formatDateBJ(customer.lastOrderDate)}
               </span>
             </div>
           ))}

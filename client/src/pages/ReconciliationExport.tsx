@@ -16,6 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Download, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
+import { formatDateBJ, formatDateTimeBJ } from "@/lib/timezone";
 
 export default function ReconciliationExport() {
   const [startDate, setStartDate] = useState("");
@@ -77,14 +78,14 @@ export default function ReconciliationExport() {
       order.channelOrderNo || "",
       order.paymentAmount || "0",
       order.courseAmount || "0",
-      order.classDate ? new Date(order.classDate).toLocaleDateString() : "",
+      order.classDate ? formatDateBJ(order.classDate) : "",
       order.classTime || "",
       order.deliveryCity || "",
       order.deliveryTeacher || "",
       order.deliveryCourse || "",
       order.salesPerson || "",
       order.status || "",
-      order.createdAt ? new Date(order.createdAt).toLocaleString() : "",
+      order.createdAt ? formatDateTimeBJ(order.createdAt) : "",
     ]);
 
     // 组装CSV内容
@@ -280,7 +281,7 @@ export default function ReconciliationExport() {
                         </TableCell>
                         <TableCell>
                           {order.classDate
-                            ? new Date(order.classDate).toLocaleDateString()
+                            ? formatDateBJ(order.classDate)
                             : "-"}
                         </TableCell>
                         <TableCell>{order.deliveryCity || "-"}</TableCell>

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Edit, UserCheck, UserX, Shield } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
+import { formatDateTimeBJ } from "@/lib/timezone";
 import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function Users() {
@@ -214,7 +215,7 @@ export default function Users() {
                         <TableCell>{getStatusBadge(user.isActive)}</TableCell>
                         <TableCell>
                           {user.lastSignedIn
-                            ? new Date(user.lastSignedIn).toLocaleString()
+                            ? formatDateTimeBJ(user.lastSignedIn)
                             : "-"}
                         </TableCell>
                         <TableCell className="text-right">

@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Calendar, Clock, Search } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
+import { formatDateBJ, formatDateTimeBJ, formatTimeBJ } from "@/lib/timezone";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -160,7 +161,7 @@ export default function Schedules() {
     const grouped = new Map<string, typeof filteredSchedules>();
     
     filteredSchedules.forEach((schedule) => {
-      const date = new Date(schedule.startTime).toLocaleDateString("zh-CN");
+      const date = formatDateBJ(schedule.startTime);
       if (!grouped.has(date)) {
         grouped.set(date, []);
       }
@@ -281,15 +282,9 @@ export default function Schedules() {
                                     <div className="flex items-center space-x-2">
                                       <Badge>{schedule.courseType}</Badge>
                                       <span className="text-sm text-muted-foreground">
-                                        {new Date(schedule.startTime).toLocaleTimeString([], {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}{" "}
+                                        {formatTimeBJ(schedule.startTime)}{" "}
                                         -{" "}
-                                        {new Date(schedule.endTime).toLocaleTimeString([], {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}
+                                        {formatTimeBJ(schedule.endTime)}
                                       </span>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-muted-foreground">
@@ -597,8 +592,8 @@ function ScheduleTable({
                 <TableCell>{schedule.teacherName || "-"}</TableCell>
                 <TableCell>{schedule.matchedOrder?.deliveryCity || "-"}</TableCell>
                 <TableCell>{schedule.matchedOrder?.deliveryRoom || "-"}</TableCell>
-                <TableCell>{new Date(schedule.startTime).toLocaleString()}</TableCell>
-                <TableCell>{new Date(schedule.endTime).toLocaleString()}</TableCell>
+                <TableCell>{formatDateTimeBJ(schedule.startTime)}</TableCell>
+                <TableCell>{formatDateTimeBJ(schedule.endTime)}</TableCell>
                 <TableCell>
                   {schedule.channelOrderNo ? (
                     <span className="text-sm">{schedule.channelOrderNo}</span>

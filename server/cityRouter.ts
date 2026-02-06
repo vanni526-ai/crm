@@ -93,7 +93,7 @@ export const cityRouter = router({
     // 返回Base64编码的Excel文件
     return {
       data: Buffer.from(buffer).toString("base64"),
-      filename: `城市统计报表_${new Date().toISOString().split('T')[0]}.xlsx`,
+      filename: `城市统计报表_${new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' })}.xlsx`,
     };
   }),
 });

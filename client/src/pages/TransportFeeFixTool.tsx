@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { formatDateBJ } from "@/lib/timezone";
 
 /**
  * 车费修复工具页面
@@ -203,7 +204,7 @@ export default function TransportFeeFixTool() {
                       </div>
                       <div>
                         <span className="text-muted-foreground">上课日期: </span>
-                        <span>{order.classDate ? new Date(order.classDate).toLocaleDateString() : "未填写"}</span>
+                        <span>{order.classDate ? formatDateBJ(order.classDate) : "未填写"}</span>
                       </div>
                       <div>
                         <span className="text-muted-foreground">老师: </span>

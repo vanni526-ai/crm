@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { formatDateBJ } from "@/lib/timezone";
 import {
   ArrowLeft, Download, Settings, TrendingUp, TrendingDown, Minus,
   BarChart3, Filter, Percent, ArrowUpRight, ArrowDownRight,
@@ -48,9 +49,9 @@ export default function SalesCityPerformance() {
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
     d.setDate(1);
-    return d.toISOString().split("T")[0];
+    return formatDateBJ(d);
   });
-  const [endDate, setEndDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [endDate, setEndDate] = useState(() => formatDateBJ(new Date()));
   const [selectedSalesperson, setSelectedSalesperson] = useState<number | undefined>();
   const [selectedCity, setSelectedCity] = useState<string | undefined>();
 
@@ -324,8 +325,8 @@ export default function SalesCityPerformance() {
       default:
         return;
     }
-    setStartDate(start.toISOString().split("T")[0]);
-    setEndDate(end.toISOString().split("T")[0]);
+    setStartDate(formatDateBJ(start));
+    setEndDate(formatDateBJ(end));
   };
 
   return (

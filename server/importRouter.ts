@@ -518,7 +518,7 @@ export const importRouter = router({
             const customerName = summaryParts[0] || '未知客户';
             
             // 提取日期和时间
-            const classDateStr = event.startTime.toISOString().split('T')[0];
+            const classDateStr = event.startTime.toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' });
             const classDate = new Date(classDateStr); // 转换为Date对象
             const startHour = event.startTime.getHours().toString().padStart(2, '0');
             const startMin = event.startTime.getMinutes().toString().padStart(2, '0');

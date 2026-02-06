@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Upload, FileSpreadsheet, FileText, Calendar, CheckCircle, XCircle, List, CalendarDays, CalendarRange, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { formatDateBJ, formatDateTimeBJ } from "@/lib/timezone";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import MonthlyPartnerSettlement from "@/components/MonthlyPartnerSettlement";
 
@@ -345,7 +346,7 @@ export default function Import() {
                           .map((schedule) => (
                             <TableRow key={schedule.id}>
                               <TableCell className="font-medium">
-                                {schedule.classDate ? new Date(schedule.classDate).toLocaleDateString() : '-'}
+                                {schedule.classDate ? formatDateBJ(schedule.classDate) : '-'}
                               </TableCell>
                               <TableCell>{schedule.classTime || '-'}</TableCell>
                               <TableCell>{schedule.deliveryCourse || '-'}</TableCell>
@@ -362,7 +363,7 @@ export default function Import() {
                       {/* 简单的按日期分组展示 */}
                       {Object.entries(
                         schedules.reduce((acc, schedule) => {
-                          const date = schedule.classDate ? new Date(schedule.classDate).toLocaleDateString() : '未设置日期';
+                          const date = schedule.classDate ? formatDateBJ(schedule.classDate) : '未设置日期';
                           if (!acc[date]) acc[date] = [];
                           acc[date].push(schedule);
                           return acc;
@@ -460,7 +461,7 @@ export default function Import() {
                             // 填充日期单元格
                             for (let day = 1; day <= daysInMonth; day++) {
                               const currentDate = new Date(year, month, day);
-                              const dateStr = currentDate.toLocaleDateString();
+                              const dateStr = formatDateBJ(currentDate);
                               const isToday = 
                                 currentDate.getDate() === today.getDate() &&
                                 currentDate.getMonth() === today.getMonth() &&
@@ -470,7 +471,7 @@ export default function Import() {
                               const daySchedules = schedules.filter((schedule) => {
                                 if (!schedule.classDate) return false;
                                 const scheduleDate = new Date(schedule.classDate);
-                                return scheduleDate.toLocaleDateString() === dateStr;
+                                return formatDateBJ(scheduleDate) === dateStr;
                               });
 
                               cells.push(
@@ -559,7 +560,7 @@ export default function Import() {
                         <TableCell>{log.totalRows}</TableCell>
                         <TableCell className="text-green-600">{log.successRows}</TableCell>
                         <TableCell className="text-red-600">{log.failedRows}</TableCell>
-                        <TableCell>{new Date(log.createdAt).toLocaleString()}</TableCell>
+                        <TableCell>{formatDateTimeBJ(log.createdAt)}</TableCell>
                         <TableCell>
                           {log.failedRows === 0 ? (
                             <CheckCircle className="h-5 w-5 text-green-600" />

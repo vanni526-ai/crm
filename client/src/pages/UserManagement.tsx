@@ -239,7 +239,7 @@ export default function UserManagement() {
                     </TableCell>
                     <TableCell>
                       {user.lastSignedIn
-                        ? new Date(user.lastSignedIn).toLocaleString("zh-CN")
+                        ? new Date(user.lastSignedIn).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
                         : "-"}
                     </TableCell>
                     <TableCell className="text-right">

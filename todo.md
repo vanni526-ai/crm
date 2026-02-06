@@ -1599,3 +1599,14 @@
 - [x] 修复getSalesStatistics/getMonthlySales/getYearlySales: 同时匹配salespersonId和salesPerson文本
 - [x] 测试验证数据一致性(33个测试全部通过)
 - [x] 保存检查点
+
+
+### 182. 统一所有时间为北京时间（UTC+8）
+- [x] 排查后端所有涉及时间的代码(46个文件，修复db.ts/routers.ts/financeRouter.ts/cityRouter.ts/reconciliationRouter.ts/importRouter.ts)
+- [x] 排查前端所有涉及时间显示的代码(25个文件，64处时间显示)
+- [x] 后端统一设置时区为Asia/Shanghai(shared/timezone.ts: nowBeijing/formatDateBeijing/todayBeijing/getBeijingYear/getBeijingMonth)
+- [x] 前端统一时间显示为北京时间(client/src/lib/timezone.ts: formatDateBJ/formatDateTimeBJ/formatTimeBJ/todayBJ)
+- [x] 创建统一的时间工具函数(后端shared/timezone.ts + 前端client/src/lib/timezone.ts)
+- [x] 修复前端页面: Home/Orders/Customers/CustomersContent/Customers_step1/Finance/Schedules/Import/Courses/ReconciliationExport/ParsingLearning/TransportFeeFixTool/Users/Notifications/SalesCityPerformance/CustomerOverview/UserManagement/UserManagementContent
+- [x] 测试验证时间一致性(33个测试全部通过，TypeScript无错误)
+- [x] 保存检查点
