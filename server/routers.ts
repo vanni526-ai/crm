@@ -467,10 +467,29 @@ export const appRouter = router({
           partnerFee = calculatedFee.toString();
         }
         
+        // 如果没有提供customerId，且当前用户是普通用户(role=user)，自动创建/关联业务客户
+        let resolvedCustomerId = input.customerId;
+        let resolvedCustomerName = input.customerName;
+        
+        if (!resolvedCustomerId && ctx.user.role === 'user') {
+          // App用户下单，自动创建/关联业务客户
+          const { customerId, customerName } = await db.getOrCreateCustomerForUser({
+            id: ctx.user.id,
+            name: ctx.user.name,
+            nickname: ctx.user.nickname,
+            phone: ctx.user.phone,
+          });
+          resolvedCustomerId = customerId;
+          // 如果没有提供客户名，使用自动获取的客户名
+          if (!resolvedCustomerName) {
+            resolvedCustomerName = customerName;
+          }
+        }
+        
         const orderData: any = {
           orderNo,
-          customerId: input.customerId || undefined,
-          customerName: input.customerName,
+          customerId: resolvedCustomerId || undefined,
+          customerName: resolvedCustomerName,
           salespersonId: input.salespersonId || undefined,
           salesId: ctx.user.id,
           salesPerson: input.salesPerson || undefined,

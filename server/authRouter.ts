@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { publicProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
-import { getDb } from "./db";
+import { getDb, getOrCreateCustomerForUser } from "./db";
 import { systemAccounts, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
@@ -303,11 +303,25 @@ export const authRouter = router({
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7天
       });
 
-      // 6. 更新最后登u5f55时间
+      // 6. 更新最后登录时间
       await drizzle
         .update(users)
         .set({ lastSignedIn: new Date() })
         .where(eq(users.id, user.id));
+
+      // 7. 登录时自动检查并补充业务客户记录(对于普通用户)
+      if (user.role === 'user' && user.phone) {
+        try {
+          await getOrCreateCustomerForUser({
+            id: user.id,
+            name: user.name,
+            nickname: user.nickname,
+            phone: user.phone,
+          });
+        } catch (err) {
+          console.error('[Login] 检查/创建业务客户失败:', err);
+        }
+      }
 
       return {
         success: true,
@@ -384,7 +398,20 @@ export const authRouter = router({
       // 获取插入的用户ID
       const userId = (result[0] as any).insertId;
 
-      // 5. 生成JWT Token(注册后自动登录)
+      // 5. 注册成功后立即创建业务客户记录
+      try {
+        await getOrCreateCustomerForUser({
+          id: userId,
+          name: input.name || input.phone,
+          nickname: input.nickname || null,
+          phone: input.phone,
+        });
+      } catch (err) {
+        // 业务客户创建失败不影响注册流程，记录日志
+        console.error('[Register] 创建业务客户失败:', err);
+      }
+
+      // 7. 生成JWT Token(注册后自动登录)
       const token = jwt.sign(
         {
           id: userId,
@@ -396,7 +423,7 @@ export const authRouter = router({
         { expiresIn: TOKEN_EXPIRY }
       );
 
-      // 6. 设置session cookie(Web端使用)
+      // 8. 设置session cookie(Web端使用)
       ctx.res?.cookie("session", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",

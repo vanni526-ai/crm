@@ -1454,3 +1454,13 @@
 - [x] 原因：订单是在代码部署前创建的，未触发新的自动关联逻辑
 - [x] 解决方案1：手动为该用户创建业务客户(ID:480003)并关联订单
 - [x] 解决方案2：创建批量同步脚本 scripts/syncAppUsersToCustomers.mjs
+
+
+### 168. 根本性解决App用户下单customerId为null的问题
+- [x] 检查routers.ts中orders.userCreate接口的自动关联逻辑(已有)
+- [x] 检查SDK中App调用的是哪个接口(orders.userCreate)
+- [x] 在orders.create接口添加自动关联逻辑(当role=user且无customerId时)
+- [x] 在auth.register注册接口中注册成功后立即创建业务客户
+- [x] 在auth.loginWithUserAccount登录接口中自动检查并补充业务客户
+- [x] 测试验证(10个测试用例全部通过)
+- [x] 保存检查点
