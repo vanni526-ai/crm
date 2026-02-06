@@ -1485,3 +1485,13 @@
 - [x] 更新SDK: ChangePasswordInput/ChangePasswordResult类型 + changePassword()方法
 - [x] 编写单元测试(10个测试用例全部通过)
 - [x] 保存检查点
+
+
+### 171. 密码重置功能（根据前端需求文档）
+- [x] 实现auth.resetPassword接口（手机号+验证码+新密码，测试环境验证码固定123456）
+- [x] 修复auth.changePassword: 改用protectedProcedure，去掉userId参数，通过ctx.user获取用户
+- [x] 修复返回格式: 统一使用{success, error?}而非{success, message}
+- [x] 更新SDK: 添加ResetPasswordInput/ResetPasswordResult类型 + resetPassword()方法
+- [x] 更新SDK: 修复ChangePasswordInput(去掉userId) + ChangePasswordResult(error替代message)
+- [x] 编写单元测试(16个测试用例全部通过)
+- [x] 保存检查点

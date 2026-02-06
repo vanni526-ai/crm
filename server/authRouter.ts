@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb, getOrCreateCustomerForUser } from "./db";
 import { systemAccounts, users } from "../drizzle/schema";
@@ -339,15 +339,100 @@ export const authRouter = router({
       };
     }),
 
-  // 修改密码(需要登录状态)
-  changePassword: publicProcedure
+  // 修改密码(需要登录状态，通过Token获取用户)
+  changePassword: protectedProcedure
     .input(
       z.object({
-        userId: z.number().int().positive("用户ID无效"),
         oldPassword: z.string().min(1, "请输入旧密码"),
         newPassword: z.string()
-          .min(6, "新密码至少6位")
-          .max(20, "新密码最多20位"),
+          .min(6, "密码长度至少6位")
+          .max(20, "密码最多20位"),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        return {
+          success: false,
+          error: "数据库连接失败",
+        };
+      }
+
+      const userId = ctx.user.id;
+
+      // 1. 查找用户
+      const userList = await drizzle
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (userList.length === 0) {
+        return {
+          success: false,
+          error: "用户不存在",
+        };
+      }
+
+      const user = userList[0];
+
+      // 2. 检查账号状态
+      if (!user.isActive) {
+        return {
+          success: false,
+          error: "账号已被禁用",
+        };
+      }
+
+      // 3. 验证旧密码
+      if (!user.password) {
+        return {
+          success: false,
+          error: "该账号未设置密码，无法修改",
+        };
+      }
+
+      const isOldPasswordValid = await verifyPassword(input.oldPassword, user.password);
+      if (!isOldPasswordValid) {
+        return {
+          success: false,
+          error: "旧密码错误",
+        };
+      }
+
+      // 4. 检查新旧密码不能相同
+      const isSamePassword = await verifyPassword(input.newPassword, user.password);
+      if (isSamePassword) {
+        return {
+          success: false,
+          error: "新密码不能与旧密码相同",
+        };
+      }
+
+      // 5. 加密新密码并更新
+      const hashedNewPassword = await hashPassword(input.newPassword);
+      await drizzle
+        .update(users)
+        .set({ password: hashedNewPassword })
+        .where(eq(users.id, userId));
+
+      return {
+        success: true,
+      };
+    }),
+
+  // 忘记密码 - 通过手机号+验证码重置密码
+  resetPassword: publicProcedure
+    .input(
+      z.object({
+        phone: z.string()
+          .min(11, "手机号格式错误")
+          .max(11, "手机号格式错误")
+          .regex(/^1[3-9]\d{9}$/, "请输入正确的手机号"),
+        code: z.string().min(1, "请输入验证码"),
+        newPassword: z.string()
+          .min(6, "密码长度至少6位")
+          .max(20, "密码最多20位"),
       })
     )
     .mutation(async ({ input }) => {
@@ -359,65 +444,50 @@ export const authRouter = router({
         });
       }
 
-      // 1. 查找用户
+      // 1. 验证手机号是否已注册
       const userList = await drizzle
         .select()
         .from(users)
-        .where(eq(users.id, input.userId))
+        .where(eq(users.phone, input.phone))
         .limit(1);
 
       if (userList.length === 0) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "用户不存在",
-        });
+        return {
+          success: false,
+          error: "手机号未注册",
+        };
       }
 
       const user = userList[0];
 
       // 2. 检查账号状态
       if (!user.isActive) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "账号已被禁用",
-        });
+        return {
+          success: false,
+          error: "账号已被禁用，请联系管理员",
+        };
       }
 
-      // 3. 验证旧密码
-      if (!user.password) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "该账号未设置密码，无法修改",
-        });
+      // 3. 验证短信验证码
+      // 测试环境固定验证码为 123456
+      // TODO: 生产环境接入真实短信服务
+      const isValidCode = input.code === "123456";
+      if (!isValidCode) {
+        return {
+          success: false,
+          error: "验证码错误",
+        };
       }
 
-      const isOldPasswordValid = await verifyPassword(input.oldPassword, user.password);
-      if (!isOldPasswordValid) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "旧密码错误",
-        });
-      }
-
-      // 4. 检查新旧密码不能相同
-      const isSamePassword = await verifyPassword(input.newPassword, user.password);
-      if (isSamePassword) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "新密码不能与旧密码相同",
-        });
-      }
-
-      // 5. 加密新密码并更新
+      // 4. 加密新密码并更新
       const hashedNewPassword = await hashPassword(input.newPassword);
       await drizzle
         .update(users)
         .set({ password: hashedNewPassword })
-        .where(eq(users.id, input.userId));
+        .where(eq(users.id, user.id));
 
       return {
         success: true,
-        message: "密码修改成功，请重新登录",
       };
     }),
 

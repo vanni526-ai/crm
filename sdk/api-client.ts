@@ -50,14 +50,24 @@ export interface RegisterInput {
 }
 
 export interface ChangePasswordInput {
-  userId: number;       // 用户ID
   oldPassword: string;  // 旧密码
   newPassword: string;  // 新密码(6-20位)
 }
 
 export interface ChangePasswordResult {
   success: boolean;
-  message: string;
+  error?: string;       // 错误信息（可选）
+}
+
+export interface ResetPasswordInput {
+  phone: string;        // 手机号(11位)
+  code: string;         // 短信验证码(测试环境固定123456)
+  newPassword: string;  // 新密码(6-20位)
+}
+
+export interface ResetPasswordResult {
+  success: boolean;
+  error?: string;       // 错误信息（可选）
 }
 
 export interface RegisterResult {
@@ -653,8 +663,8 @@ class AuthApi {
   }
 
   /**
-   * 修改密码
-   * @param input 包含userId, oldPassword, newPassword
+   * 修改密码(需要登录状态)
+   * @param input 包含oldPassword, newPassword
    * @returns 修改结果，成功后前端应跳转登录页
    */
   async changePassword(input: ChangePasswordInput): Promise<ChangePasswordResult> {
@@ -670,7 +680,24 @@ class AuthApi {
     } catch (err) {
       return {
         success: false,
-        message: (err as Error).message,
+        error: (err as Error).message,
+      };
+    }
+  }
+
+  /**
+   * 忘记密码 - 通过手机号+验证码重置密码
+   * @param input 包含phone, code, newPassword
+   * @returns 重置结果，成功后前端应跳转登录页
+   */
+  async resetPassword(input: ResetPasswordInput): Promise<ResetPasswordResult> {
+    try {
+      const result = await this.trpc.mutate<ResetPasswordResult>('auth.resetPassword', input);
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        error: (err as Error).message,
       };
     }
   }
