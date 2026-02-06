@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `sales_commission_configs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `salespersonId` int NOT NULL,\n  `city` varchar(50) NOT NULL,\n  `commissionRate` decimal(5,2) NOT NULL,\n  `notes` text,\n  `updatedBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `sales_commission_configs_id` PRIMARY KEY(`id`),\n  UNIQUE KEY `unique_salesperson_city` (`salespersonId`, `city`),\n  INDEX `commission_salesperson_idx` (`salespersonId`),\n  INDEX `commission_city_idx` (`city`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS `sales_commission_configs` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `salespersonId` int NOT NULL,\n  `city` varchar(50) NOT NULL,\n  `commissionRate` decimal(5,2) NOT NULL,\n  `notes` text,\n  `updatedBy` int NOT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `sales_commission_configs_id` PRIMARY KEY(`id`),\n  UNIQUE KEY `unique_salesperson_city` (`salespersonId`, `city`),\n  INDEX `commission_salesperson_idx` (`salespersonId`),\n  INDEX `commission_city_idx` (`city`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1734
+}

@@ -21,6 +21,7 @@ import { uploadRouter } from "./uploadRouter";
 import { excelReportRouter } from "./excelReportRouter";
 import { contentGeneratorRouter } from "./contentGeneratorRouter";
 import { notificationRouter } from "./notificationRouter";
+import { salesCityPerformanceRouter } from "./salesCityPerformanceRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -79,6 +80,7 @@ export const appRouter = router({
   transportFeeFix: transportFeeFixRouter,
   parsingLearning: parsingLearningRouter,
   reconciliation: reconciliationRouter,
+  salesCityPerformance: salesCityPerformanceRouter,
 
   // 数据质量检查
   dataQuality: router({

@@ -20,10 +20,12 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Search, Plus, Download, Upload, TrendingUp, Zap } from "lucide-react";
+import { Search, Plus, Download, Upload, TrendingUp, Zap, BarChart3 } from "lucide-react";
+import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 
 export default function Sales() {
+  const [, navigate] = useLocation();
   const [searchKeyword, setSearchKeyword] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingSalesperson, setEditingSalesperson] = useState<any>(null);
@@ -247,6 +249,14 @@ export default function Sales() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">销售管理</h1>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate("/sales-city-performance")}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            城市业绩
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 

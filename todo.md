@@ -1569,3 +1569,22 @@
 - [x] 分析财务管理模块的路由和数据结构(financeRouter, reconciliationRouter, excelReportRouter, teacherPayments, analytics)
 - [x] 生成完整的API调用接口md文档(sdk/销售管理与财务管理API接口文档.md, 14个章节覆盖全部接口)
 - [x] 更新SDK添加相关API方法(新增7个API模块: SalespersonsApi, SchedulesApi, CustomersApi, FinanceApi, ReconciliationsApi, AnalyticsApi, ExcelReportApi)
+
+
+### 180. 销售管理-销售城市业绩板块
+- [x] 设计sales_commission_configs数据库表(销售人员x城市提成比例配置)
+- [x] 推送数据库迁移
+- [x] 实现后端API: 销售x城市交叉统计(getCrossStats: 订单数、金额、提成自动计算)
+- [x] 实现后端API: 提成比例配置CRUD(setCommission+batchSetCommission+deleteCommission+getCommissionConfigs)
+- [x] 实现后端API: 环比/同比对比数据(getComparison: 支持任意两个时间段对比)
+- [x] 实现后端API: Excel导出(getExportData: 含提成计算结果)
+- [x] 前端: 全局筛选器(时间范围、城市、销售人员)
+- [x] 前端: 销售x城市交叉统计表(订单数+金额+提成)
+- [x] 前端: 汇总行和汇总列(合计行+合计列+全局总计)
+- [x] 前端: 提成金额自动计算列(订单金额x提成比例)
+- [x] 前端: 提成比例配置弹窗(单个设置+批量设置弹窗)
+- [x] 前端: 环比/同比对比(绿色标注增长/红色标注下降趋势)
+- [x] 前端: 一键导出Excel按钮(CSV格式导出)
+- [x] 编写单元测试(18个测试用例全部通过)
+- [x] 更新SDK添加SalesCityPerformanceApi类(7个方法)
+- [x] 保存检查点

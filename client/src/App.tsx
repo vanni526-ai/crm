@@ -35,6 +35,7 @@ import UserManagement from "./pages/UserManagement";
 import CustomerManagement from "./pages/CustomerManagement";
 import Courses from "./pages/Courses";
 import Notifications from "./pages/Notifications";
+import SalesCityPerformance from "./pages/SalesCityPerformance";
 
 
 function Router() {
@@ -71,6 +72,7 @@ function Router() {
       {/* <Route path={"/user-management"} component={UserManagement} /> */}
       <Route path={"/courses"} component={Courses} />
       <Route path={"/notifications"} component={Notifications} />
+      <Route path={"/sales-city-performance"} component={SalesCityPerformance} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

@@ -785,3 +785,24 @@ export const userNotifications = mysqlTable("user_notifications", {
 }));
 export type UserNotification = typeof userNotifications.$inferSelect;
 export type InsertUserNotification = typeof userNotifications.$inferInsert;
+
+/**
+ * 销售提成配置表 - 存储销售人员在不同城市的提成比例
+ */
+export const salesCommissionConfigs = mysqlTable("sales_commission_configs", {
+  id: int("id").autoincrement().primaryKey(),
+  salespersonId: int("salespersonId").notNull(), // 关联销售人员表
+  city: varchar("city", { length: 50 }).notNull(), // 城市名称
+  commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).notNull(), // 提成比例(0-100%)
+  notes: text("notes"), // 备注
+  updatedBy: int("updatedBy").notNull(), // 更新人ID
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  salespersonIdx: index("commission_salesperson_idx").on(table.salespersonId),
+  cityIdx: index("commission_city_idx").on(table.city),
+  uniqueSalespersonCity: unique("unique_salesperson_city").on(table.salespersonId, table.city),
+}));
+
+export type SalesCommissionConfig = typeof salesCommissionConfigs.$inferSelect;
+export type InsertSalesCommissionConfig = typeof salesCommissionConfigs.$inferInsert;

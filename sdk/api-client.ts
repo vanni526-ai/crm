@@ -1615,6 +1615,122 @@ class ExcelReportApi {
   }
 }
 
+class SalesCityPerformanceApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 获取销售人员x城市交叉统计数据（含汇总行列、提成自动计算） */
+  async getCrossStats(params?: {
+    startDate?: string;
+    endDate?: string;
+    salespersonId?: number;
+    city?: string;
+  }): Promise<{
+    data: Array<{
+      salespersonId: number;
+      salesPerson: string;
+      city: string;
+      orderCount: number;
+      totalAmount: number;
+      commissionRate: number;
+      commissionAmount: number;
+    }>;
+    salespersons: Array<{ id: number; name: string }>;
+    cities: string[];
+    commissionConfigs: Array<{
+      id: number;
+      salespersonId: number;
+      city: string;
+      commissionRate: number;
+      notes: string | null;
+    }>;
+  }> {
+    return this.trpc.query('salesCityPerformance.getCrossStats', params || {});
+  }
+
+  /** 获取环比/同比对比数据 */
+  async getComparison(params: {
+    currentStartDate: string;
+    currentEndDate: string;
+    previousStartDate: string;
+    previousEndDate: string;
+    salespersonId?: number;
+    city?: string;
+  }): Promise<Array<{
+    salespersonId: number;
+    salesPerson: string;
+    city: string;
+    currentOrderCount: number;
+    currentAmount: number;
+    previousOrderCount: number;
+    previousAmount: number;
+    orderCountChange: number;
+    amountChange: number;
+  }>> {
+    return this.trpc.query('salesCityPerformance.getComparison', params);
+  }
+
+  /** 获取所有提成配置列表 */
+  async getCommissionConfigs(): Promise<Array<{
+    id: number;
+    salespersonId: number;
+    city: string;
+    commissionRate: number;
+    notes: string | null;
+    createdAt: string;
+    updatedAt: string;
+  }>> {
+    return this.trpc.query('salesCityPerformance.getCommissionConfigs');
+  }
+
+  /** 设置单个提成配置（管理员） */
+  async setCommission(params: {
+    salespersonId: number;
+    city: string;
+    commissionRate: number;
+    notes?: string;
+  }): Promise<{ success: boolean }> {
+    return this.trpc.mutate('salesCityPerformance.setCommission', params);
+  }
+
+  /** 批量设置提成配置（管理员） */
+  async batchSetCommission(params: {
+    configs: Array<{
+      salespersonId: number;
+      city: string;
+      commissionRate: number;
+      notes?: string;
+    }>;
+  }): Promise<{ success: boolean; successCount: number; failCount: number }> {
+    return this.trpc.mutate('salesCityPerformance.batchSetCommission', params);
+  }
+
+  /** 删除提成配置（管理员） */
+  async deleteCommission(params: { id: number }): Promise<{ success: boolean }> {
+    return this.trpc.mutate('salesCityPerformance.deleteCommission', params);
+  }
+
+  /** 获取导出数据（用于Excel导出） */
+  async getExportData(params?: {
+    startDate?: string;
+    endDate?: string;
+    salespersonId?: number;
+    city?: string;
+  }): Promise<Array<{
+    salesPerson: string;
+    city: string;
+    orderCount: number;
+    totalAmount: number;
+    commissionRate: number;
+    commissionAmount: number;
+  }>> {
+    return this.trpc.query('salesCityPerformance.getExportData', params || {});
+  }
+}
+
 class NotificationsApi {
   private trpc: TrpcClient;
 
@@ -1739,6 +1855,7 @@ export class ApiClient {
   public readonly reconciliations: ReconciliationsApi;
   public readonly analytics: AnalyticsApi;
   public readonly excelReport: ExcelReportApi;
+  public readonly salesCityPerformance: SalesCityPerformanceApi;
 
   constructor(config: ApiClientConfig = {}) {
     // 合并默认配置
@@ -1793,6 +1910,7 @@ export class ApiClient {
     this.reconciliations = new ReconciliationsApi(this.trpc);
     this.analytics = new AnalyticsApi(this.trpc);
     this.excelReport = new ExcelReportApi(this.trpc);
+    this.salesCityPerformance = new SalesCityPerformanceApi(this.trpc);
   }
 
   private createTokenStorage(): TokenStorage {
