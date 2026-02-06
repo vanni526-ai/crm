@@ -1,0 +1,8 @@
+Badge check at 2026-02-06 09:33:
+- TypeScript: No errors
+- LSP: No errors
+- Screenshot shows sidebar with navigation items
+- At the bottom of sidebar, can see a red badge partially visible next to "申请通知" menu item
+- The badge appears to be working - red dot visible at bottom of sidebar
+- There are test notifications from earlier test runs, so unread count > 0
+- Need to scroll down to fully see the "申请通知" item with badge
