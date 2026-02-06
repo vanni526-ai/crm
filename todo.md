@@ -1495,3 +1495,15 @@
 - [x] 更新SDK: 修复ChangePasswordInput(去掉userId) + ChangePasswordResult(error替代message)
 - [x] 编写单元测试(16个测试用例全部通过)
 - [x] 保存检查点
+
+
+### 172. 检查和测试账户余额相关接口
+- [x] 检查数据库schema: customers.accountBalance + accountTransactions表
+- [x] 检查现有接口: db.ts有完整函数，routers.ts缺少独立的tRPC接口
+- [x] 新增4个查询接口: getMyBalance, getMyTransactions, getCustomerBalance, getCustomerTransactions
+- [x] 新增2个操作接口: recharge(充值), refund(退款)
+- [x] 修复函数名错误: getAccountTransactions→getCustomerTransactions
+- [x] 编写单元测试(16个测试用例全部通过)
+- [x] 更新SDK: AccountApi类 + BalanceInfo/AccountTransaction/BalanceChangeResult类型
+- [x] 生成接口文档: sdk/账户余额接口文档.md
+- [x] 保存检查点

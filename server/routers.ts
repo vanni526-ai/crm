@@ -29,7 +29,7 @@ import { generateOrderNo } from "./orderNoGenerator";
 import { generateOrderId } from "./orderIdGenerator";
 import { validateChannelOrderNo } from "./channelOrderNoUtils";
 import { validateTeacherFee } from "./teacherFeeValidator";
-import { orders } from "../drizzle/schema";
+import { orders, customers } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 // 权限检查中间件
@@ -2552,6 +2552,158 @@ export const appRouter = router({
   }),
 
   // 城市合伙人费配置
+  // ============ 账户余额管理 ============
+  account: router({
+    // App用户查询自己的余额(通过登录Token获取用户，再查关联的业务客户)
+    getMyBalance: protectedProcedure
+      .query(async ({ ctx }) => {
+        const customer = await db.getCustomerByUserId(ctx.user.id);
+        if (!customer) {
+          return { success: true, data: { balance: "0.00", customerId: null, customerName: null } };
+        }
+        // 优先从流水表获取最新余额
+        const transactions = await db.getCustomerTransactions(customer.id);
+        const latestBalance = transactions.length > 0 
+          ? transactions[0].balanceAfter 
+          : customer.accountBalance;
+        return {
+          success: true,
+          data: {
+            balance: latestBalance || "0.00",
+            customerId: customer.id,
+            customerName: customer.name,
+          },
+        };
+      }),
+
+    // App用户查询自己的账户流水
+    getMyTransactions: protectedProcedure
+      .input(z.object({
+        limit: z.number().min(1).max(100).optional(),
+        offset: z.number().min(0).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        const customer = await db.getCustomerByUserId(ctx.user.id);
+        if (!customer) {
+          return { success: true, data: { transactions: [], total: 0 } };
+        }
+        const allTransactions = await db.getCustomerTransactions(customer.id);
+        const limit = input?.limit || 20;
+        const offset = input?.offset || 0;
+        const paged = allTransactions.slice(offset, offset + limit);
+        return {
+          success: true,
+          data: {
+            transactions: paged,
+            total: allTransactions.length,
+          },
+        };
+      }),
+
+    // 管理员/销售查询指定客户的余额
+    getCustomerBalance: protectedProcedure
+      .input(z.object({ customerId: z.number() }))
+      .query(async ({ input }) => {
+        const dbInstance = await getDb();
+        if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库未初始化" });
+        const [cust] = await dbInstance.select().from(customers).where(eq(customers.id, input.customerId));
+        if (!cust) {
+          return { success: false, error: "客户不存在" };
+        }
+        const transactions = await db.getCustomerTransactions(input.customerId);
+        const latestBalance = transactions.length > 0
+          ? transactions[0].balanceAfter
+          : cust.accountBalance;
+        return {
+          success: true,
+          data: {
+            balance: latestBalance || "0.00",
+            customerId: cust.id,
+            customerName: cust.name,
+          },
+        };
+      }),
+
+    // 管理员/销售查询指定客户的流水
+    getCustomerTransactions: protectedProcedure
+      .input(z.object({
+        customerId: z.number(),
+        limit: z.number().min(1).max(100).optional(),
+        offset: z.number().min(0).optional(),
+      }))
+      .query(async ({ input }) => {
+        const allTransactions = await db.getCustomerTransactions(input.customerId);
+        const limit = input.limit || 20;
+        const offset = input.offset || 0;
+        const paged = allTransactions.slice(offset, offset + limit);
+        return {
+          success: true,
+          data: {
+            transactions: paged,
+            total: allTransactions.length,
+          },
+        };
+      }),
+
+    // 客户充值(管理员/销售操作)
+    recharge: protectedProcedure
+      .input(z.object({
+        customerId: z.number(),
+        amount: z.number().positive("充值金额必须大于0"),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const result = await db.rechargeCustomerAccount({
+            customerId: input.customerId,
+            amount: input.amount,
+            notes: input.notes || `管理员充值`,
+            operatorId: ctx.user.id,
+            operatorName: ctx.user.name || ctx.user.nickname || "未知",
+          });
+          return {
+            success: true,
+            data: {
+              balanceBefore: result.balanceBefore.toFixed(2),
+              balanceAfter: result.balanceAfter.toFixed(2),
+            },
+          };
+        } catch (error: any) {
+          return { success: false, error: error.message || "充值失败" };
+        }
+      }),
+
+    // 客户退款(管理员操作)
+    refund: protectedProcedure
+      .input(z.object({
+        customerId: z.number(),
+        amount: z.number().positive("退款金额必须大于0"),
+        orderId: z.number(),
+        orderNo: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const result = await db.refundCustomerAccount({
+            customerId: input.customerId,
+            amount: input.amount,
+            orderId: input.orderId,
+            orderNo: input.orderNo,
+            operatorId: ctx.user.id,
+            operatorName: ctx.user.name || ctx.user.nickname || "未知",
+          });
+          return {
+            success: true,
+            data: {
+              balanceBefore: result.balanceBefore.toFixed(2),
+              balanceAfter: result.balanceAfter.toFixed(2),
+            },
+          };
+        } catch (error: any) {
+          return { success: false, error: error.message || "退款失败" };
+        }
+      }),
+  }),
+
   cityPartnerConfig: router({
     // 获取所有城市配置(公开接口)
     list: publicProcedure.query(async () => {

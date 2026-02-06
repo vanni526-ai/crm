@@ -918,6 +918,122 @@ class CitiesApi {
 }
 
 // ============================================================================
+// 账户余额模块
+// ============================================================================
+
+/** 余额信息 */
+export interface BalanceInfo {
+  balance: string;        // 余额(字符串,保留两位小数)
+  customerId: number | null;
+  customerName: string | null;
+}
+
+/** 账户流水记录 */
+export interface AccountTransaction {
+  id: number;
+  customerId: number;
+  type: 'recharge' | 'consume' | 'refund';
+  amount: string;
+  balanceBefore: string;
+  balanceAfter: string;
+  orderId?: number | null;
+  orderNo?: string | null;
+  notes?: string | null;
+  operatorId?: number | null;
+  operatorName?: string | null;
+  createdAt: string;
+}
+
+/** 充值/退款结果 */
+export interface BalanceChangeResult {
+  balanceBefore: string;
+  balanceAfter: string;
+}
+
+class AccountApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 查询当前登录用户的账户余额
+   * 需要登录状态(Token)
+   * @returns { success: true, data: BalanceInfo }
+   */
+  async getMyBalance(): Promise<{ success: boolean; data: BalanceInfo }> {
+    return this.trpc.query('account.getMyBalance');
+  }
+
+  /**
+   * 查询当前登录用户的账户流水
+   * 需要登录状态(Token)
+   * @param params 分页参数: limit(每页条数,默认20), offset(偏移量,默认0)
+   * @returns { success: true, data: { transactions: AccountTransaction[], total: number } }
+   */
+  async getMyTransactions(params?: { limit?: number; offset?: number }): Promise<{
+    success: boolean;
+    data: { transactions: AccountTransaction[]; total: number };
+  }> {
+    return this.trpc.query('account.getMyTransactions', params || {});
+  }
+
+  /**
+   * 查询指定客户的余额(管理员/销售用)
+   * @param customerId 业务客户ID
+   * @returns { success: true, data: BalanceInfo } 或 { success: false, error: '...' }
+   */
+  async getCustomerBalance(customerId: number): Promise<{ success: boolean; data?: BalanceInfo; error?: string }> {
+    return this.trpc.query('account.getCustomerBalance', { customerId });
+  }
+
+  /**
+   * 查询指定客户的流水(管理员/销售用)
+   * @param customerId 业务客户ID
+   * @param params 分页参数
+   * @returns { success: true, data: { transactions, total } }
+   */
+  async getCustomerTransactions(customerId: number, params?: { limit?: number; offset?: number }): Promise<{
+    success: boolean;
+    data: { transactions: AccountTransaction[]; total: number };
+  }> {
+    return this.trpc.query('account.getCustomerTransactions', { customerId, ...params });
+  }
+
+  /**
+   * 客户充值(管理员/销售操作)
+   * @param customerId 业务客户ID
+   * @param amount 充值金额(必须大于0)
+   * @param notes 备注(可选)
+   * @returns { success: true, data: BalanceChangeResult } 或 { success: false, error: '...' }
+   */
+  async recharge(customerId: number, amount: number, notes?: string): Promise<{
+    success: boolean;
+    data?: BalanceChangeResult;
+    error?: string;
+  }> {
+    return this.trpc.mutate('account.recharge', { customerId, amount, notes });
+  }
+
+  /**
+   * 客户退款(管理员操作)
+   * @param customerId 业务客户ID
+   * @param amount 退款金额(必须大于0)
+   * @param orderId 关联订单ID
+   * @param orderNo 关联订单号
+   * @returns { success: true, data: BalanceChangeResult } 或 { success: false, error: '...' }
+   */
+  async refund(customerId: number, amount: number, orderId: number, orderNo: string): Promise<{
+    success: boolean;
+    data?: BalanceChangeResult;
+    error?: string;
+  }> {
+    return this.trpc.mutate('account.refund', { customerId, amount, orderId, orderNo });
+  }
+}
+
+// ============================================================================
 // API客户端主类
 // ============================================================================
 
@@ -933,6 +1049,7 @@ export class ApiClient {
   public readonly teachers: TeachersApi;
   public readonly classrooms: ClassroomsApi;
   public readonly metadata: MetadataApi;
+  public readonly account: AccountApi;
 
   constructor(config: ApiClientConfig = {}) {
     // 合并默认配置
@@ -977,7 +1094,8 @@ export class ApiClient {
     this.cities = new CitiesApi(this.trpc);
     this.teachers = new TeachersApi(this.trpc);
     this.classrooms = new ClassroomsApi(this.trpc);
-    this.metadata = new MetadataApi(this.trpc);;
+    this.metadata = new MetadataApi(this.trpc);
+    this.account = new AccountApi(this.trpc);
   }
 
   private createTokenStorage(): TokenStorage {
