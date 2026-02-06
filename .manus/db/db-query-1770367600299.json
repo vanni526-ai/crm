@@ -1,0 +1,28 @@
+{
+  "query": "SELECT u.id, u.name, u.phone, u.openId, c.id as customerId, c.name as customerName, c.accountBalance FROM users u LEFT JOIN customers c ON c.userId = u.id WHERE u.phone = '15921456877' OR u.name = 'test' OR u.phone = 'test';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id, u.name, u.phone, u.openId, c.id as customerId, c.name as customerName, c.accountBalance FROM users u LEFT JOIN customers c ON c.userId = u.id WHERE u.phone = '15921456877' OR u.name = 'test' OR u.phone = 'test';",
+  "rows": [
+    {
+      "id": "14790117",
+      "name": "15921456877",
+      "phone": "15921456877",
+      "openId": "user_02f7f762a30643b6",
+      "customerId": "480003",
+      "customerName": "15921456877",
+      "accountBalance": "100.00"
+    },
+    {
+      "id": "13860029",
+      "name": "test",
+      "phone": "13800138001",
+      "openId": "user_1770021458467_egfufs",
+      "customerId": "NULL",
+      "customerName": "NULL",
+      "accountBalance": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\topenId\tcustomerId\tcustomerName\taccountBalance\n14790117\t15921456877\t15921456877\tuser_02f7f762a30643b6\t480003\t15921456877\t100.00\n13860029\ttest\t13800138001\tuser_1770021458467_egfufs\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1627
+}

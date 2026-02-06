@@ -476,6 +476,7 @@ export default function Customers() {
                         className="cursor-pointer"
                       />
                     </TableHead>
+                    <TableHead className="w-20">用户编号</TableHead>
                     <TableHead>客户名</TableHead>
                     <TableHead>流量来源</TableHead>
                     <TableHead className="cursor-pointer" onClick={() => handleSort('accountBalance')}>
@@ -499,7 +500,7 @@ export default function Customers() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8">
+                      <TableCell colSpan={10} className="text-center py-8">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -519,6 +520,9 @@ export default function Customers() {
                             }}
                             className="cursor-pointer"
                           />
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground font-mono">
+                          {customer.id}
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
@@ -588,7 +592,7 @@ export default function Customers() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                         {searchTerm ? "未找到匹配的客户" : "暂无客户数据"}
                       </TableCell>
                     </TableRow>
