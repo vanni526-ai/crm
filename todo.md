@@ -1562,3 +1562,10 @@
 - [x] 修改后端查询排序逻辑(CASE WHEN排序: unread=0 > read=1 > replied=2 > archived=3，同状态按时间倒序)
 - [x] 测试验证排序(15个测试全部通过)
 - [x] 保存检查点
+
+
+### 179. 生成销售管理和财务管理API接口文档
+- [x] 分析销售管理模块的路由和数据结构(salespersonRouter, customerRouter, orderRouter)
+- [x] 分析财务管理模块的路由和数据结构(financeRouter, reconciliationRouter, excelReportRouter, teacherPayments, analytics)
+- [x] 生成完整的API调用接口md文档(sdk/销售管理与财务管理API接口文档.md, 14个章节覆盖全部接口)
+- [x] 更新SDK添加相关API方法(新增7个API模块: SalespersonsApi, SchedulesApi, CustomersApi, FinanceApi, ReconciliationsApi, AnalyticsApi, ExcelReportApi)

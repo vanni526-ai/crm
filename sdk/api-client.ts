@@ -1081,6 +1081,540 @@ export interface NotificationListResult {
   pageSize: number;
 }
 
+// ============================================================================
+// 销售人员管理模块
+// ============================================================================
+
+/** 销售人员信息 */
+export interface Salesperson {
+  id: number;
+  name: string;
+  nickname?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  wechat?: string | null;
+  commissionRate?: string | null;
+  city?: string | null;
+  notes?: string | null;
+  isActive: boolean;
+  totalOrders?: number;
+  totalSales?: string | null;
+  createdAt: string;
+}
+
+/** 销售统计数据 */
+export interface SalesStatistics {
+  totalOrders: number;
+  totalSales: string;
+  monthlyData?: Array<{ month: string; orders: number; sales: string }>;
+}
+
+class SalespersonsApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 获取所有销售人员列表 */
+  async list(): Promise<Salesperson[]> {
+    return this.trpc.query('salespersons.list');
+  }
+
+  /** 搜索销售人员 */
+  async search(keyword: string): Promise<Salesperson[]> {
+    return this.trpc.query('salespersons.search', { keyword });
+  }
+
+  /** 创建销售人员 */
+  async create(input: {
+    name: string;
+    nickname?: string;
+    phone?: string;
+    email?: string;
+    wechat?: string;
+    commissionRate?: number;
+    city?: string;
+    notes?: string;
+  }): Promise<{ id: number; success: boolean }> {
+    return this.trpc.mutate('salespersons.create', input);
+  }
+
+  /** 更新销售人员 */
+  async update(input: {
+    id: number;
+    name?: string;
+    nickname?: string;
+    phone?: string;
+    email?: string;
+    wechat?: string;
+    commissionRate?: number;
+    city?: string;
+    notes?: string;
+  }): Promise<{ success: boolean }> {
+    return this.trpc.mutate('salespersons.update', input);
+  }
+
+  /** 删除销售人员 */
+  async delete(id: number): Promise<{ success: boolean }> {
+    return this.trpc.mutate('salespersons.delete', { id });
+  }
+
+  /** 更新销售人员状态(启用/停用) */
+  async updateStatus(id: number, isActive: boolean): Promise<{ success: boolean }> {
+    return this.trpc.mutate('salespersons.updateStatus', { id, isActive });
+  }
+
+  /** 获取销售统计数据 */
+  async getStatistics(params?: {
+    salespersonId?: number;
+    startDate?: string;
+    endDate?: string;
+    groupBy?: 'month' | 'year';
+  }): Promise<any> {
+    return this.trpc.query('salespersons.getStatistics', params || {});
+  }
+
+  /** 获取月度销售额 */
+  async getMonthlySales(params: {
+    salespersonId?: number;
+    year: number;
+  }): Promise<any> {
+    return this.trpc.query('salespersons.getMonthlySales', params);
+  }
+
+  /** 获取年度销售额 */
+  async getYearlySales(params?: {
+    salespersonId?: number;
+    startYear?: number;
+    endYear?: number;
+  }): Promise<any> {
+    return this.trpc.query('salespersons.getYearlySales', params || {});
+  }
+
+  /** 更新所有销售人员统计数据 */
+  async updateAllStats(): Promise<{ success: boolean; data: any[]; message: string }> {
+    return this.trpc.mutate('salespersons.updateAllStats');
+  }
+
+  /** 更新单个销售人员统计数据 */
+  async updateStats(id: number): Promise<{ success: boolean }> {
+    return this.trpc.mutate('salespersons.updateStats', { id });
+  }
+}
+
+// ============================================================================
+// 排课预约模块
+// ============================================================================
+
+/** 排课信息 */
+export interface Schedule {
+  id: number;
+  orderId?: number | null;
+  customerName?: string | null;
+  wechatId?: string | null;
+  salesName?: string | null;
+  teacherId?: number | null;
+  teacherName?: string | null;
+  courseType: string;
+  city?: string | null;
+  location?: string | null;
+  classDate?: string | null;
+  classTime?: string | null;
+  startTime: string;
+  endTime: string;
+  status?: string | null;
+  notes?: string | null;
+  createdAt: string;
+}
+
+/** 预约输入 */
+export interface CreateAppointmentInput {
+  userId?: number;
+  cityId: number;
+  teacherId: number;
+  courseId: number;
+  scheduledDate: string;  // YYYY-MM-DD
+  scheduledTime: string;  // HH:mm
+  contactName: string;
+  contactPhone: string;
+  notes?: string;
+}
+
+class SchedulesApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 获取排课列表 */
+  async list(params?: { startTime?: Date; endTime?: Date }): Promise<Schedule[]> {
+    return this.trpc.query('schedules.list', params || {});
+  }
+
+  /** 获取排课列表(含订单信息) */
+  async listWithOrderInfo(): Promise<any[]> {
+    return this.trpc.query('schedules.listWithOrderInfo');
+  }
+
+  /** 按老师获取排课 */
+  async getByTeacher(teacherId: number): Promise<Schedule[]> {
+    return this.trpc.query('schedules.getByTeacher', { teacherId });
+  }
+
+  /** 创建课程预约(App用户) */
+  async createAppointment(input: CreateAppointmentInput): Promise<{
+    success: boolean;
+    scheduleId: number;
+    message: string;
+  }> {
+    return this.trpc.mutate('schedules.createAppointment', input);
+  }
+
+  /** 查询用户预约列表(App用户) */
+  async listAppointments(params: {
+    userId: number;
+    status?: 'scheduled' | 'completed' | 'cancelled';
+    startDate?: string;
+    endDate?: string;
+  }): Promise<{ success: boolean; data: any[]; count: number }> {
+    return this.trpc.query('schedules.listAppointments', params);
+  }
+
+  /** 取消预约(App用户) */
+  async cancelAppointment(scheduleId: number, userId: number): Promise<{ success: boolean }> {
+    return this.trpc.mutate('schedules.cancelAppointment', { scheduleId, userId });
+  }
+
+  /** 月度合伙人费用统计 */
+  async getMonthlyPartnerSettlement(year: number, month: number): Promise<any> {
+    return this.trpc.query('schedules.getMonthlyPartnerSettlement', { year, month });
+  }
+
+  /** 按日期范围统计合伙人费用 */
+  async getPartnerSettlementByDateRange(startDate: Date, endDate: Date): Promise<any> {
+    return this.trpc.query('schedules.getPartnerSettlementByDateRange', { startDate, endDate });
+  }
+}
+
+// ============================================================================
+// 客户管理模块
+// ============================================================================
+
+/** 客户信息 */
+export interface Customer {
+  id: number;
+  name?: string | null;
+  phone?: string | null;
+  totalSpent?: string | null;
+  classCount?: number | null;
+  lastOrderDate?: string | null;
+  firstOrderDate?: string | null;
+  trafficSource?: string | null;
+  createdAt: string;
+}
+
+class CustomersApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 获取客户列表(支持多种筛选条件) */
+  async list(params?: {
+    minSpent?: number;
+    maxSpent?: number;
+    minClassCount?: number;
+    maxClassCount?: number;
+    lastConsumptionDays?: number;
+    trafficSource?: string;
+    highValue?: boolean;
+    churned?: boolean;
+    sortBy?: 'totalSpent' | 'classCount' | 'lastOrderDate' | 'firstOrderDate' | 'createdAt';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<Customer[]> {
+    return this.trpc.query('customers.list', params || {});
+  }
+
+  /** 刷新所有客户统计数据(异步) */
+  async refreshAllStats(): Promise<{ taskId: string }> {
+    return this.trpc.mutate('customers.refreshAllStats');
+  }
+
+  /** 获取异步任务进度 */
+  async getProgress(taskId: string): Promise<any> {
+    return this.trpc.query('customers.getProgress', { taskId });
+  }
+}
+
+// ============================================================================
+// 财务对账模块
+// ============================================================================
+
+/** 对账记录 */
+export interface Reconciliation {
+  id: number;
+  periodStart: string;
+  periodEnd: string;
+  totalIncome: string;
+  totalExpense: string;
+  teacherFeeTotal?: string | null;
+  transportFeeTotal?: string | null;
+  otherFeeTotal?: string | null;
+  partnerFeeTotal?: string | null;
+  profit: string;
+  status: 'draft' | 'confirmed';
+  notes?: string | null;
+  createdAt: string;
+}
+
+/** 智能匹配结果 */
+export interface MatchResult {
+  scheduleId: number;
+  orderId: number;
+  confidence: number;
+  reason: string;
+}
+
+class FinanceApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 导出财务报表Excel */
+  async exportExcel(params?: { startDate?: string; endDate?: string }): Promise<{
+    success: boolean;
+    data: string;
+    filename: string;
+  }> {
+    return this.trpc.mutate('finance.exportExcel', params || {});
+  }
+}
+
+class ReconciliationsApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 获取所有对账记录 */
+  async list(): Promise<Reconciliation[]> {
+    return this.trpc.query('reconciliations.list');
+  }
+
+  /** 创建对账记录 */
+  async create(input: {
+    periodStart: string;
+    periodEnd: string;
+    totalIncome: string;
+    totalExpense: string;
+    teacherFeeTotal?: string;
+    transportFeeTotal?: string;
+    otherFeeTotal?: string;
+    partnerFeeTotal?: string;
+    profit: string;
+    notes?: string;
+  }): Promise<{ success: boolean }> {
+    return this.trpc.mutate('reconciliations.create', input);
+  }
+
+  /** 更新对账记录 */
+  async update(id: number, data: { status?: 'draft' | 'confirmed'; notes?: string }): Promise<{ success: boolean }> {
+    return this.trpc.mutate('reconciliations.update', { id, data });
+  }
+
+  /** 智能对账匹配 */
+  async intelligentMatch(params?: { scheduleIds?: number[]; orderIds?: number[] }): Promise<{
+    success: boolean;
+    matchedCount: number;
+    matches: MatchResult[];
+    message: string;
+  }> {
+    return this.trpc.mutate('reconciliation.intelligentMatch', params || {});
+  }
+
+  /** 手动创建匹配关系 */
+  async createMatch(scheduleId: number, orderId: number): Promise<{ success: boolean }> {
+    return this.trpc.mutate('reconciliation.createMatch', { scheduleId, orderId });
+  }
+
+  /** 获取所有匹配关系 */
+  async getAllMatches(): Promise<any[]> {
+    return this.trpc.query('reconciliation.getAllMatches');
+  }
+
+  /** 获取未匹配的课程日程 */
+  async getUnmatchedSchedules(): Promise<any[]> {
+    return this.trpc.query('reconciliation.getUnmatchedSchedules');
+  }
+
+  /** 获取未匹配的订单 */
+  async getUnmatchedOrders(): Promise<any[]> {
+    return this.trpc.query('reconciliation.getUnmatchedOrders');
+  }
+
+  /** 月度对账报表 */
+  async getMonthlyReport(params: {
+    startDate: string;
+    endDate: string;
+    city?: string;
+    salesPerson?: string;
+  }): Promise<any> {
+    return this.trpc.query('reconciliation.getMonthlyReport', params);
+  }
+}
+
+// ============================================================================
+// 数据统计分析模块
+// ============================================================================
+
+class AnalyticsApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 订单统计 */
+  async orderStats(startDate: string, endDate: string): Promise<any> {
+    return this.trpc.query('analytics.orderStats', { startDate, endDate });
+  }
+
+  /** 城市收入统计 */
+  async cityRevenue(): Promise<any> {
+    return this.trpc.query('analytics.cityRevenue');
+  }
+
+  /** 城市收入趋势 */
+  async cityRevenueTrend(): Promise<any> {
+    return this.trpc.query('analytics.cityRevenueTrend');
+  }
+
+  /** 老师月度统计 */
+  async teacherMonthlyStats(): Promise<any> {
+    return this.trpc.query('analytics.teacherMonthlyStats');
+  }
+
+  /** 流量来源月度统计 */
+  async trafficSourceMonthlyStats(): Promise<any> {
+    return this.trpc.query('analytics.trafficSourceMonthlyStats');
+  }
+
+  /** 流量来源分析 */
+  async trafficSourceAnalysis(): Promise<any> {
+    return this.trpc.query('analytics.trafficSourceAnalysis');
+  }
+
+  /** 销售人员支付统计 */
+  async salesPersonPaymentStats(): Promise<any> {
+    return this.trpc.query('analytics.salesPersonPaymentStats');
+  }
+
+  /** 客户余额排名 */
+  async customerBalanceRanking(): Promise<any> {
+    return this.trpc.query('analytics.customerBalanceRanking');
+  }
+
+  /** 城市财务统计 */
+  async cityFinancialStats(dateRange?: string): Promise<any> {
+    return this.trpc.query('analytics.cityFinancialStats', { dateRange });
+  }
+
+  /** 客户统计 */
+  async customerStats(): Promise<any> {
+    return this.trpc.query('analytics.customerStats');
+  }
+
+  /** 流失风险客户 */
+  async churnRiskCustomers(): Promise<any> {
+    return this.trpc.query('analytics.churnRiskCustomers');
+  }
+
+  /** 不活跃客户 */
+  async inactiveCustomers(days?: number): Promise<any> {
+    return this.trpc.query('analytics.inactiveCustomers', { days });
+  }
+
+  /** 获取所有城市合伙人费配置 */
+  async getAllCityPartnerConfig(): Promise<any> {
+    return this.trpc.query('analytics.getAllCityPartnerConfig');
+  }
+
+  /** 计算合伙人费 */
+  async calculatePartnerFee(city: string | null, courseAmount: number, teacherFee: number): Promise<{ partnerFee: number }> {
+    return this.trpc.query('analytics.calculatePartnerFee', { city, courseAmount, teacherFee });
+  }
+
+  /** 获取所有城市及统计 */
+  async getAllCitiesWithStats(params?: { startDate?: string; endDate?: string }): Promise<any> {
+    return this.trpc.query('analytics.getAllCitiesWithStats', params || {});
+  }
+}
+
+// ============================================================================
+// Excel报表导出模块
+// ============================================================================
+
+class ExcelReportApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /** 导出综合财务报表 */
+  async exportFinancialReport(params?: { startDate?: string; endDate?: string }): Promise<{
+    success: boolean;
+    data: string;
+    filename: string;
+  }> {
+    return this.trpc.mutate('excelReport.exportFinancialReport', params || {});
+  }
+
+  /** 导出城市业绩报表 */
+  async exportCityReport(params?: { startDate?: string; endDate?: string }): Promise<{
+    success: boolean;
+    data: string;
+    filename: string;
+  }> {
+    return this.trpc.mutate('excelReport.exportCityReport', params || {});
+  }
+
+  /** 导出老师结算报表 */
+  async exportTeacherSettlementReport(params?: { startDate?: string; endDate?: string }): Promise<{
+    success: boolean;
+    data: string;
+    filename: string;
+  }> {
+    return this.trpc.mutate('excelReport.exportTeacherSettlementReport', params || {});
+  }
+
+  /** 导出订单数据 */
+  async exportOrderData(params?: { startDate?: string; endDate?: string }): Promise<{
+    success: boolean;
+    data: string;
+    filename: string;
+  }> {
+    return this.trpc.mutate('excelReport.exportOrderData', params || {});
+  }
+
+  /** 获取可用报表类型 */
+  async getAvailableReports(): Promise<Array<{
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    available: boolean;
+  }>> {
+    return this.trpc.query('excelReport.getAvailableReports');
+  }
+}
+
 class NotificationsApi {
   private trpc: TrpcClient;
 
@@ -1198,6 +1732,13 @@ export class ApiClient {
   public readonly metadata: MetadataApi;
   public readonly account: AccountApi;
   public readonly notifications: NotificationsApi;
+  public readonly salespersons: SalespersonsApi;
+  public readonly schedules: SchedulesApi;
+  public readonly customers: CustomersApi;
+  public readonly finance: FinanceApi;
+  public readonly reconciliations: ReconciliationsApi;
+  public readonly analytics: AnalyticsApi;
+  public readonly excelReport: ExcelReportApi;
 
   constructor(config: ApiClientConfig = {}) {
     // 合并默认配置
@@ -1245,6 +1786,13 @@ export class ApiClient {
     this.metadata = new MetadataApi(this.trpc);
     this.account = new AccountApi(this.trpc);
     this.notifications = new NotificationsApi(this.trpc);
+    this.salespersons = new SalespersonsApi(this.trpc);
+    this.schedules = new SchedulesApi(this.trpc);
+    this.customers = new CustomersApi(this.trpc);
+    this.finance = new FinanceApi(this.trpc);
+    this.reconciliations = new ReconciliationsApi(this.trpc);
+    this.analytics = new AnalyticsApi(this.trpc);
+    this.excelReport = new ExcelReportApi(this.trpc);
   }
 
   private createTokenStorage(): TokenStorage {
