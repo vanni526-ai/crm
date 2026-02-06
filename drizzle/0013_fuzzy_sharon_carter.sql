@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD `deliveryStatus` enum('undelivered','delivered') DEFAULT 'undelivered' NOT NULL;

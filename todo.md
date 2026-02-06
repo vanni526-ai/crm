@@ -1464,3 +1464,16 @@
 - [x] 在auth.loginWithUserAccount登录接口中自动检查并补充业务客户
 - [x] 测试验证(10个测试用例全部通过)
 - [x] 保存检查点
+
+
+### 169. 订单增加“交付状态”字段
+- [x] 数据库schema添加deliveryStatus字段(已交付/未交付)
+- [x] 推送数据库迁移
+- [x] 后端接口：updateDeliveryStatus + batchUpdateDeliveryStatus
+- [x] 后端接口：查询时返回交付状态
+- [x] 后台前端：订单管理页面展示交付状态(表格列+详情弹窗+筛选器)
+- [x] 后台前端：点击切换交付状态 + 批量标记已交付按钮
+- [x] SDK更新：Order接口添加deliveryStatus + updateDeliveryStatus方法
+- [x] 接口文档更新：sdk/订单交付状态接口文档.md
+- [x] 测试验证(6个测试用例全部通过)
+- [x] 保存检查点

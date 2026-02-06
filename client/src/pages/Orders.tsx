@@ -129,6 +129,27 @@ export default function Orders() {
     },
   });
 
+  const updateDeliveryStatus = trpc.orders.updateDeliveryStatus.useMutation({
+    onSuccess: () => {
+      utils.orders.list.invalidate();
+      toast.success("交付状态已更新");
+    },
+    onError: (error) => {
+      toast.error(error.message || "更新交付状态失败");
+    },
+  });
+
+  const batchUpdateDeliveryStatus = trpc.orders.batchUpdateDeliveryStatus.useMutation({
+    onSuccess: (data) => {
+      utils.orders.list.invalidate();
+      toast.success(`批量更新交付状态成功，共更新 ${data.count} 条订单`);
+      setSelectedOrderIds([]);
+    },
+    onError: (error) => {
+      toast.error(error.message || "批量更新交付状态失败");
+    },
+  });
+
   const batchUpdateChannelOrderNo = trpc.orders.batchUpdateChannelOrderNo.useMutation({
     onSuccess: (data) => {
       utils.orders.list.invalidate();
@@ -174,6 +195,7 @@ export default function Orders() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [batchChannelAction, setBatchChannelAction] = useState<"fill" | "clear">("fill");
   const [classDateFilter, setClassDateFilter] = useState<"all" | "today" | "thisWeek" | "thisMonth" | "thisYear">("all");
+  const [deliveryStatusFilter, setDeliveryStatusFilter] = useState("all");
 
 
   const {
@@ -412,6 +434,8 @@ export default function Orders() {
       // 默认不显示作废订单(除非用户选择显示)
       const matchesVoided = !order.isVoided; // TODO: 添加作废订单筛选器
 
+      const matchesDeliveryStatus = deliveryStatusFilter === "all" || (order as any).deliveryStatus === deliveryStatusFilter;
+
       // 按上课日期筛选
       let matchesClassDate = true;
       if (classDateFilter !== "all" && order.classDate) {
@@ -441,7 +465,7 @@ export default function Orders() {
         }
       }
 
-      return matchesSearch && matchesStatus && matchesSales && matchesVoided && matchesClassDate;
+      return matchesSearch && matchesStatus && matchesSales && matchesVoided && matchesDeliveryStatus && matchesClassDate;
     });
 
     filtered.sort((a, b) => {
@@ -459,7 +483,7 @@ export default function Orders() {
     });
 
     return filtered;
-  }, [orders, searchTerm, statusFilter, salesFilter, classDateFilter, sortBy, sortOrder]);
+  }, [orders, searchTerm, statusFilter, salesFilter, classDateFilter, deliveryStatusFilter, sortBy, sortOrder]);
 
   const getFilteredOrdersByTimeRange = () => {
     const now = new Date();
@@ -721,6 +745,19 @@ export default function Orders() {
                   <Button 
                     variant="outline" 
                     size="sm"
+                    onClick={() => {
+                      if (selectedOrderIds.length === 0) {
+                        toast.error("请至少选择一个订单");
+                        return;
+                      }
+                      batchUpdateDeliveryStatus.mutate({ ids: selectedOrderIds, deliveryStatus: 'delivered' });
+                    }}
+                  >
+                    批量标记已交付
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
                     onClick={() => setBatchChannelOrderNoOpen(true)}
                   >
                     批量修正渠道订单号
@@ -768,6 +805,17 @@ export default function Orders() {
                     <SelectItem value="completed">已完成</SelectItem>
                     <SelectItem value="cancelled">已取消</SelectItem>
                     <SelectItem value="refunded">已退款</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={deliveryStatusFilter} onValueChange={setDeliveryStatusFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="交付状态" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部交付状态</SelectItem>
+                    <SelectItem value="undelivered">未交付</SelectItem>
+                    <SelectItem value="delivered">已交付</SelectItem>
                   </SelectContent>
                 </Select>
                 
@@ -918,6 +966,7 @@ export default function Orders() {
                         <TableHead>上课时间</TableHead>
                         <TableHead>备注</TableHead>
                         <TableHead>状态</TableHead>
+                        <TableHead>交付状态</TableHead>
                         <TableHead>创建时间</TableHead>
                         <TableHead className="text-right">操作</TableHead>
                       </TableRow>
@@ -1002,6 +1051,18 @@ export default function Orders() {
                             )}
                           </TableCell>
                           <TableCell>{getStatusBadge(order.status)}</TableCell>
+                          <TableCell>
+                            <Badge 
+                              variant={(order as any).deliveryStatus === 'delivered' ? 'default' : 'outline'}
+                              className={`cursor-pointer ${(order as any).deliveryStatus === 'delivered' ? 'bg-green-600 hover:bg-green-700' : 'hover:bg-muted'}`}
+                              onClick={() => {
+                                const newStatus = (order as any).deliveryStatus === 'delivered' ? 'undelivered' : 'delivered';
+                                updateDeliveryStatus.mutate({ id: order.id, deliveryStatus: newStatus });
+                              }}
+                            >
+                              {(order as any).deliveryStatus === 'delivered' ? '已交付' : '未交付'}
+                            </Badge>
+                          </TableCell>
                           <TableCell>
                             {order.createdAt instanceof Date 
                               ? order.createdAt.toLocaleDateString()
@@ -1180,6 +1241,17 @@ export default function Orders() {
                     <div>
                       <p className="text-sm text-muted-foreground">状态</p>
                       <div>{getStatusBadge(selectedOrder.status)}</div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">交付状态</p>
+                      <div>
+                        <Badge 
+                          variant={(selectedOrder as any).deliveryStatus === 'delivered' ? 'default' : 'outline'}
+                          className={(selectedOrder as any).deliveryStatus === 'delivered' ? 'bg-green-600' : ''}
+                        >
+                          {(selectedOrder as any).deliveryStatus === 'delivered' ? '已交付' : '未交付'}
+                        </Badge>
+                      </div>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">创建时间</p>

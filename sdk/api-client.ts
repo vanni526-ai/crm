@@ -102,6 +102,7 @@ export interface Order {
   deliveryCity: string;
   deliveryCourse: string;
   status: string;
+  deliveryStatus: 'undelivered' | 'delivered';
   createdAt: string;
 }
 
@@ -690,6 +691,15 @@ class OrdersApi {
    */
   async getById(id: number): Promise<Order> {
     return this.trpc.query('orders.getById', { id });
+  }
+
+  /**
+   * 更新订单交付状态
+   * @param id 订单ID
+   * @param deliveryStatus 交付状态: 'undelivered'(未交付) | 'delivered'(已交付)
+   */
+  async updateDeliveryStatus(id: number, deliveryStatus: 'undelivered' | 'delivered'): Promise<{ success: boolean }> {
+    return this.trpc.mutate('orders.updateDeliveryStatus', { id, deliveryStatus });
   }
 }
 

@@ -314,6 +314,7 @@ export const appRouter = router({
           classDate: input.classDate ? new Date(input.classDate) : undefined,
           classTime: input.classTime || undefined,
           status: 'pending', // 默认待处理状态
+          deliveryStatus: 'undelivered', // 默认未交付
           notes: input.notes || undefined,
         };
         
@@ -380,6 +381,7 @@ export const appRouter = router({
         classDate: z.string().optional(),
         classTime: z.string().optional(),
         status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+        deliveryStatus: z.enum(["undelivered", "delivered"]).optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
@@ -514,6 +516,7 @@ export const appRouter = router({
           classDate: input.classDate ? new Date(input.classDate) : undefined,
           classTime: input.classTime || undefined,
           status: input.status || undefined,
+          deliveryStatus: input.deliveryStatus || 'undelivered',
           notes: input.notes || undefined,
         };
         const id = await db.createOrder(orderData);
@@ -680,6 +683,7 @@ export const appRouter = router({
         classDate: z.string().optional(),
         classTime: z.string().optional(),
         status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+        deliveryStatus: z.enum(["undelivered", "delivered"]).optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -748,6 +752,30 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         await db.batchUpdateOrderStatus(input.ids, input.status);
+        return { success: true, count: input.ids.length };
+      }),
+    
+    // 更新单个订单的交付状态
+    updateDeliveryStatus: salesOrAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        deliveryStatus: z.enum(["undelivered", "delivered"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateOrder(input.id, { deliveryStatus: input.deliveryStatus });
+        return { success: true };
+      }),
+    
+    // 批量更新订单交付状态
+    batchUpdateDeliveryStatus: salesOrAdminProcedure
+      .input(z.object({
+        ids: z.array(z.number()),
+        deliveryStatus: z.enum(["undelivered", "delivered"]),
+      }))
+      .mutation(async ({ input }) => {
+        for (const id of input.ids) {
+          await db.updateOrder(id, { deliveryStatus: input.deliveryStatus });
+        }
         return { success: true, count: input.ids.length };
       }),
     
