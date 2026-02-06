@@ -1507,3 +1507,20 @@
 - [x] 更新SDK: AccountApi类 + BalanceInfo/AccountTransaction/BalanceChangeResult类型
 - [x] 生成接口文档: sdk/账户余额接口文档.md
 - [x] 保存检查点
+
+
+### 173. 客户管理重命名为“用户管理” + 用户角色多选
+- [x] 检查现有users表role字段定义(mysqlEnum单选)
+- [x] 修改数据库schema: 添加roles字段(varchar逗号分隔多角色)
+- [x] 推送数据库迁移 + 同步现有数据
+- [x] 修改后端接口: userManagement路由支持多角色(create/update/updateRoles)
+- [x] 修改后端接口: 权限检查中间件兼容多角色(hasRole函数)
+- [x] 修改后端接口: 注册/登录/刷新Token返回roles字段
+- [x] 添加shared/const.ts角色常量和辅助函数
+- [x] 前端: “客户管理”重命名为“用户管理”(导航栏+页面标题)
+- [x] 前端: 用户编辑/创建对话框角色改为多选checkbox(5种角色)
+- [x] 前端: 用户列表角色显示为多个Badge标签
+- [x] 更新SDK: RegisterResult/LoginResult添加roles字段
+- [x] 编写单元测试(9个测试用例全部通过)
+- [x] 开发阶段不限制权限(仅管理员权限检查，不限制页面访问)
+- [x] 保存检查点

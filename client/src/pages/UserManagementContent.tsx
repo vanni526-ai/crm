@@ -19,22 +19,90 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Search, Plus, Key, Edit, UserPlus } from "lucide-react";
+import { Search, Key, Edit, UserPlus } from "lucide-react";
+
+// 角色定义
+const ALL_ROLES = [
+  { value: "admin", label: "管理员", color: "bg-red-100 text-red-800" },
+  { value: "teacher", label: "老师", color: "bg-purple-100 text-purple-800" },
+  { value: "user", label: "普通用户", color: "bg-gray-100 text-gray-800" },
+  { value: "sales", label: "销售", color: "bg-blue-100 text-blue-800" },
+  { value: "cityPartner", label: "城市合伙人", color: "bg-amber-100 text-amber-800" },
+] as const;
+
+// 解析角色字符串为数组
+function parseRoles(rolesStr: string | null | undefined): string[] {
+  if (!rolesStr) return ["user"];
+  return rolesStr.split(",").map((r) => r.trim()).filter(Boolean);
+}
+
+// 获取角色显示信息
+function getRoleInfo(roleValue: string) {
+  return ALL_ROLES.find((r) => r.value === roleValue) || {
+    value: roleValue,
+    label: roleValue,
+    color: "bg-gray-100 text-gray-800",
+  };
+}
+
+// 多角色选择组件
+function RolesSelector({
+  selectedRoles,
+  onChange,
+}: {
+  selectedRoles: string[];
+  onChange: (roles: string[]) => void;
+}) {
+  const handleToggle = (roleValue: string) => {
+    if (selectedRoles.includes(roleValue)) {
+      // 至少保留一个角色
+      if (selectedRoles.length > 1) {
+        onChange(selectedRoles.filter((r) => r !== roleValue));
+      } else {
+        toast.error("至少需要保留一个角色");
+      }
+    } else {
+      onChange([...selectedRoles, roleValue]);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      {ALL_ROLES.map((role) => (
+        <div key={role.value} className="flex items-center space-x-3">
+          <Checkbox
+            id={`role-${role.value}`}
+            checked={selectedRoles.includes(role.value)}
+            onCheckedChange={() => handleToggle(role.value)}
+          />
+          <label
+            htmlFor={`role-${role.value}`}
+            className="flex items-center gap-2 cursor-pointer text-sm"
+          >
+            <span className={`px-2 py-0.5 rounded text-xs ${role.color}`}>
+              {role.label}
+            </span>
+          </label>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function UserManagementContent() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [resetPasswordUserId, setResetPasswordUserId] = useState<number | null>(null);
+
+  // 多角色选择状态
+  const [createRoles, setCreateRoles] = useState<string[]>(["user"]);
+  const [editRoles, setEditRoles] = useState<string[]>(["user"]);
 
   // 查询用户列表
   const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery();
@@ -44,6 +112,7 @@ export default function UserManagementContent() {
     onSuccess: () => {
       toast.success("用户创建成功");
       setIsCreateDialogOpen(false);
+      setCreateRoles(["user"]);
       refetch();
     },
     onError: (error) => {
@@ -56,10 +125,22 @@ export default function UserManagementContent() {
     onSuccess: () => {
       toast.success("用户更新成功");
       setEditingUser(null);
+      setEditRoles(["user"]);
       refetch();
     },
     onError: (error) => {
       toast.error(`更新失败: ${error.message}`);
+    },
+  });
+
+  // 更新角色
+  const updateRolesMutation = trpc.userManagement.updateRoles?.useMutation?.({
+    onSuccess: () => {
+      toast.success("角色更新成功");
+      refetch();
+    },
+    onError: (error: any) => {
+      toast.error(`角色更新失败: ${error.message}`);
     },
   });
 
@@ -104,10 +185,11 @@ export default function UserManagementContent() {
     createMutation.mutate({
       name: formData.get("name") as string,
       password: formData.get("password") as string,
-      nickname: formData.get("nickname") as string || undefined,
-      email: formData.get("email") as string || undefined,
-      phone: formData.get("phone") as string || undefined,
-      role: formData.get("role") as "admin" | "sales" | "finance" | "user",
+      nickname: (formData.get("nickname") as string) || undefined,
+      email: (formData.get("email") as string) || undefined,
+      phone: (formData.get("phone") as string) || undefined,
+      role: createRoles[0] as any, // 主角色（兼容旧接口）
+      roles: createRoles.join(","), // 多角色
     });
   };
 
@@ -117,10 +199,11 @@ export default function UserManagementContent() {
     updateMutation.mutate({
       id: editingUser.id,
       name: formData.get("name") as string,
-      nickname: formData.get("nickname") as string || undefined,
-      email: formData.get("email") as string || undefined,
-      phone: formData.get("phone") as string || undefined,
-      role: formData.get("role") as "admin" | "sales" | "finance" | "user",
+      nickname: (formData.get("nickname") as string) || undefined,
+      email: (formData.get("email") as string) || undefined,
+      phone: (formData.get("phone") as string) || undefined,
+      role: editRoles[0] as any, // 主角色（兼容旧接口）
+      roles: editRoles.join(","), // 多角色
     });
   };
 
@@ -139,55 +222,62 @@ export default function UserManagementContent() {
     toggleActiveMutation.mutate({ id: userId, isActive });
   };
 
+  const handleEditUser = (user: any) => {
+    setEditingUser(user);
+    setEditRoles(parseRoles(user.roles || user.role));
+  };
+
   return (
-      <div className="space-y-6">
-        <div className="flex justify-end items-center">
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <UserPlus className="w-4 h-4 mr-2" />
-            创建用户
-          </Button>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-end items-center">
+        <Button onClick={() => { setIsCreateDialogOpen(true); setCreateRoles(["user"]); }}>
+          <UserPlus className="w-4 h-4 mr-2" />
+          创建用户
+        </Button>
+      </div>
 
-        {/* 搜索栏 */}
-        <Card className="p-4">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="搜索用户名、花名、邮箱、手机号..."
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+      {/* 搜索栏 */}
+      <Card className="p-4">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="搜索用户名、花名、邮箱、手机号..."
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </Card>
+        </div>
+      </Card>
 
-        {/* 用户列表 */}
-        <Card>
-          <Table>
-            <TableHeader>
+      {/* 用户列表 */}
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>用户编号</TableHead>
+              <TableHead>用户名</TableHead>
+              <TableHead>花名</TableHead>
+              <TableHead>邮箱</TableHead>
+              <TableHead>手机号</TableHead>
+              <TableHead>角色</TableHead>
+              <TableHead>状态</TableHead>
+              <TableHead>最后登录</TableHead>
+              <TableHead className="text-right">操作</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
               <TableRow>
-                <TableHead>用户编号</TableHead>
-                <TableHead>用户名</TableHead>
-                <TableHead>花名</TableHead>
-                <TableHead>邮箱</TableHead>
-                <TableHead>手机号</TableHead>
-                <TableHead>角色</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>最后登录</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableCell colSpan={9} className="text-center">
+                  加载中...
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center">
-                    加载中...
-                  </TableCell>
-                </TableRow>
-              ) : filteredUsers && filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
+            ) : filteredUsers && filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => {
+                const userRoles = parseRoles((user as any).roles || user.role);
+                return (
                   <TableRow key={user.id}>
                     <TableCell className="font-mono">{user.id}</TableCell>
                     <TableCell className="font-medium">{user.name}</TableCell>
@@ -195,25 +285,19 @@ export default function UserManagementContent() {
                     <TableCell>{user.email || "-"}</TableCell>
                     <TableCell>{user.phone || "-"}</TableCell>
                     <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded text-xs ${
-                          user.role === "admin"
-                            ? "bg-red-100 text-red-800"
-                            : user.role === "sales"
-                            ? "bg-blue-100 text-blue-800"
-                            : user.role === "finance"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {user.role === "admin"
-                          ? "管理员"
-                          : user.role === "sales"
-                          ? "销售"
-                          : user.role === "finance"
-                          ? "财务"
-                          : "普通用户"}
-                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {userRoles.map((role) => {
+                          const info = getRoleInfo(role);
+                          return (
+                            <span
+                              key={role}
+                              className={`px-2 py-0.5 rounded text-xs ${info.color}`}
+                            >
+                              {info.label}
+                            </span>
+                          );
+                        })}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -238,7 +322,7 @@ export default function UserManagementContent() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingUser(user)}
+                          onClick={() => handleEditUser(user)}
                         >
                           <Edit className="w-3 h-3 mr-1" />
                           编辑
@@ -257,194 +341,185 @@ export default function UserManagementContent() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={9} className="text-center">
-                    暂无用户数据
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Card>
-
-        {/* 创建用户对话框 */}
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>创建新用户</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleCreateSubmit}>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="name">用户名 *</Label>
-                  <Input id="name" name="name" required />
-                </div>
-                <div>
-                  <Label htmlFor="password">密码 *</Label>
-                  <Input id="password" name="password" type="password" required minLength={6} />
-                  <p className="text-xs text-muted-foreground mt-1">至少6位字符</p>
-                </div>
-                <div>
-                  <Label htmlFor="nickname">花名</Label>
-                  <Input id="nickname" name="nickname" />
-                </div>
-                <div>
-                  <Label htmlFor="email">邮箱</Label>
-                  <Input id="email" name="email" type="email" />
-                </div>
-                <div>
-                  <Label htmlFor="phone">手机号</Label>
-                  <Input id="phone" name="phone" />
-                </div>
-                <div>
-                  <Label htmlFor="role">角色 *</Label>
-                  <Select name="role" defaultValue="user">
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">普通用户</SelectItem>
-                      <SelectItem value="sales">销售</SelectItem>
-                      <SelectItem value="finance">财务</SelectItem>
-                      <SelectItem value="admin">管理员</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter className="mt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsCreateDialogOpen(false)}
-                >
-                  取消
-                </Button>
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? "创建中..." : "创建"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-
-        {/* 编辑用户对话框 */}
-        <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>编辑用户</DialogTitle>
-            </DialogHeader>
-            {editingUser && (
-              <form onSubmit={handleUpdateSubmit}>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="edit-name">用户名 *</Label>
-                    <Input
-                      id="edit-name"
-                      name="name"
-                      defaultValue={editingUser.name}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-nickname">花名</Label>
-                    <Input
-                      id="edit-nickname"
-                      name="nickname"
-                      defaultValue={editingUser.nickname || ""}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-email">邮箱</Label>
-                    <Input
-                      id="edit-email"
-                      name="email"
-                      type="email"
-                      defaultValue={editingUser.email || ""}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-phone">手机号</Label>
-                    <Input
-                      id="edit-phone"
-                      name="phone"
-                      defaultValue={editingUser.phone || ""}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-role">角色 *</Label>
-                    <Select name="role" defaultValue={editingUser.role}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="user">普通用户</SelectItem>
-                        <SelectItem value="sales">销售</SelectItem>
-                        <SelectItem value="finance">财务</SelectItem>
-                        <SelectItem value="admin">管理员</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <DialogFooter className="mt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setEditingUser(null)}
-                  >
-                    取消
-                  </Button>
-                  <Button type="submit" disabled={updateMutation.isPending}>
-                    {updateMutation.isPending ? "更新中..." : "更新"}
-                  </Button>
-                </DialogFooter>
-              </form>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center">
+                  暂无用户数据
+                </TableCell>
+              </TableRow>
             )}
-          </DialogContent>
-        </Dialog>
+          </TableBody>
+        </Table>
+      </Card>
 
-        {/* 重置密码对话框 */}
-        <Dialog
-          open={isResetPasswordDialogOpen}
-          onOpenChange={setIsResetPasswordDialogOpen}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>重置密码</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleResetPassword}>
+      {/* 创建用户对话框 */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>创建新用户</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateSubmit}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">用户名 *</Label>
+                <Input id="name" name="name" required />
+              </div>
+              <div>
+                <Label htmlFor="password">密码 *</Label>
+                <Input id="password" name="password" type="password" required minLength={6} />
+                <p className="text-xs text-muted-foreground mt-1">至少6位字符</p>
+              </div>
+              <div>
+                <Label htmlFor="nickname">花名</Label>
+                <Input id="nickname" name="nickname" />
+              </div>
+              <div>
+                <Label htmlFor="email">邮箱</Label>
+                <Input id="email" name="email" type="email" />
+              </div>
+              <div>
+                <Label htmlFor="phone">手机号</Label>
+                <Input id="phone" name="phone" />
+              </div>
+              <div>
+                <Label>角色 *（可多选）</Label>
+                <div className="mt-2 p-3 border rounded-md">
+                  <RolesSelector
+                    selectedRoles={createRoles}
+                    onChange={setCreateRoles}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
+                取消
+              </Button>
+              <Button type="submit" disabled={createMutation.isPending}>
+                {createMutation.isPending ? "创建中..." : "创建"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 编辑用户对话框 */}
+      <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>编辑用户</DialogTitle>
+          </DialogHeader>
+          {editingUser && (
+            <form onSubmit={handleUpdateSubmit}>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="newPassword">新密码 *</Label>
+                  <Label htmlFor="edit-name">用户名 *</Label>
                   <Input
-                    id="newPassword"
-                    name="newPassword"
-                    type="password"
+                    id="edit-name"
+                    name="name"
+                    defaultValue={editingUser.name}
                     required
-                    minLength={6}
                   />
-                  <p className="text-xs text-muted-foreground mt-1">至少6位字符</p>
+                </div>
+                <div>
+                  <Label htmlFor="edit-nickname">花名</Label>
+                  <Input
+                    id="edit-nickname"
+                    name="nickname"
+                    defaultValue={editingUser.nickname || ""}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-email">邮箱</Label>
+                  <Input
+                    id="edit-email"
+                    name="email"
+                    type="email"
+                    defaultValue={editingUser.email || ""}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-phone">手机号</Label>
+                  <Input
+                    id="edit-phone"
+                    name="phone"
+                    defaultValue={editingUser.phone || ""}
+                  />
+                </div>
+                <div>
+                  <Label>角色 *（可多选）</Label>
+                  <div className="mt-2 p-3 border rounded-md">
+                    <RolesSelector
+                      selectedRoles={editRoles}
+                      onChange={setEditRoles}
+                    />
+                  </div>
                 </div>
               </div>
               <DialogFooter className="mt-6">
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setIsResetPasswordDialogOpen(false);
-                    setResetPasswordUserId(null);
-                  }}
+                  onClick={() => setEditingUser(null)}
                 >
                   取消
                 </Button>
-                <Button type="submit" disabled={resetPasswordMutation.isPending}>
-                  {resetPasswordMutation.isPending ? "重置中..." : "重置密码"}
+                <Button type="submit" disabled={updateMutation.isPending}>
+                  {updateMutation.isPending ? "更新中..." : "更新"}
                 </Button>
               </DialogFooter>
             </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* 重置密码对话框 */}
+      <Dialog
+        open={isResetPasswordDialogOpen}
+        onOpenChange={setIsResetPasswordDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>重置密码</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="newPassword">新密码 *</Label>
+                <Input
+                  id="newPassword"
+                  name="newPassword"
+                  type="password"
+                  required
+                  minLength={6}
+                />
+                <p className="text-xs text-muted-foreground mt-1">至少6位字符</p>
+              </div>
+            </div>
+            <DialogFooter className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsResetPasswordDialogOpen(false);
+                  setResetPasswordUserId(null);
+                }}
+              >
+                取消
+              </Button>
+              <Button type="submit" disabled={resetPasswordMutation.isPending}>
+                {resetPasswordMutation.isPending ? "重置中..." : "重置密码"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

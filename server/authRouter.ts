@@ -185,6 +185,7 @@ export const authRouter = router({
             openId: user.openId,
             name: user.name,
             role: user.role,
+            roles: user.roles || user.role,
           },
           JWT_SECRET,
           { expiresIn: TOKEN_EXPIRY }
@@ -207,6 +208,7 @@ export const authRouter = router({
             openId: user.openId || "",
             name: user.name || "",
             role: user.role,
+            roles: (user.roles || user.role).split(","),
           },
         };
       } catch (error) {
@@ -290,6 +292,7 @@ export const authRouter = router({
           openId: user.openId,
           name: user.name,
           role: user.role,
+          roles: user.roles || user.role,
         },
         JWT_SECRET,
         { expiresIn: TOKEN_EXPIRY }
@@ -309,8 +312,9 @@ export const authRouter = router({
         .set({ lastSignedIn: new Date() })
         .where(eq(users.id, user.id));
 
-      // 7. 登录时自动检查并补充业务客户记录(对于普通用户)
-      if (user.role === 'user' && user.phone) {
+      // 7. 登录时自动检查并补充业务客户记录(对于含有普通用户角色的用户)
+      const userRoles = (user.roles || user.role || '').split(',');
+      if (userRoles.includes('user') && user.phone) {
         try {
           await getOrCreateCustomerForUser({
             id: user.id,
@@ -334,6 +338,7 @@ export const authRouter = router({
           email: user.email || "",
           phone: user.phone || "",
           role: user.role,
+          roles: (user.roles || user.role).split(","),
           isActive: user.isActive,
         },
       };
@@ -543,6 +548,7 @@ export const authRouter = router({
         name: input.name || input.phone,
         nickname: input.nickname,
         role: "user",
+        roles: "user",
         isActive: true,
         loginMethod: "phone",
       });
@@ -570,6 +576,7 @@ export const authRouter = router({
           openId,
           name: input.name || input.phone,
           role: "user",
+          roles: "user",
         },
         JWT_SECRET,
         { expiresIn: TOKEN_EXPIRY }
@@ -593,6 +600,7 @@ export const authRouter = router({
           phone: input.phone,
           name: input.name || input.phone,
           role: "user",
+          roles: ["user"],
         },
       };
     }),

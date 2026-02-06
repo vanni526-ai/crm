@@ -9,7 +9,7 @@ export default function CustomerManagement() {
     <DashboardLayout>
       <div className="p-6 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">客户管理</h1>
+          <h1 className="text-3xl font-bold">用户管理</h1>
           <p className="text-muted-foreground mt-1">
             管理系统用户账号和业务客户信息
           </p>

@@ -1,7 +1,8 @@
 import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, index, date, time, json, unique } from "drizzle-orm/mysql-core";
 
 /**
- * 用户表 - 支持管理员、销售、财务三种角色
+ * 用户表 - 支持多角色：管理员(admin)、老师(teacher)、普通用户(user)、销售(sales)、城市合伙人(cityPartner)
+ * roles字段存储逗号分隔的角色列表，如 "admin,teacher"
  */
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -12,7 +13,8 @@ export const users = mysqlTable("users", {
   phone: varchar("phone", { length: 20 }), // 手u673au53f7(用于登u5f55)
   password: varchar("password", { length: 255 }), // 加密后u7684密码
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["admin", "sales", "finance", "user"]).default("user").notNull(),
+  role: mysqlEnum("role", ["admin", "sales", "finance", "user"]).default("user").notNull(), // 兼容旧字段，保留但不再作为主要角色字段
+  roles: varchar("roles", { length: 255 }).default("user").notNull(), // 新多角色字段，逗号分隔，如 "admin,teacher"
   isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

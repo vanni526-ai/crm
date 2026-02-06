@@ -267,7 +267,7 @@ export default function Customers() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">客户管理</h1>
+            <h1 className="text-3xl font-bold">用户管理</h1>
             <p className="text-muted-foreground mt-2">管理客户档案和消费记录</p>
           </div>
           <div className="flex gap-2">

@@ -30,7 +30,7 @@ import { Button } from "./ui/button";
 const menuItems = [
   { icon: LayoutDashboard, label: "首页", path: "/" },
   { icon: ShoppingCart, label: "订单管理", path: "/orders" },
-  { icon: Users, label: "客户管理", path: "/customer-management" },
+  { icon: Users, label: "用户管理", path: "/customer-management" },
   { icon: TrendingUp, label: "销售管理", path: "/sales" },
   { icon: GraduationCap, label: "课程排课", path: "/schedules" },
   { icon: UserCheck, label: "老师管理", path: "/teachers" },

@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE users SET roles = CASE WHEN role = 'admin' THEN 'admin' WHEN role = 'sales' THEN 'sales' WHEN role = 'finance' THEN 'sales' WHEN role = 'user' THEN 'user' ELSE 'user' END WHERE roles = 'user' OR roles IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE users SET roles = CASE WHEN role = 'admin' THEN 'admin' WHEN role = 'sales' THEN 'sales' WHEN role = 'finance' THEN 'sales' WHEN role = 'user' THEN 'user' ELSE 'user' END WHERE roles = 'user' OR roles IS NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1538
+}

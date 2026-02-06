@@ -94,9 +94,14 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
+      // 同步设置roles字段
+      values.roles = user.role;
+      updateSet.roles = user.role;
     } else if (user.openId === ENV.ownerOpenId) {
       values.role = "admin";
       updateSet.role = "admin";
+      values.roles = "admin";
+      updateSet.roles = "admin";
     }
 
     if (!values.lastSignedIn) {
@@ -148,6 +153,20 @@ export async function updateUserRole(userId: number, role: "admin" | "sales" | "
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(users).set({ role }).where(eq(users.id, userId));
+}
+
+/**
+ * 更新用户多角色
+ * @param userId 用户ID
+ * @param roles 角色数组，如 ["admin", "teacher"]
+ */
+export async function updateUserRoles(userId: number, roles: string[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const rolesStr = roles.length > 0 ? roles.join(",") : "user";
+  // 同时更新旧的role字段（取第一个角色作为主角色）
+  const primaryRole = roles.includes("admin") ? "admin" : roles.includes("sales") ? "sales" : roles.includes("finance") ? "finance" : "user";
+  await db.update(users).set({ roles: rolesStr, role: primaryRole as any }).where(eq(users.id, userId));
 }
 
 export async function updateUserStatus(userId: number, isActive: boolean) {

@@ -80,6 +80,7 @@ export interface RegisterResult {
     phone: string;
     name: string;
     role: string;
+    roles: string; // 多角色，逗号分隔，如 "admin,teacher"
   };
 }
 
@@ -96,6 +97,7 @@ export interface LoginResult {
     openId: string;
     name: string;
     role: string;
+    roles: string; // 多角色，逗号分隔，如 "admin,teacher"
   };
   error?: string;
 }

@@ -6,9 +6,15 @@ import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 
+// 角色常量
+const VALID_ROLES = ["admin", "teacher", "user", "sales", "cityPartner"] as const;
+
 // 权限检查中间件 - 只有管理员可以管理用户
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== "admin") {
+  // 支持多角色：检查roles字段或回退到role字段
+  const userRoles = (ctx.user as any).roles || ctx.user.role || "";
+  const hasAdmin = userRoles.split(",").map((r: string) => r.trim()).includes("admin");
+  if (!hasAdmin) {
     throw new TRPCError({ code: "FORBIDDEN", message: "需要管理员权限" });
   }
   return next({ ctx });
@@ -36,6 +42,7 @@ export const userManagementRouter = router({
       email: user.email,
       phone: user.phone,
       role: user.role,
+      roles: (user as any).roles || user.role || "user",
       isActive: user.isActive,
       createdAt: user.createdAt,
       lastSignedIn: user.lastSignedIn,
@@ -78,6 +85,7 @@ export const userManagementRouter = router({
         email: user.email,
         phone: user.phone,
         role: user.role,
+        roles: (user as any).roles || user.role || "user",
         isActive: user.isActive,
         createdAt: user.createdAt,
         lastSignedIn: user.lastSignedIn,
@@ -93,7 +101,8 @@ export const userManagementRouter = router({
         email: z.string().email("邮箱格式不正确").optional(),
         phone: z.string().optional(),
         password: z.string().min(6, "密码至少6位"),
-        role: z.enum(["admin", "sales", "finance", "user"]),
+        role: z.enum(["admin", "sales", "finance", "user"]).optional(),
+        roles: z.string().optional(), // 多角色，逗号分隔
       })
     )
     .mutation(async ({ input }) => {
@@ -111,6 +120,10 @@ export const userManagementRouter = router({
       // 生成openId(使用时间戳+随机数)
       const openId = `user_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
+      // 解析角色
+      const rolesStr = input.roles || input.role || "user";
+      const primaryRole = rolesStr.split(",")[0].trim();
+
       // 创建用户
       await drizzle.insert(users).values({
         openId,
@@ -119,13 +132,14 @@ export const userManagementRouter = router({
         email: input.email || null,
         phone: input.phone || null,
         password: hashedPassword,
-        role: input.role,
+        role: primaryRole as any,
+        roles: rolesStr,
         isActive: true,
-      });
+      } as any);
 
       return {
         success: true,
-        message: "用户创u5efau6210功",
+        message: "用户创建成功",
       };
     }),
 
@@ -139,6 +153,7 @@ export const userManagementRouter = router({
         email: z.string().email("邮箱格式不正确").optional(),
         phone: z.string().optional(),
         role: z.enum(["admin", "sales", "finance", "user"]).optional(),
+        roles: z.string().optional(), // 多角色，逗号分隔
       })
     )
     .mutation(async ({ input }) => {
@@ -150,13 +165,53 @@ export const userManagementRouter = router({
         });
       }
 
-      const { id, ...updateData } = input;
+      const { id, roles, ...updateData } = input;
 
-      await drizzle.update(users).set(updateData).where(eq(users.id, id));
+      // 如果传了roles，同步更新role字段
+      const setData: any = { ...updateData };
+      if (roles) {
+        setData.roles = roles;
+        setData.role = roles.split(",")[0].trim();
+      }
+
+      await drizzle.update(users).set(setData).where(eq(users.id, id));
 
       return {
         success: true,
         message: "用户信息更新成功",
+      };
+    }),
+
+  // 更新用户角色（多角色）
+  updateRoles: adminProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        roles: z.string().min(1, "至少需要一个角色"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+
+      const primaryRole = input.roles.split(",")[0].trim();
+
+      await drizzle
+        .update(users)
+        .set({
+          role: primaryRole as any,
+          roles: input.roles,
+        } as any)
+        .where(eq(users.id, input.id));
+
+      return {
+        success: true,
+        message: "角色更新成功",
       };
     }),
 
