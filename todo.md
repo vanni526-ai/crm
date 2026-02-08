@@ -1610,3 +1610,27 @@
 - [x] 修复前端页面: Home/Orders/Customers/CustomersContent/Customers_step1/Finance/Schedules/Import/Courses/ReconciliationExport/ParsingLearning/TransportFeeFixTool/Users/Notifications/SalesCityPerformance/CustomerOverview/UserManagement/UserManagementContent
 - [x] 测试验证时间一致性(33个测试全部通过，TypeScript无错误)
 - [x] 保存检查点
+
+
+### 183. 全面验证前后端时间处理是否正确统一为北京时间
+- [x] 验证后端时间工具函数(todayBeijing/getYearBeijing/getMonthBeijing/formatDateBeijing/formatDateTimeBeijing 全部正确)
+- [x] 验证后端关键接口的时间返回值(数据库UTC时间 2026-02-06 16:42 → 北京时间 2026-02-07 00:42 ✅)
+- [x] 验证前端时间工具函数(formatDateBJ/formatDateTimeBJ/formatTimeBJ/todayBJ 全部正确)
+- [x] 验证前端关键页面的时间显示(页面正常加载，无TypeScript错误)
+- [x] 总结验证结果
+
+
+### 184. 修复销售管理中销售人员订单数和销售额不匹配问题
+- [ ] 查询数据库验证"山竹"等销售人员的实际订单数据
+- [ ] 诊断getSalesStatistics/updateAllSalespersonStats函数的查询逻辑
+- [ ] 修复销售统计查询，确保与订单管理数据一致
+- [ ] 测试验证修复结果
+- [ ] 保存检查点
+
+
+### 184. 修复销售管理中销售人员订单数和销售额不匹配问题
+- [x] 查询数据库验证"山竹"等销售人员的实际订单数据(山竹: 111单, ¥413,773)
+- [x] 诊断getSalesStatistics/updateAllSalespersonStats函数的查询逻辑(原因: salespersons表缺少orderCount和totalSales字段)
+- [x] 修复销售统计查询(添加orderCount/totalSales字段,修改统计函数使用paymentAmount而非courseAmount)
+- [x] 测试验证修复结果(山竹: 111单, ¥413,773 ✅ 数据一致)
+- [x] 保存检查点

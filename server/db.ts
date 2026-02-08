@@ -3157,7 +3157,7 @@ export async function updateAllSalespersonStats() {
     const stats = await db
       .select({
         orderCount: sql<number>`COUNT(*)`,
-        totalAmount: sql<number>`SUM(COALESCE(${orders.courseAmount}, 0))`,
+        totalAmount: sql<number>`SUM(COALESCE(${orders.paymentAmount}, 0))`,
       })
       .from(orders)
       .where(
@@ -3170,6 +3170,15 @@ export async function updateAllSalespersonStats() {
     
     const orderCount = stats[0]?.orderCount || 0;
     const totalAmount = stats[0]?.totalAmount || 0;
+    
+    // 更新数据库中的统计字段
+    await db
+      .update(salespersons)
+      .set({
+        orderCount,
+        totalSales: totalAmount.toString(),
+      })
+      .where(eq(salespersons.id, salesperson.id));
     
     results.push({
       salespersonId: salesperson.id,
@@ -3207,7 +3216,7 @@ export async function updateSalespersonStats(salespersonId: number) {
   const stats = await db
     .select({
       orderCount: sql<number>`COUNT(*)`,
-      totalAmount: sql<number>`SUM(COALESCE(${orders.courseAmount}, 0))`,
+      totalAmount: sql<number>`SUM(COALESCE(${orders.paymentAmount}, 0))`,
     })
     .from(orders)
     .where(
@@ -3220,6 +3229,15 @@ export async function updateSalespersonStats(salespersonId: number) {
   
   const orderCount = stats[0]?.orderCount || 0;
   const totalAmount = stats[0]?.totalAmount || 0;
+  
+  // 更新数据库中的统计字段
+  await db
+    .update(salespersons)
+    .set({
+      orderCount,
+      totalSales: totalAmount.toString(),
+    })
+    .where(eq(salespersons.id, sp.id));
   
   return {
     salespersonId: sp.id,

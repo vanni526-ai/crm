@@ -373,6 +373,8 @@ export const salespersons = mysqlTable("salespersons", {
   commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).default("0.00"), // 提成比例(%)
   city: varchar("city", { length: 50 }), // 所在城市
   isActive: boolean("isActive").default(true).notNull(), // 是否在职
+  orderCount: int("orderCount").default(0).notNull(), // 订单数量(统计字段)
+  totalSales: decimal("totalSales", { precision: 12, scale: 2 }).default("0.00").notNull(), // 销售总额(统计字段)
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

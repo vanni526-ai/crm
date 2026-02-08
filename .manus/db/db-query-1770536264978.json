@@ -1,0 +1,14 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as order_count,\n  SUM(CAST(paymentAmount AS DECIMAL(10,2))) as total_amount\nFROM orders \nWHERE salesPerson = '山竹';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  COUNT(*) as order_count,\n  SUM(CAST(paymentAmount AS DECIMAL(10,2))) as total_amount\nFROM orders \nWHERE salesPerson = '山竹';\n",
+  "rows": [
+    {
+      "order_count": "111",
+      "total_amount": "413773.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "order_count\ttotal_amount\n111\t413773.00\n",
+  "stderr": "",
+  "execution_time_ms": 1538
+}
