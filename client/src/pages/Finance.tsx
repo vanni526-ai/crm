@@ -12,7 +12,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle, MapPin, RefreshCw } from "lucide-react";
+import { ArrowUpCircle, ArrowDownCircle, TrendingUp, DollarSign, Download, AlertCircle, MapPin, RefreshCw, CheckCircle2 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { formatDateBJ } from "@/lib/timezone";
@@ -500,6 +500,10 @@ export default function Finance() {
             <p className="text-muted-foreground mt-2">查看收支明细和利润分析</p>
           </div>
           <div className="flex gap-2">
+            <Button onClick={() => window.location.href = '/teacher-payment-approval'} variant="outline">
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              课时费审批
+            </Button>
             <Button onClick={handleRefresh} variant="outline" disabled={isRefreshing}>
               <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               刷新数据
