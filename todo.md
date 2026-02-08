@@ -1634,3 +1634,12 @@
 - [x] 修复销售统计查询(添加orderCount/totalSales字段,修改统计函数使用paymentAmount而非courseAmount)
 - [x] 测试验证修复结果(山竹: 111单, ¥413,773 ✅ 数据一致)
 - [x] 保存检查点
+
+
+### 185. 修复用户账号角色修改时的invalid_value错误
+- [x] 查看users表中role字段的定义和枚举值(role: 旧字段枚举["admin", "sales", "finance", "user"], roles: 新字段varchar逗号分隔)
+- [x] 查看用户更新接口的验证逻辑(userManagementRouter.ts中update接口role验证不包含teacher和cityPartner)
+- [x] 查看前端用户管理页面的角色选择组件(UserManagementContent.tsx使用多选组件RolesSelector)
+- [x] 确定支持多角色，修夏userManagementRouter.ts中role验证包含所有角色["admin", "sales", "finance", "user", "teacher", "cityPartner"]
+- [x] 测试验证角色修改功能(TypeScript编译无错误)
+- [x] 保存检查点

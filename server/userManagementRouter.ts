@@ -101,7 +101,7 @@ export const userManagementRouter = router({
         email: z.string().email("邮箱格式不正确").optional(),
         phone: z.string().optional(),
         password: z.string().min(6, "密码至少6位"),
-        role: z.enum(["admin", "sales", "finance", "user"]).optional(),
+        role: z.enum(["admin", "sales", "finance", "user", "teacher", "cityPartner"]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
       })
     )
@@ -152,7 +152,7 @@ export const userManagementRouter = router({
         nickname: z.string().optional(),
         email: z.string().email("邮箱格式不正确").optional(),
         phone: z.string().optional(),
-        role: z.enum(["admin", "sales", "finance", "user"]).optional(),
+        role: z.enum(["admin", "sales", "finance", "user", "teacher", "cityPartner"]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
       })
     )
