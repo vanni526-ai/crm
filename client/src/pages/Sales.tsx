@@ -340,11 +340,19 @@ export default function Sales() {
                   <TableCell>{sp.commissionRate ? `${sp.commissionRate}%` : "-"}</TableCell>
                   <TableCell>{sp.city || "-"}</TableCell>
                   <TableCell>
-                    {allStatistics?.orders?.filter(o => o.salespersonId === sp.id).length || 0}
+                    {allStatistics?.orders?.filter(o => 
+                      o.salespersonId === sp.id || 
+                      o.salesPerson === sp.name || 
+                      o.salesPerson === sp.nickname
+                    ).length || 0}
                   </TableCell>
                   <TableCell>
                     ¥{allStatistics?.orders
-                      ?.filter(o => o.salespersonId === sp.id)
+                      ?.filter(o => 
+                        o.salespersonId === sp.id || 
+                        o.salesPerson === sp.name || 
+                        o.salesPerson === sp.nickname
+                      )
                       .reduce((sum, o) => sum + Number(o.paymentAmount), 0)
                       .toFixed(2) || "0.00"}
                   </TableCell>
