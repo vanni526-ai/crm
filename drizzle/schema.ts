@@ -244,9 +244,11 @@ export const teacherPayments = mysqlTable("teacherPayments", {
   paymentMethod: mysqlEnum("paymentMethod", ["wechat", "alipay", "bank", "cash", "other"]),
   transactionNo: varchar("transactionNo", { length: 100 }),
   paymentTime: timestamp("paymentTime"),
-  status: mysqlEnum("status", ["pending", "paid"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "paid"]).default("pending").notNull(), // pending:待审批, approved:已审批, paid:已支付
   notes: text("notes"),
   recordedBy: int("recordedBy").notNull(), // 登记人(财务)
+  approvedBy: int("approvedBy"), // 审批人(财务)
+  approvedAt: timestamp("approvedAt"), // 审批时间
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

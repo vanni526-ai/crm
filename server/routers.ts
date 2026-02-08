@@ -22,6 +22,7 @@ import { excelReportRouter } from "./excelReportRouter";
 import { contentGeneratorRouter } from "./contentGeneratorRouter";
 import { notificationRouter } from "./notificationRouter";
 import { salesCityPerformanceRouter } from "./salesCityPerformanceRouter";
+import { teacherPaymentRouter } from "./teacherPaymentRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -91,6 +92,7 @@ export const appRouter = router({
   parsingLearning: parsingLearningRouter,
   reconciliation: reconciliationRouter,
   salesCityPerformance: salesCityPerformanceRouter,
+  teacherPayments: teacherPaymentRouter,
 
   // 数据质量检查
   dataQuality: router({
@@ -1639,49 +1641,46 @@ export const appRouter = router({
       }),
   }),
 
-  // 老师费用结算
-  teacherPayments: router({
-    list: financeOrAdminProcedure.query(async () => {
-      return db.getTeacherPaymentsByTeacher(0); // TODO: 需要修改为获取所有
-    }),
-    
-    getByTeacher: financeOrAdminProcedure
-      .input(z.object({ teacherId: z.number() }))
-      .query(async ({ input }) => {
-        return db.getTeacherPaymentsByTeacher(input.teacherId);
-      }),
-    
-    create: financeOrAdminProcedure
-      .input(z.object({
-        teacherId: z.number(),
-        orderId: z.number().optional(),
-        scheduleId: z.number().optional(),
-        amount: z.string(),
-        paymentMethod: z.enum(["wechat", "alipay", "bank", "cash", "other"]).optional(),
-        transactionNo: z.string().optional(),
-        paymentTime: z.date().optional(),
-        status: z.enum(["pending", "paid"]).optional(),
-        notes: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const id = await db.createTeacherPayment({
-          ...input,
-          recordedBy: ctx.user.id,
-        });
-        return { id, success: true };
-      }),
-    
-    updateStatus: financeOrAdminProcedure
-      .input(z.object({
-        id: z.number(),
-        status: z.enum(["pending", "paid"]),
-        paymentTime: z.date().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateTeacherPaymentStatus(input.id, input.status, input.paymentTime);
-        return { success: true };
-      }),
-  }),
+  // 老师费用结算 - 已迁移到teacherPaymentRouter
+  // teacherPayments: router({
+  //   list: financeOrAdminProcedure.query(async () => {
+  //     return db.getTeacherPaymentsByTeacher(0);
+  //   }),
+  //   getByTeacher: financeOrAdminProcedure
+  //     .input(z.object({ teacherId: z.number() }))
+  //     .query(async ({ input }) => {
+  //       return db.getTeacherPaymentsByTeacher(input.teacherId);
+  //     }),
+  //   create: financeOrAdminProcedure
+  //     .input(z.object({
+  //       teacherId: z.number(),
+  //       orderId: z.number().optional(),
+  //       scheduleId: z.number().optional(),
+  //       amount: z.string(),
+  //       paymentMethod: z.enum(["wechat", "alipay", "bank", "cash", "other"]).optional(),
+  //       transactionNo: z.string().optional(),
+  //       paymentTime: z.date().optional(),
+  //       status: z.enum(["pending", "paid"]).optional(),
+  //       notes: z.string().optional(),
+  //     }))
+  //     .mutation(async ({ input, ctx }) => {
+  //       const id = await db.createTeacherPayment({
+  //         ...input,
+  //         recordedBy: ctx.user.id,
+  //       });
+  //       return { id, success: true };
+  //     }),
+  //   updateStatus: financeOrAdminProcedure
+  //     .input(z.object({
+  //       id: z.number(),
+  //       status: z.enum(["pending", "paid"]),
+  //       paymentTime: z.date().optional(),
+  //     }))
+  //     .mutation(async ({ input }) => {
+  //       await db.updateTeacherPaymentStatus(input.id, input.status, input.paymentTime);
+  //       return { success: true };
+  //     }),
+  // }),
 
   // 财务对账
   reconciliations: router({

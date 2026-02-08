@@ -1688,4 +1688,15 @@
 - [x] 添加权限控制：teacherProcedure中间件
 - [x] 修复前端Orders.tsx中的deliveryStatus显示
 - [x] 编写测试验证接单功能(4个测试全部通过)
-- [x] 保存检查点
+- [x] 保存### 190. 实现完整的老师课时费管理功能
+- [x] 设计自动结算规则：订单deliveryStatus从'accepted'改为'delivered'时自动创建
+- [x] 扩展teacherPayments表：status扩展为pending/approved/paid，添加approvedBy和approvedAt
+- [x] 创建后端API：teacherPayments.getMyPayments（老师查询自己的收入）
+- [x] 创建后端API：teacherPayments.getPaymentStats（老师收入统计）
+- [x] 创建后端API：teacherPayments.approve（财务审批支付）
+- [x] 创建后端API：teacherPayments.markAsPaid（财务标记已支付）
+- [x] 创建后端API：teacherPayments.getMonthlyReport（按月统计报表）
+- [x] 创建后端API：teacherPayments.getPendingPayments（财务查看待审批）
+- [x] 测试验证所有功能(8个测试全部通过)
+- [x] 保存检查点编写测试验证所有功能
+- [ ] 保存检查点
