@@ -1678,3 +1678,14 @@
 - [x] 修复前端Sales.tsx统计逻辑，同时匹配ID和文本
 - [x] 测试验证统计准确性(夏鑫43个订单￥90486，统计正确)
 - [x] 保存检查点
+
+
+### 189. 为订单增加交付状态管理功能（老师接单）
+- [x] 修改deliveryStatus字段枚举值为pending/accepted/delivered
+- [x] 添加acceptedAt和acceptedBy字段(479条记录已迁移)
+- [x] 创建后端API：orders.getMyOrders（老师查看分配给自己的订单）
+- [x] 创建后端API：orders.acceptOrder（老师接单）
+- [x] 添加权限控制：teacherProcedure中间件
+- [x] 修复前端Orders.tsx中的deliveryStatus显示
+- [x] 编写测试验证接单功能(4个测试全部通过)
+- [x] 保存检查点

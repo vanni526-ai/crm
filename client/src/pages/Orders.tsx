@@ -815,7 +815,8 @@ export default function Orders() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部交付状态</SelectItem>
-                    <SelectItem value="undelivered">未交付</SelectItem>
+                    <SelectItem value="pending">待接单</SelectItem>
+                    <SelectItem value="accepted">已接单</SelectItem>
                     <SelectItem value="delivered">已交付</SelectItem>
                   </SelectContent>
                 </Select>
@@ -1057,11 +1058,12 @@ export default function Orders() {
                               variant={(order as any).deliveryStatus === 'delivered' ? 'default' : 'outline'}
                               className={`cursor-pointer ${(order as any).deliveryStatus === 'delivered' ? 'bg-green-600 hover:bg-green-700' : 'hover:bg-muted'}`}
                               onClick={() => {
-                                const newStatus = (order as any).deliveryStatus === 'delivered' ? 'undelivered' : 'delivered';
+                                const currentStatus = (order as any).deliveryStatus;
+                                const newStatus = currentStatus === 'pending' ? 'accepted' : currentStatus === 'accepted' ? 'delivered' : 'pending';
                                 updateDeliveryStatus.mutate({ id: order.id, deliveryStatus: newStatus });
                               }}
                             >
-                              {(order as any).deliveryStatus === 'delivered' ? '已交付' : '未交付'}
+                              {(order as any).deliveryStatus === 'delivered' ? '已交付' : (order as any).deliveryStatus === 'accepted' ? '已接单' : '待接单'}
                             </Badge>
                           </TableCell>
                           <TableCell>
@@ -1248,7 +1250,7 @@ export default function Orders() {
                           variant={(selectedOrder as any).deliveryStatus === 'delivered' ? 'default' : 'outline'}
                           className={(selectedOrder as any).deliveryStatus === 'delivered' ? 'bg-green-600' : ''}
                         >
-                          {(selectedOrder as any).deliveryStatus === 'delivered' ? '已交付' : '未交付'}
+                          {(selectedOrder as any).deliveryStatus === 'delivered' ? '已交付' : (selectedOrder as any).deliveryStatus === 'accepted' ? '已接单' : '待接单'}
                         </Badge>
                       </div>
                     </div>

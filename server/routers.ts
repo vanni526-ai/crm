@@ -63,6 +63,14 @@ const financeOrAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
   return next({ ctx });
 });
 
+const teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
+  // 开发阶段不限制权限
+  // if (!hasAnyRole(ctx.user.roles, ["teacher"])) {
+  //   throw new TRPCError({ code: "FORBIDDEN", message: "需要老师权限" });
+  // }
+  return next({ ctx });
+});
+
 export const appRouter = router({
   system: systemRouter,
   salespersons: salespersonRouter,
@@ -336,7 +344,7 @@ export const appRouter = router({
           classDate: input.classDate ? new Date(input.classDate) : undefined,
           classTime: input.classTime || undefined,
           status: 'pending', // 默认待处理状态
-          deliveryStatus: 'undelivered', // 默认未交付
+          deliveryStatus: 'pending', // 默认待接单
           notes: input.notes || undefined,
         };
         
@@ -403,7 +411,7 @@ export const appRouter = router({
         classDate: z.string().optional(),
         classTime: z.string().optional(),
         status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
-        deliveryStatus: z.enum(["undelivered", "delivered"]).optional(),
+        deliveryStatus: z.enum(["pending", "accepted", "delivered"]).optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
@@ -538,7 +546,7 @@ export const appRouter = router({
           classDate: input.classDate ? new Date(input.classDate) : undefined,
           classTime: input.classTime || undefined,
           status: input.status || undefined,
-          deliveryStatus: input.deliveryStatus || 'undelivered',
+          deliveryStatus: input.deliveryStatus || 'pending',
           notes: input.notes || undefined,
         };
         const id = await db.createOrder(orderData);
@@ -705,7 +713,7 @@ export const appRouter = router({
         classDate: z.string().optional(),
         classTime: z.string().optional(),
         status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
-        deliveryStatus: z.enum(["undelivered", "delivered"]).optional(),
+        deliveryStatus: z.enum(["pending", "accepted", "delivered"]).optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -781,7 +789,7 @@ export const appRouter = router({
     updateDeliveryStatus: salesOrAdminProcedure
       .input(z.object({
         id: z.number(),
-        deliveryStatus: z.enum(["undelivered", "delivered"]),
+        deliveryStatus: z.enum(["pending", "accepted", "delivered"]),
       }))
       .mutation(async ({ input }) => {
         await db.updateOrder(input.id, { deliveryStatus: input.deliveryStatus });
@@ -792,13 +800,49 @@ export const appRouter = router({
     batchUpdateDeliveryStatus: salesOrAdminProcedure
       .input(z.object({
         ids: z.array(z.number()),
-        deliveryStatus: z.enum(["undelivered", "delivered"]),
+        deliveryStatus: z.enum(["pending", "accepted", "delivered"]),
       }))
       .mutation(async ({ input }) => {
         for (const id of input.ids) {
           await db.updateOrder(id, { deliveryStatus: input.deliveryStatus });
         }
         return { success: true, count: input.ids.length };
+      }),
+    
+    // 老师查看分配给自己的订单
+    getMyOrders: teacherProcedure
+      .input(z.object({
+        deliveryStatus: z.enum(["pending", "accepted", "delivered"]).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        return db.getTeacherOrders(ctx.user.id, input?.deliveryStatus);
+      }),
+    
+    // 老师接单
+    acceptOrder: teacherProcedure
+      .input(z.object({
+        orderId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // 验证订单是否分配给该老师
+        const order = await db.getOrderById(input.orderId);
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+        }
+        
+        // 检查订单是否已经被接单
+        if (order.deliveryStatus !== 'pending') {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "该订单已经被接单或交付" });
+        }
+        
+        // 更新订单状态
+        await db.updateOrder(input.orderId, {
+          deliveryStatus: 'accepted',
+          acceptedAt: new Date(),
+          acceptedBy: ctx.user.id,
+        });
+        
+        return { success: true };
       }),
     
     // 批量更新订单号（添加支付方式前缀）

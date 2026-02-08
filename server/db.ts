@@ -386,6 +386,32 @@ export async function getOrderById(id: number) {
   return result[0] || null;
 }
 
+export async function getTeacherOrders(teacherId: number, deliveryStatus?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // 查找该老师的用户信息
+  const teacher = await db.select().from(users).where(eq(users.id, teacherId)).limit(1);
+  if (!teacher || teacher.length === 0) return [];
+  
+  const teacherName = teacher[0].name || teacher[0].nickname;
+  if (!teacherName) return [];
+  
+  // 查询分配给该老师的订单（通过deliveryTeacher字段匹配）
+  if (deliveryStatus) {
+    return db.select().from(orders)
+      .where(and(
+        eq(orders.deliveryTeacher, teacherName),
+        eq(orders.deliveryStatus, deliveryStatus as any)
+      ))
+      .orderBy(orders.classDate);
+  }
+  
+  return db.select().from(orders)
+    .where(eq(orders.deliveryTeacher, teacherName))
+    .orderBy(orders.classDate);
+}
+
 export async function getOrdersByIds(ids: number[]) {
   const db = await getDb();
   if (!db || ids.length === 0) return [];
