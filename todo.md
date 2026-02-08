@@ -1715,3 +1715,12 @@
 - [x] 在App.tsx中添加路由配置
 - [x] 测试所有功能(页面渲染正常,TypeScript无错误)
 - [x] 保存检查点
+
+
+### 192. 修复用户管理中有teacher角色但未在老师管理列表显示的问题
+- [x] 检查13860029账号的users表数据和teachers表数据(有roles但无teachers记录)
+- [x] 检查老师管理列表的查询逻辑(查询teachers表)
+- [x] 创建scripts/sync-missing-teachers.mjs补丁脚本
+- [x] 运行脚本为13860029创建teachers记录(61个用户，1个新增)
+- [x] 测试验证(teachers表已有记录)
+- [x] 保存检查点
