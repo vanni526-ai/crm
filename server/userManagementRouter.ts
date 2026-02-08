@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "./db";
-import { users } from "../drizzle/schema";
+import { users, teachers } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 import { USER_ROLE_VALUES } from "../shared/roles";
@@ -126,7 +126,7 @@ export const userManagementRouter = router({
       const primaryRole = rolesStr.split(",")[0].trim();
 
       // 创建用户
-      await drizzle.insert(users).values({
+      const [result] = await drizzle.insert(users).values({
         openId,
         name: input.name,
         nickname: input.nickname || null,
@@ -137,6 +137,19 @@ export const userManagementRouter = router({
         roles: rolesStr,
         isActive: true,
       } as any);
+
+      const newUserId = result.insertId;
+
+      // 如果角色包含teacher，同步到老师管理
+      if (rolesStr.includes('teacher')) {
+        await drizzle.insert(teachers).values({
+          userId: newUserId,
+          name: input.name,
+          phone: input.phone || '无',
+          status: '活跃',
+          isActive: true,
+        } as any);
+      }
 
       return {
         success: true,
@@ -168,6 +181,11 @@ export const userManagementRouter = router({
 
       const { id, roles, ...updateData } = input;
 
+      // 查询更新前的角色
+      const [usersBefore] = await drizzle.select().from(users).where(eq(users.id, id)).limit(1);
+      const oldRoles = usersBefore?.roles || '';
+      const hadTeacherRole = oldRoles.includes('teacher');
+
       // 如果传了roles，同步更新role字段
       const setData: any = { ...updateData };
       if (roles) {
@@ -176,6 +194,36 @@ export const userManagementRouter = router({
       }
 
       await drizzle.update(users).set(setData).where(eq(users.id, id));
+
+      // 处理老师角色变更
+      if (roles) {
+        const hasTeacherRole = roles.includes('teacher');
+        
+        // 查找关联的老师记录
+        const [teacherRecords] = await drizzle.select().from(teachers).where(eq(teachers.userId, id)).limit(1);
+        
+        if (hadTeacherRole && !hasTeacherRole) {
+          // 移除老师角色：设置为不激活
+          if (teacherRecords) {
+            await drizzle.update(teachers).set({ isActive: false, status: '不活跃' } as any).where(eq(teachers.userId, id));
+          }
+        } else if (!hadTeacherRole && hasTeacherRole) {
+          // 添加老师角色
+          if (teacherRecords) {
+            // 已存在记录，恢复激活
+            await drizzle.update(teachers).set({ isActive: true, status: '活跃' } as any).where(eq(teachers.userId, id));
+          } else {
+            // 不存在记录，创建新记录
+            await drizzle.insert(teachers).values({
+              userId: id,
+              name: updateData.name || usersBefore?.name || '未知',
+              phone: updateData.phone || usersBefore?.phone || '无',
+              status: '活跃',
+              isActive: true,
+            } as any);
+          }
+        }
+      }
 
       return {
         success: true,
@@ -200,6 +248,12 @@ export const userManagementRouter = router({
         });
       }
 
+      // 查询更新前的角色
+      const [usersBefore] = await drizzle.select().from(users).where(eq(users.id, input.id)).limit(1);
+      const oldRoles = usersBefore?.roles || '';
+      const hadTeacherRole = oldRoles.includes('teacher');
+      const hasTeacherRole = input.roles.includes('teacher');
+
       const primaryRole = input.roles.split(",")[0].trim();
 
       await drizzle
@@ -209,6 +263,31 @@ export const userManagementRouter = router({
           roles: input.roles,
         } as any)
         .where(eq(users.id, input.id));
+
+      // 处理老师角色变更
+      const [teacherRecords] = await drizzle.select().from(teachers).where(eq(teachers.userId, input.id)).limit(1);
+      
+      if (hadTeacherRole && !hasTeacherRole) {
+        // 移除老师角色：设置为不激活
+        if (teacherRecords) {
+          await drizzle.update(teachers).set({ isActive: false, status: '不活跃' } as any).where(eq(teachers.userId, input.id));
+        }
+      } else if (!hadTeacherRole && hasTeacherRole) {
+        // 添加老师角色
+        if (teacherRecords) {
+          // 已存在记录，恢复激活
+          await drizzle.update(teachers).set({ isActive: true, status: '活跃' } as any).where(eq(teachers.userId, input.id));
+        } else {
+          // 不存在记录，创建新记录
+          await drizzle.insert(teachers).values({
+            userId: input.id,
+            name: usersBefore?.name || '未知',
+            phone: usersBefore?.phone || '无',
+            status: '活跃',
+            isActive: true,
+          } as any);
+        }
+      }
 
       return {
         success: true,

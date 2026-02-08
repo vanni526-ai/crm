@@ -1655,3 +1655,16 @@
 - [x] 运行迁移脚本验证数据完整性(已执行)
 - [x] 测试TypeScript编译和运行时功能(TypeScript无错误，服务器运行正常)
 - [x] 保存检查点
+
+
+### 187. 实现老师管理和用户管理的双向同步
+- [x] 在teachers表中添加userId字段关联users表(ALTER TABLE执行成功)
+- [x] 创建scripts/sync-teachers-to-users.mjs脚本，将现有老师同步到用户管理
+- [x] 运行同步脚本验证历史数据同步(70个老师全部成功关联)
+- [x] 修改userManagementRouter.ts的create接口，新建老师角色时同步到老师管理
+- [x] 修改userManagementRouter.ts的update/updateRoles接口，角色变更时同步激活状态
+- [x] 创建teacherUserSync.test.ts测试文件
+- [x] 测试新建老师账户自动同步(测试通过)
+- [x] 测试角色移除/恢复时激活状态同步(测试通过)
+- [x] 验证所有老师都已关联userId(测试通过)
+- [x] 保存检查点

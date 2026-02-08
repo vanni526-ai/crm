@@ -116,6 +116,7 @@ export const orders = mysqlTable("orders", {
  */
 export const teachers = mysqlTable("teachers", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // 关联users表(可选)
   name: varchar("name", { length: 100 }).notNull(), // 姓名
   phone: varchar("phone", { length: 20 }), // 电话号码
   status: varchar("status", { length: 20 }).default("活跃").notNull(), // 活跃状态(活跃/不活跃)
@@ -141,6 +142,7 @@ export const teachers = mysqlTable("teachers", {
   phoneIdx: index("teacher_phone_idx").on(table.phone),
   cityIdx: index("teacher_city_idx").on(table.city),
   nameIdx: index("teacher_name_idx").on(table.name),
+  userIdx: index("teacher_user_idx").on(table.userId),
 }));
 
 /**
