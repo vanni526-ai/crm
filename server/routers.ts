@@ -26,6 +26,7 @@ import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
 import { formatDateBeijing } from "../shared/timezone";
+import { USER_ROLE_VALUES } from "../shared/roles";
 import * as db from "./db";
 import { getDb, getOrderById } from "./db";
 import { generateOrderNo } from "./orderNoGenerator";
@@ -160,10 +161,10 @@ export const appRouter = router({
     updateRole: adminProcedure
       .input(z.object({
         userId: z.number(),
-        role: z.enum(["admin", "sales", "finance", "user"]),
+        role: z.enum(USER_ROLE_VALUES as [string, ...string[]]),
       }))
       .mutation(async ({ input }) => {
-        await db.updateUserRole(input.userId, input.role);
+        await db.updateUserRole(input.userId, input.role as any);
         return { success: true };
       }),
 
@@ -171,7 +172,7 @@ export const appRouter = router({
     updateRoles: adminProcedure
       .input(z.object({
         userId: z.number(),
-        roles: z.array(z.enum(["admin", "teacher", "user", "sales", "cityPartner"])).min(1, "至少选择一个角色"),
+        roles: z.array(z.enum(USER_ROLE_VALUES as [string, ...string[]])).min(1, "至少选择一个角色"),
       }))
       .mutation(async ({ input }) => {
         await db.updateUserRoles(input.userId, input.roles);

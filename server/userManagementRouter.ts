@@ -5,9 +5,10 @@ import { getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
+import { USER_ROLE_VALUES } from "../shared/roles";
 
-// 角色常量
-const VALID_ROLES = ["admin", "teacher", "user", "sales", "cityPartner"] as const;
+// 角色常量（已弃用，使用shared/roles.ts中的USER_ROLE_VALUES）
+const VALID_ROLES = USER_ROLE_VALUES;
 
 // 权限检查中间件 - 只有管理员可以管理用户
 const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -101,7 +102,7 @@ export const userManagementRouter = router({
         email: z.string().email("邮箱格式不正确").optional(),
         phone: z.string().optional(),
         password: z.string().min(6, "密码至少6位"),
-        role: z.enum(["admin", "sales", "finance", "user", "teacher", "cityPartner"]).optional(),
+        role: z.enum(USER_ROLE_VALUES as [string, ...string[]]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
       })
     )
@@ -152,7 +153,7 @@ export const userManagementRouter = router({
         nickname: z.string().optional(),
         email: z.string().email("邮箱格式不正确").optional(),
         phone: z.string().optional(),
-        role: z.enum(["admin", "sales", "finance", "user", "teacher", "cityPartner"]).optional(),
+        role: z.enum(USER_ROLE_VALUES as [string, ...string[]]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
       })
     )

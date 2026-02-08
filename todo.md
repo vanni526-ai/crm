@@ -1643,3 +1643,15 @@
 - [x] 确定支持多角色，修夏userManagementRouter.ts中role验证包含所有角色["admin", "sales", "finance", "user", "teacher", "cityPartner"]
 - [x] 测试验证角色修改功能(TypeScript编译无错误)
 - [x] 保存检查点
+
+
+### 186. 统一角色枚举定义和数据库schema同步
+- [x] 创建shared/roles.ts定义角色枚举常量
+- [x] 更新drizzle/schema.ts中users表的role字段枚举值，包含所有角色(ALTER TABLE执行成功)
+- [x] 创建scripts/migrate-user-roles.mjs批量迁移脚本(36个用户，27个已迁移，9个已跳过，0个失败)
+- [x] 更新server/routers.ts引用共享角色枚举
+- [x] 更新server/userManagementRouter.ts引用共享角色枚举
+- [x] 更新server/db.ts中updateUserRole函数签名
+- [x] 运行迁移脚本验证数据完整性(已执行)
+- [x] 测试TypeScript编译和运行时功能(TypeScript无错误，服务器运行正常)
+- [x] 保存检查点

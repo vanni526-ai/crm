@@ -43,6 +43,7 @@ import {
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { formatDateBeijing, BEIJING_TIMEZONE } from "../shared/timezone";
+import { UserRole } from "../shared/roles";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -152,7 +153,7 @@ export async function getAllUsers() {
   return db.select().from(users).orderBy(desc(users.createdAt));
 }
 
-export async function updateUserRole(userId: number, role: "admin" | "sales" | "finance" | "user") {
+export async function updateUserRole(userId: number, role: UserRole) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(users).set({ role }).where(eq(users.id, userId));
