@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Search, Key, Edit, UserPlus, X } from "lucide-react";
+import { Search, Key, Edit, UserPlus, X, ChevronDown } from "lucide-react";
 
 // 角色定义
 const ALL_ROLES = [
@@ -49,7 +49,7 @@ function getRoleInfo(roleValue: string) {
   };
 }
 
-// 多角色选择组件
+// 多角色选择组件（下拉多选样式）
 function RolesSelector({
   selectedRoles,
   onChange,
@@ -57,38 +57,85 @@ function RolesSelector({
   selectedRoles: string[];
   onChange: (roles: string[]) => void;
 }) {
-  const handleToggle = (roleValue: string) => {
-    if (selectedRoles.includes(roleValue)) {
-      // 至少保留一个角色
-      if (selectedRoles.length > 1) {
-        onChange(selectedRoles.filter((r) => r !== roleValue));
-      } else {
-        toast.error("至少需要保留一个角色");
-      }
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleRemove = (roleValue: string) => {
+    if (selectedRoles.length > 1) {
+      onChange(selectedRoles.filter((r) => r !== roleValue));
     } else {
-      onChange([...selectedRoles, roleValue]);
+      toast.error("至少需要保留一个角色");
     }
   };
 
+  const handleSelect = (roleValue: string) => {
+    if (!selectedRoles.includes(roleValue)) {
+      onChange([...selectedRoles, roleValue]);
+    }
+    setIsOpen(false);
+  };
+
+  const availableRoles = ALL_ROLES.filter(
+    (role) => !selectedRoles.includes(role.value)
+  );
+
   return (
-    <div className="space-y-3">
-      {ALL_ROLES.map((role) => (
-        <div key={role.value} className="flex items-center space-x-3">
-          <Checkbox
-            id={`role-${role.value}`}
-            checked={selectedRoles.includes(role.value)}
-            onCheckedChange={() => handleToggle(role.value)}
-          />
-          <label
-            htmlFor={`role-${role.value}`}
-            className="flex items-center gap-2 cursor-pointer text-sm"
+    <div className="space-y-2">
+      {/* 已选角色显示 */}
+      <div className="flex flex-wrap gap-2">
+        {selectedRoles.map((roleValue) => {
+          const roleInfo = getRoleInfo(roleValue);
+          return (
+            <Badge
+              key={roleValue}
+              className={`${roleInfo.color} flex items-center gap-1`}
+            >
+              {roleInfo.label}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRemove(roleValue);
+                }}
+                className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          );
+        })}
+      </div>
+
+      {/* 下拉选择器 */}
+      {availableRoles.length > 0 && (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-full px-3 py-2 text-left border rounded-md bg-white hover:bg-gray-50 flex items-center justify-between"
           >
-            <span className={`px-2 py-0.5 rounded text-xs ${role.color}`}>
-              {role.label}
-            </span>
-          </label>
+            <span className="text-sm text-gray-500">选择角色...</span>
+            <ChevronDown className="h-4 w-4 text-gray-400" />
+          </button>
+
+          {isOpen && (
+            <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+              {availableRoles.map((role) => (
+                <button
+                  key={role.value}
+                  type="button"
+                  onClick={() => handleSelect(role.value)}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <span className={`px-2 py-0.5 rounded text-xs ${role.color}`}>
+                    {role.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
+      )}
     </div>
   );
 }
@@ -429,7 +476,7 @@ export default function UserManagementContent() {
 
       {/* 编辑用户对话框 */}
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-        <DialogContent className="max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>编辑用户</DialogTitle>
           </DialogHeader>
@@ -488,10 +535,17 @@ export default function UserManagementContent() {
                         {editCities.map((city) => (
                           <Badge key={city} variant="secondary" className="flex items-center gap-1">
                             {city}
-                            <X
-                              className="w-3 h-3 cursor-pointer"
-                              onClick={() => setEditCities(editCities.filter(c => c !== city))}
-                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setEditCities(editCities.filter(c => c !== city));
+                              }}
+                              className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
                           </Badge>
                         ))}
                       </div>
@@ -515,7 +569,7 @@ export default function UserManagementContent() {
                       ))}
                     </select>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计</p>
+                  <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计（老师和合伙人可以在不同城市）</p>
                 </div>
               </div>
               <DialogFooter className="mt-6">

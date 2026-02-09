@@ -28,8 +28,116 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Search, Plus, Key, Edit, UserPlus } from "lucide-react";
+import { Search, Plus, Key, Edit, UserPlus, X, ChevronDown } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
+
+// 角色定义
+const ALL_ROLES = [
+  { value: "admin", label: "管理员", color: "bg-red-100 text-red-800" },
+  { value: "teacher", label: "老师", color: "bg-purple-100 text-purple-800" },
+  { value: "user", label: "普通用户", color: "bg-gray-100 text-gray-800" },
+  { value: "sales", label: "销售", color: "bg-blue-100 text-blue-800" },
+  { value: "partner", label: "城市合伙人", color: "bg-yellow-100 text-yellow-800" },
+];
+
+function getRoleInfo(roleValue: string) {
+  return ALL_ROLES.find((r) => r.value === roleValue) || {
+    value: roleValue,
+    label: roleValue,
+    color: "bg-gray-100 text-gray-800",
+  };
+}
+
+// 多角色选择组件（下拉多选样式）
+function RolesSelector({
+  selectedRoles,
+  onChange,
+}: {
+  selectedRoles: string[];
+  onChange: (roles: string[]) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleRemove = (roleValue: string) => {
+    if (selectedRoles.length > 1) {
+      onChange(selectedRoles.filter((r) => r !== roleValue));
+    } else {
+      toast.error("至少需要保留一个角色");
+    }
+  };
+
+  const handleSelect = (roleValue: string) => {
+    if (!selectedRoles.includes(roleValue)) {
+      onChange([...selectedRoles, roleValue]);
+    }
+    setIsOpen(false);
+  };
+
+  const availableRoles = ALL_ROLES.filter(
+    (role) => !selectedRoles.includes(role.value)
+  );
+
+  return (
+    <div className="space-y-2">
+      {/* 已选角色显示 */}
+      <div className="flex flex-wrap gap-2">
+        {selectedRoles.map((roleValue) => {
+          const roleInfo = getRoleInfo(roleValue);
+          return (
+            <span
+              key={roleValue}
+              className={`${roleInfo.color} px-2 py-1 rounded text-xs flex items-center gap-1`}
+            >
+              {roleInfo.label}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRemove(roleValue);
+                }}
+                className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          );
+        })}
+      </div>
+
+      {/* 下拉选择器 */}
+      {availableRoles.length > 0 && (
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-full px-3 py-2 text-left border rounded-md bg-white hover:bg-gray-50 flex items-center justify-between"
+          >
+            <span className="text-sm text-gray-500">选择角色...</span>
+            <ChevronDown className="h-4 w-4 text-gray-400" />
+          </button>
+
+          {isOpen && (
+            <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+              {availableRoles.map((role) => (
+                <button
+                  key={role.value}
+                  type="button"
+                  onClick={() => handleSelect(role.value)}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <span className={`px-2 py-0.5 rounded text-xs ${role.color}`}>
+                    {role.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function UserManagement() {
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -37,9 +145,14 @@ export default function UserManagement() {
   const [editingUser, setEditingUser] = useState<any>(null);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [resetPasswordUserId, setResetPasswordUserId] = useState<number | null>(null);
+  const [editRoles, setEditRoles] = useState<string[]>([]);
+  const [editCities, setEditCities] = useState<string[]>([]);
 
   // 查询用户列表
   const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery();
+  
+  // 查询城市列表
+  const { data: cities } = trpc.analytics.getAllCities.useQuery();
 
   // 创建用户
   const createMutation = trpc.userManagement.create.useMutation({
@@ -122,8 +235,24 @@ export default function UserManagement() {
       nickname: formData.get("nickname") as string || undefined,
       email: formData.get("email") as string || undefined,
       phone: formData.get("phone") as string || undefined,
-      role: formData.get("role") as "admin" | "sales" | "finance" | "user",
+      roles: editRoles.join(","), // 将数组转换为逗号分隔的字符串
+      city: editCities.length > 0 ? JSON.stringify(editCities) : undefined,
     });
+  };
+  
+  const handleEditUser = (user: any) => {
+    setEditingUser(user);
+    // 初始化角色数据（从逗号分隔的字符串转换为数组）
+    const rolesStr = user.roles || user.role || "user";
+    const userRoles = rolesStr.split(",").map((r: string) => r.trim());
+    setEditRoles(userRoles);
+    // 初始化城市数据
+    try {
+      const userCities = user.city ? JSON.parse(user.city) : [];
+      setEditCities(userCities);
+    } catch (e) {
+      setEditCities([]);
+    }
   };
 
   const handleResetPassword = (e: React.FormEvent<HTMLFormElement>) => {
@@ -247,7 +376,7 @@ export default function UserManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingUser(user)}
+                          onClick={() => handleEditUser(user)}
                         >
                           <Edit className="w-3 h-3 mr-1" />
                           编辑
@@ -382,18 +511,67 @@ export default function UserManagement() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-role">角色 *</Label>
-                    <Select name="role" defaultValue={editingUser.role}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="user">普通用户</SelectItem>
-                        <SelectItem value="sales">销售</SelectItem>
-                        <SelectItem value="finance">财务</SelectItem>
-                        <SelectItem value="admin">管理员</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label>角色 *（可多选）</Label>
+                    <div className="mt-2 p-3 border rounded-md">
+                      <RolesSelector
+                        selectedRoles={editRoles}
+                        onChange={setEditRoles}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>城市（可多选）</Label>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      用于老师和城市合伙人角色的业绩统计（老师和合伙人可以在不同城市）
+                    </p>
+                    <div className="mt-2 space-y-2">
+                      {/* 已选城市显示 */}
+                      <div className="flex flex-wrap gap-2">
+                        {editCities.map((cityName) => (
+                          <span
+                            key={cityName}
+                            className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1"
+                          >
+                            {cityName}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setEditCities(editCities.filter((c) => c !== cityName));
+                              }}
+                              className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      {/* 城市选择下拉框 */}
+                      {cities && cities.length > 0 && (
+                        <Select
+                          value=""
+                          onValueChange={(value) => {
+                            if (value && !editCities.includes(value)) {
+                              setEditCities([...editCities, value]);
+                            }
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="选择城市..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {cities
+                              .filter((city) => !editCities.includes(city.name))
+                              .map((city) => (
+                                <SelectItem key={city.id} value={city.name}>
+                                  {city.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <DialogFooter className="mt-6">
