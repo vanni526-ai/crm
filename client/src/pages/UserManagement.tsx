@@ -238,6 +238,29 @@ export default function UserManagement() {
 
   const handleUpdateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // 验证：至少选择1个角色
+    if (editRoles.length === 0) {
+      toast.error("每个账号必须最少1种角色");
+      return;
+    }
+    
+    // 验证：老师/合伙人必须选择城市
+    if (editRoles.includes('teacher')) {
+      const teacherCities = roleCitiesMap['teacher'] || [];
+      if (teacherCities.length === 0) {
+        toast.error("选择老师角色时，必须选择对应的城市");
+        return;
+      }
+    }
+    if (editRoles.includes('cityPartner')) {
+      const partnerCities = roleCitiesMap['cityPartner'] || [];
+      if (partnerCities.length === 0) {
+        toast.error("选择合伙人角色时，必须选择对应的城市");
+        return;
+      }
+    }
+    
     const formData = new FormData(e.currentTarget);
     updateMutation.mutate({
       id: editingUser.id,
@@ -603,7 +626,7 @@ export default function UserManagement() {
                             }}
                             className="w-4 h-4"
                           />
-                          <label htmlFor="role-teacher" className="text-sm font-medium cursor-pointer">老师</label>
+                          <label htmlFor="role-teacher" className="text-sm font-medium cursor-pointer">老师 <span className="text-red-500">*</span></label>
                         </div>
                         <div className="flex-1 space-y-2">
                           <div className="flex flex-wrap gap-2">
@@ -654,7 +677,7 @@ export default function UserManagement() {
                             }}
                             className="w-4 h-4"
                           />
-                          <label htmlFor="role-cityPartner" className="text-sm font-medium cursor-pointer">合伙人</label>
+                          <label htmlFor="role-cityPartner" className="text-sm font-medium cursor-pointer">合伙人 <span className="text-red-500">*</span></label>
                         </div>
                         <div className="flex-1 space-y-2">
                           <div className="flex flex-wrap gap-2">
@@ -688,6 +711,29 @@ export default function UserManagement() {
                         </div>
                       </div>
 
+                      {/* 管理员角色行 */}
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                          <input
+                            type="checkbox"
+                            id="role-admin"
+                            checked={editRoles.includes('admin')}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setEditRoles([...editRoles, 'admin']);
+                              } else {
+                                setEditRoles(editRoles.filter(r => r !== 'admin'));
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <label htmlFor="role-admin" className="text-sm font-medium cursor-pointer">管理员</label>
+                        </div>
+                        <div className="flex-1 text-xs text-gray-500">
+                          管理员不需要选择城市
+                        </div>
+                      </div>
+
                       {/* 销售角色行 */}
                       <div className="flex items-start gap-4">
                         <div className="flex items-center gap-2 w-24 flex-shrink-0">
@@ -700,42 +746,37 @@ export default function UserManagement() {
                                 setEditRoles([...editRoles, 'sales']);
                               } else {
                                 setEditRoles(editRoles.filter(r => r !== 'sales'));
-                                setRoleCitiesMap({ ...roleCitiesMap, sales: [] });
                               }
                             }}
                             className="w-4 h-4"
                           />
                           <label htmlFor="role-sales" className="text-sm font-medium cursor-pointer">销售</label>
                         </div>
-                        <div className="flex-1 space-y-2">
-                          <div className="flex flex-wrap gap-2">
-                            {(roleCitiesMap['sales'] || []).map((cityName) => (
-                              <span key={cityName} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
-                                {cityName}
-                                <button type="button" onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setRoleCitiesMap({ ...roleCitiesMap, sales: (roleCitiesMap['sales'] || []).filter(c => c !== cityName) });
-                                }} className="ml-1 hover:bg-black/10 rounded-full p-0.5">
-                                  <X className="h-3 w-3" />
-                                </button>
-                              </span>
-                            ))}
-                          </div>
-                          {editRoles.includes('sales') && cities && cities.length > 0 && (
-                            <Select value={undefined} onValueChange={(value) => {
-                              if (value && !(roleCitiesMap['sales'] || []).includes(value)) {
-                                setRoleCitiesMap({ ...roleCitiesMap, sales: [...(roleCitiesMap['sales'] || []), value] });
+                        <div className="flex-1 text-xs text-gray-500">
+                          销售不需要选择城市
+                        </div>
+                      </div>
+
+                      {/* 普通用户角色行 */}
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                          <input
+                            type="checkbox"
+                            id="role-user"
+                            checked={editRoles.includes('user')}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setEditRoles([...editRoles, 'user']);
+                              } else {
+                                setEditRoles(editRoles.filter(r => r !== 'user'));
                               }
-                            }}>
-                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="添加城市..." /></SelectTrigger>
-                              <SelectContent>
-                                {cities.filter(city => !(roleCitiesMap['sales'] || []).includes(city.name)).map(city => (
-                                  <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <label htmlFor="role-user" className="text-sm font-medium cursor-pointer">普通用户</label>
+                        </div>
+                        <div className="flex-1 text-xs text-gray-500">
+                          普通用户不需要选择城市
                         </div>
                       </div>
 

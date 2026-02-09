@@ -1,0 +1,1 @@
+ALTER TABLE `user_role_cities` MODIFY COLUMN `role` enum('admin','teacher','cityPartner','sales','user') NOT NULL;

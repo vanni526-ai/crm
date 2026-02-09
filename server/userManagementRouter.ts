@@ -205,7 +205,17 @@ export const userManagementRouter = router({
 
       // 解析角色
       const rolesStr = input.roles || input.role || "user";
-      const primaryRole = rolesStr.split(",")[0].trim();
+      const rolesArray = rolesStr.split(",").map((r: string) => r.trim());
+      
+      // 验证：至少选择1个角色
+      if (rolesArray.length === 0 || rolesArray.every((r: string) => !r)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "每个账号必须最少1种角色",
+        });
+      }
+      
+      const primaryRole = rolesArray[0];
 
       // 创建用户
       const [result] = await drizzle.insert(users).values({
@@ -283,8 +293,47 @@ export const userManagementRouter = router({
       // 如果传了roles，同步更新role字段
       const setData: any = { ...updateData };
       if (roles) {
+        const rolesArray = roles.split(",").map((r: string) => r.trim());
+        
+        // 验证：至少选择1个角色
+        if (rolesArray.length === 0 || rolesArray.every((r: string) => !r)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "每个账号必须最少1种角色",
+          });
+        }
+        
+        // 验证：老师/合伙人必须选择城市
+        if (roleCities) {
+          for (const role of rolesArray) {
+            if (role === 'teacher' || role === 'cityPartner') {
+              const cities = roleCities[role];
+              if (!cities || cities.length === 0) {
+                throw new TRPCError({
+                  code: "BAD_REQUEST",
+                  message: `选择${role === 'teacher' ? '老师' : '合伙人'}角色时，必须选择对应的城市`,
+                });
+              }
+            }
+          }
+        } else {
+          // 如果没有传roleCities，但有teacher或cityPartner角色，需要检查数据库中是否已有城市
+          for (const role of rolesArray) {
+            if (role === 'teacher' || role === 'cityPartner') {
+              const existingCities = await getUserRoleCities(id);
+              const roleCity = existingCities.find((rc: any) => rc.role === role);
+              if (!roleCity || !roleCity.cities || JSON.parse(roleCity.cities).length === 0) {
+                throw new TRPCError({
+                  code: "BAD_REQUEST",
+                  message: `选择${role === 'teacher' ? '老师' : '合伙人'}角色时，必须选择对应的城市`,
+                });
+              }
+            }
+          }
+        }
+        
         setData.roles = roles;
-        setData.role = roles.split(",")[0].trim();
+        setData.role = rolesArray[0];
       }
 
       await drizzle.update(users).set(setData).where(eq(users.id, id));

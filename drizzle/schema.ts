@@ -29,7 +29,7 @@ export const users = mysqlTable("users", {
 export const userRoleCities = mysqlTable("user_role_cities", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(), // 关联users表
-  role: mysqlEnum("role", ["teacher", "cityPartner", "sales"]).notNull(), // 角色类型
+  role: mysqlEnum("role", ["admin", "teacher", "cityPartner", "sales", "user"]).notNull(), // 角色类型
   cities: text("cities").notNull(), // 城市列表(JSON数组存储，如 '["深圳","广州"]')
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
