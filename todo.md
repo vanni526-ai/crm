@@ -1766,4 +1766,22 @@
 - [x] 解决编辑弹窗中RolesSelector占用过多垂直空间的问题
 - [x] 将RolesSelector改为下拉多选样式，与城市选择器保持一致
 - [x] 测试验证城市字段可见性和删除功能(所有功能正常)
+- [x] 保存检查点(version: 9ced7d40)
+
+
+### 196. 为订单系统添加状态更新API和老师端查询API
+- [x] 添加订单状态更新API(orders.updateStatus - 更新支付状态)
+- [x] 添加订单交付状态更新API(orders.updateDeliveryStatus - 更新交付状态)
+- [x] 添加通用订单更新API(orders.updateFields - 更新状态和交付信息)
+- [x] 添加老师端订单查询API(orders.getTeacherOrders - 查询已支付但未交付的订单)
+- [ ] 编写API测试用例验证功能
+- [ ] 保存检查点
+
+
+### 196. 为订单系统添加状态更新API和老师端查询API
+- [x] 添加订单状态更新API(orders.updateStatus - 更新支付状态)
+- [x] 添加订单交付状态更新API(orders.updateDeliveryStatus - 更新交付状态)
+- [x] 添加通用订单更新API(orders.updateFields - 更新状态和交付信息)
+- [x] 添加老师端订单查询API(orders.getTeacherOrders - 查询已支付但未交付的订单)
+- [x] 编写API测试用例验证功能(11个测试全部通过)
 - [ ] 保存检查点

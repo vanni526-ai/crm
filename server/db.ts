@@ -338,12 +338,6 @@ export async function getOrCreateCustomerForUser(user: {
   };
 }
 
-export async function updateCustomer(id: number, data: Partial<InsertCustomer>) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  await db.update(customers).set(data).where(eq(customers.id, id));
-}
-
 export async function deleteCustomer(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -477,6 +471,89 @@ export async function updateOrder(id: number, data: Partial<InsertOrder>) {
   }
   
   await db.update(orders).set(data).where(eq(orders.id, id));
+  
+  // 返回更新后的订单
+  const updated = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
+  return updated[0];
+}
+
+/**
+ * 更新订单支付状态
+ * @param id 订单ID
+ * @param status 支付状态
+ */
+export async function updateOrderStatus(id: number, status: "pending" | "paid" | "completed" | "cancelled" | "refunded") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(orders).set({ status }).where(eq(orders.id, id));
+  return { success: true, message: "订单状态更新成功" };
+}
+
+/**
+ * 更新订单交付状态
+ * @param id 订单ID
+ * @param deliveryStatus 交付状态
+ */
+export async function updateOrderDeliveryStatus(id: number, deliveryStatus: "pending" | "accepted" | "delivered") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(orders).set({ deliveryStatus }).where(eq(orders.id, id));
+  return { success: true, message: "订单交付状态更新成功" };
+}
+
+/**
+ * 老师端查询订单 - 查询已支付但未交付的订单
+ * @param teacherName 老师名称(可选)
+ * @param city 城市(可选)
+ * @returns 订单列表
+ */
+export async function getTeacherPendingOrders(teacherName?: string, city?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  let query = db
+    .select()
+    .from(orders)
+    .where(
+      and(
+        eq(orders.status, "paid"), // 已支付
+        eq(orders.deliveryStatus, "pending") // 未交付
+      )
+    );
+  
+  // 如果指定了老师名称,过滤
+  if (teacherName) {
+    query = db
+      .select()
+      .from(orders)
+      .where(
+        and(
+          eq(orders.status, "paid"),
+          eq(orders.deliveryStatus, "pending"),
+          eq(orders.deliveryTeacher, teacherName)
+        )
+      );
+  }
+  
+  // 如果指定了城市,过滤
+  if (city) {
+    query = db
+      .select()
+      .from(orders)
+      .where(
+        and(
+          eq(orders.status, "paid"),
+          eq(orders.deliveryStatus, "pending"),
+          teacherName ? eq(orders.deliveryTeacher, teacherName) : undefined,
+          eq(orders.deliveryCity, city)
+        )
+      );
+  }
+  
+  const result = await query;
+  return result;
 }
 
 export async function updateOrderNo(id: number, orderNo: string) {

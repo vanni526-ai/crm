@@ -232,6 +232,60 @@ export const appRouter = router({
         return db.getOrderById(input.id);
       }),
     
+    // 更新订单支付状态
+    updateStatus: salesOrAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]),
+      }))
+      .mutation(async ({ input }) => {
+        return db.updateOrderStatus(input.id, input.status);
+      }),
+    
+    // 更新订单交付状态
+    updateDeliveryStatus: salesOrAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        deliveryStatus: z.enum(["pending", "accepted", "delivered"]),
+      }))
+      .mutation(async ({ input }) => {
+        return db.updateOrderDeliveryStatus(input.id, input.deliveryStatus);
+      }),
+    
+    // 通用订单更新接口(简化版) - 仅用于更新状态和交付信息
+    updateFields: salesOrAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.object({
+          status: z.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+          deliveryStatus: z.enum(["pending", "accepted", "delivered"]).optional(),
+          deliveryTeacher: z.string().optional(),
+          deliveryCity: z.string().optional(),
+          deliveryRoom: z.string().optional(), // 交付教室(使用deliveryRoom字段)
+          deliveryCourse: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input }) => {
+        return db.updateOrder(input.id, input.data);
+      }),
+    
+    // 老师端查询订单 - 查询已支付但未交付的订单
+    getTeacherOrders: protectedProcedure
+      .input(z.object({
+        page: z.number().optional().default(1),
+        pageSize: z.number().optional().default(10),
+        teacherName: z.string().optional(), // 可选:按老师名筛选
+        city: z.string().optional(), // 可选:按城市筛选
+      }))
+      .query(async ({ ctx, input }) => {
+        // 查询已支付但未交付的订单(status='paid' AND deliveryStatus='pending')
+        const allOrders = await db.getTeacherPendingOrders(input.teacherName, input.city);
+        const total = allOrders.length;
+        const start = (input.page - 1) * input.pageSize;
+        const orders = allOrders.slice(start, start + input.pageSize);
+        return { orders, total };
+      }),
+    
     parseTransferNotes: salesOrAdminProcedure
       .input(z.object({
         text: z.string(),
@@ -787,17 +841,7 @@ export const appRouter = router({
         return { success: true, count: input.ids.length };
       }),
     
-    // 更新单个订单的交付状态
-    updateDeliveryStatus: salesOrAdminProcedure
-      .input(z.object({
-        id: z.number(),
-        deliveryStatus: z.enum(["pending", "accepted", "delivered"]),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateOrder(input.id, { deliveryStatus: input.deliveryStatus });
-        return { success: true };
-      }),
-    
+
     // 批量更新订单交付状态
     batchUpdateDeliveryStatus: salesOrAdminProcedure
       .input(z.object({
