@@ -1902,4 +1902,22 @@
 - [x] 实现状态筛选器（启用/禁用）
 - [x] 添加“重置筛选”按钮
 - [x] 测试筛选功能
+- [x] 保存检查点
+
+### 138. 修复用户编辑功能中角色城市保存失败的问题
+- [x] 检查后端userManagement.update API的角色城市保存逻辑（正常）
+- [x] 检查前端UserManagement.tsx的数据提交格式（正常）
+- [x] 检查roleCities表的插入/更新逻辑（正常）
+- [x] 修复角色城市保存问题（Select组件value从空字符串改为undefined）
+- [x] 修复数据加载问题（list API返回roleCities字段）
+- [ ] 测试验证角色城市保存和显示功能
+- [ ] 保存检查点
+
+### 138. 修复用户编辑功能中角色城市保存失败的问题
+- [x] 检查后端userManagement.update API的角色城市保存逻辑(正常)
+- [x] 检查前端UserManagement.tsx的数据提交格式(正常)
+- [x] 检查roleCities表的插入/更新逻辑(正常)
+- [x] 修复角色城市保存问题(Select组件value从空字符串改为undefined)
+- [x] 修复数据加载问题(list API返回roleCities字段格式转换)
+- [x] 测试验证角色城市保存和显示功能
 - [ ] 保存检查点

@@ -75,20 +75,37 @@ export const userManagementRouter = router({
         }
       }
 
-      // 不返回密码字段
-      return userList.map((user) => ({
-        id: user.id,
-        openId: user.openId,
-        name: user.name,
-        nickname: user.nickname,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        roles: (user as any).roles || user.role || "user",
-        isActive: user.isActive,
-        createdAt: user.createdAt,
-        lastSignedIn: user.lastSignedIn,
-      }));
+      // 不返回密码字段，但返回roleCities数据
+      const usersWithRoleCities = await Promise.all(
+        userList.map(async (user) => {
+          // 获取角色-城市关联并转换为前端期望的格式
+          const roleCitiesData = await getUserRoleCities(user.id);
+          const roleCities: Record<string, string[]> = {};
+          for (const rc of roleCitiesData) {
+            try {
+              roleCities[rc.role] = JSON.parse(rc.cities);
+            } catch {
+              roleCities[rc.role] = [];
+            }
+          }
+
+          return {
+            id: user.id,
+            openId: user.openId,
+            name: user.name,
+            nickname: user.nickname,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            roles: (user as any).roles || user.role || "user",
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            lastSignedIn: user.lastSignedIn,
+            roleCities, // 现在格式正确了：Record<string, string[]>
+          };
+        })
+      );
+      return usersWithRoleCities;
   }),
 
   // 获取单个用户详情

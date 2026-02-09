@@ -621,7 +621,7 @@ export default function UserManagement() {
                             ))}
                           </div>
                           {editRoles.includes('teacher') && cities && cities.length > 0 && (
-                            <Select value="" onValueChange={(value) => {
+                            <Select value={undefined} onValueChange={(value) => {
                               if (value && !(roleCitiesMap['teacher'] || []).includes(value)) {
                                 setRoleCitiesMap({ ...roleCitiesMap, teacher: [...(roleCitiesMap['teacher'] || []), value] });
                               }
@@ -672,7 +672,7 @@ export default function UserManagement() {
                             ))}
                           </div>
                           {editRoles.includes('cityPartner') && cities && cities.length > 0 && (
-                            <Select value="" onValueChange={(value) => {
+                            <Select value={undefined} onValueChange={(value) => {
                               if (value && !(roleCitiesMap['cityPartner'] || []).includes(value)) {
                                 setRoleCitiesMap({ ...roleCitiesMap, cityPartner: [...(roleCitiesMap['cityPartner'] || []), value] });
                               }
@@ -723,7 +723,7 @@ export default function UserManagement() {
                             ))}
                           </div>
                           {editRoles.includes('sales') && cities && cities.length > 0 && (
-                            <Select value="" onValueChange={(value) => {
+                            <Select value={undefined} onValueChange={(value) => {
                               if (value && !(roleCitiesMap['sales'] || []).includes(value)) {
                                 setRoleCitiesMap({ ...roleCitiesMap, sales: [...(roleCitiesMap['sales'] || []), value] });
                               }
