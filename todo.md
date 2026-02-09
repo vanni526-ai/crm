@@ -1884,3 +1884,12 @@
 - [ ] 删除Teachers.tsx中的handleCreate函数
 - [ ] 删除Teachers.tsx中的createCities状态
 - [ ] 保存检查点
+
+### 新任务: 检查订单交付状态API实现并完善数据结构
+- [x] 检查后端orders.updateDeliveryStatus API实现
+- [x] 检查teacher.acceptCourse接口是否内部调用订单更新（接口不存在）
+- [x] 确认课程数据结构是否包含orderNo字段
+- [x] 完善Order接口类型定义(acceptedBy, deliveryStatus等字段)
+- [x] 增强updateDeliveryStatus API自动记录acceptedBy和acceptedAt
+- [x] 更新API接口文档
+- [ ] 保存检查点

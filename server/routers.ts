@@ -248,8 +248,9 @@ export const appRouter = router({
         id: z.number(),
         deliveryStatus: z.enum(["pending", "accepted", "delivered"]),
       }))
-      .mutation(async ({ input }) => {
-        return db.updateOrderDeliveryStatus(input.id, input.deliveryStatus);
+      .mutation(async ({ input, ctx }) => {
+        // 当状态变为accepted时，自动记录当前用户为接单老师
+        return db.updateOrderDeliveryStatus(input.id, input.deliveryStatus, ctx.user.id);
       }),
     
     // 通用订单更新接口(简化版) - 仅用于更新状态和交付信息

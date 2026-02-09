@@ -579,12 +579,31 @@ export async function updateOrderStatus(id: number, status: "pending" | "paid" |
  * 更新订单交付状态
  * @param id 订单ID
  * @param deliveryStatus 交付状态
+ * @param userId 接单老师ID（可选，当状态变为accepted时自动记录）
  */
-export async function updateOrderDeliveryStatus(id: number, deliveryStatus: "pending" | "accepted" | "delivered") {
+export async function updateOrderDeliveryStatus(
+  id: number, 
+  deliveryStatus: "pending" | "accepted" | "delivered",
+  userId?: number
+) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.update(orders).set({ deliveryStatus }).where(eq(orders.id, id));
+  const updateData: any = { deliveryStatus };
+  
+  // 如果状态变为"已接单"，自动记录接单信息
+  if (deliveryStatus === "accepted" && userId) {
+    updateData.acceptedBy = userId;
+    updateData.acceptedAt = new Date();
+  }
+  
+  // 如果状态变回"待接单"，清除接单信息
+  if (deliveryStatus === "pending") {
+    updateData.acceptedBy = null;
+    updateData.acceptedAt = null;
+  }
+  
+  await db.update(orders).set(updateData).where(eq(orders.id, id));
   return { success: true, message: "订单交付状态更新成功" };
 }
 
