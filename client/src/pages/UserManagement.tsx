@@ -239,6 +239,9 @@ export default function UserManagement() {
   const handleUpdateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
+    console.log("[DEBUG] handleUpdateSubmit - editRoles:", editRoles);
+    console.log("[DEBUG] handleUpdateSubmit - roleCitiesMap:", roleCitiesMap);
+    
     // 验证：至少选择1个角色
     if (editRoles.length === 0) {
       toast.error("每个账号必须最少1种角色");
@@ -262,7 +265,7 @@ export default function UserManagement() {
     }
     
     const formData = new FormData(e.currentTarget);
-    updateMutation.mutate({
+    const submitData = {
       id: editingUser.id,
       name: formData.get("name") as string,
       nickname: formData.get("nickname") as string || undefined,
@@ -270,7 +273,12 @@ export default function UserManagement() {
       phone: formData.get("phone") as string || undefined,
       roles: editRoles.join(","), // 将数组转换为逗号分隔的字符串
       roleCities: Object.keys(roleCitiesMap).length > 0 ? roleCitiesMap : undefined, // 角色-城市关联
-    });
+    };
+    console.log("[DEBUG] Submitting data:", submitData);
+    console.log("[DEBUG] submitData.roles:", submitData.roles);
+    console.log("[DEBUG] submitData.roleCities:", submitData.roleCities);
+    console.log("[DEBUG] JSON.stringify(submitData):", JSON.stringify(submitData));
+    updateMutation.mutate(submitData);
   };
   
   const handleEditUser = (user: any) => {
