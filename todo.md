@@ -1961,3 +1961,18 @@
 - [ ] 修复角色保存问题
 - [ ] 测试验证角色保存和显示功能
 - [ ] 保存检查点
+
+### 141. 修复角色城市保存后重新打开编辑对话框时城市标签消失的问题
+- [x] 检查后端userManagement.list API的roleCities返回格式（正常）
+- [x] 检查前端handleEditUser函数的roleCitiesMap初始化逻辑（正常）
+- [x] 修复问题（过滤roleCitiesMap中的空数组和undefined值）
+- [ ] 测试验证：保存城市后重新打开对话框，城市标签应正确显示
+- [ ] 保存检查点
+
+### 136. 统一用户管理页面,删除重复的UserManagement.tsx
+- [x] 删除UserManagement.tsx文件
+- [x] 从App.tsx中移除/user-management路由
+- [x] 更新DashboardLayout侧边栏导航,确保"用户管理"链接指向/customer-management
+- [x] 整理用户管理相关API接口文档供前端App使用
+- [x] 验证修改后的系统功能正常
+- [ ] 创建检查点
