@@ -66,20 +66,9 @@ export default function Teachers() {
   const { data: cities } = trpc.analytics.getAllCities.useQuery();
   
   // 城市选择状态
-  const [createCities, setCreateCities] = useState<string[]>([]);
   const [editCities, setEditCities] = useState<string[]>([]);
   
-  const createTeacher = trpc.teachers.create.useMutation({
-    onSuccess: () => {
-      utils.teachers.list.invalidate();
-      toast.success("老师创建成功");
-      setCreateOpen(false);
-      reset();
-    },
-    onError: (error) => {
-      toast.error(error.message || "创建失败");
-    },
-  });
+
 
   const updateTeacher = trpc.teachers.update.useMutation({
     onSuccess: () => {
@@ -116,25 +105,7 @@ export default function Teachers() {
     },
   });
 
-  const toggleActiveMutation = trpc.teachers.update.useMutation({
-    onSuccess: (_, variables) => {
-      // 乐观更新
-      utils.teachers.list.setData(undefined, (old) => {
-        if (!old) return old;
-        return old.map((t: any) => 
-          t.id === variables.id 
-            ? { ...t, isActive: variables.data.isActive } 
-            : t
-        );
-      });
-      toast.success(variables.data.isActive ? "已激活" : "已停用");
-    },
-    onError: (error, variables) => {
-      // 回滚
-      utils.teachers.list.invalidate();
-      toast.error(error.message || "状态切换失败");
-    },
-  });
+
 
   const importMutation = trpc.teachers.importFromExcel.useMutation({
     onSuccess: (data) => {
@@ -148,7 +119,7 @@ export default function Teachers() {
     },
   });
 
-  const [createOpen, setCreateOpen] = useState(false);
+
   const [editOpen, setEditOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [batchStatusDialogOpen, setBatchStatusDialogOpen] = useState(false);
@@ -202,15 +173,7 @@ export default function Teachers() {
     resolver: zodResolver(teacherSchema),
   });
 
-  const handleCreate = (data: TeacherFormData) => {
-    const createData = {
-      ...data,
-      city: createCities.length > 0 ? JSON.stringify(createCities) : data.city, // 使用城市数组或原始值
-      contractEndDate: data.contractEndDate ? new Date(data.contractEndDate) : undefined,
-      joinDate: data.joinDate ? new Date(data.joinDate) : undefined,
-    };
-    createTeacher.mutate(createData);
-  };
+
 
   const handleEdit = (teacher: any) => {
     setSelectedTeacher(teacher);
@@ -250,13 +213,9 @@ export default function Teachers() {
 
   const handleUpdate = (data: TeacherFormData) => {
     if (!selectedTeacher) return;
-    // 只提交编辑对话框中存在的字段
+    // 只提交合同相关字段，基本信息在用户管理中修改
     const updateData = {
-      name: data.name,
-      phone: data.phone,
-      status: data.status,
       category: data.category,
-      city: editCities.length > 0 ? JSON.stringify(editCities) : data.city, // 使用城市数组或原始值
       customerType: data.customerType,
       aliases: data.aliases,
       notes: data.notes,
@@ -358,12 +317,7 @@ export default function Teachers() {
     setAvatarEditOpen(true);
   };
 
-  const handleToggleActive = (teacherId: number, isActive: boolean) => {
-    toggleActiveMutation.mutate({
-      id: teacherId,
-      data: { isActive },
-    });
-  };
+
 
   // 多选功能
   const handleSelectAll = (checked: boolean) => {
@@ -633,10 +587,7 @@ export default function Teachers() {
               onChange={handleFileChange}
               style={{ display: 'none' }}
             />
-            <Button onClick={() => setCreateOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              新增老师
-            </Button>
+
           </div>
         </div>
 
@@ -810,7 +761,7 @@ export default function Teachers() {
                     <TableHead>昵称</TableHead>
                     <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
-                    <TableHead>激活</TableHead>
+
                     <TableHead>分类</TableHead>
                     <TableHead>城市</TableHead>
                     <TableHead>合同到期</TableHead>
@@ -887,12 +838,7 @@ export default function Teachers() {
                           {teacher.status || '活跃'}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <Switch
-                          checked={teacher.isActive ?? true}
-                          onCheckedChange={(checked) => handleToggleActive(teacher.id, checked)}
-                        />
-                      </TableCell>
+
                       <TableCell>{teacher.category || '-'}</TableCell>
                       <TableCell>{teacher.city || '-'}</TableCell>
                       <TableCell>
@@ -947,226 +893,50 @@ export default function Teachers() {
           </CardContent>
         </Card>
 
-        {/* 创建老师对话框 */}
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>新增老师</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit(handleCreate)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">姓名 *</Label>
-                  <Input id="name" {...register("name")} />
-                  {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="phone">电话号码 *</Label>
-                  <Input id="phone" {...register("phone")} />
-                  {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
-                </div>
-                <div>
-                  <Label>活跃状态 *</Label>
-                  <div className="flex gap-4 mt-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        {...register("status")}
-                        value="激活"
-                        className="w-4 h-4"
-                      />
-                      <span>激活</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        {...register("status")}
-                        value="不激活"
-                        className="w-4 h-4"
-                      />
-                      <span>不激活</span>
-                    </label>
-                  </div>
-                  {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="category">分类</Label>
-                  <Input id="category" {...register("category")} placeholder="本部老师/合伙店老师" />
-                </div>
-                <div className="col-span-2">
-                  <Label>城市 *（可多选）</Label>
-                  <div className="mt-2 p-3 border rounded-md space-y-2">
-                    {/* 已选城市 */}
-                    {createCities.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {createCities.map((city) => (
-                          <Badge key={city} variant="secondary" className="flex items-center gap-1">
-                            {city}
-                            <X
-                              className="w-3 h-3 cursor-pointer"
-                              onClick={() => setCreateCities(createCities.filter(c => c !== city))}
-                            />
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    {/* 城市选择器 */}
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value=""
-                      onChange={(e) => {
-                        const city = e.target.value;
-                        if (city && !createCities.includes(city)) {
-                          setCreateCities([...createCities, city]);
-                        }
-                      }}
-                    >
-                      <option value="">选择城市...</option>
-                      {cities?.map((city) => (
-                        <option key={city.name} value={city.name}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计</p>
-                  {errors.city && (
-                    <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="customerType">受众客户类型</Label>
-                  <Input id="customerType" {...register("customerType")} />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="notes">备注</Label>
-                <Textarea id="notes" {...register("notes")} rows={3} />
-              </div>
-              
-              {/* 头像上传 */}
-              <div>
-                <Label>老师头像</Label>
-                <div className="flex items-center gap-4 mt-2">
-                  {avatarPreview && (
-                    <img 
-                      src={avatarPreview} 
-                      alt="头像预览" 
-                      className="w-20 h-20 rounded-full object-cover border-2 border-border"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <input
-                      ref={avatarInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarChange}
-                      className="hidden"
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => avatarInputRef.current?.click()}
-                      >
-                        选择图片
-                      </Button>
-                      {avatarFile && (
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => handleUploadAvatar()}
-                          disabled={uploadingAvatar}
-                        >
-                          {uploadingAvatar ? "上传中..." : "上传"}
-                        </Button>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      支持 JPG、PNG 格式，大小不超过2MB，选择后可裁剪调整
-                    </p>
-                  </div>
-                </div>
-              </div>
-              
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
-                  取消
-                </Button>
-                <Button type="submit" disabled={createTeacher.isPending}>
-                  {createTeacher.isPending ? "创建中..." : "创建"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+
 
         {/* 编辑老师对话框 */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>编辑老师信息</DialogTitle>
+              <p className="text-sm text-muted-foreground mt-2">
+                基本信息（姓名、电话、头像、城市、状态）仅供查看，请在<strong>用户管理</strong>中编辑。
+              </p>
             </DialogHeader>
             <form onSubmit={handleSubmit(handleUpdate)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="edit-name">姓名 *</Label>
-                  <Input id="edit-name" {...register("name")} />
-                  {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+                  <Input id="edit-name" {...register("name")} disabled className="bg-muted" />
                 </div>
                 <div>
                   <Label htmlFor="edit-phone">电话号码</Label>
-                  <Input id="edit-phone" {...register("phone")} />
+                  <Input id="edit-phone" {...register("phone")} disabled className="bg-muted" />
                 </div>
                 <div>
                   <Label htmlFor="edit-status">活跃状态</Label>
-                  <Input id="edit-status" {...register("status")} />
+                  <Input id="edit-status" {...register("status")} disabled className="bg-muted" />
                 </div>
                 <div>
                   <Label htmlFor="edit-category">分类</Label>
                   <Input id="edit-category" {...register("category")} />
                 </div>
                 <div className="col-span-2">
-                  <Label>城市（可多选）</Label>
-                  <div className="mt-2 p-3 border rounded-md space-y-2">
-                    {/* 已选城市 */}
-                    {editCities.length > 0 && (
+                  <Label>城市（只读）</Label>
+                  <div className="mt-2 p-3 border rounded-md bg-muted">
+                    {editCities.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
                         {editCities.map((city) => (
-                          <Badge key={city} variant="secondary" className="flex items-center gap-1">
+                          <Badge key={city} variant="secondary">
                             {city}
-                            <X
-                              className="w-3 h-3 cursor-pointer"
-                              onClick={() => setEditCities(editCities.filter(c => c !== city))}
-                            />
                           </Badge>
                         ))}
                       </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">未设置城市</span>
                     )}
-                    {/* 城市选择器 */}
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value=""
-                      onChange={(e) => {
-                        const city = e.target.value;
-                        if (city && !editCities.includes(city)) {
-                          setEditCities([...editCities, city]);
-                        }
-                      }}
-                    >
-                      <option value="">选择城市...</option>
-                      {cities?.map((city) => (
-                        <option key={city.name} value={city.name}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计</p>
-                  {errors.city && (
-                    <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
-                  )}
                 </div>
                 <div>
                   <Label htmlFor="edit-customerType">受众客户类型</Label>

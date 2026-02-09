@@ -1858,5 +1858,29 @@
 - [x] 将UserManagement.tsx中的两列布局代码应用到UserManagementContent.tsx
 - [x] 在userManagementRouter.ts中添加getRoleCities API
 - [x] 修复TypeScript编译错误
-- [ ] 测试验证生产环境的UI更新
-- [ ] 保存检查点并通知用户发布
+- [x] 保存检查点并通知用户发布
+
+
+### 204. 重构用户管理和老师管理的架构
+- [ ] 修改手机号唯一性验证：只检查users表，不检查teachers表
+- [ ] 删除teachers.create API中的基础信息创建功能
+- [ ] 删除teachers.update API中的基础信息更新功能（保留合同信息更新）
+- [ ] 修改userManagement.create API：添加"老师"角色时自动在teachers表创建关联记录
+- [ ] 修改userManagement.update API：同步角色变更到teachers表
+- [ ] 修改userManagement.delete API：删除用户时同步删除teachers表关联记录
+- [ ] 修改teachers.list API：从users表读取基础信息，从teachers表读取合同信息
+- [ ] 修改老师管理前端UI：基础信息改为只读显示
+- [ ] 修改老师管理前端UI：只允许编辑合同相关信息
+- [ ] 删除老师管理的"新增老师"功能（改为在用户管理中添加"老师"角色）
+- [ ] 测试验证：用户管理添加/删除老师角色，老师管理同步显示/隐藏
+- [ ] 测试验证：手机号唯一性验证不再冲突
+- [ ] 保存检查点
+
+
+### 205. 删除老师管理页面的"新增老师"功能
+- [ ] 删除Teachers.tsx中的"新增老师"按钮
+- [ ] 删除Teachers.tsx中的新增老师对话框
+- [ ] 删除Teachers.tsx中的createTeacher相关代码
+- [ ] 删除Teachers.tsx中的handleCreate函数
+- [ ] 删除Teachers.tsx中的createCities状态
+- [ ] 保存检查点

@@ -164,12 +164,11 @@ export const userManagementRouter = router({
 
       const newUserId = result.insertId;
 
-      // 如果角色包含teacher，同步到老师管理
+      // 如果角色包含teacher，在teachers表创建关联记录（只存储userId和合同信息）
       if (rolesStr.includes('teacher')) {
         await drizzle.insert(teachers).values({
           userId: newUserId,
-          name: input.name,
-          phone: input.phone || '无',
+          // 基础信息从 users 表读取，这里只存储合同相关字段
           status: '活跃',
           isActive: true,
         } as any);
@@ -259,11 +258,10 @@ export const userManagementRouter = router({
             // 已存在记录，恢复激活
             await drizzle.update(teachers).set({ isActive: true, status: '活跃' } as any).where(eq(teachers.userId, id));
           } else {
-            // 不存在记录，创建新记录
+            // 不存在记录，创建新记录（只存储userId和合同信息）
             await drizzle.insert(teachers).values({
               userId: id,
-              name: updateData.name || usersBefore?.name || '未知',
-              phone: updateData.phone || usersBefore?.phone || '无',
+              // 基础信息从 users 表读取
               status: '活跃',
               isActive: true,
             } as any);

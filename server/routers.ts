@@ -1285,121 +1285,47 @@ export const appRouter = router({
         return db.getTeacherById(input.id);
       }),
     
+    // 已废弃：不再通过此API创建老师，改为在用户管理中添加"老师"角色
     create: adminProcedure
       .input(z.object({
-        name: z.string(),
-        phone: z.string().optional(),
-        status: z.string().optional(),
+        userId: z.number(), // 关联的用户ID
+        category: z.string().optional(),
         customerType: z.string().optional(),
         notes: z.string().optional(),
-        category: z.string().optional(),
-        city: z.string().optional(), // 城市字段，支持JSON数组格式
-        // 兼容旧字段
-        nickname: z.string().optional(),
-        email: z.string().optional(),
-        wechat: z.string().optional(),
-        hourlyRate: z.string().optional(),
-        bankAccount: z.string().optional(),
-        bankName: z.string().optional(),
-        avatarUrl: z.string().optional(), // 头像URL
+        contractEndDate: z.union([z.string(), z.date()]).optional(),
+        joinDate: z.union([z.string(), z.date()]).optional(),
+        aliases: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        // 手机号唯一性验证
-        if (input.phone) {
-          const { checkPhoneUnique } = await import("./phoneValidator");
-          const phoneCheck = await checkPhoneUnique(input.phone);
-          if (!phoneCheck.isUnique) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: `手机号已被使用（${phoneCheck.conflictType === "user" ? "用户管理" : "老师管理"}中的 ${phoneCheck.conflictName}）`,
-            });
-          }
-        }
-
-        // 创建老师记录
-        const teacherId = await db.createTeacher(input);
-
-        // 同步到用户管理：创建对应的用户账户
-        if (input.phone) {
-          const drizzle = await getDb();
-          if (drizzle) {
-            // 生成openId
-            const openId = `teacher_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-            // 生成默认密码（手机号后6位）
-            const { hashPassword } = await import("./passwordUtils");
-            const defaultPassword = input.phone.slice(-6) || "123456";
-            const hashedPassword = await hashPassword(defaultPassword);
-
-            // 创建用户账户
-            await drizzle.insert(users).values({
-              openId,
-              name: input.name,
-              nickname: input.nickname || null,
-              email: input.email || null,
-              phone: input.phone,
-              password: hashedPassword,
-              role: "teacher" as any,
-              roles: "teacher",
-              isActive: input.status === "激活" || input.status === "活跃",
-            } as any);
-          }
-        }
+        // 只创建teachers表的合同信息记录
+        const teacherId = await db.createTeacher({
+          userId: input.userId,
+          category: input.category,
+          customerType: input.customerType,
+          notes: input.notes,
+          contractEndDate: input.contractEndDate,
+          joinDate: input.joinDate,
+          aliases: input.aliases,
+        } as any);
 
         return { id: teacherId, success: true };
       }),
     
+    // 只允许更新合同相关信息，基础信息在用户管理中修改
     update: adminProcedure
       .input(z.object({
         id: z.number(),
         data: z.object({
-          name: z.string().optional(),
-          phone: z.string().optional(),
-          status: z.string().optional(),
+          category: z.string().optional(),
           customerType: z.string().optional(),
           notes: z.string().optional(),
-          category: z.string().optional(),
-          city: z.string().optional().refine(
-            (val) => {
-              // 如果提供了city值,验证格式
-              if (!val || val.trim() === '') return true; // 空值允许(编辑时可选)
-              const cities = val.split(';').map(c => c.trim()).filter(c => c !== '');
-              return cities.length > 0;
-            },
-            { message: "请输入有效的城市名称,多个城市用分号分隔" }
-          ),
           contractEndDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
           joinDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
           aliases: z.string().optional(), // 别名(逗号分隔)
-          // 兼容旧字段
-          nickname: z.string().optional(),
-          email: z.string().optional(),
-          wechat: z.string().optional(),
-          hourlyRate: z.string().optional(),
-          bankAccount: z.string().optional(),
-          bankName: z.string().optional(),
-          isActive: z.boolean().optional(),
-          avatarUrl: z.string().optional(), // 头像URL
+          avatarUrl: z.string().optional(), // 头像 URL（通过头像编辑对话框更新）
         }),
       }))
       .mutation(async ({ input }) => {
-        // 手机号唯一性验证（排除当前老师记录）
-        if (input.data.phone) {
-          const { checkPhoneUnique } = await import("./phoneValidator");
-          // 获取老师的userId以排除对应的用户记录
-          const teacher = await db.getTeacherById(input.id);
-          const phoneCheck = await checkPhoneUnique(
-            input.data.phone,
-            teacher?.userId || undefined,
-            input.id
-          );
-          if (!phoneCheck.isUnique) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
-              message: `手机号已被使用（${phoneCheck.conflictType === "user" ? "用户管理" : "老师管理"}中的 ${phoneCheck.conflictName}）`,
-            });
-          }
-        }
-
         await db.updateTeacher(input.id, input.data);
         return { success: true };
       }),
