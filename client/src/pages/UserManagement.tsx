@@ -511,120 +511,164 @@ export default function UserManagement() {
                     />
                   </div>
                   <div>
-                    <Label>角色 *（可多选）</Label>
-                    <div className="mt-2 p-3 border rounded-md">
-                      <RolesSelector
-                        selectedRoles={editRoles}
-                        onChange={setEditRoles}
-                      />
+                    <Label>角色与城市 *</Label>
+                    <div className="mt-2 p-4 border rounded-md space-y-3">
+                      {/* 老师角色行 */}
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                          <input
+                            type="checkbox"
+                            id="role-teacher"
+                            checked={editRoles.includes('teacher')}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setEditRoles([...editRoles, 'teacher']);
+                              } else {
+                                setEditRoles(editRoles.filter(r => r !== 'teacher'));
+                                setRoleCitiesMap({ ...roleCitiesMap, teacher: [] });
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <label htmlFor="role-teacher" className="text-sm font-medium cursor-pointer">老师</label>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex flex-wrap gap-2">
+                            {(roleCitiesMap['teacher'] || []).map((cityName) => (
+                              <span key={cityName} className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                                {cityName}
+                                <button type="button" onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setRoleCitiesMap({ ...roleCitiesMap, teacher: (roleCitiesMap['teacher'] || []).filter(c => c !== cityName) });
+                                }} className="ml-1 hover:bg-black/10 rounded-full p-0.5">
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                          {editRoles.includes('teacher') && cities && cities.length > 0 && (
+                            <Select value="" onValueChange={(value) => {
+                              if (value && !(roleCitiesMap['teacher'] || []).includes(value)) {
+                                setRoleCitiesMap({ ...roleCitiesMap, teacher: [...(roleCitiesMap['teacher'] || []), value] });
+                              }
+                            }}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="添加城市..." /></SelectTrigger>
+                              <SelectContent>
+                                {cities.filter(city => !(roleCitiesMap['teacher'] || []).includes(city.name)).map(city => (
+                                  <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 合伙人角色行 */}
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                          <input
+                            type="checkbox"
+                            id="role-cityPartner"
+                            checked={editRoles.includes('cityPartner')}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setEditRoles([...editRoles, 'cityPartner']);
+                              } else {
+                                setEditRoles(editRoles.filter(r => r !== 'cityPartner'));
+                                setRoleCitiesMap({ ...roleCitiesMap, cityPartner: [] });
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <label htmlFor="role-cityPartner" className="text-sm font-medium cursor-pointer">合伙人</label>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex flex-wrap gap-2">
+                            {(roleCitiesMap['cityPartner'] || []).map((cityName) => (
+                              <span key={cityName} className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                                {cityName}
+                                <button type="button" onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setRoleCitiesMap({ ...roleCitiesMap, cityPartner: (roleCitiesMap['cityPartner'] || []).filter(c => c !== cityName) });
+                                }} className="ml-1 hover:bg-black/10 rounded-full p-0.5">
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                          {editRoles.includes('cityPartner') && cities && cities.length > 0 && (
+                            <Select value="" onValueChange={(value) => {
+                              if (value && !(roleCitiesMap['cityPartner'] || []).includes(value)) {
+                                setRoleCitiesMap({ ...roleCitiesMap, cityPartner: [...(roleCitiesMap['cityPartner'] || []), value] });
+                              }
+                            }}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="添加城市..." /></SelectTrigger>
+                              <SelectContent>
+                                {cities.filter(city => !(roleCitiesMap['cityPartner'] || []).includes(city.name)).map(city => (
+                                  <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* 销售角色行 */}
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                          <input
+                            type="checkbox"
+                            id="role-sales"
+                            checked={editRoles.includes('sales')}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setEditRoles([...editRoles, 'sales']);
+                              } else {
+                                setEditRoles(editRoles.filter(r => r !== 'sales'));
+                                setRoleCitiesMap({ ...roleCitiesMap, sales: [] });
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <label htmlFor="role-sales" className="text-sm font-medium cursor-pointer">销售</label>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex flex-wrap gap-2">
+                            {(roleCitiesMap['sales'] || []).map((cityName) => (
+                              <span key={cityName} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                                {cityName}
+                                <button type="button" onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setRoleCitiesMap({ ...roleCitiesMap, sales: (roleCitiesMap['sales'] || []).filter(c => c !== cityName) });
+                                }} className="ml-1 hover:bg-black/10 rounded-full p-0.5">
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                          {editRoles.includes('sales') && cities && cities.length > 0 && (
+                            <Select value="" onValueChange={(value) => {
+                              if (value && !(roleCitiesMap['sales'] || []).includes(value)) {
+                                setRoleCitiesMap({ ...roleCitiesMap, sales: [...(roleCitiesMap['sales'] || []), value] });
+                              }
+                            }}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="添加城市..." /></SelectTrigger>
+                              <SelectContent>
+                                {cities.filter(city => !(roleCitiesMap['sales'] || []).includes(city.name)).map(city => (
+                                  <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground mt-2">用于老师和城市合伙人角色的业绩统计（老师和合伙人可以不在同城市）</p>
                     </div>
                   </div>
-                  {/* 根据选中的角色动态显示城市字段 */}
-                  {editRoles.includes('teacher') && (
-                    <div>
-                      <Label>老师所在城市（可多选）</Label>
-                      <div className="mt-2 space-y-2">
-                        <div className="flex flex-wrap gap-2">
-                          {(roleCitiesMap['teacher'] || []).map((cityName) => (
-                            <span key={cityName} className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs flex items-center gap-1">
-                              {cityName}
-                              <button type="button" onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setRoleCitiesMap({ ...roleCitiesMap, teacher: (roleCitiesMap['teacher'] || []).filter(c => c !== cityName) });
-                              }} className="ml-1 hover:bg-black/10 rounded-full p-0.5">
-                                <X className="h-3 w-3" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                        {cities && cities.length > 0 && (
-                          <Select value="" onValueChange={(value) => {
-                            if (value && !(roleCitiesMap['teacher'] || []).includes(value)) {
-                              setRoleCitiesMap({ ...roleCitiesMap, teacher: [...(roleCitiesMap['teacher'] || []), value] });
-                            }
-                          }}>
-                            <SelectTrigger><SelectValue placeholder="选择城市..." /></SelectTrigger>
-                            <SelectContent>
-                              {cities.filter(city => !(roleCitiesMap['teacher'] || []).includes(city.name)).map(city => (
-                                <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {editRoles.includes('cityPartner') && (
-                    <div>
-                      <Label>合伙人所在城市（可多选）</Label>
-                      <div className="mt-2 space-y-2">
-                        <div className="flex flex-wrap gap-2">
-                          {(roleCitiesMap['cityPartner'] || []).map((cityName) => (
-                            <span key={cityName} className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs flex items-center gap-1">
-                              {cityName}
-                              <button type="button" onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setRoleCitiesMap({ ...roleCitiesMap, cityPartner: (roleCitiesMap['cityPartner'] || []).filter(c => c !== cityName) });
-                              }} className="ml-1 hover:bg-black/10 rounded-full p-0.5">
-                                <X className="h-3 w-3" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                        {cities && cities.length > 0 && (
-                          <Select value="" onValueChange={(value) => {
-                            if (value && !(roleCitiesMap['cityPartner'] || []).includes(value)) {
-                              setRoleCitiesMap({ ...roleCitiesMap, cityPartner: [...(roleCitiesMap['cityPartner'] || []), value] });
-                            }
-                          }}>
-                            <SelectTrigger><SelectValue placeholder="选择城市..." /></SelectTrigger>
-                            <SelectContent>
-                              {cities.filter(city => !(roleCitiesMap['cityPartner'] || []).includes(city.name)).map(city => (
-                                <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {editRoles.includes('sales') && (
-                    <div>
-                      <Label>销售所在城市（可多选）</Label>
-                      <div className="mt-2 space-y-2">
-                        <div className="flex flex-wrap gap-2">
-                          {(roleCitiesMap['sales'] || []).map((cityName) => (
-                            <span key={cityName} className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs flex items-center gap-1">
-                              {cityName}
-                              <button type="button" onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setRoleCitiesMap({ ...roleCitiesMap, sales: (roleCitiesMap['sales'] || []).filter(c => c !== cityName) });
-                              }} className="ml-1 hover:bg-black/10 rounded-full p-0.5">
-                                <X className="h-3 w-3" />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                        {cities && cities.length > 0 && (
-                          <Select value="" onValueChange={(value) => {
-                            if (value && !(roleCitiesMap['sales'] || []).includes(value)) {
-                              setRoleCitiesMap({ ...roleCitiesMap, sales: [...(roleCitiesMap['sales'] || []), value] });
-                            }
-                          }}>
-                            <SelectTrigger><SelectValue placeholder="选择城市..." /></SelectTrigger>
-                            <SelectContent>
-                              {cities.filter(city => !(roleCitiesMap['sales'] || []).includes(city.name)).map(city => (
-                                <SelectItem key={city.id} value={city.name}>{city.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <DialogFooter className="mt-6">
                   <Button
