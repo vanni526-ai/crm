@@ -1,0 +1,9 @@
+{
+  "query": "SELECT u.id, u.username, u.nickname, u.phone, u.roles,\n       GROUP_CONCAT(CONCAT(urc.role, ':', urc.cities) SEPARATOR '; ') as role_cities\nFROM users u\nLEFT JOIN user_role_cities urc ON u.id = urc.userId\nWHERE u.username = 'test'\nGROUP BY u.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id, u.username, u.nickname, u.phone, u.roles,\n       GROUP_CONCAT(CONCAT(urc.role, ':', urc.cities) SEPARATOR '; ') as role_cities\nFROM users u\nLEFT JOIN user_role_cities urc ON u.id = urc.userId\nWHERE u.username = 'test'\nGROUP BY u.id;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1577
+}
