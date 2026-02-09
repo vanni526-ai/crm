@@ -22,6 +22,26 @@ export const users = mysqlTable("users", {
 });
 
 /**
+ * 用户角色-城市关联表
+ * 支持一个用户的不同角色关联不同的城市列表
+ * 例如：用户A作为老师在深圳，作为城市合伙人在天津
+ */
+export const userRoleCities = mysqlTable("user_role_cities", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // 关联users表
+  role: mysqlEnum("role", ["teacher", "cityPartner", "sales"]).notNull(), // 角色类型
+  cities: text("cities").notNull(), // 城市列表(JSON数组存储，如 '["深圳","广州"]')
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userRoleIdx: index("user_role_idx").on(table.userId, table.role),
+  userIdIdx: index("user_id_idx").on(table.userId),
+}));
+
+export type UserRoleCity = typeof userRoleCities.$inferSelect;
+export type InsertUserRoleCity = typeof userRoleCities.$inferInsert
+
+/**
  * 客户表
  */
 export const customers = mysqlTable("customers", {

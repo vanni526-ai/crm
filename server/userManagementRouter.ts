@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
-import { getDb } from "./db";
+import { getDb, setUserRoleCities, getUserRoleCities } from "./db";
 import { users, teachers } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
@@ -77,6 +77,17 @@ export const userManagementRouter = router({
 
       const user = userList[0];
 
+      // 获取角色-城市关联
+      const roleCitiesData = await getUserRoleCities(user.id);
+      const roleCities: Record<string, string[]> = {};
+      for (const rc of roleCitiesData) {
+        try {
+          roleCities[rc.role] = JSON.parse(rc.cities);
+        } catch {
+          roleCities[rc.role] = [];
+        }
+      }
+
       // 不返回密码字段
       return {
         id: user.id,
@@ -87,6 +98,7 @@ export const userManagementRouter = router({
         phone: user.phone,
         role: user.role,
         roles: (user as any).roles || user.role || "user",
+        roleCities, // 角色-城市关联
         isActive: user.isActive,
         createdAt: user.createdAt,
         lastSignedIn: user.lastSignedIn,
@@ -168,7 +180,7 @@ export const userManagementRouter = router({
         phone: z.string().optional(),
         role: z.enum(USER_ROLE_VALUES as [string, ...string[]]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
-        city: z.string().optional(), // 城市数据（JSON数组字符串）
+        roleCities: z.record(z.string(), z.array(z.string())).optional(), // 角色-城市关联，如 { "teacher": ["深圳"], "cityPartner": ["天津"] }
       })
     )
     .mutation(async ({ input }) => {
@@ -180,7 +192,7 @@ export const userManagementRouter = router({
         });
       }
 
-      const { id, roles, ...updateData } = input;
+      const { id, roles, roleCities, ...updateData } = input;
 
       // 查询更新前的角色
       const [usersBefore] = await drizzle.select().from(users).where(eq(users.id, id)).limit(1);
@@ -195,6 +207,15 @@ export const userManagementRouter = router({
       }
 
       await drizzle.update(users).set(setData).where(eq(users.id, id));
+
+      // 保存角色-城市关联
+      if (roleCities) {
+        for (const [role, cities] of Object.entries(roleCities)) {
+          if (role === 'teacher' || role === 'cityPartner' || role === 'sales') {
+            await setUserRoleCities(id, role as 'teacher' | 'cityPartner' | 'sales', cities as string[]);
+          }
+        }
+      }
 
       // 处理老师角色变更
       if (roles) {

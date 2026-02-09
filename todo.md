@@ -1784,4 +1784,13 @@
 - [x] 添加通用订单更新API(orders.updateFields - 更新状态和交付信息)
 - [x] 添加老师端订单查询API(orders.getTeacherOrders - 查询已支付但未交付的订单)
 - [x] 编写API测试用例验证功能(11个测试全部通过)
+- [x] 保存检查点(version: 189223ac)
+
+
+### 197. 修复用户管理页面城市选择逻辑，支持不同角色关联不同城市
+- [x] 分析数据库schema设计方案(需要新建user_role_cities表)
+- [x] 修改数据库schema支持角色-城市关联(已创建user_role_cities表)
+- [x] 修改后端API支持角色-城市数据的保存和查询(db.ts和userManagementRouter.ts)
+- [ ] 修改前端UI,根据选择的角色动态显示对应的城市选择字段
+- [ ] 测试验证:老师角色在深圳,合伙人角色在天津的场景
 - [ ] 保存检查点

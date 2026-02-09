@@ -40,6 +40,9 @@ import {
   classrooms,
   InsertCity,
   InsertClassroom,
+  userRoleCities,
+  InsertUserRoleCity,
+  UserRoleCity,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { formatDateBeijing, BEIJING_TIMEZONE } from "../shared/timezone";
@@ -157,6 +160,88 @@ export async function updateUserRole(userId: number, role: UserRole) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(users).set({ role }).where(eq(users.id, userId));
+}
+
+// ===== User Role Cities Functions =====
+
+/**
+ * 获取用户的所有角色-城市关联
+ */
+export async function getUserRoleCities(userId: number): Promise<UserRoleCity[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(userRoleCities).where(eq(userRoleCities.userId, userId));
+}
+
+/**
+ * 获取用户的特定角色的城市列表
+ */
+export async function getUserRoleCitiesByRole(
+  userId: number,
+  role: 'teacher' | 'cityPartner' | 'sales'
+): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db
+    .select()
+    .from(userRoleCities)
+    .where(and(eq(userRoleCities.userId, userId), eq(userRoleCities.role, role)));
+  
+  if (result.length === 0) return [];
+  try {
+    return JSON.parse(result[0].cities);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * 设置用户的特定角色的城市列表
+ */
+export async function setUserRoleCities(
+  userId: number,
+  role: 'teacher' | 'cityPartner' | 'sales',
+  cities: string[]
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const citiesJson = JSON.stringify(cities);
+  
+  // 检查是否已存在
+  const existing = await db
+    .select()
+    .from(userRoleCities)
+    .where(and(eq(userRoleCities.userId, userId), eq(userRoleCities.role, role)));
+  
+  if (existing.length > 0) {
+    // 更新
+    await db
+      .update(userRoleCities)
+      .set({ cities: citiesJson })
+      .where(and(eq(userRoleCities.userId, userId), eq(userRoleCities.role, role)));
+  } else {
+    // 插入
+    await db.insert(userRoleCities).values({
+      userId,
+      role,
+      cities: citiesJson,
+    });
+  }
+}
+
+/**
+ * 删除用户的特定角色的城市关联
+ */
+export async function deleteUserRoleCities(
+  userId: number,
+  role: 'teacher' | 'cityPartner' | 'sales'
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .delete(userRoleCities)
+    .where(and(eq(userRoleCities.userId, userId), eq(userRoleCities.role, role)));
 }
 
 /**

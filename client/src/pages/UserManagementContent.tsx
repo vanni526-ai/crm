@@ -257,7 +257,7 @@ export default function UserManagementContent() {
       phone: (formData.get("phone") as string) || undefined,
       role: editRoles[0] as any, // 主角色（兼容旧接口）
       roles: editRoles.join(","), // 多角色
-      city: editCities.length > 0 ? JSON.stringify(editCities) : undefined, // 城市数据
+      roleCities: editCities.length > 0 ? { [editRoles[0]]: editCities } : undefined, // TODO: 支持多角色-城市关联
     });
   };
 

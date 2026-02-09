@@ -236,7 +236,7 @@ export default function UserManagement() {
       email: formData.get("email") as string || undefined,
       phone: formData.get("phone") as string || undefined,
       roles: editRoles.join(","), // 将数组转换为逗号分隔的字符串
-      city: editCities.length > 0 ? JSON.stringify(editCities) : undefined,
+      roleCities: editCities.length > 0 ? { [editRoles[0]]: editCities } : undefined, // TODO: 支持多角色-城市关联
     });
   };
   

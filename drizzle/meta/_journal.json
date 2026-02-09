@@ -155,6 +155,13 @@
       "when": 1770562948617,
       "tag": "0021_charming_agent_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1770607925521,
+      "tag": "0022_wide_vulture",
+      "breakpoints": true
     }
   ]
 }
