@@ -127,6 +127,18 @@ export const userManagementRouter = router({
         });
       }
 
+      // 手机号唯一性验证
+      if (input.phone) {
+        const { checkPhoneUnique } = await import("./phoneValidator");
+        const phoneCheck = await checkPhoneUnique(input.phone);
+        if (!phoneCheck.isUnique) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `手机号已被使用（${phoneCheck.conflictType === "user" ? "用户管理" : "老师管理"}中的 ${phoneCheck.conflictName}）`,
+          });
+        }
+      }
+
       // 加密密码
       const hashedPassword = await hashPassword(input.password);
 
@@ -193,6 +205,18 @@ export const userManagementRouter = router({
       }
 
       const { id, roles, roleCities, ...updateData } = input;
+
+      // 手机号唯一性验证（排除当前用户）
+      if (updateData.phone) {
+        const { checkPhoneUnique } = await import("./phoneValidator");
+        const phoneCheck = await checkPhoneUnique(updateData.phone, id);
+        if (!phoneCheck.isUnique) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `手机号已被使用（${phoneCheck.conflictType === "user" ? "用户管理" : "老师管理"}中的 ${phoneCheck.conflictName}）`,
+          });
+        }
+      }
 
       // 查询更新前的角色
       const [usersBefore] = await drizzle.select().from(users).where(eq(users.id, id)).limit(1);

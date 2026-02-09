@@ -26,8 +26,8 @@ const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/ses
 
 const teacherSchema = z.object({
   name: z.string().min(1, "老师姓名不能为空"),
-  phone: z.string().optional(),
-  status: z.string().optional(),
+  phone: z.string().min(1, "电话号码不能为空"),
+  status: z.enum(["激活", "不激活"], { message: "请选择活跃状态" }),
   customerType: z.string().optional(),
   notes: z.string().optional(),
   category: z.string().optional(),
@@ -961,12 +961,33 @@ export default function Teachers() {
                   {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="phone">电话号码</Label>
+                  <Label htmlFor="phone">电话号码 *</Label>
                   <Input id="phone" {...register("phone")} />
+                  {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
                 </div>
                 <div>
-                  <Label htmlFor="status">活跃状态</Label>
-                  <Input id="status" {...register("status")} placeholder="活跃/不活跃" />
+                  <Label>活跃状态 *</Label>
+                  <div className="flex gap-4 mt-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        {...register("status")}
+                        value="激活"
+                        className="w-4 h-4"
+                      />
+                      <span>激活</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        {...register("status")}
+                        value="不激活"
+                        className="w-4 h-4"
+                      />
+                      <span>不激活</span>
+                    </label>
+                  </div>
+                  {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor="category">分类</Label>

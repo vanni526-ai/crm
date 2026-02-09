@@ -34,7 +34,7 @@ import { generateOrderNo } from "./orderNoGenerator";
 import { generateOrderId } from "./orderIdGenerator";
 import { validateChannelOrderNo } from "./channelOrderNoUtils";
 import { validateTeacherFee } from "./teacherFeeValidator";
-import { orders, customers } from "../drizzle/schema";
+import { orders, customers, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 import { hasAnyRole, USER_ROLES } from "@shared/const";
@@ -1304,8 +1304,48 @@ export const appRouter = router({
         avatarUrl: z.string().optional(), // 头像URL
       }))
       .mutation(async ({ input }) => {
-        const id = await db.createTeacher(input);
-        return { id, success: true };
+        // 手机号唯一性验证
+        if (input.phone) {
+          const { checkPhoneUnique } = await import("./phoneValidator");
+          const phoneCheck = await checkPhoneUnique(input.phone);
+          if (!phoneCheck.isUnique) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `手机号已被使用（${phoneCheck.conflictType === "user" ? "用户管理" : "老师管理"}中的 ${phoneCheck.conflictName}）`,
+            });
+          }
+        }
+
+        // 创建老师记录
+        const teacherId = await db.createTeacher(input);
+
+        // 同步到用户管理：创建对应的用户账户
+        if (input.phone) {
+          const drizzle = await getDb();
+          if (drizzle) {
+            // 生成openId
+            const openId = `teacher_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+            // 生成默认密码（手机号后6位）
+            const { hashPassword } = await import("./passwordUtils");
+            const defaultPassword = input.phone.slice(-6) || "123456";
+            const hashedPassword = await hashPassword(defaultPassword);
+
+            // 创建用户账户
+            await drizzle.insert(users).values({
+              openId,
+              name: input.name,
+              nickname: input.nickname || null,
+              email: input.email || null,
+              phone: input.phone,
+              password: hashedPassword,
+              role: "teacher" as any,
+              roles: "teacher",
+              isActive: input.status === "激活" || input.status === "活跃",
+            } as any);
+          }
+        }
+
+        return { id: teacherId, success: true };
       }),
     
     update: adminProcedure
@@ -1342,6 +1382,24 @@ export const appRouter = router({
         }),
       }))
       .mutation(async ({ input }) => {
+        // 手机号唯一性验证（排除当前老师记录）
+        if (input.data.phone) {
+          const { checkPhoneUnique } = await import("./phoneValidator");
+          // 获取老师的userId以排除对应的用户记录
+          const teacher = await db.getTeacherById(input.id);
+          const phoneCheck = await checkPhoneUnique(
+            input.data.phone,
+            teacher?.userId || undefined,
+            input.id
+          );
+          if (!phoneCheck.isUnique) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `手机号已被使用（${phoneCheck.conflictType === "user" ? "用户管理" : "老师管理"}中的 ${phoneCheck.conflictName}）`,
+            });
+          }
+        }
+
         await db.updateTeacher(input.id, input.data);
         return { success: true };
       }),
