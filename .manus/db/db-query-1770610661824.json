@@ -1,0 +1,16 @@
+{
+  "query": "SELECT phone, COUNT(*) as count, GROUP_CONCAT(id) as ids, GROUP_CONCAT(name) as names\nFROM teachers\nWHERE phone IS NOT NULL AND phone != ''\nGROUP BY phone\nHAVING COUNT(*) > 1\nORDER BY count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT phone, COUNT(*) as count, GROUP_CONCAT(id) as ids, GROUP_CONCAT(name) as names\nFROM teachers\nWHERE phone IS NOT NULL AND phone != ''\nGROUP BY phone\nHAVING COUNT(*) > 1\nORDER BY count DESC;",
+  "rows": [
+    {
+      "phone": "13800138000",
+      "count": "2",
+      "ids": "420016,510031",
+      "names": "张老师,张老师"
+    }
+  ],
+  "messages": [],
+  "stdout": "phone\tcount\tids\tnames\n13800138000\t2\t420016,510031\t张老师,张老师\n",
+  "stderr": "",
+  "execution_time_ms": 1674
+}

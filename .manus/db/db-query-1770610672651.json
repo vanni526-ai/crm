@@ -1,0 +1,34 @@
+{
+  "query": "SELECT phone, COUNT(*) as count, GROUP_CONCAT(id) as ids, GROUP_CONCAT(username) as usernames\nFROM users\nWHERE phone IS NOT NULL AND phone != ''\nGROUP BY phone\nHAVING COUNT(*) > 1\nORDER BY count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT phone, COUNT(*) as count, GROUP_CONCAT(id) as ids, GROUP_CONCAT(username) as usernames\nFROM users\nWHERE phone IS NOT NULL AND phone != ''\nGROUP BY phone\nHAVING COUNT(*) > 1\nORDER BY count DESC;",
+  "rows": [
+    {
+      "phone": "无",
+      "count": "14",
+      "ids": "15362143,15362144,15362145,15362147,15362171,15362172,15362173,15362174,15362175,15362176,15362177,15362178,15362179,15362181",
+      "usernames": "NULL"
+    },
+    {
+      "phone": "13800138001",
+      "count": "4",
+      "ids": "13860029,13860093,13860095,14430230",
+      "usernames": "NULL"
+    },
+    {
+      "phone": "13800138000",
+      "count": "3",
+      "ids": "13860030,15150010,15362180",
+      "usernames": "NULL"
+    },
+    {
+      "phone": "13900139001",
+      "count": "2",
+      "ids": "13860094,13860096",
+      "usernames": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "phone\tcount\tids\tusernames\n无\t14\t15362143,15362144,15362145,15362147,15362171,15362172,15362173,15362174,15362175,15362176,15362177,15362178,15362179,15362181\tNULL\n13800138001\t4\t13860029,13860093,13860095,14430230\tNULL\n13800138000\t3\t13860030,15150010,15362180\tNULL\n13900139001\t2\t13860094,13860096\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1531
+}
