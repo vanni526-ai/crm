@@ -1851,3 +1851,12 @@
 - [x] 城市badge可点击删除，下拉选择器可添加新城市
 - [x] 测试验证UI效果：功能正常，显示正确
 - [x] 保存检查点
+
+
+### 203. 修改UserManagementContent.tsx组件，实现两列布局的角色-城市选择UI
+- [x] 读取UserManagementContent.tsx的编辑弹窗代码
+- [x] 将UserManagement.tsx中的两列布局代码应用到UserManagementContent.tsx
+- [x] 在userManagementRouter.ts中添加getRoleCities API
+- [x] 修复TypeScript编译错误
+- [ ] 测试验证生产环境的UI更新
+- [ ] 保存检查点并通知用户发布

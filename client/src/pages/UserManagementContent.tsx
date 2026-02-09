@@ -151,8 +151,10 @@ export default function UserManagementContent() {
   const [createRoles, setCreateRoles] = useState<string[]>(["user"]);
   const [editRoles, setEditRoles] = useState<string[]>(["user"]);
   
-  // 城市选择状态
-  const [editCities, setEditCities] = useState<string[]>([]);
+  // 城市选择状态（每个角色独立的城市列表）
+  const [editTeacherCities, setEditTeacherCities] = useState<string[]>([]);
+  const [editPartnerCities, setEditPartnerCities] = useState<string[]>([]);
+  const [editSalesCities, setEditSalesCities] = useState<string[]>([]);
 
   // 查询用户列表
   const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery();
@@ -257,7 +259,11 @@ export default function UserManagementContent() {
       phone: (formData.get("phone") as string) || undefined,
       role: editRoles[0] as any, // 主角色（兼容旧接口）
       roles: editRoles.join(","), // 多角色
-      roleCities: editCities.length > 0 ? { [editRoles[0]]: editCities } : undefined, // TODO: 支持多角色-城市关联
+      roleCities: {
+        ...(editTeacherCities.length > 0 ? { teacher: editTeacherCities } : {}),
+        ...(editPartnerCities.length > 0 ? { cityPartner: editPartnerCities } : {}),
+        ...(editSalesCities.length > 0 ? { sales: editSalesCities } : {}),
+      },
     });
   };
 
@@ -276,19 +282,33 @@ export default function UserManagementContent() {
     toggleActiveMutation.mutate({ id: userId, isActive });
   };
 
-  const handleEditUser = (user: any) => {
+  const trpcUtils = trpc.useUtils();
+
+  const handleEditUser = async (user: any) => {
     setEditingUser(user);
     setEditRoles(parseRoles(user.roles || user.role));
-    // 解析城市数据（JSON数组或逗号分隔字符串）
-    if (user.city) {
-      try {
-        const parsed = JSON.parse(user.city);
-        setEditCities(Array.isArray(parsed) ? parsed : [user.city]);
-      } catch {
-        setEditCities(user.city.split(",").map((c: string) => c.trim()).filter(Boolean));
-      }
-    } else {
-      setEditCities([]);
+    
+    // 重置所有角色的城市列表
+    setEditTeacherCities([]);
+    setEditPartnerCities([]);
+    setEditSalesCities([]);
+    
+    // 从user_role_cities表加载每个角色的城市列表
+    try {
+      const roleCitiesData = await trpcUtils.userManagement.getRoleCities.fetch({ userId: user.id });
+      const roleCitiesMap: Record<string, string[]> = {};
+      roleCitiesData.forEach((rc: any) => {
+        if (!roleCitiesMap[rc.role]) {
+          roleCitiesMap[rc.role] = [];
+        }
+        roleCitiesMap[rc.role].push(rc.cityName);
+      });
+      
+      setEditTeacherCities(roleCitiesMap['teacher'] || []);
+      setEditPartnerCities(roleCitiesMap['cityPartner'] || []);
+      setEditSalesCities(roleCitiesMap['sales'] || []);
+    } catch (error) {
+      console.error('Failed to load role cities:', error);
     }
   };
 
@@ -518,56 +538,175 @@ export default function UserManagementContent() {
                   />
                 </div>
                 <div>
-                  <Label>角色 *（可多选）</Label>
-                  <div className="mt-2 p-3 border rounded-md">
-                    <RolesSelector
-                      selectedRoles={editRoles}
-                      onChange={setEditRoles}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label>城市（可多选）</Label>
-                  <div className="mt-2 p-3 border rounded-md space-y-2">
-                    {/* 已选城市 */}
-                    {editCities.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {editCities.map((city) => (
-                          <Badge key={city} variant="secondary" className="flex items-center gap-1">
-                            {city}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setEditCities(editCities.filter(c => c !== city));
-                              }}
-                              className="ml-1 hover:bg-black/10 rounded-full p-0.5"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </Badge>
-                        ))}
+                  <Label>角色与城市 *</Label>
+                  <div className="mt-2 p-4 border rounded-md space-y-3">
+                    {/* 老师角色行 */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          id="role-teacher"
+                          checked={editRoles.includes('teacher')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEditRoles([...editRoles, 'teacher']);
+                            } else {
+                              setEditRoles(editRoles.filter(r => r !== 'teacher'));
+                              setEditTeacherCities([]);
+                            }
+                          }}
+                          className="w-4 h-4"
+                        />
+                        <label htmlFor="role-teacher" className="text-sm font-medium cursor-pointer">老师</label>
                       </div>
-                    )}
-                    {/* 城市选择器 */}
-                    <select
-                      className="w-full p-2 border rounded-md"
-                      value=""
-                      onChange={(e) => {
-                        const city = e.target.value;
-                        if (city && !editCities.includes(city)) {
-                          setEditCities([...editCities, city]);
-                        }
-                      }}
-                    >
-                      <option value="">选择城市...</option>
-                      {cities?.map((city) => (
-                        <option key={city.name} value={city.name}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </select>
+                      {editRoles.includes('teacher') && (
+                        <div className="flex-1 space-y-2">
+                          {editTeacherCities.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {editTeacherCities.map((city) => (
+                                <Badge key={city} variant="secondary" className="bg-purple-100 text-purple-800">
+                                  {city}
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditTeacherCities(editTeacherCities.filter(c => c !== city))}
+                                    className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          <select
+                            className="w-full p-2 border rounded-md text-sm"
+                            value=""
+                            onChange={(e) => {
+                              const city = e.target.value;
+                              if (city && !editTeacherCities.includes(city)) {
+                                setEditTeacherCities([...editTeacherCities, city]);
+                              }
+                            }}
+                          >
+                            <option value="">添加城市...</option>
+                            {cities?.map((city) => (
+                              <option key={city.name} value={city.name}>{city.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 合伙人角色行 */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          id="role-cityPartner"
+                          checked={editRoles.includes('cityPartner')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEditRoles([...editRoles, 'cityPartner']);
+                            } else {
+                              setEditRoles(editRoles.filter(r => r !== 'cityPartner'));
+                              setEditPartnerCities([]);
+                            }
+                          }}
+                          className="w-4 h-4"
+                        />
+                        <label htmlFor="role-cityPartner" className="text-sm font-medium cursor-pointer">合伙人</label>
+                      </div>
+                      {editRoles.includes('cityPartner') && (
+                        <div className="flex-1 space-y-2">
+                          {editPartnerCities.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {editPartnerCities.map((city) => (
+                                <Badge key={city} variant="secondary" className="bg-amber-100 text-amber-800">
+                                  {city}
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditPartnerCities(editPartnerCities.filter(c => c !== city))}
+                                    className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          <select
+                            className="w-full p-2 border rounded-md text-sm"
+                            value=""
+                            onChange={(e) => {
+                              const city = e.target.value;
+                              if (city && !editPartnerCities.includes(city)) {
+                                setEditPartnerCities([...editPartnerCities, city]);
+                              }
+                            }}
+                          >
+                            <option value="">添加城市...</option>
+                            {cities?.map((city) => (
+                              <option key={city.name} value={city.name}>{city.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 销售角色行 */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          id="role-sales"
+                          checked={editRoles.includes('sales')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEditRoles([...editRoles, 'sales']);
+                            } else {
+                              setEditRoles(editRoles.filter(r => r !== 'sales'));
+                              setEditSalesCities([]);
+                            }
+                          }}
+                          className="w-4 h-4"
+                        />
+                        <label htmlFor="role-sales" className="text-sm font-medium cursor-pointer">销售</label>
+                      </div>
+                      {editRoles.includes('sales') && (
+                        <div className="flex-1 space-y-2">
+                          {editSalesCities.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {editSalesCities.map((city) => (
+                                <Badge key={city} variant="secondary" className="bg-blue-100 text-blue-800">
+                                  {city}
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditSalesCities(editSalesCities.filter(c => c !== city))}
+                                    className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          <select
+                            className="w-full p-2 border rounded-md text-sm"
+                            value=""
+                            onChange={(e) => {
+                              const city = e.target.value;
+                              if (city && !editSalesCities.includes(city)) {
+                                setEditSalesCities([...editSalesCities, city]);
+                              }
+                            }}
+                          >
+                            <option value="">添加城市...</option>
+                            {cities?.map((city) => (
+                              <option key={city.name} value={city.name}>{city.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计（老师和合伙人可以在不同城市）</p>
                 </div>

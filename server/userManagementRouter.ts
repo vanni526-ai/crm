@@ -400,6 +400,14 @@ export const userManagementRouter = router({
       };
     }),
 
+  // 获取用户的角色-城市关联
+  getRoleCities: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .query(async ({ input }) => {
+      const roleCities = await getUserRoleCities(input.userId);
+      return roleCities;
+    }),
+
   // 删除用户
   delete: adminProcedure
     .input(z.object({ id: z.number() }))
