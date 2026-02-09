@@ -23,7 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Search, Key, Edit, UserPlus } from "lucide-react";
+import { Search, Key, Edit, UserPlus, X } from "lucide-react";
 
 // 角色定义
 const ALL_ROLES = [
@@ -103,9 +103,15 @@ export default function UserManagementContent() {
   // 多角色选择状态
   const [createRoles, setCreateRoles] = useState<string[]>(["user"]);
   const [editRoles, setEditRoles] = useState<string[]>(["user"]);
+  
+  // 城市选择状态
+  const [editCities, setEditCities] = useState<string[]>([]);
 
   // 查询用户列表
   const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery();
+  
+  // 查询城市列表
+  const { data: cities } = trpc.analytics.getAllCities.useQuery();
 
   // 创建用户
   const createMutation = trpc.userManagement.create.useMutation({
@@ -204,6 +210,7 @@ export default function UserManagementContent() {
       phone: (formData.get("phone") as string) || undefined,
       role: editRoles[0] as any, // 主角色（兼容旧接口）
       roles: editRoles.join(","), // 多角色
+      city: editCities.length > 0 ? JSON.stringify(editCities) : undefined, // 城市数据
     });
   };
 
@@ -225,6 +232,17 @@ export default function UserManagementContent() {
   const handleEditUser = (user: any) => {
     setEditingUser(user);
     setEditRoles(parseRoles(user.roles || user.role));
+    // 解析城市数据（JSON数组或逗号分隔字符串）
+    if (user.city) {
+      try {
+        const parsed = JSON.parse(user.city);
+        setEditCities(Array.isArray(parsed) ? parsed : [user.city]);
+      } catch {
+        setEditCities(user.city.split(",").map((c: string) => c.trim()).filter(Boolean));
+      }
+    } else {
+      setEditCities([]);
+    }
   };
 
   return (
@@ -411,7 +429,7 @@ export default function UserManagementContent() {
 
       {/* 编辑用户对话框 */}
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>编辑用户</DialogTitle>
           </DialogHeader>
@@ -460,6 +478,44 @@ export default function UserManagementContent() {
                       onChange={setEditRoles}
                     />
                   </div>
+                </div>
+                <div>
+                  <Label>城市（可多选）</Label>
+                  <div className="mt-2 p-3 border rounded-md space-y-2">
+                    {/* 已选城市 */}
+                    {editCities.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {editCities.map((city) => (
+                          <Badge key={city} variant="secondary" className="flex items-center gap-1">
+                            {city}
+                            <X
+                              className="w-3 h-3 cursor-pointer"
+                              onClick={() => setEditCities(editCities.filter(c => c !== city))}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    {/* 城市选择器 */}
+                    <select
+                      className="w-full p-2 border rounded-md"
+                      value=""
+                      onChange={(e) => {
+                        const city = e.target.value;
+                        if (city && !editCities.includes(city)) {
+                          setEditCities([...editCities, city]);
+                        }
+                      }}
+                    >
+                      <option value="">选择城市...</option>
+                      {cities?.map((city) => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计</p>
                 </div>
               </div>
               <DialogFooter className="mt-6">

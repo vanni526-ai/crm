@@ -1249,14 +1249,7 @@ export const appRouter = router({
         customerType: z.string().optional(),
         notes: z.string().optional(),
         category: z.string().optional(),
-        city: z.string().min(1, "城市不能为空").refine(
-          (val) => {
-            // 验证城市格式:支持单个城市或多个城市(分号分隔)
-            const cities = val.split(';').map(c => c.trim()).filter(c => c !== '');
-            return cities.length > 0;
-          },
-          { message: "请输入有效的城市名称,多个城市用分号分隔" }
-        ),
+        city: z.string().optional(), // 城市字段，支持JSON数组格式
         // 兼容旧字段
         nickname: z.string().optional(),
         email: z.string().optional(),
@@ -1817,6 +1810,11 @@ export const appRouter = router({
       }),
     
     // 城市管理
+    getAllCities: protectedProcedure
+      .query(async () => {
+        return db.getAllCities();
+      }),
+    
     getAllCitiesWithStats: protectedProcedure
       .input(z.object({
         startDate: z.string().optional(),

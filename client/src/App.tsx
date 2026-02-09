@@ -70,7 +70,7 @@ function Router() {
       <Route path={"/reconciliation-report"} component={ReconciliationReport} />
       <Route path={"/accounts"} component={AccountManagement} />
       <Route path={"/login"} component={LocalLogin} />
-      {/* <Route path={"/user-management"} component={UserManagement} /> */}
+      <Route path={"/user-management"} component={UserManagement} />
       <Route path={"/courses"} component={Courses} />
       <Route path={"/notifications"} component={Notifications} />
       <Route path={"/sales-city-performance"} component={SalesCityPerformance} />

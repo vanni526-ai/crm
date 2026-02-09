@@ -168,6 +168,7 @@ export const userManagementRouter = router({
         phone: z.string().optional(),
         role: z.enum(USER_ROLE_VALUES as [string, ...string[]]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
+        city: z.string().optional(), // 城市数据（JSON数组字符串）
       })
     )
     .mutation(async ({ input }) => {

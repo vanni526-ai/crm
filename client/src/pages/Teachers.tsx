@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Search, Eye, Edit, Upload, Download, Trash2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Search, Eye, Edit, Upload, Download, Trash2, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, X } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,14 +31,7 @@ const teacherSchema = z.object({
   customerType: z.string().optional(),
   notes: z.string().optional(),
   category: z.string().optional(),
-  city: z.string().min(1, "城市不能为空").refine(
-    (val) => {
-      // 验证城市格式:支持单个城市或多个城市(分号分隔)
-      const cities = val.split(';').map(c => c.trim()).filter(c => c !== '');
-      return cities.length > 0;
-    },
-    { message: "请输入有效的城市名称,多个城市用分号分隔" }
-  ),
+  city: z.string().optional(), // 城市字段改为可选，由多选组件管理
   aliases: z.string().optional(), // 别名(逗号分隔)
   contractEndDate: z.string().optional(), // 合同到期时间
   joinDate: z.string().optional(), // 入职时间
@@ -68,6 +61,13 @@ export default function Teachers() {
     startDate: statsStartDate,
     endDate: statsEndDate,
   });
+  
+  // 查询城市列表
+  const { data: cities } = trpc.analytics.getAllCities.useQuery();
+  
+  // 城市选择状态
+  const [createCities, setCreateCities] = useState<string[]>([]);
+  const [editCities, setEditCities] = useState<string[]>([]);
   
   const createTeacher = trpc.teachers.create.useMutation({
     onSuccess: () => {
@@ -205,6 +205,7 @@ export default function Teachers() {
   const handleCreate = (data: TeacherFormData) => {
     const createData = {
       ...data,
+      city: createCities.length > 0 ? JSON.stringify(createCities) : data.city, // 使用城市数组或原始值
       contractEndDate: data.contractEndDate ? new Date(data.contractEndDate) : undefined,
       joinDate: data.joinDate ? new Date(data.joinDate) : undefined,
     };
@@ -220,6 +221,17 @@ export default function Teachers() {
     setValue("notes", teacher.notes || "");
     setValue("category", teacher.category || "");
     setValue("city", teacher.city || "");
+    // 解析城市数据
+    if (teacher.city) {
+      try {
+        const parsed = JSON.parse(teacher.city);
+        setEditCities(Array.isArray(parsed) ? parsed : [teacher.city]);
+      } catch {
+        setEditCities(teacher.city.split(";").map((c: string) => c.trim()).filter(Boolean));
+      }
+    } else {
+      setEditCities([]);
+    }
     // 将aliases数组转换为逗号分隔的字符串
     const aliasesStr = teacher.aliases ? 
       (typeof teacher.aliases === 'string' ? teacher.aliases : JSON.parse(teacher.aliases).join(', ')) : 
@@ -244,7 +256,7 @@ export default function Teachers() {
       phone: data.phone,
       status: data.status,
       category: data.category,
-      city: data.city,
+      city: editCities.length > 0 ? JSON.stringify(editCities) : data.city, // 使用城市数组或原始值
       customerType: data.customerType,
       aliases: data.aliases,
       notes: data.notes,
@@ -960,13 +972,43 @@ export default function Teachers() {
                   <Label htmlFor="category">分类</Label>
                   <Input id="category" {...register("category")} placeholder="本部老师/合伙店老师" />
                 </div>
-                <div>
-                  <Label htmlFor="city">城市 *</Label>
-                  <Input 
-                    id="city" 
-                    {...register("city")} 
-                    placeholder="如:北京 或 北京;上海;深圳"
-                  />
+                <div className="col-span-2">
+                  <Label>城市 *（可多选）</Label>
+                  <div className="mt-2 p-3 border rounded-md space-y-2">
+                    {/* 已选城市 */}
+                    {createCities.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {createCities.map((city) => (
+                          <Badge key={city} variant="secondary" className="flex items-center gap-1">
+                            {city}
+                            <X
+                              className="w-3 h-3 cursor-pointer"
+                              onClick={() => setCreateCities(createCities.filter(c => c !== city))}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    {/* 城市选择器 */}
+                    <select
+                      className="w-full p-2 border rounded-md"
+                      value=""
+                      onChange={(e) => {
+                        const city = e.target.value;
+                        if (city && !createCities.includes(city)) {
+                          setCreateCities([...createCities, city]);
+                        }
+                      }}
+                    >
+                      <option value="">选择城市...</option>
+                      {cities?.map((city) => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计</p>
                   {errors.city && (
                     <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
                   )}
@@ -1064,13 +1106,43 @@ export default function Teachers() {
                   <Label htmlFor="edit-category">分类</Label>
                   <Input id="edit-category" {...register("category")} />
                 </div>
-                <div>
-                  <Label htmlFor="edit-city">城市</Label>
-                  <Input 
-                    id="edit-city" 
-                    {...register("city")} 
-                    placeholder="如:北京 或 北京;上海;深圳"
-                  />
+                <div className="col-span-2">
+                  <Label>城市（可多选）</Label>
+                  <div className="mt-2 p-3 border rounded-md space-y-2">
+                    {/* 已选城市 */}
+                    {editCities.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {editCities.map((city) => (
+                          <Badge key={city} variant="secondary" className="flex items-center gap-1">
+                            {city}
+                            <X
+                              className="w-3 h-3 cursor-pointer"
+                              onClick={() => setEditCities(editCities.filter(c => c !== city))}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    {/* 城市选择器 */}
+                    <select
+                      className="w-full p-2 border rounded-md"
+                      value=""
+                      onChange={(e) => {
+                        const city = e.target.value;
+                        if (city && !editCities.includes(city)) {
+                          setEditCities([...editCities, city]);
+                        }
+                      }}
+                    >
+                      <option value="">选择城市...</option>
+                      {cities?.map((city) => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计</p>
                   {errors.city && (
                     <p className="text-sm text-destructive mt-1">{errors.city.message}</p>
                   )}
