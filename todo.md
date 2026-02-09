@@ -1885,11 +1885,21 @@
 - [ ] 删除Teachers.tsx中的createCities状态
 - [ ] 保存检查点
 
-### 新任务: 检查订单交付状态API实现并完善数据结构
+### 136. 检查订单交付状态API实现并完善数据结构
 - [x] 检查后端orders.updateDeliveryStatus API实现
 - [x] 检查teacher.acceptCourse接口是否内部调用订单更新（接口不存在）
 - [x] 确认课程数据结构是否包含orderNo字段
 - [x] 完善Order接口类型定义(acceptedBy, deliveryStatus等字段)
 - [x] 增强updateDeliveryStatus API自动记录acceptedBy和acceptedAt
 - [x] 更新API接口文档
+- [x] 保存检查点
+
+### 137. 用户管理列表增加筛选器功能
+- [x] 修改后端userManagement.list API支持筛选参数（city, role, isActive）
+- [x] 修改前端UserManagement.tsx添加筛选器UI组件
+- [x] 实现城市筛选器（下拉选择）
+- [x] 实现角色筛选器（多选或下拉）
+- [x] 实现状态筛选器（启用/禁用）
+- [x] 添加“重置筛选”按钮
+- [x] 测试筛选功能
 - [ ] 保存检查点

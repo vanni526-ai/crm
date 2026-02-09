@@ -22,32 +22,73 @@ const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 export const userManagementRouter = router({
-  // 获取所有用户列表
-  list: adminProcedure.query(async () => {
-    const drizzle = await getDb();
-    if (!drizzle) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "数据库连接失败",
-      });
-    }
+  // 获取所有用户列表（支持筛选）
+  list: adminProcedure
+    .input(z.object({
+      city: z.string().optional(),  // 城市筛选
+      role: z.string().optional(),  // 角色筛选
+      isActive: z.boolean().optional(),  // 状态筛选
+    }).optional())
+    .query(async ({ input }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
 
-    const userList = await drizzle.select().from(users);
+      let userList = await drizzle.select().from(users);
 
-    // 不返回密码字段
-    return userList.map((user) => ({
-      id: user.id,
-      openId: user.openId,
-      name: user.name,
-      nickname: user.nickname,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      roles: (user as any).roles || user.role || "user",
-      isActive: user.isActive,
-      createdAt: user.createdAt,
-      lastSignedIn: user.lastSignedIn,
-    }));
+      // 应用筛选条件
+      if (input) {
+        // 状态筛选
+        if (input.isActive !== undefined) {
+          userList = userList.filter(user => user.isActive === input.isActive);
+        }
+
+        // 角色筛选
+        if (input.role) {
+          userList = userList.filter(user => {
+            const userRoles = (user as any).roles || user.role || "";
+            return userRoles.split(",").map((r: string) => r.trim()).includes(input.role!);
+          });
+        }
+
+        // 城市筛选（需要查询roleCities）
+        if (input.city) {
+          const filteredUsers = [];
+          for (const user of userList) {
+            const roleCities = await getUserRoleCities(user.id);
+            // 检查用户的任何角色是否包含该城市
+            const hasCity = Object.values(roleCities).some(cityList => {
+              if (Array.isArray(cityList)) {
+                return cityList.includes(input.city!);
+              }
+              return false;
+            });
+            if (hasCity) {
+              filteredUsers.push(user);
+            }
+          }
+          userList = filteredUsers;
+        }
+      }
+
+      // 不返回密码字段
+      return userList.map((user) => ({
+        id: user.id,
+        openId: user.openId,
+        name: user.name,
+        nickname: user.nickname,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        roles: (user as any).roles || user.role || "user",
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        lastSignedIn: user.lastSignedIn,
+      }));
   }),
 
   // 获取单个用户详情

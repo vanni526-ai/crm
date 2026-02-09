@@ -148,9 +148,18 @@ export default function UserManagement() {
   const [editRoles, setEditRoles] = useState<string[]>([]);
   // 为每个角色维护独立的城市列表
   const [roleCitiesMap, setRoleCitiesMap] = useState<Record<string, string[]>>({});
+  
+  // 筛选器状态
+  const [filterCity, setFilterCity] = useState<string>("");
+  const [filterRole, setFilterRole] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>(""); // "all" | "active" | "inactive"
 
-  // 查询用户列表
-  const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery();
+  // 查询用户列表（带筛选参数）
+  const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery({
+    city: filterCity || undefined,
+    role: filterRole || undefined,
+    isActive: filterStatus === "active" ? true : filterStatus === "inactive" ? false : undefined,
+  });
   
   // 查询城市列表
   const { data: cities } = trpc.analytics.getAllCities.useQuery();
@@ -286,8 +295,9 @@ export default function UserManagement() {
           </Button>
         </div>
 
-        {/* 搜索栏 */}
-        <Card className="p-4">
+        {/* 搜索栏和筛选器 */}
+        <Card className="p-4 space-y-4">
+          {/* 搜索框 */}
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -298,6 +308,69 @@ export default function UserManagement() {
                 className="pl-10"
               />
             </div>
+          </div>
+
+          {/* 筛选器 */}
+          <div className="flex gap-3 items-center">
+            <span className="text-sm text-muted-foreground">筛选：</span>
+            
+            {/* 城市筛选 */}
+            <Select value={filterCity || "all"} onValueChange={(value) => setFilterCity(value === "all" ? "" : value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="所有城市" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">所有城市</SelectItem>
+                {cities?.map((city) => (
+                  <SelectItem key={city.id} value={city.name}>
+                    {city.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* 角色筛选 */}
+            <Select value={filterRole || "all"} onValueChange={(value) => setFilterRole(value === "all" ? "" : value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="所有角色" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">所有角色</SelectItem>
+                {ALL_ROLES.map((role) => (
+                  <SelectItem key={role.value} value={role.value}>
+                    {role.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* 状态筛选 */}
+            <Select value={filterStatus || "all"} onValueChange={(value) => setFilterStatus(value === "all" ? "" : value)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="所有状态" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">所有状态</SelectItem>
+                <SelectItem value="active">已启用</SelectItem>
+                <SelectItem value="inactive">已禁用</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* 重置筛选按钮 */}
+            {(filterCity || filterRole || filterStatus) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setFilterCity("");
+                  setFilterRole("");
+                  setFilterStatus("");
+                }}
+              >
+                <X className="w-4 h-4 mr-1" />
+                重置筛选
+              </Button>
+            )}
           </div>
         </Card>
 
