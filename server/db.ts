@@ -648,6 +648,8 @@ export async function getAllTeachers() {
   const results = await db.select({
     id: teachers.id,
     name: teachers.name,
+    nickname: teachers.nickname,
+    phone: teachers.phone,
     customerType: teachers.customerType,
     notes: teachers.notes,
     city: teachers.city,

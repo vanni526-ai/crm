@@ -540,6 +540,7 @@ export default function Teachers() {
     const term = searchTerm.toLowerCase();
     return (
       teacher.name?.toLowerCase().includes(term) ||
+      teacher.nickname?.toLowerCase().includes(term) ||
       teacher.phone?.toLowerCase().includes(term) ||
       teacher.customerType?.toLowerCase().includes(term) ||
       teacher.city?.toLowerCase().includes(term)
@@ -779,6 +780,7 @@ export default function Teachers() {
                       />
                     </TableHead>
                     <TableHead className="w-16">头像</TableHead>
+                    <TableHead>ID</TableHead>
                     <TableHead>
                       <Button 
                         variant="ghost" 
@@ -793,6 +795,7 @@ export default function Teachers() {
                         {sortField !== 'name' && <ArrowUpDown className="ml-1 w-3 h-3 opacity-30" />}
                       </Button>
                     </TableHead>
+                    <TableHead>昵称</TableHead>
                     <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>激活</TableHead>
@@ -863,7 +866,9 @@ export default function Teachers() {
                           <AvatarFallback>{teacher.name?.[0] || '?'}</AvatarFallback>
                         </Avatar>
                       </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">{teacher.id}</TableCell>
                       <TableCell className="font-medium">{teacher.name}</TableCell>
+                      <TableCell className="text-muted-foreground">{teacher.nickname || '-'}</TableCell>
                       <TableCell>{teacher.phone || '-'}</TableCell>
                       <TableCell>
                         <Badge variant={teacher.status === '活跃' ? 'default' : 'secondary'}>
