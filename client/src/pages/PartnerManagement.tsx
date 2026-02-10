@@ -452,7 +452,8 @@ export default function PartnerManagement() {
     },
   });
   const filteredPartnerStats = partnerStats?.filter((stat) =>
-    stat.partnerName.toLowerCase().includes(searchTerm.toLowerCase())
+    stat.partnerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    stat.cities.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
@@ -524,7 +525,7 @@ export default function PartnerManagement() {
             <div className="flex items-center gap-2">
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="搜索合伙人姓名..."
+                placeholder="搜索合伙人姓名或城市名称..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="max-w-sm"

@@ -77,12 +77,18 @@ export default function Users() {
       sales: "default",
       finance: "secondary",
       user: "outline",
+      cityPartner: "default",
+      teacher: "secondary",
+      customer: "outline",
     };
     const labels: Record<string, string> = {
       admin: "管理员",
       sales: "销售",
       finance: "财务",
       user: "普通用户",
+      cityPartner: "城市合伙人",
+      teacher: "老师",
+      customer: "客户",
     };
     return <Badge variant={variants[role] || "outline"}>{labels[role] || role}</Badge>;
   };
@@ -152,6 +158,9 @@ export default function Users() {
                     <SelectItem value="admin">管理员</SelectItem>
                     <SelectItem value="sales">销售</SelectItem>
                     <SelectItem value="finance">财务</SelectItem>
+                    <SelectItem value="cityPartner">城市合伙人</SelectItem>
+                    <SelectItem value="teacher">老师</SelectItem>
+                    <SelectItem value="customer">客户</SelectItem>
                     <SelectItem value="user">普通用户</SelectItem>
                   </SelectContent>
                 </Select>
@@ -285,6 +294,9 @@ export default function Users() {
                       <SelectItem value="admin">管理员</SelectItem>
                       <SelectItem value="sales">销售</SelectItem>
                       <SelectItem value="finance">财务</SelectItem>
+                      <SelectItem value="cityPartner">城市合伙人</SelectItem>
+                      <SelectItem value="teacher">老师</SelectItem>
+                      <SelectItem value="customer">客户</SelectItem>
                       <SelectItem value="user">普通用户</SelectItem>
                     </SelectContent>
                   </Select>
@@ -294,6 +306,12 @@ export default function Users() {
                     <strong>销售:</strong> 可登记订单、查看客户信息
                     <br />
                     <strong>财务:</strong> 可查看财务对账、管理老师费用
+                    <br />
+                    <strong>城市合伙人:</strong> 可查看所管理城市的订单统计和分红明细
+                    <br />
+                    <strong>老师:</strong> 可查看自己的课程安排和课时费
+                    <br />
+                    <strong>客户:</strong> 可查看自己的订单和课程信息
                     <br />
                     <strong>普通用户:</strong> 只能查看基本信息
                   </p>

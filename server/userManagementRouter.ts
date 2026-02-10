@@ -416,6 +416,8 @@ export const userManagementRouter = router({
       const oldRoles = usersBefore?.roles || '';
       const hadTeacherRole = oldRoles.includes('teacher');
       const hasTeacherRole = input.roles.includes('teacher');
+      const hadCityPartnerRole = oldRoles.includes('cityPartner');
+      const hasCityPartnerRole = input.roles.includes('cityPartner');
 
       const primaryRole = input.roles.split(",")[0].trim();
 
@@ -450,6 +452,12 @@ export const userManagementRouter = router({
             isActive: true,
           } as any);
         }
+      }
+
+      // 处理城市合伙人角色变更
+      if (hadCityPartnerRole && !hasCityPartnerRole) {
+        // 移除城市合伙人角色：从 partners 表删除记录
+        await drizzle.execute(`DELETE FROM partners WHERE userId = ${input.id}`);
       }
 
       return {
