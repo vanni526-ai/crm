@@ -176,6 +176,13 @@
       "when": 1770704186620,
       "tag": "0024_silky_iron_fist",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1770705490962,
+      "tag": "0025_curved_hammerhead",
+      "breakpoints": true
     }
   ]
 }

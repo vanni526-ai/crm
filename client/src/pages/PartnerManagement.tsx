@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,355 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, Search } from "lucide-react";
+
+// 费用明细Tab组件
+function ExpenseManagementTab({ partnerId }: { partnerId: number }) {
+  const utils = trpc.useUtils();
+  const [addExpenseOpen, setAddExpenseOpen] = useState(false);
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
+  
+  // 查询所有城市
+  const { data: allCities } = trpc.city.getAll.useQuery();
+  
+  // 查询费用明细列表
+  const { data: expenses, isLoading } = trpc.partnerManagement.getExpenses.useQuery(
+    { partnerId },
+    { enabled: !!partnerId }
+  );
+  
+  // 创建/更新费用明细
+  const upsertExpenseMutation = trpc.partnerManagement.upsertExpense.useMutation({
+    onSuccess: () => {
+      toast.success("保存成功");
+      setAddExpenseOpen(false);
+      utils.partnerManagement.getExpenses.invalidate({ partnerId });
+      setSelectedCityId(null);
+      setSelectedMonth("");
+    },
+    onError: (error) => {
+      toast.error(`保存失败: ${error.message}`);
+    },
+  });
+  
+  const handleSubmitExpense = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    
+    if (!selectedCityId || !selectedMonth) {
+      toast.error("请选择城市和月份");
+      return;
+    }
+    
+    upsertExpenseMutation.mutate({
+      partnerId,
+      cityId: selectedCityId,
+      month: selectedMonth,
+      rentFee: formData.get("rentFee") as string || "0",
+      propertyFee: formData.get("propertyFee") as string || "0",
+      utilityFee: formData.get("utilityFee") as string || "0",
+      consumablesFee: formData.get("consumablesFee") as string || "0",
+      teacherFee: formData.get("teacherFee") as string || "0",
+      transportFee: formData.get("transportFee") as string || "0",
+      otherFee: formData.get("otherFee") as string || "0",
+      deferredPayment: formData.get("deferredPayment") as string || "0",
+      notes: formData.get("notes") as string || "",
+    });
+  };
+  
+  // 按月份分组费用明细
+  const expensesByMonth = expenses?.reduce((acc: any, expense: any) => {
+    const monthKey = new Date(expense.month).toISOString().slice(0, 7);
+    if (!acc[monthKey]) {
+      acc[monthKey] = [];
+    }
+    acc[monthKey].push(expense);
+    return acc;
+  }, {});
+  
+  if (isLoading) {
+    return <div className="p-4 text-center text-muted-foreground">加载中...</div>;
+  }
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">费用明细管理</h3>
+        <Dialog open={addExpenseOpen} onOpenChange={setAddExpenseOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              添加费用记录
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>添加月度费用</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSubmitExpense} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>城市 *</Label>
+                  <Select value={selectedCityId?.toString() || ""} onValueChange={(v) => setSelectedCityId(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="选择城市" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allCities?.map((city: any) => (
+                        <SelectItem key={city.id} value={city.id.toString()}>
+                          {city.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>月份 *</Label>
+                  <Input
+                    type="month"
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="rentFee">房租</Label>
+                  <Input id="rentFee" name="rentFee" type="number" step="0.01" defaultValue="0" />
+                </div>
+                <div>
+                  <Label htmlFor="propertyFee">物业</Label>
+                  <Input id="propertyFee" name="propertyFee" type="number" step="0.01" defaultValue="0" />
+                </div>
+                <div>
+                  <Label htmlFor="utilityFee">水电</Label>
+                  <Input id="utilityFee" name="utilityFee" type="number" step="0.01" defaultValue="0" />
+                </div>
+                <div>
+                  <Label htmlFor="consumablesFee">耗材</Label>
+                  <Input id="consumablesFee" name="consumablesFee" type="number" step="0.01" defaultValue="0" />
+                </div>
+                <div>
+                  <Label htmlFor="teacherFee">老师费用</Label>
+                  <Input id="teacherFee" name="teacherFee" type="number" step="0.01" defaultValue="0" />
+                </div>
+                <div>
+                  <Label htmlFor="transportFee">车费</Label>
+                  <Input id="transportFee" name="transportFee" type="number" step="0.01" defaultValue="0" />
+                </div>
+                <div>
+                  <Label htmlFor="otherFee">其他费用</Label>
+                  <Input id="otherFee" name="otherFee" type="number" step="0.01" defaultValue="0" />
+                </div>
+                <div>
+                  <Label htmlFor="deferredPayment">合同后付款</Label>
+                  <Input id="deferredPayment" name="deferredPayment" type="number" step="0.01" defaultValue="0" />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="notes">备注</Label>
+                <Textarea id="notes" name="notes" rows={2} />
+              </div>
+              
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setAddExpenseOpen(false)}>
+                  取消
+                </Button>
+                <Button type="submit" disabled={upsertExpenseMutation.isPending}>
+                  {upsertExpenseMutation.isPending ? "保存中..." : "保存"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      {/* 费用明细列表 */}
+      {expensesByMonth && Object.keys(expensesByMonth).length > 0 ? (
+        <div className="space-y-6">
+          {Object.keys(expensesByMonth)
+            .sort()
+            .reverse()
+            .map((monthKey) => (
+              <div key={monthKey}>
+                <h4 className="text-md font-semibold mb-3">{monthKey}</h4>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>城市</TableHead>
+                      <TableHead className="text-right">房租</TableHead>
+                      <TableHead className="text-right">物业</TableHead>
+                      <TableHead className="text-right">水电</TableHead>
+                      <TableHead className="text-right">耗材</TableHead>
+                      <TableHead className="text-right">老师费用</TableHead>
+                      <TableHead className="text-right">车费</TableHead>
+                      <TableHead className="text-right">其他</TableHead>
+                      <TableHead className="text-right">后付款</TableHead>
+                      <TableHead className="text-right">总费用</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {expensesByMonth[monthKey].map((expense: any) => {
+                      const totalFee = 
+                        parseFloat(expense.rentFee || "0") +
+                        parseFloat(expense.propertyFee || "0") +
+                        parseFloat(expense.utilityFee || "0") +
+                        parseFloat(expense.consumablesFee || "0") +
+                        parseFloat(expense.teacherFee || "0") +
+                        parseFloat(expense.transportFee || "0") +
+                        parseFloat(expense.otherFee || "0") +
+                        parseFloat(expense.deferredPayment || "0");
+                      
+                      return (
+                        <TableRow key={expense.id}>
+                          <TableCell className="font-medium">{expense.cityId}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.rentFee || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.propertyFee || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.utilityFee || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.consumablesFee || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.teacherFee || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.transportFee || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.otherFee || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right">￥{parseFloat(expense.deferredPayment || "0").toFixed(2)}</TableCell>
+                          <TableCell className="text-right font-semibold">￥{totalFee.toFixed(2)}</TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">暂无费用记录</p>
+      )}
+    </div>
+  );
+}
+
+// 城市管理Tab组件
+function CityManagementTab({ partnerId }: { partnerId: number }) {
+  const utils = trpc.useUtils();
+  const [selectedCityIds, setSelectedCityIds] = useState<number[]>([]);
+  
+  // 查询所有城市
+  const { data: allCities } = trpc.city.getAll.useQuery();
+  
+  // 查询合伙人已分配的城市
+  const { data: partnerCities, isLoading: citiesLoading } = trpc.partnerManagement.getPartnerCities.useQuery(
+    { partnerId },
+    { enabled: !!partnerId }
+  );
+  
+  // 查询城市订单统计
+  const { data: cityStats, isLoading: statsLoading } = trpc.partnerManagement.getCityOrderStats.useQuery(
+    { partnerId },
+    { enabled: !!partnerId }
+  );
+  
+  // 分配城市
+  const assignCitiesMutation = trpc.partnerManagement.assignCities.useMutation({
+    onSuccess: () => {
+      toast.success("城市分配成功");
+      utils.partnerManagement.getPartnerCities.invalidate({ partnerId });
+      utils.partnerManagement.getCityOrderStats.invalidate({ partnerId });
+      setSelectedCityIds([]);
+    },
+    onError: (error) => {
+      toast.error(`分配失败: ${error.message}`);
+    },
+  });
+  
+  // 初始化已选中的城市
+  useEffect(() => {
+    if (partnerCities && partnerCities.length > 0) {
+      setSelectedCityIds(partnerCities.map(pc => pc.cityId!));
+    }
+  }, [partnerCities]);
+  
+  const handleCityToggle = (cityId: number) => {
+    setSelectedCityIds(prev => 
+      prev.includes(cityId) 
+        ? prev.filter(id => id !== cityId)
+        : [...prev, cityId]
+    );
+  };
+  
+  const handleSaveCities = () => {
+    assignCitiesMutation.mutate({
+      partnerId,
+      cityIds: selectedCityIds,
+    });
+  };
+  
+  if (citiesLoading || statsLoading) {
+    return <div className="p-4 text-center text-muted-foreground">加载中...</div>;
+  }
+  
+  return (
+    <div className="space-y-6">
+      {/* 城市选择 */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">分配城市</h3>
+        <div className="grid grid-cols-4 gap-3 mb-4">
+          {allCities?.map((city: any) => (
+            <label
+              key={city.id}
+              className="flex items-center space-x-2 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+            >
+              <input
+                type="checkbox"
+                checked={selectedCityIds.includes(city.id)}
+                onChange={() => handleCityToggle(city.id)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">{city.name}</span>
+            </label>
+          ))}
+        </div>
+        <Button onClick={handleSaveCities} disabled={assignCitiesMutation.isPending}>
+          {assignCitiesMutation.isPending ? "保存中..." : "保存城市分配"}
+        </Button>
+      </div>
+      
+      {/* 城市订单统计 */}
+      <div>
+        <h3 className="text-lg font-semibold mb-3">城市订单统计</h3>
+        {cityStats && cityStats.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>城市</TableHead>
+                <TableHead className="text-right">订单数</TableHead>
+                <TableHead className="text-right">课程金额</TableHead>
+                <TableHead className="text-right">老师费用</TableHead>
+                <TableHead className="text-right">车费</TableHead>
+                <TableHead className="text-right">合伙人费</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {cityStats.map((stat) => (
+                <TableRow key={stat.cityId}>
+                  <TableCell className="font-medium">{stat.cityName}</TableCell>
+                  <TableCell className="text-right">{stat.orderCount}</TableCell>
+                  <TableCell className="text-right">￥{parseFloat(stat.totalAmount).toFixed(2)}</TableCell>
+                  <TableCell className="text-right">￥{parseFloat(stat.totalTeacherFee).toFixed(2)}</TableCell>
+                  <TableCell className="text-right">￥{parseFloat(stat.totalTransportFee).toFixed(2)}</TableCell>
+                  <TableCell className="text-right">￥{parseFloat(stat.totalPartnerFee).toFixed(2)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <p className="text-sm text-muted-foreground">暂无订单数据</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function PartnerManagement() {
 
@@ -433,9 +782,7 @@ export default function PartnerManagement() {
               </TabsContent>
 
               <TabsContent value="cities">
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">城市管理功能开发中...</p>
-                </div>
+                <CityManagementTab partnerId={selectedPartnerId!} />
               </TabsContent>
 
               <TabsContent value="orders">
@@ -445,9 +792,7 @@ export default function PartnerManagement() {
               </TabsContent>
 
               <TabsContent value="expenses">
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">费用明细功能开发中...</p>
-                </div>
+                <ExpenseManagementTab partnerId={selectedPartnerId!} />
               </TabsContent>
 
               <TabsContent value="account">

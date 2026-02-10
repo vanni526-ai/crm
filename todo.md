@@ -2025,3 +2025,43 @@
 - [ ] 在DashboardLayout中添加导航入口
 - [ ] 测试验证功能
 - [ ] 创建检查点
+
+### 新增任务：完善合伙人管理模块的城市管理Tab和费用明细Tab
+
+#### 城市管理Tab
+- [ ] 后端API：实现为合伙人分配城市的功能（assignCities）
+- [ ] 后端API：查询合伙人关联的城市列表（getPartnerCities）
+- [ ] 后端API：查询每个城市的订单统计数据（getCityOrderStats）
+- [ ] 前端UI：实现城市分配界面（多选城市）
+- [ ] 前端UI：显示已分配城市列表
+- [ ] 前端UI：显示每个城市的订单统计（订单数、课程金额、利润等）
+
+#### 费用明细Tab
+- [ ] 后端API：创建费用记录（createExpense）
+- [ ] 后端API：查询费用记录列表（listExpenses）
+- [ ] 后端API：更新费用记录（updateExpense）
+- [ ] 后端API：删除费用记录（deleteExpense）
+- [ ] 前端UI：实现月度费用录入表单（8个类别：房租、物业、水电、耗材、老师费用、车费、其他费用、延期支付）
+- [ ] 前端UI：显示历史费用记录列表
+- [ ] 前端UI：支持编辑和删除费用记录
+
+#### 测试和交付
+- [ ] 编写城市管理功能的单元测试
+- [ ] 编写费用明细功能的单元测试
+- [ ] 浏览器端到端测试
+- [ ] 保存检查点
+
+### 136. 完善合伙人管理模块的城市管理Tab和费用明细Tab功能
+- [x] 后端API:扩展partnerManagementRouter支持城市管理功能
+  - [x] assignCities: 为合伙人分配城市
+  - [x] getPartnerCities: 查询合伙人关联的城市列表
+  - [x] getCityOrderStats: 查询每个城市的订单统计数据
+- [x] 后端API:扩展partnerManagementRouter支持费用明细功能
+  - [x] upsertExpense: 创建/更新月度费用记录
+  - [x] getExpenses: 查询合伙人的费用明细列表
+- [x] 前端:实现城市管理Tab
+  - [x] 城市选择和分配功能
+  - [x] 城市订单统计表格展示
+- [x] 前端:实现费用明细Tab
+  - [x] 添加月度费用记录表单(8个类别)
+  - [x] 按月份分组展示费用明细

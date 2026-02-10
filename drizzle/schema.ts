@@ -698,6 +698,26 @@ export type PartnerProfitRecord = typeof partnerProfitRecords.$inferSelect;
 export type InsertPartnerProfitRecord = typeof partnerProfitRecords.$inferInsert;
 
 /**
+ * 合伙人-城市关联表
+ */
+export const partnerCities = mysqlTable("partner_cities", {
+  id: int("id").autoincrement().primaryKey(),
+  partnerId: int("partnerId").notNull(), // 关联partners表
+  cityId: int("cityId").notNull(), // 关联cities表
+  
+  createdBy: int("createdBy").notNull(), // 创建人
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  partnerIdx: index("partner_city_partner_idx").on(table.partnerId),
+  cityIdx: index("partner_city_city_idx").on(table.cityId),
+  uniquePartnerCity: index("unique_partner_city").on(table.partnerId, table.cityId),
+}));
+
+export type PartnerCity = typeof partnerCities.$inferSelect;
+export type InsertPartnerCity = typeof partnerCities.$inferInsert;
+
+/**
  * 审计日志表 - 记录重要操作的历史记录
  */
 export const auditLogs = mysqlTable("auditLogs", {

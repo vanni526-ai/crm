@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { partners, partnerExpenses, partnerProfitRecords } from "../drizzle/schema";
+import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -342,9 +342,64 @@ export const partnerManagementRouter = router({
     }),
 
   /**
+   * 为合伙人分配城市
+   */
+  assignCities: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityIds: z.array(z.number()),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      // 先删除现有的城市关联
+      await db.delete(partnerCities).where(eq(partnerCities.partnerId, input.partnerId));
+      
+      // 添加新的城市关联
+      if (input.cityIds.length > 0) {
+        await db.insert(partnerCities).values(
+          input.cityIds.map((cityId) => ({
+            partnerId: input.partnerId,
+            cityId,
+            createdBy: ctx.user.id,
+          }))
+        );
+      }
+      
+      return { success: true };
+    }),
+
+  /**
+   * 获取合伙人关联的城市列表
+   */
+  getPartnerCities: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      const result = await db
+        .select({
+          id: partnerCities.id,
+          partnerId: partnerCities.partnerId,
+          cityId: partnerCities.cityId,
+          cityName: cities.name,
+          createdAt: partnerCities.createdAt,
+        })
+        .from(partnerCities)
+        .leftJoin(cities, eq(partnerCities.cityId, cities.id))
+        .where(eq(partnerCities.partnerId, input.partnerId));
+      
+      return result;
+    }),
+
+  /**
    * 获取合伙人的订单统计（按城市）
    */
-  getOrderStats: protectedProcedure
+  getCityOrderStats: protectedProcedure
     .input(z.object({
       partnerId: z.number(),
       startDate: z.string().optional(),
@@ -354,10 +409,55 @@ export const partnerManagementRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
-      // TODO: 实现订单统计逻辑
-      // 需要关联orders表，根据deliveryCity和日期范围统计
-      // 返回格式: { cityName: string, orderCount: number, totalAmount: number }[]
+      // 获取合伙人关联的城市
+      const partnerCitiesList = await db
+        .select({ cityId: partnerCities.cityId, cityName: cities.name })
+        .from(partnerCities)
+        .leftJoin(cities, eq(partnerCities.cityId, cities.id))
+        .where(eq(partnerCities.partnerId, input.partnerId));
       
-      return [];
+      if (partnerCitiesList.length === 0) {
+        return [];
+      }
+      
+      // 统计每个城市的订单数据
+      const stats = [];
+      for (const city of partnerCitiesList) {
+        // 根据城市名称匹配订单
+        const conditions = [sql`${orders.deliveryCity} = ${city.cityName}`];
+        
+        if (input.startDate) {
+          conditions.push(sql`${orders.classDate} >= ${input.startDate}`);
+        }
+        
+        if (input.endDate) {
+          conditions.push(sql`${orders.classDate} <= ${input.endDate}`);
+        }
+        
+        const result = await db
+          .select({
+            orderCount: sql<number>`COUNT(*)`,
+            totalAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`,
+            totalTeacherFee: sql<string>`COALESCE(SUM(${orders.teacherFee}), 0)`,
+            totalTransportFee: sql<string>`COALESCE(SUM(${orders.transportFee}), 0)`,
+            totalPartnerFee: sql<string>`COALESCE(SUM(${orders.partnerFee}), 0)`,
+          })
+          .from(orders)
+          .where(and(...conditions));
+        
+        if (result[0]) {
+          stats.push({
+            cityId: city.cityId,
+            cityName: city.cityName,
+            orderCount: Number(result[0].orderCount),
+            totalAmount: result[0].totalAmount,
+            totalTeacherFee: result[0].totalTeacherFee,
+            totalTransportFee: result[0].totalTransportFee,
+            totalPartnerFee: result[0].totalPartnerFee,
+          });
+        }
+      }
+      
+      return stats;
     }),
 });

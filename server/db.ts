@@ -43,6 +43,9 @@ import {
   userRoleCities,
   InsertUserRoleCity,
   UserRoleCity,
+  partnerCities,
+  partnerExpenses,
+  partners,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 import { formatDateBeijing, BEIJING_TIMEZONE } from "../shared/timezone";
@@ -4537,4 +4540,202 @@ export async function listMyNotifications(userId: number, params: { page?: numbe
     page,
     pageSize,
   };
+}
+
+// ==================== 合伙人城市管理 ====================
+
+/** 为合伙人分配城市 */
+export async function assignPartnerCities(partnerId: number, cityIds: number[], createdBy: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 删除现有的城市分配
+  await db.delete(partnerCities).where(eq(partnerCities.partnerId, partnerId));
+  
+  // 插入新的城市分配
+  if (cityIds.length > 0) {
+    await db.insert(partnerCities).values(
+      cityIds.map(cityId => ({
+        partnerId,
+        cityId,
+        createdBy,
+      }))
+    );
+  }
+  
+  return true;
+}
+
+/** 查询合伙人关联的城市列表 */
+export async function getPartnerCities(partnerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const result = await db
+    .select({
+      id: partnerCities.id,
+      partnerId: partnerCities.partnerId,
+      cityId: partnerCities.cityId,
+      cityName: cities.name,
+      createdAt: partnerCities.createdAt,
+    })
+    .from(partnerCities)
+    .leftJoin(cities, eq(partnerCities.cityId, cities.id))
+    .where(eq(partnerCities.partnerId, partnerId));
+  
+  return result;
+}
+
+/** 查询合伙人的城市订单统计 */
+export async function getPartnerCityOrderStats(partnerId: number, options?: {
+  startDate?: string;
+  endDate?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 获取合伙人关联的城市
+  const partnerCitiesList = await getPartnerCities(partnerId);
+  if (partnerCitiesList.length === 0) {
+    return [];
+  }
+  
+  const stats = [];
+  for (const city of partnerCitiesList) {
+    const conditions = [sql`${orders.deliveryCity} = ${city.cityName}`];
+    
+    if (options?.startDate) {
+      conditions.push(sql`${orders.classDate} >= ${options.startDate}`);
+    }
+    if (options?.endDate) {
+      conditions.push(sql`${orders.classDate} <= ${options.endDate}`);
+    }
+    
+    const result = await db
+      .select({
+        orderCount: sql<number>`COUNT(*)`,
+        totalAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`,
+        totalTeacherFee: sql<string>`COALESCE(SUM(${orders.teacherFee}), 0)`,
+        totalTransportFee: sql<string>`COALESCE(SUM(${orders.transportFee}), 0)`,
+        totalPartnerFee: sql<string>`COALESCE(SUM(${orders.partnerFee}), 0)`,
+      })
+      .from(orders)
+      .where(and(...conditions));
+    
+    stats.push({
+      cityId: city.cityId,
+      cityName: city.cityName,
+      orderCount: result[0]?.orderCount || 0,
+      totalAmount: result[0]?.totalAmount || "0",
+      totalTeacherFee: result[0]?.totalTeacherFee || "0",
+      totalTransportFee: result[0]?.totalTransportFee || "0",
+      totalPartnerFee: result[0]?.totalPartnerFee || "0",
+    });
+  }
+  
+  return stats;
+}
+
+// ==================== 合伙人费用明细管理 ====================
+
+/** 创建/更新合伙人费用明细 */
+export async function upsertPartnerExpense(data: {
+  partnerId: number;
+  cityId: number;
+  month: string;
+  rentFee: string;
+  propertyFee: string;
+  utilityFee: string;
+  consumablesFee: string;
+  teacherFee: string;
+  transportFee: string;
+  otherFee: string;
+  deferredPayment: string;
+  notes?: string;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 检查是否已存在该月份的费用记录
+  const existing = await db
+    .select()
+    .from(partnerExpenses)
+    .where(
+      and(
+        eq(partnerExpenses.partnerId, data.partnerId),
+        eq(partnerExpenses.cityId, data.cityId),
+        sql`DATE_FORMAT(${partnerExpenses.month}, '%Y-%m') = ${data.month.slice(0, 7)}`
+      )
+    )
+    .limit(1);
+  
+  if (existing.length > 0) {
+    // 更新现有记录
+    await db
+      .update(partnerExpenses)
+      .set({
+        rentFee: data.rentFee,
+        propertyFee: data.propertyFee,
+        utilityFee: data.utilityFee,
+        consumablesFee: data.consumablesFee,
+        teacherFee: data.teacherFee,
+        transportFee: data.transportFee,
+        otherFee: data.otherFee,
+        deferredPayment: data.deferredPayment,
+        notes: data.notes,
+        updatedAt: new Date(),
+      })
+      .where(eq(partnerExpenses.id, existing[0].id));
+    
+    return existing[0];
+  } else {
+    // 创建新记录
+    await db
+      .insert(partnerExpenses)
+      .values({
+        partnerId: data.partnerId,
+        cityId: data.cityId,
+        month: new Date(data.month.slice(0, 7) + "-01"),
+        rentFee: data.rentFee,
+        propertyFee: data.propertyFee,
+        utilityFee: data.utilityFee,
+        consumablesFee: data.consumablesFee,
+        teacherFee: data.teacherFee,
+        transportFee: data.transportFee,
+        otherFee: data.otherFee,
+        deferredPayment: data.deferredPayment,
+        notes: data.notes,
+        createdBy: data.createdBy,
+      });
+    
+    // 查询刚创建的记录(按ID降序获取最新的)
+    const created = await db
+      .select()
+      .from(partnerExpenses)
+      .where(
+        and(
+          eq(partnerExpenses.partnerId, data.partnerId),
+          eq(partnerExpenses.cityId, data.cityId)
+        )
+      )
+      .orderBy(desc(partnerExpenses.id))
+      .limit(1);
+    
+    return created.length > 0 ? created[0] : { id: 0 };
+  }
+}
+
+/** 查询合伙人的费用明细列表 */
+export async function getPartnerExpenses(partnerId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const result = await db
+    .select()
+    .from(partnerExpenses)
+    .where(eq(partnerExpenses.partnerId, partnerId))
+    .orderBy(desc(partnerExpenses.month));
+  
+  return result;
 }
