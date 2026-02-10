@@ -2264,7 +2264,7 @@ export default function Orders() {
                   📊 此操作将根据城市管理中配置的合伙人费比例，重新计算{selectedOrderIds.length > 0 ? `选中的 ${selectedOrderIds.length} 个订单` : '所有订单'}的合伙人费用。
                 </p>
                 <p className="text-sm text-blue-900">
-                  计算公式：<strong>合伙人费 = (课程金额 - 老师费用) × 合伙人费比例</strong>
+                  计算公式：<strong>合伙人费 = (课程金额 - 老师费用 - 车费) × 合伙人费比例</strong>
                 </p>
               </div>
               <div className="bg-amber-50 p-3 rounded-md border border-amber-200">
