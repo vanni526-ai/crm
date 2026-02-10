@@ -295,10 +295,14 @@ export default function UserManagementContent() {
       const roleCitiesData = await trpcUtils.userManagement.getRoleCities.fetch({ userId: user.id });
       const roleCitiesMap: Record<string, string[]> = {};
       roleCitiesData.forEach((rc: any) => {
-        if (!roleCitiesMap[rc.role]) {
+        try {
+          // cities字段是JSON字符串，需要解析为数组
+          const citiesArray = JSON.parse(rc.cities || '[]');
+          roleCitiesMap[rc.role] = citiesArray;
+        } catch (e) {
+          console.error('Failed to parse cities for role:', rc.role, e);
           roleCitiesMap[rc.role] = [];
         }
-        roleCitiesMap[rc.role].push(rc.cityName);
       });
       
       setEditTeacherCities(roleCitiesMap['teacher'] || []);

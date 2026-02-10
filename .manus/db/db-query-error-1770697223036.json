@@ -1,0 +1,8 @@
+{
+  "query": "SELECT urc.user_id, urc.role, urc.city_id, c.name as city_name \nFROM user_role_cities urc \nLEFT JOIN cities c ON urc.city_id = c.id \nWHERE urc.user_id = 13860029 \nORDER BY urc.role, c.name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT urc.user_id, urc.role, urc.city_id, c.name as city_name \nFROM user_role_cities urc \nLEFT JOIN cities c ON urc.city_id = c.id \nWHERE urc.user_id = 13860029 \nORDER BY urc.role, c.name;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'urc.city_id' in 'on clause'"
+  ]
+}

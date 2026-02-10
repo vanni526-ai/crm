@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name, nickname, email, phone, roles FROM users WHERE email = 'test@example.com' OR nickname LIKE '%test测试用户526%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, email, phone, roles FROM users WHERE email = 'test@example.com' OR nickname LIKE '%test测试用户526%';",
+  "rows": [
+    {
+      "id": "13860029",
+      "name": "test",
+      "nickname": "test测试用户526",
+      "email": "test@example.com",
+      "phone": "13800138013",
+      "roles": "teacher,cityPartner"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\temail\tphone\troles\n13860029\ttest\ttest测试用户526\ttest@example.com\t13800138013\tteacher,cityPartner\n",
+  "stderr": "",
+  "execution_time_ms": 1477
+}
