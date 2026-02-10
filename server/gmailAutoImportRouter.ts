@@ -283,7 +283,8 @@ export const gmailAutoImportRouter = router({
             const partnerFee = await calculatePartnerFee(
               orderData.city || "",
               orderData.courseAmount || 0,
-              orderData.teacherFee || 0
+              orderData.teacherFee || 0,
+              orderData.carFee || 0
             );
             
             // 验证渠道订单号
@@ -447,7 +448,8 @@ export const gmailAutoImportRouter = router({
             const partnerFee = await calculatePartnerFee(
               orderData.city || "",
               orderData.courseAmount || 0,
-              orderData.teacherFee || 0
+              orderData.teacherFee || 0,
+              orderData.carFee || 0
             );
             
             // 验证渠道订单号格式并识别支付渠道

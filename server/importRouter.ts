@@ -414,7 +414,8 @@ export const importRouter = router({
             const partnerFee = await db.calculatePartnerFee(
               order.city || "",
               order.courseAmount,
-              order.teacherFee
+              order.teacherFee,
+              order.carFee
             );
 
             // 生成订单号

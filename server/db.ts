@@ -3080,20 +3080,22 @@ export async function deleteCityConfig(id: number) {
  * @param city 城市名称
  * @param courseAmount 课程金额
  * @param teacherFee 老师费用
+ * @param transportFee 车费（可选，默认为0）
  * @returns 合伙人费金额
  */
 export async function calculatePartnerFee(
   city: string | null,
   courseAmount: number,
-  teacherFee: number
-): Promise<number> {
+  teacherFee: number,
+  transportFee: number = 0
+) {
   if (!city) return 0;
   
   const config = await getCityPartnerConfigByCity(city);
   if (!config) return 0;
   
   const rate = Number(config.partnerFeeRate) / 100;
-  const baseRevenue = courseAmount - teacherFee;
+  const baseRevenue = courseAmount - teacherFee - transportFee;
   
   // 如果基础收益<=0，返回0（合伙人不承担亏损）
   if (baseRevenue <= 0) return 0;

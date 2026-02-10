@@ -1990,4 +1990,14 @@
 - [x] 定位城市标签显示不全的原因（cities字段JSON解析错误）
 - [x] 修复城市标签渲染问题，确保所有关联城市都能正确显示
 - [x] 测试验证：编辑test用户，确认老师角色显示3个城市标签，合伙人角色显示2个城市标签
+- [x] 创建检查点
+
+### 139. 更新合伙人费用计算公式
+- [x] 查找当前系统中合伙人费用的计算逻辑位置（db.ts - calculatePartnerFee）
+- [x] 更新计算公式：合伙人费 = (课程金额 - 老师费用 - 车费) × 合伙人费比例
+- [x] 更新db.ts中calculatePartnerFee函数，添加transportFee参数
+- [x] 更新gmailAutoImportRouter.ts中的calculatePartnerFee调用
+- [x] 更新importRouter.ts中的calculatePartnerFee调用
+- [x] 更新所有测试文件，添加车费参数的测试用例
+- [x] 运行测试验证新公式是否正确（36个测试全部通过）
 - [ ] 创建检查点
