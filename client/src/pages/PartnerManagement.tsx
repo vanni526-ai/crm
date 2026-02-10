@@ -11,7 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Search } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, Calendar } from "lucide-react";
+import DashboardLayout from "@/components/DashboardLayout";
 
 // 费用明细Tab组件
 function ExpenseManagementTab({ partnerId }: { partnerId: number }) {
@@ -370,9 +371,41 @@ export default function PartnerManagement() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  
+  // 时间筛选器状态
+  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
+  
+  // 计算时间范围
+  const getDateRange = () => {
+    const now = new Date();
+    let startDate = "";
+    let endDate = "";
+    
+    if (dateFilter === "thisMonth") {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
+    } else if (dateFilter === "thisYear") {
+      startDate = new Date(now.getFullYear(), 0, 1).toISOString().split("T")[0];
+      endDate = new Date(now.getFullYear(), 11, 31).toISOString().split("T")[0];
+    } else if (dateFilter === "custom") {
+      startDate = customStartDate;
+      endDate = customEndDate;
+    }
+    
+    return { startDate, endDate };
+  };
+  
+  const { startDate, endDate } = getDateRange();
 
-  // 查询所有合伙人
-  const { data: partners, isLoading } = trpc.partnerManagement.list.useQuery();
+  // 查询合伙人统计数据
+  const { data: partnerStats, isLoading } = trpc.partnerManagement.getPartnerStats.useQuery(
+    startDate || endDate ? { startDate, endDate } : undefined
+  );
+  
+  // 查询所有合伙人(用于创建/编辑)
+  const { data: partners } = trpc.partnerManagement.list.useQuery();
 
   // 查询单个合伙人详情
   const { data: partnerDetail } = trpc.partnerManagement.getById.useQuery(
@@ -418,10 +451,8 @@ export default function PartnerManagement() {
       toast.error(`删除失败: ${error.message}`);
     },
   });
-
-  // 筛选合伙人
-  const filteredPartners = partners?.filter((p) =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPartnerStats = partnerStats?.filter((stat) =>
+    stat.partnerName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
@@ -480,6 +511,7 @@ export default function PartnerManagement() {
   }
 
   return (
+    <DashboardLayout>
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">合伙人管理</h1>
@@ -566,17 +598,54 @@ export default function PartnerManagement() {
         </Dialog>
       </div>
 
-      {/* 搜索栏 */}
+      {/* 搜索栏和筛选器 */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex items-center gap-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="搜索合伙人姓名..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="搜索合伙人姓名..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Select value={dateFilter} onValueChange={setDateFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="选择时间范围" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部时间</SelectItem>
+                  <SelectItem value="thisMonth">本月</SelectItem>
+                  <SelectItem value="thisYear">今年</SelectItem>
+                  <SelectItem value="custom">自定义</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {dateFilter === "custom" && (
+              <>
+                <Input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="w-[150px]"
+                  placeholder="开始日期"
+                />
+                <span className="text-muted-foreground">至</span>
+                <Input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="w-[150px]"
+                  placeholder="结束日期"
+                />
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -591,38 +660,42 @@ export default function PartnerManagement() {
             <TableHeader>
               <TableRow>
                 <TableHead>姓名</TableHead>
-                <TableHead>利润分成比例</TableHead>
-                <TableHead>品牌使用费</TableHead>
-                <TableHead>技术服务费</TableHead>
-                <TableHead>合同期限</TableHead>
-                <TableHead>状态</TableHead>
+                <TableHead>城市</TableHead>
+                <TableHead>订单数</TableHead>
+                <TableHead>课程金额</TableHead>
+                <TableHead>老师费用</TableHead>
+                <TableHead>车费</TableHead>
+                <TableHead>房租</TableHead>
+                <TableHead>物业</TableHead>
+                <TableHead>水电</TableHead>
+                <TableHead>耗材</TableHead>
+                <TableHead>后付款</TableHead>
+                <TableHead>分红金额</TableHead>
                 <TableHead>操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredPartners?.map((partner) => (
-                <TableRow key={partner.id}>
-                  <TableCell className="font-medium">{partner.name}</TableCell>
-                  <TableCell>{(Number(partner.profitRatio) * 100).toFixed(0)}%</TableCell>
-                  <TableCell>¥{Number(partner.brandFee).toFixed(2)}</TableCell>
-                  <TableCell>¥{Number(partner.techServiceFee).toFixed(2)}</TableCell>
-                  <TableCell>
-                    {partner.contractStartDate && partner.contractEndDate
-                      ? `${new Date(partner.contractStartDate).toLocaleDateString()} - ${new Date(partner.contractEndDate).toLocaleDateString()}`
-                      : "-"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={partner.isActive ? "default" : "secondary"}>
-                      {partner.isActive ? "活跃" : "停用"}
-                    </Badge>
-                  </TableCell>
+              {filteredPartnerStats?.map((stat) => (
+                <TableRow key={stat.partnerId}>
+                  <TableCell className="font-medium">{stat.partnerName}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{stat.cities || "-"}</TableCell>
+                  <TableCell>{stat.orderCount}</TableCell>
+                  <TableCell>￥{Number(stat.courseAmount).toFixed(2)}</TableCell>
+                  <TableCell>￥{Number(stat.teacherFee).toFixed(2)}</TableCell>
+                  <TableCell>￥{Number(stat.transportFee).toFixed(2)}</TableCell>
+                  <TableCell>￥{Number(stat.rentFee).toFixed(2)}</TableCell>
+                  <TableCell>￥{Number(stat.propertyFee).toFixed(2)}</TableCell>
+                  <TableCell>￥{Number(stat.utilityFee).toFixed(2)}</TableCell>
+                  <TableCell>￥{Number(stat.consumablesFee).toFixed(2)}</TableCell>
+                  <TableCell>￥{Number(stat.deferredPayment).toFixed(2)}</TableCell>
+                  <TableCell className="font-semibold text-green-600">￥{Number(stat.partnerFee).toFixed(2)}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => {
-                          setSelectedPartnerId(partner.id);
+                          setSelectedPartnerId(stat.partnerId);
                           setEditOpen(true);
                         }}
                       >
@@ -631,7 +704,7 @@ export default function PartnerManagement() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleDelete(partner.id)}
+                        onClick={() => handleDelete(stat.partnerId)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -838,5 +911,6 @@ export default function PartnerManagement() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }

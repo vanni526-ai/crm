@@ -460,4 +460,130 @@ export const partnerManagementRouter = router({
       
       return stats;
     }),
+
+  /**
+   * 获取合伙人统计数据(用于列表展示)
+   */
+  getPartnerStats: protectedProcedure
+    .input(z.object({
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+    }).optional())
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      // 获取所有合伙人
+      const allPartners = await db
+        .select()
+        .from(partners)
+        .orderBy(desc(partners.createdAt));
+      
+      // 为每个合伙人统计数据
+      const stats = [];
+      for (const partner of allPartners) {
+        // 获取合伙人的城市列表
+        const partnerCitiesList = await db
+          .select({
+            cityId: partnerCities.cityId,
+            cityName: cities.name,
+          })
+          .from(partnerCities)
+          .leftJoin(cities, eq(partnerCities.cityId, cities.id))
+          .where(eq(partnerCities.partnerId, partner.id));
+        
+        // 统计所有城市的数据
+        let totalOrderCount = 0;
+        let totalCourseAmount = 0;
+        let totalTeacherFee = 0;
+        let totalTransportFee = 0;
+        let totalRentFee = 0;
+        let totalPropertyFee = 0;
+        let totalUtilityFee = 0;
+        let totalConsumablesFee = 0;
+        let totalDeferredPayment = 0;
+        let totalPartnerFee = 0;
+        
+        for (const city of partnerCitiesList) {
+          // 构建查询条件
+          const conditions = [sql`${orders.deliveryCity} = ${city.cityName}`];
+          
+          if (input?.startDate) {
+            conditions.push(sql`${orders.classDate} >= ${input.startDate}`);
+          }
+          
+          if (input?.endDate) {
+            conditions.push(sql`${orders.classDate} <= ${input.endDate}`);
+          }
+          
+          // 统计订单数据
+          const orderResult = await db
+            .select({
+              orderCount: sql<number>`COUNT(*)`,
+              totalAmount: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`,
+              totalTeacherFee: sql<string>`COALESCE(SUM(${orders.teacherFee}), 0)`,
+              totalTransportFee: sql<string>`COALESCE(SUM(${orders.transportFee}), 0)`,
+              totalRentFee: sql<string>`COALESCE(SUM(${orders.rentFee}), 0)`,
+              totalPropertyFee: sql<string>`COALESCE(SUM(${orders.propertyFee}), 0)`,
+              totalUtilityFee: sql<string>`COALESCE(SUM(${orders.utilityFee}), 0)`,
+              totalConsumablesFee: sql<string>`COALESCE(SUM(${orders.consumablesFee}), 0)`,
+              totalPartnerFee: sql<string>`COALESCE(SUM(${orders.partnerFee}), 0)`,
+            })
+            .from(orders)
+            .where(and(...conditions));
+          
+          if (orderResult[0]) {
+            totalOrderCount += Number(orderResult[0].orderCount);
+            totalCourseAmount += Number(orderResult[0].totalAmount);
+            totalTeacherFee += Number(orderResult[0].totalTeacherFee);
+            totalTransportFee += Number(orderResult[0].totalTransportFee);
+            totalRentFee += Number(orderResult[0].totalRentFee);
+            totalPropertyFee += Number(orderResult[0].totalPropertyFee);
+            totalUtilityFee += Number(orderResult[0].totalUtilityFee);
+            totalConsumablesFee += Number(orderResult[0].totalConsumablesFee);
+            totalPartnerFee += Number(orderResult[0].totalPartnerFee);
+          }
+          
+          // 统计费用明细中的后付款
+          const expenseConditions = [eq(partnerExpenses.partnerId, partner.id), eq(partnerExpenses.cityId, city.cityId)];
+          
+          if (input?.startDate) {
+            expenseConditions.push(sql`${partnerExpenses.month} >= ${input.startDate}`);
+          }
+          
+          if (input?.endDate) {
+            expenseConditions.push(sql`${partnerExpenses.month} <= ${input.endDate}`);
+          }
+          
+          const expenseResult = await db
+            .select({
+              totalDeferredPayment: sql<string>`COALESCE(SUM(${partnerExpenses.deferredPayment}), 0)`,
+            })
+            .from(partnerExpenses)
+            .where(and(...expenseConditions));
+          
+          if (expenseResult[0]) {
+            totalDeferredPayment += Number(expenseResult[0].totalDeferredPayment);
+          }
+        }
+        
+        stats.push({
+          partnerId: partner.id,
+          partnerName: partner.name,
+          cities: partnerCitiesList.map(c => c.cityName).join(", "),
+          orderCount: totalOrderCount,
+          courseAmount: totalCourseAmount.toFixed(2),
+          teacherFee: totalTeacherFee.toFixed(2),
+          transportFee: totalTransportFee.toFixed(2),
+          rentFee: totalRentFee.toFixed(2),
+          propertyFee: totalPropertyFee.toFixed(2),
+          utilityFee: totalUtilityFee.toFixed(2),
+          consumablesFee: totalConsumablesFee.toFixed(2),
+          deferredPayment: totalDeferredPayment.toFixed(2),
+          partnerFee: totalPartnerFee.toFixed(2),
+        });
+      }
+      
+      return stats;
+    }),
 });
