@@ -591,6 +591,113 @@ export type CityPartnerConfig = typeof cityPartnerConfig.$inferSelect;
 export type InsertCityPartnerConfig = typeof cityPartnerConfig.$inferInsert;
 
 /**
+ * 合伙人表 - 管理城市合伙人的基本信息和合同信息
+ */
+export const partners = mysqlTable("partners", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // 关联users表
+  name: varchar("name", { length: 100 }).notNull(), // 合伙人姓名
+  phone: varchar("phone", { length: 20 }), // 手机号(用于登录App)
+  
+  // 合同信息
+  profitRatio: decimal("profitRatio", { precision: 5, scale: 2 }).notNull(), // 分红比例(百分比)
+  profitRule: text("profitRule"), // 分红规则描述
+  brandFee: decimal("brandFee", { precision: 10, scale: 2 }).default("0.00"), // 品牌加盟费
+  techServiceFee: decimal("techServiceFee", { precision: 10, scale: 2 }).default("0.00"), // 技术服务费
+  deferredPaymentTotal: decimal("deferredPaymentTotal", { precision: 10, scale: 2 }).default("0.00"), // 后付款总金额
+  deferredPaymentRule: text("deferredPaymentRule"), // 后付款扣款规则
+  contractStartDate: date("contractStartDate"), // 合同起始日期
+  contractEndDate: date("contractEndDate"), // 合同结束日期
+  contractHistory: text("contractHistory"), // 合同修订历史(JSON数组存储)
+  
+  // 收款账户
+  accountName: varchar("accountName", { length: 100 }), // 开户名
+  bankName: varchar("bankName", { length: 200 }), // 开户行
+  accountNumber: varchar("accountNumber", { length: 50 }), // 账号
+  
+  isActive: boolean("isActive").default(true).notNull(),
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdx: index("partner_user_idx").on(table.userId),
+  phoneIdx: index("partner_phone_idx").on(table.phone),
+}));
+
+export type Partner = typeof partners.$inferSelect;
+export type InsertPartner = typeof partners.$inferInsert;
+
+/**
+ * 合伙人费用明细表 - 按月记录合伙人的各项费用
+ */
+export const partnerExpenses = mysqlTable("partner_expenses", {
+  id: int("id").autoincrement().primaryKey(),
+  partnerId: int("partnerId").notNull(), // 关联partners表
+  cityId: int("cityId").notNull(), // 关联cities表
+  month: date("month").notNull(), // 月份(YYYY-MM-01格式)
+  
+  // 费用明细
+  rentFee: decimal("rentFee", { precision: 10, scale: 2 }).default("0.00"), // 房租
+  propertyFee: decimal("propertyFee", { precision: 10, scale: 2 }).default("0.00"), // 物业
+  utilityFee: decimal("utilityFee", { precision: 10, scale: 2 }).default("0.00"), // 水电
+  consumablesFee: decimal("consumablesFee", { precision: 10, scale: 2 }).default("0.00"), // 耗材
+  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }).default("0.00"), // 老师费用
+  transportFee: decimal("transportFee", { precision: 10, scale: 2 }).default("0.00"), // 车费
+  otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
+  totalFee: decimal("totalFee", { precision: 10, scale: 2 }).default("0.00"), // 总费用
+  
+  // 合同后付款
+  deferredPayment: decimal("deferredPayment", { precision: 10, scale: 2 }).default("0.00"), // 本月后付款扣款
+  deferredPaymentBalance: decimal("deferredPaymentBalance", { precision: 10, scale: 2 }).default("0.00"), // 后付款未结清余额
+  
+  // 分红相关
+  revenue: decimal("revenue", { precision: 10, scale: 2 }).default("0.00"), // 本月营收
+  profit: decimal("profit", { precision: 10, scale: 2 }).default("0.00"), // 本月利润
+  profitAmount: decimal("profitAmount", { precision: 10, scale: 2 }).default("0.00"), // 本月分红金额
+  
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  partnerIdx: index("expense_partner_idx").on(table.partnerId),
+  monthIdx: index("expense_month_idx").on(table.month),
+  partnerMonthIdx: unique("unique_partner_month").on(table.partnerId, table.cityId, table.month),
+}));
+
+export type PartnerExpense = typeof partnerExpenses.$inferSelect;
+export type InsertPartnerExpense = typeof partnerExpenses.$inferInsert;
+
+/**
+ * 合伙人分红流水表 - 记录每次分红转账的详细信息
+ */
+export const partnerProfitRecords = mysqlTable("partner_profit_records", {
+  id: int("id").autoincrement().primaryKey(),
+  partnerId: int("partnerId").notNull(), // 关联partners表
+  expenseId: int("expenseId"), // 关联partner_expenses表(可选)
+  
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // 分红金额
+  transferDate: date("transferDate").notNull(), // 转账日期
+  transferMethod: mysqlEnum("transferMethod", ["wechat", "alipay", "bank", "cash", "other"]).default("bank").notNull(), // 转账方式
+  transactionNo: varchar("transactionNo", { length: 100 }), // 交易流水号
+  
+  status: mysqlEnum("status", ["pending", "completed", "failed"]).default("pending").notNull(), // 状态
+  notes: text("notes"),
+  
+  recordedBy: int("recordedBy").notNull(), // 登记人
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  partnerIdx: index("profit_partner_idx").on(table.partnerId),
+  dateIdx: index("profit_date_idx").on(table.transferDate),
+  statusIdx: index("profit_status_idx").on(table.status),
+}));
+
+export type PartnerProfitRecord = typeof partnerProfitRecords.$inferSelect;
+export type InsertPartnerProfitRecord = typeof partnerProfitRecords.$inferInsert;
+
+/**
  * 审计日志表 - 记录重要操作的历史记录
  */
 export const auditLogs = mysqlTable("auditLogs", {

@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, orderNo, channelOrderNo, deliveryCity, courseAmount, teacherFee, transportFee, partnerFee FROM orders WHERE orderNo LIKE 'ORD177045%' OR channelOrderNo LIKE 'ORD177045%' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, orderNo, channelOrderNo, deliveryCity, courseAmount, teacherFee, transportFee, partnerFee FROM orders WHERE orderNo LIKE 'ORD177045%' OR channelOrderNo LIKE 'ORD177045%' LIMIT 10;",
+  "rows": [
+    {
+      "id": "2370001",
+      "orderNo": "ORD1770454929035213",
+      "channelOrderNo": "A2026020512251110045365",
+      "deliveryCity": "重庆",
+      "courseAmount": "4000.00",
+      "teacherFee": "2000.00",
+      "transportFee": "0.00",
+      "partnerFee": "900.00"
+    },
+    {
+      "id": "2370002",
+      "orderNo": "ORD1770454929116836",
+      "channelOrderNo": "A2026020518382510049879",
+      "deliveryCity": "苏州",
+      "courseAmount": "1500.00",
+      "teacherFee": "750.00",
+      "transportFee": "0.00",
+      "partnerFee": "375.00"
+    },
+    {
+      "id": "2370003",
+      "orderNo": "ORD1770454929160523",
+      "channelOrderNo": "4200002985202602052116241628",
+      "deliveryCity": "天津",
+      "courseAmount": "1500.00",
+      "teacherFee": "300.00",
+      "transportFee": "0.00",
+      "partnerFee": "600.00"
+    },
+    {
+      "id": "2370004",
+      "orderNo": "ORD1770454929200173",
+      "channelOrderNo": "4200002972202602050596070657",
+      "deliveryCity": "深圳",
+      "courseAmount": "1200.00",
+      "teacherFee": "420.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "id": "2370005",
+      "orderNo": "ORD1770455001192224",
+      "channelOrderNo": "A2026020500554910041969",
+      "deliveryCity": "上海",
+      "courseAmount": "33400.00",
+      "teacherFee": "200.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "id": "2370006",
+      "orderNo": "ORD1770455001237836",
+      "channelOrderNo": "A2026020515271910047167",
+      "deliveryCity": "苏州",
+      "courseAmount": "2700.00",
+      "teacherFee": "1350.00",
+      "transportFee": "0.00",
+      "partnerFee": "675.00"
+    },
+    {
+      "id": "2370007",
+      "orderNo": "ORD1770455001274328",
+      "channelOrderNo": "4200003020202602052977276520",
+      "deliveryCity": "上海",
+      "courseAmount": "1500.00",
+      "teacherFee": "300.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "id": "2370008",
+      "orderNo": "ORD1770455001311412",
+      "channelOrderNo": "4200003039202602057147173193",
+      "deliveryCity": "互联网课",
+      "courseAmount": "350.00",
+      "teacherFee": "0.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "id": "2370009",
+      "orderNo": "ORD1770455001353138",
+      "channelOrderNo": "4200002996202602057034052505",
+      "deliveryCity": "深圳",
+      "courseAmount": "0.00",
+      "teacherFee": "400.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    },
+    {
+      "id": "2370010",
+      "orderNo": "ORD177045500142265",
+      "channelOrderNo": "4200003041202602058047397943",
+      "deliveryCity": "上海",
+      "courseAmount": "2700.00",
+      "teacherFee": "500.00",
+      "transportFee": "0.00",
+      "partnerFee": "0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNo\tchannelOrderNo\tdeliveryCity\tcourseAmount\tteacherFee\ttransportFee\tpartnerFee\n2370001\tORD1770454929035213\tA2026020512251110045365\t重庆\t4000.00\t2000.00\t0.00\t900.00\n2370002\tORD1770454929116836\tA2026020518382510049879\t苏州\t1500.00\t750.00\t0.00\t375.00\n2370003\tORD1770454929160523\t4200002985202602052116241628\t天津\t1500.00\t300.00\t0.00\t600.00\n2370004\tORD1770454929200173\t4200002972202602050596070657\t深圳\t1200.00\t420.00\t0.00\t0.00\n2370005\tORD1770455001192224\tA2026020500554910041969\t上海\t33400.00\t200.00\t0.00\t0.00\n2370006\tORD1770455001237836\tA2026020515271910047167\t苏州\t2700.00\t1350.00\t0.00\t675.00\n2370007\tORD1770455001274328\t4200003020202602052977276520\t上海\t1500.00\t300.00\t0.00\t0.00\n2370008\tORD1770455001311412\t4200003039202602057147173193\t互联网课\t350.00\t0.00\t0.00\t0.00\n2370009\tORD1770455001353138\t4200002996202602057034052505\t深圳\t0.00\t400.00\t0.00\t0.00\n2370010\tORD177045500142265\t4200003041202602058047397943\t上海\t2700.00\t500.00\t0.00\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 1561
+}
