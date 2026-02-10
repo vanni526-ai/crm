@@ -922,7 +922,7 @@ export default function () {
                             {order.warnings && order.warnings.length > 0 ? (
                               <div className="space-y-1">
                                 {order.warnings.map((warning: string, i: number) => (
-                                  <Badge key={i} variant="outline" className="text-xs">
+                                  <Badge key={`${order._tempId}-warning-${i}-${warning.substring(0, 20)}`} variant="outline" className="text-xs">
                                     {warning}
                                   </Badge>
                                 ))}

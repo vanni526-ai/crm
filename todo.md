@@ -2114,3 +2114,19 @@
 - [ ] 定位"NotFoundError: Failed to execute 'insertBefore' on 'Node'"错误
 - [ ] 修复DOM操作错误
 - [ ] 测试手动导入功能
+
+### 136. Gmail导入手动导入功能DOM错误全面检查
+- [ ] 检查GmailImport.tsx中所有使用index作为key的地方
+- [ ] 检查是否有其他列表渲染使用了不稳定的key
+- [ ] 检查浏览器控制台错误信息
+- [ ] 检查网络请求是否正常
+- [ ] 修复所有发现的问题
+- [ ] 测试验证修复效果
+- [ ] 保存检查点
+
+### 137. 修复生产环境Gmail导入功能DOM错误
+- [x] 检查生产环境代码版本是否包含_tempId修复
+- [x] 对比开发环境和生产环境代码差异
+- [x] 全面检查所有可能导致DOM错误的地方(发现warnings列表使用index作为key)
+- [x] 修复所有发现的问题(使用order._tempId+warning内容作为唯一key)
+- [ ] 保存检查点并指导用户发布到生产环境
