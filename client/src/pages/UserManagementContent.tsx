@@ -37,7 +37,12 @@ const ALL_ROLES = [
 // 解析角色字符串为数组
 function parseRoles(rolesStr: string | null | undefined): string[] {
   if (!rolesStr) return ["user"];
-  return rolesStr.split(",").map((r) => r.trim()).filter(Boolean);
+  const roles = rolesStr.split(",").map((r) => r.trim()).filter(Boolean);
+  // 确保普通用户角色始终存在
+  if (!roles.includes("user")) {
+    roles.push("user");
+  }
+  return roles;
 }
 
 // 获取角色显示信息
@@ -60,6 +65,11 @@ function RolesSelector({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleRemove = (roleValue: string) => {
+    // 普通用户角色不可删除
+    if (roleValue === "user") {
+      toast.error("普通用户角色不可删除");
+      return;
+    }
     if (selectedRoles.length > 1) {
       onChange(selectedRoles.filter((r) => r !== roleValue));
     } else {
@@ -90,17 +100,20 @@ function RolesSelector({
               className={`${roleInfo.color} flex items-center gap-1`}
             >
               {roleInfo.label}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleRemove(roleValue);
-                }}
-                className="ml-1 hover:bg-black/10 rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              {/* 普通用户角色不显示删除按钮 */}
+              {roleValue !== "user" && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRemove(roleValue);
+                  }}
+                  className="ml-1 hover:bg-black/10 rounded-full p-0.5"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
             </Badge>
           );
         })}
@@ -284,7 +297,12 @@ export default function UserManagementContent() {
 
   const handleEditUser = async (user: any) => {
     setEditingUser(user);
-    setEditRoles(parseRoles(user.roles || user.role));
+    const parsedRoles = parseRoles(user.roles || user.role);
+    // 确保普通用户角色始终存在
+    if (!parsedRoles.includes("user")) {
+      parsedRoles.push("user");
+    }
+    setEditRoles(parsedRoles);
     
     // 重置所有角色的城市列表
     setEditTeacherCities([]);
@@ -670,7 +688,20 @@ export default function UserManagementContent() {
                         />
                         <label htmlFor="role-sales" className="text-sm font-medium cursor-pointer">销售</label>
                       </div>
+                    </div>
 
+                    {/* 普通用户角色行（默认勾选且不可取消） */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          id="role-user"
+                          checked={true}
+                          disabled={true}
+                          className="w-4 h-4 cursor-not-allowed"
+                        />
+                        <label htmlFor="role-user" className="text-sm font-medium text-gray-500">普通用户</label>
+                      </div>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计（老师和合伙人可以在不同城市）</p>
