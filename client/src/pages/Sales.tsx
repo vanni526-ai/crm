@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -20,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Search, Plus, Download, Upload, TrendingUp, Zap, BarChart3 } from "lucide-react";
+import { Search, Plus, Download, Upload, TrendingUp, Zap, BarChart3, Calendar, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 
@@ -32,6 +39,13 @@ export default function Sales() {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isSmartRegisterOpen, setIsSmartRegisterOpen] = useState(false);
+  
+  // 时间筛选和排序状态
+  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
+  const [sortField, setSortField] = useState<string>("orderCount");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   // 查询销售人员列表
   const { data: salespersons, isLoading, refetch } = trpc.salespersons.list.useQuery();
@@ -85,17 +99,149 @@ export default function Sales() {
     },
   });
 
-  // 过滤销售人员
-  const filteredSalespersons = salespersons?.filter((sp) => {
-    if (!searchKeyword) return true;
-    const keyword = searchKeyword.toLowerCase();
-    return (
-      sp.name?.toLowerCase().includes(keyword) ||
-      sp.nickname?.toLowerCase().includes(keyword) ||
-      sp.phone?.toLowerCase().includes(keyword) ||
-      sp.wechat?.toLowerCase().includes(keyword)
+  // 获取时间范围
+  const getDateRange = () => {
+    const now = new Date();
+    let startDate: Date | null = null;
+    let endDate: Date | null = null;
+
+    switch (dateFilter) {
+      case "today":
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        break;
+      case "week":
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay());
+        startDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        break;
+      case "month":
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+        break;
+      case "year":
+        startDate = new Date(now.getFullYear(), 0, 1);
+        endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+        break;
+      case "custom":
+        if (customStartDate) startDate = new Date(customStartDate);
+        if (customEndDate) {
+          const endDateStr = customEndDate + " 23:59:59";
+          endDate = new Date(endDateStr);
+        }
+        break;
+      default:
+        return { startDate: null, endDate: null };
+    }
+
+    return { startDate, endDate };
+  };
+
+  // 过滤和排序销售人员
+  const filteredAndSortedSalespersons = useMemo(() => {
+    if (!salespersons || !allStatistics?.orders) return [];
+
+    const { startDate, endDate } = getDateRange();
+
+    // 过滤订单
+    const filteredOrders = allStatistics.orders.filter((order) => {
+      if (startDate && endDate && order.classDate) {
+        const orderDate = new Date(order.classDate);
+        if (orderDate < startDate || orderDate > endDate) return false;
+      }
+      return true;
+    });
+
+    // 计算每个销售人员的统计数据
+    const salesWithStats = salespersons.map((sp) => {
+      const spOrders = filteredOrders.filter(
+        (o) =>
+          o.salespersonId === sp.id ||
+          o.salesPerson === sp.name ||
+          o.salesPerson === sp.nickname
+      );
+      const orderCount = spOrders.length;
+      const totalAmount = spOrders.reduce((sum, o) => sum + Number(o.paymentAmount), 0);
+
+      return {
+        ...sp,
+        orderCount,
+        totalAmount,
+      };
+    });
+
+    // 关键词过滤
+    const keywordFiltered = salesWithStats.filter((sp) => {
+      if (!searchKeyword) return true;
+      const keyword = searchKeyword.toLowerCase();
+      return (
+        sp.name?.toLowerCase().includes(keyword) ||
+        sp.nickname?.toLowerCase().includes(keyword) ||
+        sp.phone?.toLowerCase().includes(keyword) ||
+        sp.wechat?.toLowerCase().includes(keyword)
+      );
+    });
+
+    // 排序
+    return keywordFiltered.sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (sortField) {
+        case "orderCount":
+          aValue = a.orderCount;
+          bValue = b.orderCount;
+          break;
+        case "totalAmount":
+          aValue = a.totalAmount;
+          bValue = b.totalAmount;
+          break;
+        case "commissionRate":
+          aValue = a.commissionRate || 0;
+          bValue = b.commissionRate || 0;
+          break;
+        case "city":
+          aValue = a.city || "";
+          bValue = b.city || "";
+          break;
+        case "name":
+          aValue = a.name || "";
+          bValue = b.name || "";
+          break;
+        default:
+          return 0;
+      }
+
+      if (typeof aValue === "string") {
+        return sortOrder === "asc"
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+
+      return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+    });
+  }, [salespersons, allStatistics, searchKeyword, dateFilter, customStartDate, customEndDate, sortField, sortOrder]);
+
+  // 排序处理
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("desc");
+    }
+  };
+
+  // 获取排序图标
+  const getSortIcon = (field: string) => {
+    if (sortField !== field) return <ArrowUpDown className="w-4 h-4 ml-1 inline" />;
+    return sortOrder === "asc" ? (
+      <ArrowUp className="w-4 h-4 ml-1 inline" />
+    ) : (
+      <ArrowDown className="w-4 h-4 ml-1 inline" />
     );
-  });
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -287,15 +433,58 @@ export default function Sales() {
 
       {/* 搜索栏 */}
       <Card className="p-4 mb-6">
-        <div className="flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="搜索销售人员姓名、花名、电话、微信..."
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              className="pl-10"
-            />
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="搜索销售人员姓名、花名、电话、微信..."
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+          
+          {/* 时间筛选器 */}
+          <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">时间筛选:</span>
+            </div>
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="选择时间范围" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部时间</SelectItem>
+                <SelectItem value="today">今日</SelectItem>
+                <SelectItem value="week">本周</SelectItem>
+                <SelectItem value="month">本月</SelectItem>
+                <SelectItem value="year">今年</SelectItem>
+                <SelectItem value="custom">自定义</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            {dateFilter === "custom" && (
+              <>
+                <Input
+                  type="date"
+                  value={customStartDate}
+                  onChange={(e) => setCustomStartDate(e.target.value)}
+                  className="w-[160px]"
+                  placeholder="开始日期"
+                />
+                <span className="text-muted-foreground">至</span>
+                <Input
+                  type="date"
+                  value={customEndDate}
+                  onChange={(e) => setCustomEndDate(e.target.value)}
+                  className="w-[160px]"
+                  placeholder="结束日期"
+                />
+              </>
+            )}
           </div>
         </div>
       </Card>
@@ -305,14 +494,39 @@ export default function Sales() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>姓名</TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("name")}
+              >
+                姓名{getSortIcon("name")}
+              </TableHead>
               <TableHead>花名</TableHead>
               <TableHead>电话</TableHead>
               <TableHead>微信</TableHead>
-              <TableHead>提成比例</TableHead>
-              <TableHead>城市</TableHead>
-              <TableHead>订单数</TableHead>
-              <TableHead>销售额</TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("commissionRate")}
+              >
+                提成比例{getSortIcon("commissionRate")}
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("city")}
+              >
+                城市{getSortIcon("city")}
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("orderCount")}
+              >
+                订单数{getSortIcon("orderCount")}
+              </TableHead>
+              <TableHead 
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleSort("totalAmount")}
+              >
+                销售额{getSortIcon("totalAmount")}
+              </TableHead>
               <TableHead>状态</TableHead>
               <TableHead className="text-right">操作</TableHead>
             </TableRow>
@@ -324,14 +538,14 @@ export default function Sales() {
                   加载中...
                 </TableCell>
               </TableRow>
-            ) : filteredSalespersons?.length === 0 ? (
+            ) : filteredAndSortedSalespersons?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                   暂无销售人员
                 </TableCell>
               </TableRow>
             ) : (
-              filteredSalespersons?.map((sp) => (
+              filteredAndSortedSalespersons?.map((sp: any) => (
                 <TableRow key={sp.id}>
                   <TableCell className="font-medium">{sp.name}</TableCell>
                   <TableCell>{sp.nickname || "-"}</TableCell>
@@ -339,23 +553,8 @@ export default function Sales() {
                   <TableCell>{sp.wechat || "-"}</TableCell>
                   <TableCell>{sp.commissionRate ? `${sp.commissionRate}%` : "-"}</TableCell>
                   <TableCell>{sp.city || "-"}</TableCell>
-                  <TableCell>
-                    {allStatistics?.orders?.filter(o => 
-                      o.salespersonId === sp.id || 
-                      o.salesPerson === sp.name || 
-                      o.salesPerson === sp.nickname
-                    ).length || 0}
-                  </TableCell>
-                  <TableCell>
-                    ¥{allStatistics?.orders
-                      ?.filter(o => 
-                        o.salespersonId === sp.id || 
-                        o.salesPerson === sp.name || 
-                        o.salesPerson === sp.nickname
-                      )
-                      .reduce((sum, o) => sum + Number(o.paymentAmount), 0)
-                      .toFixed(2) || "0.00"}
-                  </TableCell>
+                  <TableCell>{sp.orderCount || 0}</TableCell>
+                  <TableCell>¥{sp.totalAmount?.toFixed(2) || "0.00"}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
                       sp.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
