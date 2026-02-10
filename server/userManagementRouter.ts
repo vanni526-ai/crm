@@ -241,6 +241,18 @@ export const userManagementRouter = router({
           isActive: true,
         } as any);
       }
+      
+      // 如果角色包含cityPartner，在partners表创建关联记录
+      if (rolesStr.includes('cityPartner')) {
+        const { partners } = await import('../drizzle/schema');
+        await drizzle.insert(partners).values({
+          userId: newUserId,
+          name: input.name,
+          phone: input.phone || null,
+          profitRatio: '0.30', // 默认30%
+          createdBy: 1, // 管理员创建
+        } as any);
+      }
 
       return {
         success: true,

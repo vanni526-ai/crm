@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM partner_cities;\nDELETE FROM partner_expenses;\nDELETE FROM partner_profit_records;\nDELETE FROM partners;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute DELETE FROM partner_cities;\nDELETE FROM partner_expenses;\nDELETE FROM partner_profit_records;\nDELETE FROM partners;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2266
+}
