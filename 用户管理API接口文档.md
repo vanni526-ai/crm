@@ -44,7 +44,7 @@ interface User {
 - `finance` - 财务
 - `普通用户` - 普通用户
 
-**注意：** `teacher`、`cityPartner`、`sales`角色需要关联城市信息。
+**注意：** **只有** `teacher`和`cityPartner`角色需要关联城市信息，`sales`角色不需要。
 
 ---
 
@@ -421,8 +421,9 @@ function EditUserScreen({ userId }) {
 
 ### 1. 角色-城市关联规则
 
-- **老师（teacher）**、**合伙人（cityPartner）**、**销售（sales）** 角色需要关联城市
-- 创建或更新用户时，如果选择了这些角色，**必须**提供对应的城市列表
+- **只有老师（teacher）和合伙人（cityPartner）** 角色需要关联城市
+- **销售（sales）角色不需要关联城市**
+- 创建或更新用户时，如果选择了teacher或cityPartner角色，**必须**提供对应的城市列表
 - 城市列表不能为空
 
 ### 2. 手机号唯一性

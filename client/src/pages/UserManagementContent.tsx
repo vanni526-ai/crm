@@ -154,7 +154,6 @@ export default function UserManagementContent() {
   // 城市选择状态（每个角色独立的城市列表）
   const [editTeacherCities, setEditTeacherCities] = useState<string[]>([]);
   const [editPartnerCities, setEditPartnerCities] = useState<string[]>([]);
-  const [editSalesCities, setEditSalesCities] = useState<string[]>([]);
 
   // 查询用户列表
   const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery();
@@ -262,7 +261,6 @@ export default function UserManagementContent() {
       roleCities: {
         ...(editTeacherCities.length > 0 ? { teacher: editTeacherCities } : {}),
         ...(editPartnerCities.length > 0 ? { cityPartner: editPartnerCities } : {}),
-        ...(editSalesCities.length > 0 ? { sales: editSalesCities } : {}),
       },
     });
   };
@@ -291,7 +289,6 @@ export default function UserManagementContent() {
     // 重置所有角色的城市列表
     setEditTeacherCities([]);
     setEditPartnerCities([]);
-    setEditSalesCities([]);
     
     // 从user_role_cities表加载每个角色的城市列表
     try {
@@ -306,7 +303,6 @@ export default function UserManagementContent() {
       
       setEditTeacherCities(roleCitiesMap['teacher'] || []);
       setEditPartnerCities(roleCitiesMap['cityPartner'] || []);
-      setEditSalesCities(roleCitiesMap['sales'] || []);
     } catch (error) {
       console.error('Failed to load role cities:', error);
     }
@@ -664,48 +660,13 @@ export default function UserManagementContent() {
                               setEditRoles([...editRoles, 'sales']);
                             } else {
                               setEditRoles(editRoles.filter(r => r !== 'sales'));
-                              setEditSalesCities([]);
                             }
                           }}
                           className="w-4 h-4"
                         />
                         <label htmlFor="role-sales" className="text-sm font-medium cursor-pointer">销售</label>
                       </div>
-                      {editRoles.includes('sales') && (
-                        <div className="flex-1 space-y-2">
-                          {editSalesCities.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                              {editSalesCities.map((city) => (
-                                <Badge key={city} variant="secondary" className="bg-blue-100 text-blue-800">
-                                  {city}
-                                  <button
-                                    type="button"
-                                    onClick={() => setEditSalesCities(editSalesCities.filter(c => c !== city))}
-                                    className="ml-1 hover:bg-black/10 rounded-full p-0.5"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                          <select
-                            className="w-full p-2 border rounded-md text-sm"
-                            value=""
-                            onChange={(e) => {
-                              const city = e.target.value;
-                              if (city && !editSalesCities.includes(city)) {
-                                setEditSalesCities([...editSalesCities, city]);
-                              }
-                            }}
-                          >
-                            <option value="">添加城市...</option>
-                            {cities?.map((city) => (
-                              <option key={city.name} value={city.name}>{city.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
+
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">用于老师和城市合伙人角色的业绩统计（老师和合伙人可以在不同城市）</p>

@@ -341,8 +341,8 @@ export const userManagementRouter = router({
       // 保存角色-城市关联
       if (roleCities) {
         for (const [role, cities] of Object.entries(roleCities)) {
-          if (role === 'teacher' || role === 'cityPartner' || role === 'sales') {
-            await setUserRoleCities(id, role as 'teacher' | 'cityPartner' | 'sales', cities as string[]);
+          if (role === 'teacher' || role === 'cityPartner') {
+            await setUserRoleCities(id, role as 'teacher' | 'cityPartner', cities as string[]);
           }
         }
       }

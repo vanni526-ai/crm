@@ -1975,4 +1975,12 @@
 - [x] 更新DashboardLayout侧边栏导航,确保"用户管理"链接指向/customer-management
 - [x] 整理用户管理相关API接口文档供前端App使用
 - [x] 验证修改后的系统功能正常
+- [x] 创建检查点
+
+### 137. 修改用户角色城市关联规则：只有老师和合伙人需要指定城市
+- [x] 修改后端userManagementRouter.ts的update接口，移除对sales角色的城市验证
+- [x] 修改后端db.ts的setUserRoleCities函数，移除sales类型
+- [x] 修改前端UserManagementContent.tsx，移除销售角色的城市选择器UI
+- [x] 更新用户管理API接口文档，说明只有teacher和cityPartner需要城市
+- [x] 测试验证：编辑用户时，销售角色不显示城市选择器
 - [ ] 创建检查点

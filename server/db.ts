@@ -200,7 +200,7 @@ export async function getUserRoleCitiesByRole(
  */
 export async function setUserRoleCities(
   userId: number,
-  role: 'teacher' | 'cityPartner' | 'sales',
+  role: 'teacher' | 'cityPartner',
   cities: string[]
 ): Promise<void> {
   const db = await getDb();
