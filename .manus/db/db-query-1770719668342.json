@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 删除指定的测试账户\nDELETE FROM users WHERE \n  id IN (1740005) OR\n  phone IN ('13860033', '13860036', '13860039', '13860094', '13950012', '14430227', '14460013', '15365401', '15372484', '15372600', '15372601', '15372612', '15372613', '15372620', '15372621', '15372632', '15372633', '15372717') OR\n  name IN ('测试', 'test_user', 'test-hanyijun', 'testuser', 'Test App User', '测试唯一性验证', '测试合伙人', '测试销售');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 删除指定的测试账户\nDELETE FROM users WHERE \n  id IN (1740005) OR\n  phone IN ('13860033', '13860036', '13860039', '13860094', '13950012', '14430227', '14460013', '15365401', '15372484', '15372600', '15372601', '15372612', '15372613', '15372620', '15372621', '15372632', '15372633', '15372717') OR\n  name IN ('测试', 'test_user', 'test-hanyijun', 'testuser', 'Test App User', '测试唯一性验证', '测试合伙人', '测试销售');\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1573
+}
