@@ -120,7 +120,12 @@ export default function () {
   const previewImportMutation = trpc.gmailAutoImport.previewImport.useMutation({
     onSuccess: (data: any) => {
       setPreviewData(data);
-      setEditedOrders(data.orders);
+      // 为每个订单添加唯一ID
+      const ordersWithId = data.orders.map((order: any, index: number) => ({
+        ...order,
+        _tempId: `order-${Date.now()}-${index}`
+      }));
+      setEditedOrders(ordersWithId);
       setShowPasteDialog(false);
       setShowPreviewDialog(true);
       setIsImporting(false);
@@ -211,8 +216,8 @@ export default function () {
   };
 
   // 删除预览订单
-  const handleRemoveOrder = (index: number) => {
-    const newOrders = editedOrders.filter((_, i) => i !== index);
+  const handleRemoveOrder = (tempId: string) => {
+    const newOrders = editedOrders.filter((order: any) => order._tempId !== tempId);
     setEditedOrders(newOrders);
     toast.success("已移除订单");
   };
@@ -823,7 +828,7 @@ export default function () {
                     </TableHeader>
                     <TableBody>
                       {editedOrders.map((order: any, index: number) => (
-                        <TableRow key={index} className={!order.isValid ? "bg-yellow-50" : ""}>
+                        <TableRow key={order._tempId} className={!order.isValid ? "bg-yellow-50" : ""}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>
                             <input
@@ -930,7 +935,7 @@ export default function () {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleRemoveOrder(index)}
+                              onClick={() => handleRemoveOrder(order._tempId)}
                               className="text-red-600 hover:text-red-700"
                             >
                               <Trash2 className="w-4 h-4" />
