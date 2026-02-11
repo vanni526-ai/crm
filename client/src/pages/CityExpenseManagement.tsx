@@ -294,15 +294,20 @@ export default function CityExpenseManagement() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>月份 *</Label>
-                    <Input
-                      type="month"
-                      value={formData.month}
-                      onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                      disabled={!!editingExpense}
-                    />
-                  </div>
+              <div className="space-y-2">
+                <Label>月份</Label>
+                <Select value={selectedMonth || "all"} onValueChange={(val) => setSelectedMonth(val === "all" ? "" : val)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="全部月份" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部月份</SelectItem>
+                    {expenses && Array.from(new Set(expenses.map(e => e.month))).sort().reverse().map(month => (
+                      <SelectItem key={month} value={month}>{month}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
@@ -477,12 +482,17 @@ export default function CityExpenseManagement() {
               </div>
               <div className="w-[200px]">
                 <Label>月份</Label>
-                <Input
-                  type="month"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
-                  placeholder="选择月份"
-                />
+                <Select value={selectedMonth || "all"} onValueChange={(val) => setSelectedMonth(val === "all" ? "" : val)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="全部月份" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部月份</SelectItem>
+                    {expenses && Array.from(new Set(expenses.map(e => e.month))).sort().reverse().map(month => (
+                      <SelectItem key={month} value={month}>{month}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>
