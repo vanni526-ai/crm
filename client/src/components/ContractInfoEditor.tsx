@@ -30,7 +30,34 @@ export default function ContractInfoEditor({
   };
 
   const handleSubmit = () => {
-    onSave(formData);
+    // 将所有数字字段从字符串转换为number类型
+    const convertedData = { ...formData };
+    
+    // 投资费用字段
+    const numberFields = [
+      'brandUsageFee', 'brandAuthDeposit', 'managementFee', 'operationPositionFee',
+      'teacherRecruitmentFee', 'marketingFee', 'estimatedRentDeposit', 'estimatedPropertyFee',
+      'estimatedUtilityFee', 'estimatedRegistrationFee', 'estimatedRenovationFee', 'totalEstimatedCost',
+      // 股权和分红比例字段
+      'equityRatioPartner', 'equityRatioBrand',
+      'profitRatioStage1Partner', 'profitRatioStage1Brand',
+      'profitRatioStage2APartner', 'profitRatioStage2ABrand',
+      'profitRatioStage2BPartner', 'profitRatioStage2BBrand',
+      'profitRatioStage3Partner', 'profitRatioStage3Brand',
+    ];
+    
+    numberFields.forEach(field => {
+      if (convertedData[field] !== null && convertedData[field] !== undefined && convertedData[field] !== '') {
+        const num = typeof convertedData[field] === 'string' 
+          ? parseFloat(convertedData[field]) 
+          : convertedData[field];
+        convertedData[field] = isNaN(num) ? null : num;
+      } else {
+        convertedData[field] = null;
+      }
+    });
+    
+    onSave(convertedData);
   };
 
   return (
