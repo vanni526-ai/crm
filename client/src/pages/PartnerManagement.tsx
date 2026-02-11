@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { FileUp, Calculator, Download, Eye } from "lucide-react";
+import { FileUp, Calculator, Download, Eye, Edit } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import ContractInfoEditor from "@/components/ContractInfoEditor";
 
@@ -336,6 +336,20 @@ export default function PartnerManagement() {
                                 >
                                   <Calculator className="w-4 h-4 mr-2" />
                                   {calculateProfitStageMutation.isPending ? "计算中..." : "更新分红阶段"}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setEditingContract(true);
+                                    setContractPreview({
+                                      contractFileUrl: contractInfo.contractFileUrl || "",
+                                      contractInfo: contractInfo,
+                                    });
+                                  }}
+                                >
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  编辑合同
                                 </Button>
                                 <Button
                                   size="sm"
