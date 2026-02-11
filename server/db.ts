@@ -4149,7 +4149,7 @@ export async function toggleCourseActive(id: number) {
 // ==================== 城市管理 ====================
 
 /**
- * 获取所有城市列表
+ * 获取所有城市列表（包含合伙人分红比例）
  */
 export async function getAllCities() {
   const db = await getDb();
@@ -4157,11 +4157,52 @@ export async function getAllCities() {
 
   try {
     const cityList = await db
-      .select()
+      .select({
+        id: cities.id,
+        name: cities.name,
+        areaCode: cities.areaCode,
+        isActive: cities.isActive,
+        sortOrder: cities.sortOrder,
+        createdAt: cities.createdAt,
+        updatedAt: cities.updatedAt,
+        // 关联查询partner_cities表获取当前分红阶段的合佩人分红比例
+        currentProfitStage: partnerCities.currentProfitStage,
+        isInvestmentRecovered: partnerCities.isInvestmentRecovered,
+        profitRatioStage1Partner: partnerCities.profitRatioStage1Partner,
+        profitRatioStage2APartner: partnerCities.profitRatioStage2APartner,
+        profitRatioStage2BPartner: partnerCities.profitRatioStage2BPartner,
+        profitRatioStage3Partner: partnerCities.profitRatioStage3Partner,
+      })
       .from(cities)
+      .leftJoin(partnerCities, eq(cities.id, partnerCities.cityId))
       .orderBy(asc(cities.sortOrder), asc(cities.name));
     
-    return cityList;
+    // 计算每个城市的当前合佩人分红比例
+    return cityList.map(city => {
+      let partnerFeeRate = 0;
+      if (city.currentProfitStage === 1 && city.profitRatioStage1Partner) {
+        partnerFeeRate = parseFloat(city.profitRatioStage1Partner);
+      } else if (city.currentProfitStage === 2) {
+        if (city.isInvestmentRecovered && city.profitRatioStage2BPartner) {
+          partnerFeeRate = parseFloat(city.profitRatioStage2BPartner);
+        } else if (!city.isInvestmentRecovered && city.profitRatioStage2APartner) {
+          partnerFeeRate = parseFloat(city.profitRatioStage2APartner);
+        }
+      } else if (city.currentProfitStage === 3 && city.profitRatioStage3Partner) {
+        partnerFeeRate = parseFloat(city.profitRatioStage3Partner);
+      }
+      
+      return {
+        id: city.id,
+        name: city.name,
+        areaCode: city.areaCode,
+        isActive: city.isActive,
+        sortOrder: city.sortOrder,
+        createdAt: city.createdAt,
+        updatedAt: city.updatedAt,
+        partnerFeeRate, // 当前合佩人分红比例
+      };
+    });
   } catch (error) {
     console.error("获取城市列表失败:", error);
     return [];

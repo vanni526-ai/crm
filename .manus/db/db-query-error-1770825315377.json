@@ -1,0 +1,8 @@
+{
+  "query": "SELECT \n  pc.id,\n  pc.city,\n  p.name as partnerName,\n  pc.currentProfitStage,\n  pc.hasReturnedInvestment,\n  CASE \n    WHEN pc.currentProfitStage = 1 THEN pc.stage1PartnerRatio\n    WHEN pc.currentProfitStage = 2 AND pc.hasReturnedInvestment = 0 THEN pc.stage2APartnerRatio\n    WHEN pc.currentProfitStage = 2 AND pc.hasReturnedInvestment = 1 THEN pc.stage2BPartnerRatio\n    WHEN pc.currentProfitStage = 3 THEN pc.stage3PartnerRatio\n    ELSE 0\n  END as currentPartnerRatio\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nWHERE pc.city = '无锡'\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  pc.id,\n  pc.city,\n  p.name as partnerName,\n  pc.currentProfitStage,\n  pc.hasReturnedInvestment,\n  CASE \n    WHEN pc.currentProfitStage = 1 THEN pc.stage1PartnerRatio\n    WHEN pc.currentProfitStage = 2 AND pc.hasReturnedInvestment = 0 THEN pc.stage2APartnerRatio\n    WHEN pc.currentProfitStage = 2 AND pc.hasReturnedInvestment = 1 THEN pc.stage2BPartnerRatio\n    WHEN pc.currentProfitStage = 3 THEN pc.stage3PartnerRatio\n    ELSE 0\n  END as currentPartnerRatio\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nWHERE pc.city = '无锡'\nLIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'pc.city' in 'where clause'"
+  ]
+}

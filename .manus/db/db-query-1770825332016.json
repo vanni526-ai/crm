@@ -1,0 +1,22 @@
+{
+  "query": "SELECT \n  pc.id,\n  c.name as cityName,\n  p.name as partnerName,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner,\n  CASE \n    WHEN pc.currentProfitStage = 1 THEN pc.profitRatioStage1Partner\n    WHEN pc.currentProfitStage = 2 AND pc.isInvestmentRecovered = 0 THEN pc.profitRatioStage2APartner\n    WHEN pc.currentProfitStage = 2 AND pc.isInvestmentRecovered = 1 THEN pc.profitRatioStage2BPartner\n    WHEN pc.currentProfitStage = 3 THEN pc.profitRatioStage3Partner\n    ELSE 0\n  END as currentPartnerRatio\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '无锡'\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  pc.id,\n  c.name as cityName,\n  p.name as partnerName,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner,\n  CASE \n    WHEN pc.currentProfitStage = 1 THEN pc.profitRatioStage1Partner\n    WHEN pc.currentProfitStage = 2 AND pc.isInvestmentRecovered = 0 THEN pc.profitRatioStage2APartner\n    WHEN pc.currentProfitStage = 2 AND pc.isInvestmentRecovered = 1 THEN pc.profitRatioStage2BPartner\n    WHEN pc.currentProfitStage = 3 THEN pc.profitRatioStage3Partner\n    ELSE 0\n  END as currentPartnerRatio\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '无锡'\nLIMIT 5;",
+  "rows": [
+    {
+      "id": "39",
+      "cityName": "无锡",
+      "partnerName": "周建虎",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0",
+      "profitRatioStage1Partner": "30.00",
+      "profitRatioStage2APartner": "30.00",
+      "profitRatioStage2BPartner": "20.00",
+      "profitRatioStage3Partner": "20.00",
+      "currentPartnerRatio": "30.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcityName\tpartnerName\tcurrentProfitStage\tisInvestmentRecovered\tprofitRatioStage1Partner\tprofitRatioStage2APartner\tprofitRatioStage2BPartner\tprofitRatioStage3Partner\tcurrentPartnerRatio\n39\t无锡\t周建虎\t1\t0\t30.00\t30.00\t20.00\t20.00\t30.00\n",
+  "stderr": "",
+  "execution_time_ms": 1501
+}
