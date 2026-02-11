@@ -1,0 +1,150 @@
+{
+  "query": "\nSELECT \n  p.id as partner_id,\n  p.name as partner_name,\n  c.name as city_name,\n  pc.id as partner_city_id,\n  COUNT(o.id) as order_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN orders o ON c.name = o.deliveryCity\nGROUP BY p.id, p.name, c.name, pc.id\nORDER BY order_count ASC, p.id, c.name;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  p.id as partner_id,\n  p.name as partner_name,\n  c.name as city_name,\n  pc.id as partner_city_id,\n  COUNT(o.id) as order_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN orders o ON c.name = o.deliveryCity\nGROUP BY p.id, p.name, c.name, pc.id\nORDER BY order_count ASC, p.id, c.name;\n",
+  "rows": [
+    {
+      "partner_id": "29",
+      "partner_name": "测试合伙人",
+      "city_name": "NULL",
+      "partner_city_id": "NULL",
+      "order_count": "0"
+    },
+    {
+      "partner_id": "30",
+      "partner_name": "测试合伙人",
+      "city_name": "NULL",
+      "partner_city_id": "NULL",
+      "order_count": "0"
+    },
+    {
+      "partner_id": "31",
+      "partner_name": "测试合伙人",
+      "city_name": "NULL",
+      "partner_city_id": "NULL",
+      "order_count": "0"
+    },
+    {
+      "partner_id": "32",
+      "partner_name": "测试合伙人",
+      "city_name": "NULL",
+      "partner_city_id": "NULL",
+      "order_count": "0"
+    },
+    {
+      "partner_id": "18",
+      "partner_name": "张雪婷",
+      "city_name": "大连",
+      "partner_city_id": "30",
+      "order_count": "3"
+    },
+    {
+      "partner_id": "18",
+      "partner_name": "张雪婷",
+      "city_name": "石家庄",
+      "partner_city_id": "29",
+      "order_count": "4"
+    },
+    {
+      "partner_id": "23",
+      "partner_name": "曹心茹",
+      "city_name": "东莞",
+      "partner_city_id": "35",
+      "order_count": "4"
+    },
+    {
+      "partner_id": "21",
+      "partner_name": "张浩炜",
+      "city_name": "郑州",
+      "partner_city_id": "33",
+      "order_count": "5"
+    },
+    {
+      "partner_id": "22",
+      "partner_name": "康红祥",
+      "city_name": "太原",
+      "partner_city_id": "34",
+      "order_count": "5"
+    },
+    {
+      "partner_id": "25",
+      "partner_name": "冯玉智",
+      "city_name": "福州",
+      "partner_city_id": "37",
+      "order_count": "5"
+    },
+    {
+      "partner_id": "26",
+      "partner_name": "周建虎",
+      "city_name": "无锡",
+      "partner_city_id": "39",
+      "order_count": "5"
+    },
+    {
+      "partner_id": "25",
+      "partner_name": "冯玉智",
+      "city_name": "泉州",
+      "partner_city_id": "38",
+      "order_count": "6"
+    },
+    {
+      "partner_id": "19",
+      "partner_name": "孙志俊",
+      "city_name": "济南",
+      "partner_city_id": "31",
+      "order_count": "9"
+    },
+    {
+      "partner_id": "17",
+      "partner_name": "重庆加盟商",
+      "city_name": "重庆",
+      "partner_city_id": "27",
+      "order_count": "10"
+    },
+    {
+      "partner_id": "20",
+      "partner_name": "王开霖",
+      "city_name": "武汉",
+      "partner_city_id": "32",
+      "order_count": "14"
+    },
+    {
+      "partner_id": "28",
+      "partner_name": "朱利闻",
+      "city_name": "宁波",
+      "partner_city_id": "41",
+      "order_count": "14"
+    },
+    {
+      "partner_id": "16",
+      "partner_name": "苏州加盟商",
+      "city_name": "苏州",
+      "partner_city_id": "26",
+      "order_count": "16"
+    },
+    {
+      "partner_id": "24",
+      "partner_name": "赵浩然",
+      "city_name": "南京",
+      "partner_city_id": "36",
+      "order_count": "17"
+    },
+    {
+      "partner_id": "27",
+      "partner_name": "瀛姬直营",
+      "city_name": "深圳",
+      "partner_city_id": "40",
+      "order_count": "28"
+    },
+    {
+      "partner_id": "18",
+      "partner_name": "张雪婷",
+      "city_name": "天津",
+      "partner_city_id": "28",
+      "order_count": "40"
+    }
+  ],
+  "messages": [],
+  "stdout": "partner_id\tpartner_name\tcity_name\tpartner_city_id\torder_count\n29\t测试合伙人\tNULL\tNULL\t0\n30\t测试合伙人\tNULL\tNULL\t0\n31\t测试合伙人\tNULL\tNULL\t0\n32\t测试合伙人\tNULL\tNULL\t0\n18\t张雪婷\t大连\t30\t3\n18\t张雪婷\t石家庄\t29\t4\n23\t曹心茹\t东莞\t35\t4\n21\t张浩炜\t郑州\t33\t5\n22\t康红祥\t太原\t34\t5\n25\t冯玉智\t福州\t37\t5\n26\t周建虎\t无锡\t39\t5\n25\t冯玉智\t泉州\t38\t6\n19\t孙志俊\t济南\t31\t9\n17\t重庆加盟商\t重庆\t27\t10\n20\t王开霖\t武汉\t32\t14\n28\t朱利闻\t宁波\t41\t14\n16\t苏州加盟商\t苏州\t26\t16\n24\t赵浩然\t南京\t36\t17\n27\t瀛姬直营\t深圳\t40\t28\n18\t张雪婷\t天津\t28\t40\n",
+  "stderr": "",
+  "execution_time_ms": 1521
+}

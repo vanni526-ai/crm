@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  p.id as partner_id,\n  p.name as partner_name,\n  pc.city_name,\n  pc.id as partner_city_id,\n  COUNT(o.id) as order_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partner_id\nLEFT JOIN orders o ON pc.city_name = o.city\nGROUP BY p.id, p.name, pc.city_name, pc.id\nORDER BY p.id, pc.city_name;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  p.id as partner_id,\n  p.name as partner_name,\n  pc.city_name,\n  pc.id as partner_city_id,\n  COUNT(o.id) as order_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partner_id\nLEFT JOIN orders o ON pc.city_name = o.city\nGROUP BY p.id, p.name, pc.city_name, pc.id\nORDER BY p.id, pc.city_name;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'pc.partner_id' in 'on clause'"
+  ]
+}

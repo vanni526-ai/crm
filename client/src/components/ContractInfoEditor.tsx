@@ -30,6 +30,48 @@ export default function ContractInfoEditor({
   };
 
   const handleSubmit = () => {
+    // 验证必填字段
+    const requiredFields = [
+      { key: 'contractStartDate', label: '合同开始日期' },
+      { key: 'contractEndDate', label: '合同结束日期' },
+      { key: 'contractSignDate', label: '合同签署日期' },
+      { key: 'equityRatioPartner', label: '合伙人工商股权比例' },
+      { key: 'equityRatioBrand', label: '品牌方工商股权比例' },
+      { key: 'profitRatioStage1Partner', label: '第1阶段合伙人分红比例' },
+      { key: 'profitRatioStage1Brand', label: '第1阶段品牌方分红比例' },
+      { key: 'profitRatioStage2APartner', label: '第2阶段A合伙人分红比例' },
+      { key: 'profitRatioStage2ABrand', label: '第2阶段A品牌方分红比例' },
+      { key: 'profitRatioStage2BPartner', label: '第2阶段B合伙人分红比例' },
+      { key: 'profitRatioStage2BBrand', label: '第2阶段B品牌方分红比例' },
+      { key: 'profitRatioStage3Partner', label: '第3阶段合伙人分红比例' },
+      { key: 'profitRatioStage3Brand', label: '第3阶段品牌方分红比例' },
+      { key: 'brandUsageFee', label: '品牌使用费' },
+      { key: 'brandAuthDeposit', label: '品牌授权押金' },
+      { key: 'managementFee', label: '管理费' },
+      { key: 'operationPositionFee', label: '运营岗位费' },
+      { key: 'teacherRecruitmentFee', label: '老师招聘培训费' },
+      { key: 'marketingFee', label: '营销推广费' },
+      { key: 'estimatedRentDeposit', label: '预估租金押金' },
+      { key: 'estimatedPropertyFee', label: '预估物业费' },
+      { key: 'estimatedUtilityFee', label: '预估水电费' },
+      { key: 'estimatedRegistrationFee', label: '预估注册代理记账费' },
+      { key: 'estimatedRenovationFee', label: '预估装修及基础工具成本' },
+      { key: 'partnerBankName', label: '开户行' },
+      { key: 'partnerBankAccount', label: '账号' },
+      { key: 'partnerAccountHolder', label: '账户名称' },
+    ];
+    
+    const missingFields = requiredFields.filter(field => {
+      const value = formData[field.key];
+      return value === null || value === undefined || value === '';
+    });
+    
+    if (missingFields.length > 0) {
+      const missingLabels = missingFields.map(f => f.label).join('、');
+      alert(`请填写以下必填字段：${missingLabels}`);
+      return;
+    }
+    
     // 将所有数字字段从字符串转换为number类型
     const convertedData = { ...formData };
     
@@ -51,9 +93,9 @@ export default function ContractInfoEditor({
         const num = typeof convertedData[field] === 'string' 
           ? parseFloat(convertedData[field]) 
           : convertedData[field];
-        convertedData[field] = isNaN(num) ? null : num;
+        convertedData[field] = isNaN(num) ? undefined : num;
       } else {
-        convertedData[field] = null;
+        convertedData[field] = undefined;
       }
     });
     

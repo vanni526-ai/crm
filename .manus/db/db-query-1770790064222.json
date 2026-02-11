@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 首先查找没有关联订单的partner_cities记录\nSELECT pc.id, pc.partnerId, c.name as city_name\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN orders o ON c.name = o.deliveryCity\nGROUP BY pc.id, pc.partnerId, c.name\nHAVING COUNT(o.id) = 0;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 首先查找没有关联订单的partner_cities记录\nSELECT pc.id, pc.partnerId, c.name as city_name\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN orders o ON c.name = o.deliveryCity\nGROUP BY pc.id, pc.partnerId, c.name\nHAVING COUNT(o.id) = 0;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1539
+}
