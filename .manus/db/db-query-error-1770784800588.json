@@ -1,0 +1,8 @@
+{
+  "query": "SELECT * FROM partner_cities WHERE city_id = (SELECT id FROM cities WHERE name = '无锡') LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT * FROM partner_cities WHERE city_id = (SELECT id FROM cities WHERE name = '无锡') LIMIT 1;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'city_id' in 'where clause'"
+  ]
+}
