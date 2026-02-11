@@ -1,0 +1,9 @@
+{
+  "query": "-- 查看未关联的合伙人记录\nSELECT id, name, userId FROM partners WHERE userId IS NULL OR userId = 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 查看未关联的合伙人记录\nSELECT id, name, userId FROM partners WHERE userId IS NULL OR userId = 0;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1566
+}

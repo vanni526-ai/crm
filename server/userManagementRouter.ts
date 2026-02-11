@@ -380,10 +380,120 @@ export const userManagementRouter = router({
             // 不存在记录，创建新记录（只存储userId和合同信息）
             await drizzle.insert(teachers).values({
               userId: id,
-              // 基础信息从 users 表读取
+              // 基础信息介 users 表读取
               status: '活跃',
               isActive: true,
             } as any);
+          }
+        }
+      }
+      
+      // 处理城市合伙人角色变更
+      if (roles) {
+        const hasCityPartnerRole = roles.includes('cityPartner');
+        const hadCityPartnerRole = oldRoles.includes('cityPartner');
+        
+        const { partners, partnerCities, cities } = await import('../drizzle/schema');
+        
+        // 查找关联的合伙人记录
+        const [partnerRecords] = await drizzle.select().from(partners).where(eq(partners.userId, id)).limit(1);
+        
+        if (hadCityPartnerRole && !hasCityPartnerRole) {
+          // 移除合伙人角色：设置为不激活
+          if (partnerRecords) {
+            await drizzle.update(partners).set({ isActive: false } as any).where(eq(partners.userId, id));
+          }
+        } else if (!hadCityPartnerRole && hasCityPartnerRole) {
+          // 添加合伙人角色
+          if (partnerRecords) {
+            // 已存在记录，恢复激活
+            await drizzle.update(partners).set({ 
+              isActive: true,
+              name: updateData.name || partnerRecords.name,
+              phone: updateData.phone || partnerRecords.phone,
+            } as any).where(eq(partners.userId, id));
+          } else {
+            // 不存在记录，创建新记录
+            const [newPartner] = await drizzle.insert(partners).values({
+              userId: id,
+              name: updateData.name || usersBefore?.name || '未知',
+              phone: updateData.phone || usersBefore?.phone || null,
+              profitRatio: '0.30', // 默认30%
+              createdBy: 1, // 管理员创建
+              isActive: true,
+            } as any);
+            
+            // 如果指定了城市，创建partnerCities记录
+            if (roleCities && roleCities.cityPartner && roleCities.cityPartner.length > 0) {
+              const partnerId = newPartner.insertId;
+              
+              for (const cityName of roleCities.cityPartner) {
+                // 查找城市ID
+                const [cityRecord] = await drizzle.select().from(cities).where(eq(cities.name, cityName)).limit(1);
+                if (cityRecord) {
+                  // 创建partnerCities记录（草稿状态）
+                  await drizzle.insert(partnerCities).values({
+                    partnerId: partnerId,
+                    cityId: cityRecord.id,
+                    contractStatus: 'draft',
+                    currentProfitStage: 1,
+                    isInvestmentRecovered: false,
+                    createdBy: 1,
+                  } as any);
+                }
+              }
+            }
+          }
+        } else if (hasCityPartnerRole && partnerRecords) {
+          // 已经是合伙人，更新基础信息
+          await drizzle.update(partners).set({ 
+            name: updateData.name || partnerRecords.name,
+            phone: updateData.phone || partnerRecords.phone,
+          } as any).where(eq(partners.userId, id));
+          
+          // 如果更新了城市列表，同步更新partnerCities
+          if (roleCities && roleCities.cityPartner) {
+            const partnerId = partnerRecords.id;
+            const newCityNames = roleCities.cityPartner;
+            
+            // 获取当前已关联的城市
+            const existingPartnerCities = await drizzle.select().from(partnerCities).where(eq(partnerCities.partnerId, partnerId));
+            const existingCityIds = existingPartnerCities.map((pc: any) => pc.cityId);
+            
+            // 获取新城市的ID列表
+            const newCityIds: number[] = [];
+            for (const cityName of newCityNames) {
+              const [cityRecord] = await drizzle.select().from(cities).where(eq(cities.name, cityName)).limit(1);
+              if (cityRecord) {
+                newCityIds.push(cityRecord.id);
+              }
+            }
+            
+            // 添加新城市
+            for (const cityId of newCityIds) {
+              if (!existingCityIds.includes(cityId)) {
+                await drizzle.insert(partnerCities).values({
+                  partnerId: partnerId,
+                  cityId: cityId,
+                  contractStatus: 'draft',
+                  currentProfitStage: 1,
+                  isInvestmentRecovered: false,
+                  createdBy: 1,
+                } as any);
+              }
+            }
+            
+            // 删除不再关联的城市（可选，根据业务需求决定是删除还是标记为不激活）
+            // for (const existingCityId of existingCityIds) {
+            //   if (!newCityIds.includes(existingCityId)) {
+            //     await drizzle.delete(partnerCities).where(
+            //       and(
+            //         eq(partnerCities.partnerId, partnerId),
+            //         eq(partnerCities.cityId, existingCityId)
+            //       )
+            //     );
+            //   }
+            // }
           }
         }
       }
@@ -455,9 +565,30 @@ export const userManagementRouter = router({
       }
 
       // 处理城市合伙人角色变更
+      const { partners } = await import('../drizzle/schema');
+      const [partnerRecords] = await drizzle.select().from(partners).where(eq(partners.userId, input.id)).limit(1);
+      
       if (hadCityPartnerRole && !hasCityPartnerRole) {
-        // 移除城市合伙人角色：从 partners 表删除记录
-        await drizzle.execute(`DELETE FROM partners WHERE userId = ${input.id}`);
+        // 移除城市合伙人角色：设置为不激活
+        if (partnerRecords) {
+          await drizzle.update(partners).set({ isActive: false } as any).where(eq(partners.userId, input.id));
+        }
+      } else if (!hadCityPartnerRole && hasCityPartnerRole) {
+        // 添加城市合伙人角色
+        if (partnerRecords) {
+          // 已存在记录，恢复激活
+          await drizzle.update(partners).set({ isActive: true } as any).where(eq(partners.userId, input.id));
+        } else {
+          // 不存在记录，创建新记录
+          await drizzle.insert(partners).values({
+            userId: input.id,
+            name: usersBefore?.name || '未知',
+            phone: usersBefore?.phone || null,
+            profitRatio: '0.30', // 默认30%
+            createdBy: 1, // 管理员创建
+            isActive: true,
+          } as any);
+        }
       }
 
       return {
