@@ -389,6 +389,8 @@ export const partnerManagementRouter = router({
           partnerId: partnerCities.partnerId,
           cityId: partnerCities.cityId,
           cityName: cities.name,
+          contractEndDate: partnerCities.contractEndDate,
+          contractStatus: partnerCities.contractStatus,
           createdAt: partnerCities.createdAt,
         })
         .from(partnerCities)
@@ -569,6 +571,22 @@ export const partnerManagementRouter = router({
           }
         }
         
+        // 计算当月分红金额
+        const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+        const currentMonthProfit = await db
+          .select({
+            totalProfit: sql<string>`COALESCE(SUM(${partnerProfitRecords.amount}), 0)`,
+          })
+          .from(partnerProfitRecords)
+          .where(
+            and(
+              eq(partnerProfitRecords.partnerId, partner.id),
+              sql`DATE_FORMAT(${partnerProfitRecords.transferDate}, '%Y-%m') = ${currentMonth}`
+            )
+          );
+        
+        const currentMonthProfitAmount = currentMonthProfit[0] ? Number(currentMonthProfit[0].totalProfit) : 0;
+        
         stats.push({
           partnerId: partner.id,
           partnerName: partner.name,
@@ -583,6 +601,7 @@ export const partnerManagementRouter = router({
           consumablesFee: totalConsumablesFee.toFixed(2),
           deferredPayment: totalDeferredPayment.toFixed(2),
           partnerFee: totalPartnerFee.toFixed(2),
+          currentMonthProfit: currentMonthProfitAmount.toFixed(2),
         });
       }
       

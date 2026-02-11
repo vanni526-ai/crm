@@ -17,6 +17,7 @@ export default function PartnerManagement() {
   const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
   const [contractDialogOpen, setContractDialogOpen] = useState(false);
   const [uploadingContract, setUploadingContract] = useState(false);
+  const [citySearchQuery, setCitySearchQuery] = useState("");
 
   // 查询合伙人列表
   const { data: partners, isLoading: partnersLoading } = trpc.partnerManagement.list.useQuery();
@@ -152,37 +153,51 @@ export default function PartnerManagement() {
             <CardHeader>
               <CardTitle>合伙人列表</CardTitle>
               <CardDescription>共 {partners?.length || 0} 个合伙人</CardDescription>
+              <div className="mt-4">
+                <Input
+                  placeholder="搜索城市名称..."
+                  value={citySearchQuery}
+                  onChange={(e) => setCitySearchQuery(e.target.value)}
+                  className="w-full"
+                />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 {partnersLoading ? (
                   <div className="text-center text-muted-foreground py-8">加载中...</div>
                 ) : partners && partners.length > 0 ? (
-                  partners.map((partner) => {
-                    const stats = partnerStats?.find((s) => s.partnerId === partner.id);
-                    return (
-                      <div
-                        key={partner.id}
-                        className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                          selectedPartnerId === partner.id
-                            ? "bg-primary/10 border-primary"
-                            : "hover:bg-accent"
-                        }`}
-                        onClick={() => {
-                          setSelectedPartnerId(partner.id);
-                          setSelectedCityId(null);
-                        }}
-                      >
-                        <div className="font-medium">{partner.name}</div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          {stats?.cities || "未分配城市"}
+                  partners
+                    .filter((partner) => {
+                      const stats = partnerStats?.find((s) => s.partnerId === partner.id);
+                      const cities = stats?.cities || "";
+                      return cities.toLowerCase().includes(citySearchQuery.toLowerCase());
+                    })
+                    .map((partner) => {
+                      const stats = partnerStats?.find((s) => s.partnerId === partner.id);
+                      return (
+                        <div
+                          key={partner.id}
+                          className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                            selectedPartnerId === partner.id
+                              ? "bg-primary/10 border-primary"
+                              : "hover:bg-accent"
+                          }`}
+                          onClick={() => {
+                            setSelectedPartnerId(partner.id);
+                            setSelectedCityId(null);
+                          }}
+                        >
+                          <div className="font-medium">{stats?.cities || "未分配城市"}</div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            合伙人：{partner.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            当月分红：¥{stats?.currentMonthProfit || "0.00"}
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          订单：{stats?.orderCount || 0} | 销售额：¥{stats?.courseAmount || "0.00"}
-                        </div>
-                      </div>
-                    );
-                  })
+                      );
+                    })
                 ) : (
                   <div className="text-center text-muted-foreground py-8">暂无合伙人</div>
                 )}
@@ -211,22 +226,40 @@ export default function PartnerManagement() {
                     </div>
                     <div className="space-y-2">
                       {partnerCities && partnerCities.length > 0 ? (
-                        partnerCities.map((city) => (
-                          <div
-                            key={city.id}
-                            className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                              selectedCityId === city.cityId
-                                ? "bg-primary/10 border-primary"
-                                : "hover:bg-accent"
-                            }`}
-                            onClick={() => setSelectedCityId(city.cityId)}
-                          >
-                            <div className="font-medium">{city.cityName}</div>
-                            <div className="text-sm text-muted-foreground mt-1">
-                              点击查看合同信息
+                        partnerCities.map((city) => {
+                          // 计算合同剩余有效期
+                          let remainingDays: number | null = null;
+                          if (city.contractEndDate) {
+                            const endDate = new Date(city.contractEndDate);
+                            const today = new Date();
+                            const diffTime = endDate.getTime() - today.getTime();
+                            remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                          }
+                          
+                          return (
+                            <div
+                              key={city.id}
+                              className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                                selectedCityId === city.cityId
+                                  ? "bg-primary/10 border-primary"
+                                  : "hover:bg-accent"
+                              }`}
+                              onClick={() => setSelectedCityId(city.cityId)}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="font-medium">{city.cityName}</div>
+                                {remainingDays !== null && (
+                                  <Badge variant={remainingDays > 90 ? "default" : remainingDays > 30 ? "secondary" : "destructive"}>
+                                    {remainingDays > 0 ? `剩余${remainingDays}天` : "已过期"}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-sm text-muted-foreground mt-1">
+                                点击查看合同信息
+                              </div>
                             </div>
-                          </div>
-                        ))
+                          );
+                        })
                       ) : (
                         <div className="text-center text-muted-foreground py-8">
                           该合伙人暂未关联城市
@@ -441,24 +474,16 @@ export default function PartnerManagement() {
                         <h3 className="text-lg font-semibold">收款账户信息</h3>
                         <div className="grid grid-cols-1 gap-4">
                           <div>
+                            <Label className="text-muted-foreground">账户名称</Label>
+                            <div className="mt-1">{contractInfo.partnerAccountHolder || "未设置"}</div>
+                          </div>
+                          <div>
                             <Label className="text-muted-foreground">开户行</Label>
                             <div className="mt-1">{contractInfo.partnerBankName || "未设置"}</div>
                           </div>
                           <div>
-                            <Label className="text-muted-foreground">银行账号</Label>
+                            <Label className="text-muted-foreground">账号</Label>
                             <div className="mt-1">{contractInfo.partnerBankAccount || "未设置"}</div>
-                          </div>
-                          <div>
-                            <Label className="text-muted-foreground">账户名</Label>
-                            <div className="mt-1">{contractInfo.partnerAccountHolder || "未设置"}</div>
-                          </div>
-                          <div>
-                            <Label className="text-muted-foreground">支付宝账号</Label>
-                            <div className="mt-1">{contractInfo.partnerAlipayAccount || "未设置"}</div>
-                          </div>
-                          <div>
-                            <Label className="text-muted-foreground">微信账号</Label>
-                            <div className="mt-1">{contractInfo.partnerWechatAccount || "未设置"}</div>
                           </div>
                           <div>
                             <Label className="text-muted-foreground">每月分红支付日</Label>
