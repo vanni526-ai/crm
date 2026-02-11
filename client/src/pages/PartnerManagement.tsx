@@ -13,6 +13,7 @@ import { FileUp, Calculator, Download, Eye, Edit } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import ContractInfoEditor from "@/components/ContractInfoEditor";
 import PartnerInfoTab from "@/components/PartnerInfoTab";
+import CreatePartnerDialog from "@/components/CreatePartnerDialog";
 
 export default function PartnerManagement() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
@@ -20,12 +21,15 @@ export default function PartnerManagement() {
   const [contractDialogOpen, setContractDialogOpen] = useState(false);
   const [uploadingContract, setUploadingContract] = useState(false);
   const [citySearchQuery, setCitySearchQuery] = useState("");
+  const [createPartnerDialogOpen, setCreatePartnerDialogOpen] = useState(false);
   
   // 合同预览和编辑状态
   const [contractPreview, setContractPreview] = useState<any>(null); // 识别结果预览
   const [editingContract, setEditingContract] = useState(false); // 是否处于编辑模式
   const [editFormData, setEditFormData] = useState<any>({}); // 编辑表单数据
 
+  const utils = trpc.useUtils();
+  
   // 查询合伙人列表
   const { data: partners, isLoading: partnersLoading } = trpc.partnerManagement.list.useQuery();
   
@@ -183,8 +187,15 @@ export default function PartnerManagement() {
           {/* 左侧：合伙人列表 */}
           <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle>合伙人列表</CardTitle>
-              <CardDescription>共 {partners?.length || 0} 个合伙人</CardDescription>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>合伙人列表</CardTitle>
+                  <CardDescription>共 {partners?.length || 0} 个合伙人</CardDescription>
+                </div>
+                <Button onClick={() => setCreatePartnerDialogOpen(true)}>
+                  新增合伙人
+                </Button>
+              </div>
               <div className="mt-4">
                 <Input
                   placeholder="搜索城市名称..."
@@ -635,6 +646,16 @@ export default function PartnerManagement() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* 新增合伙人对话框 */}
+        <CreatePartnerDialog
+          open={createPartnerDialogOpen}
+          onOpenChange={setCreatePartnerDialogOpen}
+          onSuccess={() => {
+            // 刷新合伙人列表
+            utils.partnerManagement.list.invalidate();
+          }}
+        />
       </div>
     </DashboardLayout>
   );
