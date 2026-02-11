@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 先删除partner_cities表中的关联记录\nDELETE FROM partner_cities \nWHERE partnerId IN (SELECT id FROM partners WHERE name = '测试合伙人');\n\n-- 再删除partners表中的测试合伙人记录\nDELETE FROM partners WHERE name = '测试合伙人';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 先删除partner_cities表中的关联记录\nDELETE FROM partner_cities \nWHERE partnerId IN (SELECT id FROM partners WHERE name = '测试合伙人');\n\n-- 再删除partners表中的测试合伙人记录\nDELETE FROM partners WHERE name = '测试合伙人';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1749
+}

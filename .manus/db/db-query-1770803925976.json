@@ -1,0 +1,19 @@
+{
+  "query": "\n-- 检查是否还有测试合伙人记录\nSELECT COUNT(*) as remaining_test_partners \nFROM partners \nWHERE name = '测试合伙人';\n\n-- 检查合伙人总数\nSELECT COUNT(*) as total_partners FROM partners;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 检查是否还有测试合伙人记录\nSELECT COUNT(*) as remaining_test_partners \nFROM partners \nWHERE name = '测试合伙人';\n\n-- 检查合伙人总数\nSELECT COUNT(*) as total_partners FROM partners;\n",
+  "rows": [
+    {
+      "remaining_test_partners": "0"
+    },
+    {
+      "remaining_test_partners": "total_partners"
+    },
+    {
+      "remaining_test_partners": "13"
+    }
+  ],
+  "messages": [],
+  "stdout": "remaining_test_partners\n0\ntotal_partners\n13\n",
+  "stderr": "",
+  "execution_time_ms": 1747
+}
