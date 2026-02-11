@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { FileUp, Calculator, Download, Eye, Edit } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import ContractInfoEditor from "@/components/ContractInfoEditor";
+import PartnerInfoTab from "@/components/PartnerInfoTab";
 
 export default function PartnerManagement() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
@@ -239,9 +240,10 @@ export default function PartnerManagement() {
           {/* 右侧：详情区域 */}
           <Card className="lg:col-span-2">
             {selectedPartnerId ? (
-              <Tabs defaultValue="cities" className="w-full">
+              <Tabs defaultValue="info" className="w-full">
                 <CardHeader>
-                  <TabsList className="grid w-full grid-cols-4">
+                  <TabsList className="grid w-full grid-cols-5">
+                    <TabsTrigger value="info">合伙人信息</TabsTrigger>
                     <TabsTrigger value="cities">城市管理</TabsTrigger>
                     <TabsTrigger value="contract">合同信息</TabsTrigger>
                     <TabsTrigger value="account">收款账户</TabsTrigger>
@@ -250,6 +252,11 @@ export default function PartnerManagement() {
                 </CardHeader>
 
                 <CardContent>
+                  {/* 合伙人信息Tab */}
+                  <TabsContent value="info" className="space-y-4">
+                    <PartnerInfoTab partnerId={selectedPartnerId} />
+                  </TabsContent>
+
                   {/* 城市管理Tab */}
                   <TabsContent value="cities" className="space-y-4">
                     <div className="flex justify-between items-center">

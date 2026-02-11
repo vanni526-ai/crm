@@ -598,6 +598,9 @@ export const partners = mysqlTable("partners", {
   userId: int("userId").notNull(), // 关联users表
   name: varchar("name", { length: 100 }).notNull(), // 合伙人姓名
   phone: varchar("phone", { length: 20 }), // 手机号(用于登录App)
+  idCardNumber: varchar("idCardNumber", { length: 18 }), // 身份证号码
+  idCardFrontUrl: text("idCardFrontUrl"), // 身份证正面照片URL
+  idCardBackUrl: text("idCardBackUrl"), // 身份证反面照片URL
   
   // 合同信息
   profitRatio: decimal("profitRatio", { precision: 5, scale: 2 }).notNull(), // 分红比例(百分比)

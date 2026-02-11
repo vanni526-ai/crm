@@ -2,6 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
+import { recognizeIDCard } from "./idCardOCR";
 
 /**
  * 文件上传路由
@@ -89,6 +90,60 @@ export const uploadRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "文件上传失败",
+        });
+      }
+    }),
+
+  /**
+   * 上传身份证照片并识别
+   * 接收base64编码的图片数据,上传到S3并调用OCR识别姓名和身份证号
+   */
+  uploadAndRecognizeIDCard: protectedProcedure
+    .input(z.object({
+      base64Data: z.string(), // base64编码的图片数据(包含data:image/...前缀)
+      side: z.enum(["front", "back"]), // 正面或反面
+    }))
+    .mutation(async ({ input }) => {
+      try {
+        // 解析base64数据
+        const matches = input.base64Data.match(/^data:image\/(\w+);base64,(.+)$/);
+        if (!matches) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "无效的图片数据格式",
+          });
+        }
+
+        const imageType = matches[1]; // png, jpeg, jpg, etc.
+        const base64Content = matches[2];
+        const buffer = Buffer.from(base64Content, 'base64');
+
+        // 生成唯一的文件名
+        const timestamp = Date.now();
+        const randomSuffix = Math.random().toString(36).substring(2, 8);
+        const fileKey = `id-cards/${input.side}-${timestamp}-${randomSuffix}.${imageType}`;
+
+        // 上传到S3
+        const contentType = `image/${imageType}`;
+        const result = await storagePut(fileKey, buffer, contentType);
+
+        // 调用OCR识别（只对正面进行识别）
+        let ocrResult = null;
+        if (input.side === "front") {
+          ocrResult = await recognizeIDCard(result.url);
+        }
+
+        return {
+          success: true,
+          url: result.url,
+          key: result.key,
+          ocr: ocrResult, // OCR识别结果（只有正面才有）
+        };
+      } catch (error) {
+        console.error("身份证上传失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "身份证上传失败",
         });
       }
     }),

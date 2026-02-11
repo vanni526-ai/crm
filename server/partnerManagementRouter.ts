@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders } from "../drizzle/schema";
+import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders, users } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { uploadAndParseContract } from "./contractParser";
@@ -66,9 +66,12 @@ export const partnerManagementRouter = router({
    */
   create: protectedProcedure
     .input(z.object({
-      userId: z.number(),
+      userId: z.number().optional(), // 可选，如果不提供则自动创建
       name: z.string(),
       phone: z.string().optional(),
+      idCardNumber: z.string().optional(), // 身份证号码
+      idCardFrontUrl: z.string().optional(), // 身份证正面照片URL
+      idCardBackUrl: z.string().optional(), // 身份证反面照片URL
       profitRatio: z.string(), // decimal类型需要字符串
       profitRule: z.string().optional(),
       brandFee: z.string().optional(),
@@ -86,16 +89,59 @@ export const partnerManagementRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
+      let userId = input.userId;
+      
+      // 如果没有提供userId，则自动创建用户账号
+      if (!userId) {
+        if (!input.phone) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "创建合伙人时必须提供手机号"
+          });
+        }
+        
+        // 检查手机号是否已存在
+        const existingUser = await db.select().from(users).where(eq(users.phone, input.phone)).limit(1);
+        if (existingUser.length > 0) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "该手机号已被使用"
+          });
+        }
+        
+        // 创建用户账号
+        const { hashPassword } = await import("./passwordUtils");
+        const hashedPassword = await hashPassword("123456"); // 默认密码
+        const openId = `partner_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+        
+        const userResult = await db.insert(users).values({
+          openId,
+          name: input.name,
+          phone: input.phone,
+          password: hashedPassword,
+          role: "user" as any,
+          roles: "user,cityPartner", // 普通用户 + 合伙人
+          isActive: true,
+        } as any);
+        
+        userId = Number(userResult[0].insertId);
+      }
+      
       const { contractStartDate, contractEndDate, ...insertData } = input;
       
       const result = await db.insert(partners).values({
         ...insertData,
+        userId,
         ...(contractStartDate ? { contractStartDate: new Date(contractStartDate) } : {}),
         ...(contractEndDate ? { contractEndDate: new Date(contractEndDate) } : {}),
         createdBy: ctx.user.id,
       });
       
-      return { id: Number(result[0].insertId) };
+      return { 
+        id: Number(result[0].insertId),
+        userId,
+        userCreated: !input.userId // 标记是否新创建了用户
+      };
     }),
 
   /**
@@ -106,6 +152,9 @@ export const partnerManagementRouter = router({
       id: z.number(),
       name: z.string().optional(),
       phone: z.string().optional(),
+      idCardNumber: z.string().optional(), // 身份证号码
+      idCardFrontUrl: z.string().optional(), // 身份证正面照片URL
+      idCardBackUrl: z.string().optional(), // 身份证反面照片URL
       profitRatio: z.string().optional(), // decimal类型需要字符串
       profitRule: z.string().optional(),
       brandFee: z.string().optional(),
@@ -125,12 +174,42 @@ export const partnerManagementRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
-      const { id, contractStartDate, contractEndDate, ...updateData } = input;
+      const { id, contractStartDate, contractEndDate, phone, ...updateData } = input;
+      
+      // 如果更新了手机号，需要同步到users表
+      if (phone !== undefined) {
+        // 先获取合伙人的userId
+        const partner = await db.select().from(partners).where(eq(partners.id, id)).limit(1);
+        if (partner.length === 0) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "合伙人不存在" });
+        }
+        
+        const userId = partner[0].userId;
+        
+        // 检查新手机号是否已被其他用户使用
+        if (phone) {
+          const existingUser = await db.select().from(users)
+            .where(eq(users.phone, phone))
+            .limit(1);
+          if (existingUser.length > 0 && existingUser[0].id !== userId) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "该手机号已被其他用户使用"
+            });
+          }
+        }
+        
+        // 同步更新users表的手机号
+        await db.update(users)
+          .set({ phone })
+          .where(eq(users.id, userId));
+      }
       
       await db
         .update(partners)
         .set({
           ...updateData,
+          ...(phone !== undefined ? { phone } : {}),
           ...(contractStartDate ? { contractStartDate: new Date(contractStartDate) } : {}),
           ...(contractEndDate ? { contractEndDate: new Date(contractEndDate) } : {}),
         })
