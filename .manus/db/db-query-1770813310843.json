@@ -1,0 +1,16 @@
+{
+  "query": "\nSELECT p.id as partner_id, p.name, pc.id as partner_city_id, pc.cityId \nFROM partners p \nLEFT JOIN partner_cities pc ON p.id = pc.partnerId \nWHERE p.name = '李一涵';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT p.id as partner_id, p.name, pc.id as partner_city_id, pc.cityId \nFROM partners p \nLEFT JOIN partner_cities pc ON p.id = pc.partnerId \nWHERE p.name = '李一涵';\n",
+  "rows": [
+    {
+      "partner_id": "30001",
+      "name": "李一涵",
+      "partner_city_id": "NULL",
+      "cityId": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "partner_id\tname\tpartner_city_id\tcityId\n30001\t李一涵\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1499
+}

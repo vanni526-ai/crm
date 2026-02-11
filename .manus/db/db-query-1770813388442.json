@@ -1,0 +1,13 @@
+{
+  "query": "\n-- 先查询李一涵的partnerId\nSELECT id FROM partners WHERE name = '李一涵';\n\n-- 删除partner_cities记录\nDELETE FROM partner_cities WHERE partnerId IN (SELECT id FROM partners WHERE name = '李一涵');\n\n-- 删除partners记录\nDELETE FROM partners WHERE name = '李一涵';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 先查询李一涵的partnerId\nSELECT id FROM partners WHERE name = '李一涵';\n\n-- 删除partner_cities记录\nDELETE FROM partner_cities WHERE partnerId IN (SELECT id FROM partners WHERE name = '李一涵');\n\n-- 删除partners记录\nDELETE FROM partners WHERE name = '李一涵';\n",
+  "rows": [
+    {
+      "id": "30001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n30001\n",
+  "stderr": "",
+  "execution_time_ms": 2003
+}

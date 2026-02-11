@@ -23,10 +23,22 @@ export default function ContractInfoEditor({
   const [formData, setFormData] = useState(initialData || {});
 
   const handleChange = (field: string, value: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
+    const newData = {
+      ...formData,
       [field]: value,
-    }));
+    };
+    
+    // 如果修改的是四项费用之一，自动重新计算品牌使用费
+    if (['managementFee', 'operationPositionFee', 'teacherRecruitmentFee', 'marketingFee'].includes(field)) {
+      const managementFee = field === 'managementFee' ? (value || 0) : (newData.managementFee || 0);
+      const operationPositionFee = field === 'operationPositionFee' ? (value || 0) : (newData.operationPositionFee || 0);
+      const teacherRecruitmentFee = field === 'teacherRecruitmentFee' ? (value || 0) : (newData.teacherRecruitmentFee || 0);
+      const marketingFee = field === 'marketingFee' ? (value || 0) : (newData.marketingFee || 0);
+      
+      newData.brandUsageFee = managementFee + operationPositionFee + teacherRecruitmentFee + marketingFee;
+    }
+    
+    setFormData(newData);
   };
 
   const handleSubmit = () => {
@@ -43,9 +55,9 @@ export default function ContractInfoEditor({
       { key: 'profitRatioStage2ABrand', label: '第2阶段A品牌方分红比例' },
       { key: 'profitRatioStage2BPartner', label: '第2阶段B合伙人分红比例' },
       { key: 'profitRatioStage2BBrand', label: '第2阶段B品牌方分红比例' },
-      { key: 'profitRatioStage3Partner', label: '第3阶段合伙人分红比例' },
+      { key: 'profitRatioStage3Partner', label: '第3阶段合佩人分红比例' },
       { key: 'profitRatioStage3Brand', label: '第3阶段品牌方分红比例' },
-      { key: 'brandUsageFee', label: '品牌使用费' },
+      // brandUsageFee 不再是必填字段，因为它是自动计算的
       { key: 'brandAuthDeposit', label: '品牌授权押金' },
       { key: 'managementFee', label: '管理费' },
       { key: 'operationPositionFee', label: '运营岗位费' },
@@ -336,19 +348,19 @@ export default function ContractInfoEditor({
           <CardTitle>投资费用明细（单位：元）</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* 品牌使用费（总金额） */}
+          {/* 品牌使用费（总金额，自动计算） */}
           <div className="p-4 bg-primary/5 rounded-lg space-y-4">
             <div>
               <Label className="font-semibold">品牌使用费（总金额）</Label>
-              <Input
-                type="number"
-                value={formData.brandUsageFee || ""}
-                onChange={(e) => handleChange("brandUsageFee", parseFloat(e.target.value))}
-                placeholder="如：50000"
-                className="mt-2"
-                required
-              />
-              <p className="text-sm text-muted-foreground mt-2">包含：管理费 + 运营岗位费 + 老师招聘培训费 + 营销推广费</p>
+              <div className="mt-2 text-2xl font-bold text-primary">
+                ￥{(
+                  (formData.managementFee || 0) +
+                  (formData.operationPositionFee || 0) +
+                  (formData.teacherRecruitmentFee || 0) +
+                  (formData.marketingFee || 0)
+                ).toFixed(2)}
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">自动计算：管理费 + 运营岗位费 + 老师招聘培训费 + 营销推广费</p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">

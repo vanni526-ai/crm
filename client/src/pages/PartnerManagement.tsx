@@ -494,11 +494,16 @@ export default function PartnerManagement() {
                           <div>
                             <h3 className="text-lg font-semibold mb-4">投资费用明细</h3>
                             <div className="space-y-4">
-                              {/* 品牌使用费（总金额，加粗） */}
+                              {/* 品牌使用费（总金额，自动计算） */}
                               <div className="p-4 bg-primary/5 rounded-lg">
                                 <Label className="text-muted-foreground font-semibold">品牌使用费（总金额）</Label>
                                 <div className="mt-2 text-2xl font-bold">
-                                  ￥{contractInfo.brandUsageFee ? parseFloat(contractInfo.brandUsageFee).toFixed(2) : "0.00"}
+                                  ￥{(
+                                    (contractInfo.managementFee ? parseFloat(contractInfo.managementFee) : 0) +
+                                    (contractInfo.operationPositionFee ? parseFloat(contractInfo.operationPositionFee) : 0) +
+                                    (contractInfo.teacherRecruitmentFee ? parseFloat(contractInfo.teacherRecruitmentFee) : 0) +
+                                    (contractInfo.marketingFee ? parseFloat(contractInfo.marketingFee) : 0)
+                                  ).toFixed(2)}
                                 </div>
                                 <div className="mt-3 text-sm text-muted-foreground space-y-1">
                                   <div className="flex justify-between">

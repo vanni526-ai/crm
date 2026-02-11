@@ -1,0 +1,122 @@
+{
+  "query": "\nSELECT \n    p.name as partner_name,\n    c.name as city_name,\n    pc.currentProfitStage,\n    pc.isInvestmentRecovered,\n    pc.contractStartDate\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nORDER BY c.name;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n    p.name as partner_name,\n    c.name as city_name,\n    pc.currentProfitStage,\n    pc.isInvestmentRecovered,\n    pc.contractStartDate\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nORDER BY c.name;\n",
+  "rows": [
+    {
+      "partner_name": "曹心茹",
+      "city_name": "东莞",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-09-05"
+    },
+    {
+      "partner_name": "赵浩然",
+      "city_name": "南京",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-09-16"
+    },
+    {
+      "partner_name": "张雪婷",
+      "city_name": "大连",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-08-01"
+    },
+    {
+      "partner_name": "张雪婷",
+      "city_name": "天津",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-06-18"
+    },
+    {
+      "partner_name": "康红祥",
+      "city_name": "太原",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-07-26"
+    },
+    {
+      "partner_name": "朱利闻",
+      "city_name": "宁波",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-12-31"
+    },
+    {
+      "partner_name": "周建虎",
+      "city_name": "无锡",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-11-01"
+    },
+    {
+      "partner_name": "王开霖",
+      "city_name": "武汉",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-07-22"
+    },
+    {
+      "partner_name": "冯玉智",
+      "city_name": "泉州",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-09-16"
+    },
+    {
+      "partner_name": "孙志俊",
+      "city_name": "济南",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-06-24"
+    },
+    {
+      "partner_name": "瀛姬直营",
+      "city_name": "深圳",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-11-30"
+    },
+    {
+      "partner_name": "张雪婷",
+      "city_name": "石家庄",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-08-01"
+    },
+    {
+      "partner_name": "冯玉智",
+      "city_name": "福州",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-09-16"
+    },
+    {
+      "partner_name": "苏州加盟商",
+      "city_name": "苏州",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "NULL"
+    },
+    {
+      "partner_name": "张浩炜",
+      "city_name": "郑州",
+      "currentProfitStage": "3",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "2025-08-15"
+    },
+    {
+      "partner_name": "重庆加盟商",
+      "city_name": "重庆",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0",
+      "contractStartDate": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "partner_name\tcity_name\tcurrentProfitStage\tisInvestmentRecovered\tcontractStartDate\n曹心茹\t东莞\t3\t0\t2025-09-05\n赵浩然\t南京\t3\t0\t2025-09-16\n张雪婷\t大连\t3\t0\t2025-08-01\n张雪婷\t天津\t3\t0\t2025-06-18\n康红祥\t太原\t3\t0\t2025-07-26\n朱利闻\t宁波\t3\t0\t2025-12-31\n周建虎\t无锡\t3\t0\t2025-11-01\n王开霖\t武汉\t3\t0\t2025-07-22\n冯玉智\t泉州\t3\t0\t2025-09-16\n孙志俊\t济南\t3\t0\t2025-06-24\n瀛姬直营\t深圳\t3\t0\t2025-11-30\n张雪婷\t石家庄\t3\t0\t2025-08-01\n冯玉智\t福州\t3\t0\t2025-09-16\n苏州加盟商\t苏州\t1\t0\tNULL\n张浩炜\t郑州\t3\t0\t2025-08-15\n重庆加盟商\t重庆\t1\t0\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1561
+}

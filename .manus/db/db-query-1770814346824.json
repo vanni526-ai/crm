@@ -1,0 +1,38 @@
+{
+  "query": "\nSELECT \n    p.name as partner_name,\n    c.name as city_name,\n    pc.contractStatus,\n    pc.currentProfitStage,\n    pc.brandUsageFee\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE c.name IN ('福州', '泉州', '无锡', '郑州')\nORDER BY c.name;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n    p.name as partner_name,\n    c.name as city_name,\n    pc.contractStatus,\n    pc.currentProfitStage,\n    pc.brandUsageFee\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE c.name IN ('福州', '泉州', '无锡', '郑州')\nORDER BY c.name;\n",
+  "rows": [
+    {
+      "partner_name": "周建虎",
+      "city_name": "无锡",
+      "contractStatus": "active",
+      "currentProfitStage": "1",
+      "brandUsageFee": "NULL"
+    },
+    {
+      "partner_name": "冯玉智",
+      "city_name": "泉州",
+      "contractStatus": "active",
+      "currentProfitStage": "1",
+      "brandUsageFee": "NULL"
+    },
+    {
+      "partner_name": "冯玉智",
+      "city_name": "福州",
+      "contractStatus": "active",
+      "currentProfitStage": "1",
+      "brandUsageFee": "NULL"
+    },
+    {
+      "partner_name": "张浩炜",
+      "city_name": "郑州",
+      "contractStatus": "active",
+      "currentProfitStage": "1",
+      "brandUsageFee": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "partner_name\tcity_name\tcontractStatus\tcurrentProfitStage\tbrandUsageFee\n周建虎\t无锡\tactive\t1\tNULL\n冯玉智\t泉州\tactive\t1\tNULL\n冯玉智\t福州\tactive\t1\tNULL\n张浩炜\t郑州\tactive\t1\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1522
+}

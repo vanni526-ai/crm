@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 修复所有城市的合同状态：从 terminated 改为 active\nUPDATE partner_cities SET contractStatus = 'active' WHERE contractStatus = 'terminated';\n\n-- 修复所有城市的当前分红阶段：从 3 改为 1\nUPDATE partner_cities SET currentProfitStage = 1 WHERE currentProfitStage = 3;\n\n-- 修复福州和泉州的品牌使用费：从 0 改为 50000\nUPDATE partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nSET pc.brandUsageFee = 50000\nWHERE c.name IN ('福州', '泉州') AND pc.brandUsageFee = 0;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 修复所有城市的合同状态：从 terminated 改为 active\nUPDATE partner_cities SET contractStatus = 'active' WHERE contractStatus = 'terminated';\n\n-- 修复所有城市的当前分红阶段：从 3 改为 1\nUPDATE partner_cities SET currentProfitStage = 1 WHERE currentProfitStage = 3;\n\n-- 修复福州和泉州的品牌使用费：从 0 改为 50000\nUPDATE partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nSET pc.brandUsageFee = 50000\nWHERE c.name IN ('福州', '泉州') AND pc.brandUsageFee = 0;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1991
+}
