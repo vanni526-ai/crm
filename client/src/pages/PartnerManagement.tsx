@@ -404,13 +404,13 @@ export default function PartnerManagement() {
                               <div>
                                 <Label className="text-muted-foreground">合伙人股权比例</Label>
                                 <div className="mt-1 text-2xl font-bold">
-                                  {contractInfo.equityRatioPartner || 0}%
+                                  {contractInfo.equityRatioPartner ? `${parseFloat(contractInfo.equityRatioPartner)}%` : "未设置"}
                                 </div>
                               </div>
                               <div>
                                 <Label className="text-muted-foreground">品牌方股权比例</Label>
                                 <div className="mt-1 text-2xl font-bold">
-                                  {contractInfo.equityRatioBrand || 0}%
+                                  {contractInfo.equityRatioBrand ? `${parseFloat(contractInfo.equityRatioBrand)}%` : "未设置"}
                                 </div>
                               </div>
                             </div>
@@ -430,72 +430,87 @@ export default function PartnerManagement() {
                                 <div>
                                   <span className="text-muted-foreground">合伙人分红：</span>
                                   <span className="text-xl font-bold ml-2">
-                                    {contractInfo.currentProfitStage === 1
-                                      ? contractInfo.profitRatioStage1Partner
-                                      : contractInfo.currentProfitStage === 2
-                                      ? contractInfo.isInvestmentRecovered
-                                        ? contractInfo.profitRatioStage2BPartner
-                                        : contractInfo.profitRatioStage2APartner
-                                      : contractInfo.profitRatioStage3Partner || 0}
-                                    %
+                                    {(() => {
+                                      const ratio = contractInfo.currentProfitStage === 1
+                                        ? contractInfo.profitRatioStage1Partner
+                                        : contractInfo.currentProfitStage === 2
+                                        ? contractInfo.isInvestmentRecovered
+                                          ? contractInfo.profitRatioStage2BPartner
+                                          : contractInfo.profitRatioStage2APartner
+                                        : contractInfo.profitRatioStage3Partner;
+                                      return ratio ? `${parseFloat(ratio)}%` : "未设置";
+                                    })()}
                                   </span>
                                 </div>
                                 <div>
                                   <span className="text-muted-foreground">品牌方分红：</span>
                                   <span className="text-xl font-bold ml-2">
-                                    {contractInfo.currentProfitStage === 1
-                                      ? contractInfo.profitRatioStage1Brand
-                                      : contractInfo.currentProfitStage === 2
-                                      ? contractInfo.isInvestmentRecovered
-                                        ? contractInfo.profitRatioStage2BBrand
-                                        : contractInfo.profitRatioStage2ABrand
-                                      : contractInfo.profitRatioStage3Brand || 0}
-                                    %
+                                    {(() => {
+                                      const ratio = contractInfo.currentProfitStage === 1
+                                        ? contractInfo.profitRatioStage1Brand
+                                        : contractInfo.currentProfitStage === 2
+                                        ? contractInfo.isInvestmentRecovered
+                                          ? contractInfo.profitRatioStage2BBrand
+                                          : contractInfo.profitRatioStage2ABrand
+                                        : contractInfo.profitRatioStage3Brand;
+                                      return ratio ? `${parseFloat(ratio)}%` : "未设置";
+                                    })()}
                                   </span>
                                 </div>
                               </div>
-                              {contractInfo.isInvestmentRecovered !== undefined && (
-                                <div className="mt-2">
-                                  <Badge variant={contractInfo.isInvestmentRecovered ? "default" : "secondary"}>
-                                    {contractInfo.isInvestmentRecovered ? "已回本" : "未回本"}
-                                  </Badge>
-                                </div>
-                              )}
+                              <div className="mt-2">
+                                <Badge variant={
+                                  contractInfo.isInvestmentRecovered === null || contractInfo.isInvestmentRecovered === undefined
+                                    ? "outline"
+                                    : contractInfo.isInvestmentRecovered
+                                    ? "default"
+                                    : "secondary"
+                                }>
+                                  {contractInfo.isInvestmentRecovered === null || contractInfo.isInvestmentRecovered === undefined
+                                    ? "待确认"
+                                    : contractInfo.isInvestmentRecovered
+                                    ? "已回本"
+                                    : "未回本"}
+                                </Badge>
+                              </div>
                             </div>
                           </div>
 
                           {/* 投资费用 */}
                           <div>
                             <h3 className="text-lg font-semibold mb-4">投资费用明细</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label className="text-muted-foreground">品牌使用费</Label>
-                                <div className="mt-1">¥{contractInfo.brandUsageFee || "0.00"}</div>
+                            <div className="space-y-4">
+                              {/* 品牌使用费（总金额，加粗） */}
+                              <div className="p-4 bg-primary/5 rounded-lg">
+                                <Label className="text-muted-foreground font-semibold">品牌使用费（总金额）</Label>
+                                <div className="mt-2 text-2xl font-bold">
+                                  ￥{contractInfo.brandUsageFee ? parseFloat(contractInfo.brandUsageFee).toFixed(2) : "0.00"}
+                                </div>
+                                <div className="mt-3 text-sm text-muted-foreground space-y-1">
+                                  <div className="flex justify-between">
+                                    <span>管理费</span>
+                                    <span>￥{contractInfo.managementFee ? parseFloat(contractInfo.managementFee).toFixed(2) : "0.00"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>运营岗位费</span>
+                                    <span>￥{contractInfo.operationPositionFee ? parseFloat(contractInfo.operationPositionFee).toFixed(2) : "0.00"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>老师招聘及培训费</span>
+                                    <span>￥{contractInfo.teacherRecruitmentFee ? parseFloat(contractInfo.teacherRecruitmentFee).toFixed(2) : "0.00"}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span>营销推广费</span>
+                                    <span>￥{contractInfo.marketingFee ? parseFloat(contractInfo.marketingFee).toFixed(2) : "0.00"}</span>
+                                  </div>
+                                </div>
                               </div>
+                              
+                              {/* 品牌授权押金（单独显示） */}
                               <div>
                                 <Label className="text-muted-foreground">品牌授权押金</Label>
-                                <div className="mt-1">¥{contractInfo.brandAuthDeposit || "0.00"}</div>
-                              </div>
-                              <div>
-                                <Label className="text-muted-foreground">管理费</Label>
-                                <div className="mt-1">¥{contractInfo.managementFee || "0.00"}</div>
-                              </div>
-                              <div>
-                                <Label className="text-muted-foreground">运营岗位费</Label>
-                                <div className="mt-1">¥{contractInfo.operationPositionFee || "0.00"}</div>
-                              </div>
-                              <div>
-                                <Label className="text-muted-foreground">老师招聘及培训费</Label>
-                                <div className="mt-1">¥{contractInfo.teacherRecruitmentFee || "0.00"}</div>
-                              </div>
-                              <div>
-                                <Label className="text-muted-foreground">营销推广费</Label>
-                                <div className="mt-1">¥{contractInfo.marketingFee || "0.00"}</div>
-                              </div>
-                              <div className="col-span-2">
-                                <Label className="text-muted-foreground">总预估成本</Label>
-                                <div className="mt-1 text-2xl font-bold">
-                                  ¥{contractInfo.totalEstimatedCost || "0.00"}
+                                <div className="mt-1 text-xl font-semibold">
+                                  ￥{contractInfo.brandAuthDeposit ? parseFloat(contractInfo.brandAuthDeposit).toFixed(2) : "0.00"}
                                 </div>
                               </div>
                             </div>

@@ -234,16 +234,62 @@ export default function ContractInfoEditor({
         <CardHeader>
           <CardTitle>投资费用明细（单位：元）</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>品牌使用费</Label>
-            <Input
-              type="number"
-              value={formData.brandUsageFee || ""}
-              onChange={(e) => handleChange("brandUsageFee", parseFloat(e.target.value))}
-              placeholder="如：50000"
-            />
+        <CardContent className="space-y-6">
+          {/* 品牌使用费（总金额） */}
+          <div className="p-4 bg-primary/5 rounded-lg space-y-4">
+            <div>
+              <Label className="font-semibold">品牌使用费（总金额）</Label>
+              <Input
+                type="number"
+                value={formData.brandUsageFee || ""}
+                onChange={(e) => handleChange("brandUsageFee", parseFloat(e.target.value))}
+                placeholder="如：50000"
+                className="mt-2"
+              />
+              <p className="text-sm text-muted-foreground mt-2">包含：管理费 + 运营岗位费 + 老师招聘培训费 + 营销推广费</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>管理费</Label>
+                <Input
+                  type="number"
+                  value={formData.managementFee || ""}
+                  onChange={(e) => handleChange("managementFee", parseFloat(e.target.value))}
+                  placeholder="如：5000"
+                />
+              </div>
+              <div>
+                <Label>运营岗位费</Label>
+                <Input
+                  type="number"
+                  value={formData.operationPositionFee || ""}
+                  onChange={(e) => handleChange("operationPositionFee", parseFloat(e.target.value))}
+                  placeholder="如：18000"
+                />
+              </div>
+              <div>
+                <Label>老师招聘及培训费</Label>
+                <Input
+                  type="number"
+                  value={formData.teacherRecruitmentFee || ""}
+                  onChange={(e) => handleChange("teacherRecruitmentFee", parseFloat(e.target.value))}
+                  placeholder="如：7000"
+                />
+              </div>
+              <div>
+                <Label>营销推广费</Label>
+                <Input
+                  type="number"
+                  value={formData.marketingFee || ""}
+                  onChange={(e) => handleChange("marketingFee", parseFloat(e.target.value))}
+                  placeholder="如：20000"
+                />
+              </div>
+            </div>
           </div>
+          
+          {/* 品牌授权押金（单独） */}
           <div>
             <Label>品牌授权押金</Label>
             <Input
@@ -251,51 +297,7 @@ export default function ContractInfoEditor({
               value={formData.brandAuthDeposit || ""}
               onChange={(e) => handleChange("brandAuthDeposit", parseFloat(e.target.value))}
               placeholder="如：5000"
-            />
-          </div>
-          <div>
-            <Label>管理费</Label>
-            <Input
-              type="number"
-              value={formData.managementFee || ""}
-              onChange={(e) => handleChange("managementFee", parseFloat(e.target.value))}
-              placeholder="如：5000"
-            />
-          </div>
-          <div>
-            <Label>运营岗位费</Label>
-            <Input
-              type="number"
-              value={formData.operationPositionFee || ""}
-              onChange={(e) => handleChange("operationPositionFee", parseFloat(e.target.value))}
-              placeholder="如：18000"
-            />
-          </div>
-          <div>
-            <Label>老师招聘及培训费</Label>
-            <Input
-              type="number"
-              value={formData.teacherRecruitmentFee || ""}
-              onChange={(e) => handleChange("teacherRecruitmentFee", parseFloat(e.target.value))}
-              placeholder="如：7000"
-            />
-          </div>
-          <div>
-            <Label>营销推广费</Label>
-            <Input
-              type="number"
-              value={formData.marketingFee || ""}
-              onChange={(e) => handleChange("marketingFee", parseFloat(e.target.value))}
-              placeholder="如：20000"
-            />
-          </div>
-          <div className="col-span-2">
-            <Label>总预估成本</Label>
-            <Input
-              type="number"
-              value={formData.totalEstimatedCost || ""}
-              onChange={(e) => handleChange("totalEstimatedCost", parseFloat(e.target.value))}
-              placeholder="如：44000"
+              className="mt-2"
             />
           </div>
         </CardContent>

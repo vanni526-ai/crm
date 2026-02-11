@@ -1,0 +1,22 @@
+{
+  "query": "SELECT \n  equityRatioPartner, \n  equityRatioBrand,\n  profitRatioStage1Partner,\n  profitRatioStage1Brand,\n  profitRatioStage2APartner,\n  profitRatioStage2ABrand,\n  profitRatioStage2BPartner,\n  profitRatioStage2BBrand,\n  profitRatioStage3Partner,\n  profitRatioStage3Brand\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '无锡'\nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  equityRatioPartner, \n  equityRatioBrand,\n  profitRatioStage1Partner,\n  profitRatioStage1Brand,\n  profitRatioStage2APartner,\n  profitRatioStage2ABrand,\n  profitRatioStage2BPartner,\n  profitRatioStage2BBrand,\n  profitRatioStage3Partner,\n  profitRatioStage3Brand\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '无锡'\nLIMIT 1;",
+  "rows": [
+    {
+      "equityRatioPartner": "NULL",
+      "equityRatioBrand": "NULL",
+      "profitRatioStage1Partner": "NULL",
+      "profitRatioStage1Brand": "NULL",
+      "profitRatioStage2APartner": "NULL",
+      "profitRatioStage2ABrand": "NULL",
+      "profitRatioStage2BPartner": "NULL",
+      "profitRatioStage2BBrand": "NULL",
+      "profitRatioStage3Partner": "NULL",
+      "profitRatioStage3Brand": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "equityRatioPartner\tequityRatioBrand\tprofitRatioStage1Partner\tprofitRatioStage1Brand\tprofitRatioStage2APartner\tprofitRatioStage2ABrand\tprofitRatioStage2BPartner\tprofitRatioStage2BBrand\tprofitRatioStage3Partner\tprofitRatioStage3Brand\nNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1547
+}
