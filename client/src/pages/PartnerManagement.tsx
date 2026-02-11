@@ -1,836 +1,525 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Search, Calendar } from "lucide-react";
+import { FileUp, Calculator, Download, Eye } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 
-// 费用明细Tab组件
-function ExpenseManagementTab({ partnerId }: { partnerId: number }) {
-  const utils = trpc.useUtils();
-  const [addExpenseOpen, setAddExpenseOpen] = useState(false);
-  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<string>("");
-  
-  // 查询所有城市
-  const { data: allCities } = trpc.city.getAll.useQuery();
-  
-  // 查询费用明细列表
-  const { data: expenses, isLoading } = trpc.partnerManagement.getExpenses.useQuery(
-    { partnerId },
-    { enabled: !!partnerId }
-  );
-  
-  // 创建/更新费用明细
-  const upsertExpenseMutation = trpc.partnerManagement.upsertExpense.useMutation({
-    onSuccess: () => {
-      toast.success("保存成功");
-      setAddExpenseOpen(false);
-      utils.partnerManagement.getExpenses.invalidate({ partnerId });
-      setSelectedCityId(null);
-      setSelectedMonth("");
-    },
-    onError: (error) => {
-      toast.error(`保存失败: ${error.message}`);
-    },
-  });
-  
-  const handleSubmitExpense = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    if (!selectedCityId || !selectedMonth) {
-      toast.error("请选择城市和月份");
-      return;
-    }
-    
-    upsertExpenseMutation.mutate({
-      partnerId,
-      cityId: selectedCityId,
-      month: selectedMonth,
-      rentFee: formData.get("rentFee") as string || "0",
-      propertyFee: formData.get("propertyFee") as string || "0",
-      utilityFee: formData.get("utilityFee") as string || "0",
-      consumablesFee: formData.get("consumablesFee") as string || "0",
-      teacherFee: formData.get("teacherFee") as string || "0",
-      transportFee: formData.get("transportFee") as string || "0",
-      otherFee: formData.get("otherFee") as string || "0",
-      deferredPayment: formData.get("deferredPayment") as string || "0",
-      notes: formData.get("notes") as string || "",
-    });
-  };
-  
-  // 按月份分组费用明细
-  const expensesByMonth = expenses?.reduce((acc: any, expense: any) => {
-    const monthKey = new Date(expense.month).toISOString().slice(0, 7);
-    if (!acc[monthKey]) {
-      acc[monthKey] = [];
-    }
-    acc[monthKey].push(expense);
-    return acc;
-  }, {});
-  
-  if (isLoading) {
-    return <div className="p-4 text-center text-muted-foreground">加载中...</div>;
-  }
-  
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">费用明细管理</h3>
-        <Dialog open={addExpenseOpen} onOpenChange={setAddExpenseOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              添加费用记录
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>添加月度费用</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmitExpense} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>城市 *</Label>
-                  <Select value={selectedCityId?.toString() || ""} onValueChange={(v) => setSelectedCityId(Number(v))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="选择城市" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {allCities?.map((city: any) => (
-                        <SelectItem key={city.id} value={city.id.toString()}>
-                          {city.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>月份 *</Label>
-                  <Input
-                    type="month"
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="rentFee">房租</Label>
-                  <Input id="rentFee" name="rentFee" type="number" step="0.01" defaultValue="0" />
-                </div>
-                <div>
-                  <Label htmlFor="propertyFee">物业</Label>
-                  <Input id="propertyFee" name="propertyFee" type="number" step="0.01" defaultValue="0" />
-                </div>
-                <div>
-                  <Label htmlFor="utilityFee">水电</Label>
-                  <Input id="utilityFee" name="utilityFee" type="number" step="0.01" defaultValue="0" />
-                </div>
-                <div>
-                  <Label htmlFor="consumablesFee">耗材</Label>
-                  <Input id="consumablesFee" name="consumablesFee" type="number" step="0.01" defaultValue="0" />
-                </div>
-                <div>
-                  <Label htmlFor="teacherFee">老师费用</Label>
-                  <Input id="teacherFee" name="teacherFee" type="number" step="0.01" defaultValue="0" />
-                </div>
-                <div>
-                  <Label htmlFor="transportFee">车费</Label>
-                  <Input id="transportFee" name="transportFee" type="number" step="0.01" defaultValue="0" />
-                </div>
-                <div>
-                  <Label htmlFor="otherFee">其他费用</Label>
-                  <Input id="otherFee" name="otherFee" type="number" step="0.01" defaultValue="0" />
-                </div>
-                <div>
-                  <Label htmlFor="deferredPayment">合同后付款</Label>
-                  <Input id="deferredPayment" name="deferredPayment" type="number" step="0.01" defaultValue="0" />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="notes">备注</Label>
-                <Textarea id="notes" name="notes" rows={2} />
-              </div>
-              
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setAddExpenseOpen(false)}>
-                  取消
-                </Button>
-                <Button type="submit" disabled={upsertExpenseMutation.isPending}>
-                  {upsertExpenseMutation.isPending ? "保存中..." : "保存"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-      
-      {/* 费用明细列表 */}
-      {expensesByMonth && Object.keys(expensesByMonth).length > 0 ? (
-        <div className="space-y-6">
-          {Object.keys(expensesByMonth)
-            .sort()
-            .reverse()
-            .map((monthKey) => (
-              <div key={monthKey}>
-                <h4 className="text-md font-semibold mb-3">{monthKey}</h4>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>城市</TableHead>
-                      <TableHead className="text-right">房租</TableHead>
-                      <TableHead className="text-right">物业</TableHead>
-                      <TableHead className="text-right">水电</TableHead>
-                      <TableHead className="text-right">耗材</TableHead>
-                      <TableHead className="text-right">老师费用</TableHead>
-                      <TableHead className="text-right">车费</TableHead>
-                      <TableHead className="text-right">其他</TableHead>
-                      <TableHead className="text-right">后付款</TableHead>
-                      <TableHead className="text-right">总费用</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {expensesByMonth[monthKey].map((expense: any) => {
-                      const totalFee = 
-                        parseFloat(expense.rentFee || "0") +
-                        parseFloat(expense.propertyFee || "0") +
-                        parseFloat(expense.utilityFee || "0") +
-                        parseFloat(expense.consumablesFee || "0") +
-                        parseFloat(expense.teacherFee || "0") +
-                        parseFloat(expense.transportFee || "0") +
-                        parseFloat(expense.otherFee || "0") +
-                        parseFloat(expense.deferredPayment || "0");
-                      
-                      return (
-                        <TableRow key={expense.id}>
-                          <TableCell className="font-medium">{expense.cityId}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.rentFee || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.propertyFee || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.utilityFee || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.consumablesFee || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.teacherFee || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.transportFee || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.otherFee || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right">￥{parseFloat(expense.deferredPayment || "0").toFixed(2)}</TableCell>
-                          <TableCell className="text-right font-semibold">￥{totalFee.toFixed(2)}</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            ))}
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">暂无费用记录</p>
-      )}
-    </div>
-  );
-}
-
-// 城市管理Tab组件
-function CityManagementTab({ partnerId }: { partnerId: number }) {
-  const utils = trpc.useUtils();
-  const [selectedCityIds, setSelectedCityIds] = useState<number[]>([]);
-  
-  // 查询所有城市
-  const { data: allCities } = trpc.city.getAll.useQuery();
-  
-  // 查询合伙人已分配的城市
-  const { data: partnerCities, isLoading: citiesLoading } = trpc.partnerManagement.getPartnerCities.useQuery(
-    { partnerId },
-    { enabled: !!partnerId }
-  );
-  
-  // 查询城市订单统计
-  const { data: cityStats, isLoading: statsLoading } = trpc.partnerManagement.getCityOrderStats.useQuery(
-    { partnerId },
-    { enabled: !!partnerId }
-  );
-  
-  // 分配城市
-  const assignCitiesMutation = trpc.partnerManagement.assignCities.useMutation({
-    onSuccess: () => {
-      toast.success("城市分配成功");
-      utils.partnerManagement.getPartnerCities.invalidate({ partnerId });
-      utils.partnerManagement.getCityOrderStats.invalidate({ partnerId });
-      setSelectedCityIds([]);
-    },
-    onError: (error) => {
-      toast.error(`分配失败: ${error.message}`);
-    },
-  });
-  
-  // 初始化已选中的城市
-  useEffect(() => {
-    if (partnerCities && partnerCities.length > 0) {
-      setSelectedCityIds(partnerCities.map(pc => pc.cityId!));
-    }
-  }, [partnerCities]);
-  
-  const handleCityToggle = (cityId: number) => {
-    setSelectedCityIds(prev => 
-      prev.includes(cityId) 
-        ? prev.filter(id => id !== cityId)
-        : [...prev, cityId]
-    );
-  };
-  
-  const handleSaveCities = () => {
-    assignCitiesMutation.mutate({
-      partnerId,
-      cityIds: selectedCityIds,
-    });
-  };
-  
-  if (citiesLoading || statsLoading) {
-    return <div className="p-4 text-center text-muted-foreground">加载中...</div>;
-  }
-  
-  return (
-    <div className="space-y-6">
-      {/* 城市选择 */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">分配城市</h3>
-        <div className="grid grid-cols-4 gap-3 mb-4">
-          {allCities?.map((city: any) => (
-            <label
-              key={city.id}
-              className="flex items-center space-x-2 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
-            >
-              <input
-                type="checkbox"
-                checked={selectedCityIds.includes(city.id)}
-                onChange={() => handleCityToggle(city.id)}
-                className="w-4 h-4"
-              />
-              <span className="text-sm">{city.name}</span>
-            </label>
-          ))}
-        </div>
-        <Button onClick={handleSaveCities} disabled={assignCitiesMutation.isPending}>
-          {assignCitiesMutation.isPending ? "保存中..." : "保存城市分配"}
-        </Button>
-      </div>
-      
-      {/* 城市订单统计 */}
-      <div>
-        <h3 className="text-lg font-semibold mb-3">城市订单统计</h3>
-        {cityStats && cityStats.length > 0 ? (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>城市</TableHead>
-                <TableHead className="text-right">订单数</TableHead>
-                <TableHead className="text-right">课程金额</TableHead>
-                <TableHead className="text-right">老师费用</TableHead>
-                <TableHead className="text-right">车费</TableHead>
-                <TableHead className="text-right">合伙人费</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cityStats.map((stat) => (
-                <TableRow key={stat.cityId}>
-                  <TableCell className="font-medium">{stat.cityName}</TableCell>
-                  <TableCell className="text-right">{stat.orderCount}</TableCell>
-                  <TableCell className="text-right">￥{parseFloat(stat.totalAmount).toFixed(2)}</TableCell>
-                  <TableCell className="text-right">￥{parseFloat(stat.totalTeacherFee).toFixed(2)}</TableCell>
-                  <TableCell className="text-right">￥{parseFloat(stat.totalTransportFee).toFixed(2)}</TableCell>
-                  <TableCell className="text-right">￥{parseFloat(stat.totalPartnerFee).toFixed(2)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        ) : (
-          <p className="text-sm text-muted-foreground">暂无订单数据</p>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function PartnerManagement() {
-
-  const utils = trpc.useUtils();
-  
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  
-  // 时间筛选器状态
-  const [dateFilter, setDateFilter] = useState<string>("all");
-  const [customStartDate, setCustomStartDate] = useState<string>("");
-  const [customEndDate, setCustomEndDate] = useState<string>("");
-  
-  // 计算时间范围
-  const getDateRange = () => {
-    const now = new Date();
-    let startDate = "";
-    let endDate = "";
-    
-    if (dateFilter === "thisMonth") {
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
-    } else if (dateFilter === "thisYear") {
-      startDate = new Date(now.getFullYear(), 0, 1).toISOString().split("T")[0];
-      endDate = new Date(now.getFullYear(), 11, 31).toISOString().split("T")[0];
-    } else if (dateFilter === "custom") {
-      startDate = customStartDate;
-      endDate = customEndDate;
-    }
-    
-    return { startDate, endDate };
-  };
-  
-  const { startDate, endDate } = getDateRange();
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
+  const [contractDialogOpen, setContractDialogOpen] = useState(false);
+  const [uploadingContract, setUploadingContract] = useState(false);
 
+  // 查询合伙人列表
+  const { data: partners, isLoading: partnersLoading } = trpc.partnerManagement.list.useQuery();
+  
   // 查询合伙人统计数据
-  const { data: partnerStats, isLoading } = trpc.partnerManagement.getPartnerStats.useQuery(
-    startDate || endDate ? { startDate, endDate } : undefined
-  );
-  
-  // 查询所有合伙人(用于创建/编辑)
-  const { data: partners } = trpc.partnerManagement.list.useQuery();
+  const { data: partnerStats } = trpc.partnerManagement.getPartnerStats.useQuery();
 
-  // 查询单个合伙人详情
-  const { data: partnerDetail } = trpc.partnerManagement.getById.useQuery(
-    { id: selectedPartnerId! },
+  // 查询合伙人关联的城市
+  const { data: partnerCities } = trpc.partnerManagement.getPartnerCities.useQuery(
+    { partnerId: selectedPartnerId! },
     { enabled: !!selectedPartnerId }
   );
 
-  // 创建合伙人
-  const createMutation = trpc.partnerManagement.create.useMutation({
-    onSuccess: () => {
-      toast.success("创建成功");
-      setCreateOpen(false);
-      utils.partnerManagement.list.invalidate();
-    },
-    onError: (error) => {
-      toast.error(`创建失败: ${error.message}`);
-    },
-  });
-
-  // 更新合伙人
-  const updateMutation = trpc.partnerManagement.update.useMutation({
-    onSuccess: () => {
-      toast.success("更新成功");
-      setEditOpen(false);
-      utils.partnerManagement.list.invalidate();
-      if (selectedPartnerId) {
-        utils.partnerManagement.getById.invalidate({ id: selectedPartnerId });
-      }
-    },
-    onError: (error) => {
-      toast.error(`更新失败: ${error.message}`);
-    },
-  });
-
-  // 删除合伙人
-  const deleteMutation = trpc.partnerManagement.delete.useMutation({
-    onSuccess: () => {
-      toast.success("删除成功");
-      utils.partnerManagement.list.invalidate();
-      setSelectedPartnerId(null);
-    },
-    onError: (error) => {
-      toast.error(`删除失败: ${error.message}`);
-    },
-  });
-  const filteredPartnerStats = partnerStats?.filter((stat) =>
-    stat.partnerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    stat.cities.toLowerCase().includes(searchTerm.toLowerCase())
+  // 查询合同信息
+  const { data: contractInfo, refetch: refetchContract } = trpc.partnerManagement.getContractInfo.useQuery(
+    { partnerId: selectedPartnerId!, cityId: selectedCityId! },
+    { enabled: !!selectedPartnerId && !!selectedCityId }
   );
 
-  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    
-    createMutation.mutate({
-      userId: Number(formData.get("userId")),
-      name: formData.get("name") as string,
-      profitRatio: formData.get("profitRatio") as string,
-      profitRule: formData.get("profitRule") as string,
-      brandFee: formData.get("brandFee") as string || "0",
-      techServiceFee: formData.get("techServiceFee") as string || "0",
-      deferredPaymentTotal: formData.get("deferredPaymentTotal") as string || "0",
-      deferredPaymentRule: formData.get("deferredPaymentRule") as string || "",
-      contractStartDate: formData.get("contractStartDate") as string,
-      contractEndDate: formData.get("contractEndDate") as string,
-      accountName: formData.get("accountName") as string || "",
-      bankName: formData.get("bankName") as string || "",
-      accountNumber: formData.get("accountNumber") as string || "",
-      notes: formData.get("notes") as string || "",
-    });
-  };
+  // 上传合同
+  const uploadContractMutation = trpc.partnerManagement.uploadContract.useMutation({
+    onSuccess: () => {
+      toast.success("合同上传成功，信息已自动识别");
+      setContractDialogOpen(false);
+      refetchContract();
+    },
+    onError: (error) => {
+      toast.error(`合同上传失败: ${error.message}`);
+    },
+  });
 
-  const handleUpdate = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!partnerDetail) return;
-    
-    const formData = new FormData(e.currentTarget);
-    
-    updateMutation.mutate({
-      id: partnerDetail.id,
-      profitRatio: formData.get("profitRatio") as string,
-      profitRule: formData.get("profitRule") as string,
-      brandFee: formData.get("brandFee") as string,
-      techServiceFee: formData.get("techServiceFee") as string,
-      deferredPaymentTotal: formData.get("deferredPaymentTotal") as string,
-      deferredPaymentRule: formData.get("deferredPaymentRule") as string,
-      contractStartDate: formData.get("contractStartDate") as string,
-      contractEndDate: formData.get("contractEndDate") as string,
-      accountName: formData.get("accountName") as string,
-      bankName: formData.get("bankName") as string,
-      accountNumber: formData.get("accountNumber") as string,
-      notes: formData.get("notes") as string,
-    });
-  };
+  // 计算分红阶段
+  const calculateProfitStageMutation = trpc.partnerManagement.calculateProfitStage.useMutation({
+    onSuccess: (data) => {
+      toast.success(`分红阶段已更新：第${data.currentProfitStage}阶段`);
+      refetchContract();
+    },
+    onError: (error) => {
+      toast.error(`计算失败: ${error.message}`);
+    },
+  });
 
-  const handleDelete = (id: number) => {
-    if (confirm("确定要删除这个合伙人吗？")) {
-      deleteMutation.mutate({ id });
+  // 处理合同文件上传
+  const handleContractUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("只支持PDF格式的合同文件");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("文件大小不能超过10MB");
+      return;
+    }
+
+    setUploadingContract(true);
+
+    try {
+      // 读取文件为Base64
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+        const base64Data = base64.split(",")[1]; // 去掉data:application/pdf;base64,前缀
+
+        await uploadContractMutation.mutateAsync({
+          partnerId: selectedPartnerId!,
+          cityId: selectedCityId!,
+          fileBase64: base64Data,
+          fileName: file.name,
+        });
+
+        setUploadingContract(false);
+      };
+      reader.onerror = () => {
+        toast.error("文件读取失败");
+        setUploadingContract(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      setUploadingContract(false);
     }
   };
 
-  if (isLoading) {
-    return <div className="p-8">加载中...</div>;
-  }
+  // 处理分红阶段计算
+  const handleCalculateProfitStage = () => {
+    if (!selectedPartnerId || !selectedCityId) {
+      toast.error("请先选择合伙人和城市");
+      return;
+    }
+
+    calculateProfitStageMutation.mutate({
+      partnerId: selectedPartnerId,
+      cityId: selectedCityId,
+    });
+  };
+
+  // 获取分红阶段文本
+  const getProfitStageText = (stage: number, isRecovered: boolean) => {
+    if (stage === 1) return "第1阶段（0-12个月）";
+    if (stage === 2) {
+      return isRecovered ? "第2阶段B（13-24个月，已回本）" : "第2阶段A（13-24个月，未回本）";
+    }
+    return "第3阶段（25个月后）";
+  };
+
+  // 获取合同状态Badge
+  const getContractStatusBadge = (status: string) => {
+    const statusMap: Record<string, { label: string; variant: any }> = {
+      draft: { label: "草稿", variant: "secondary" },
+      active: { label: "生效中", variant: "default" },
+      expired: { label: "已过期", variant: "destructive" },
+      terminated: { label: "已终止", variant: "outline" },
+    };
+    const config = statusMap[status] || statusMap.draft;
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
 
   return (
     <DashboardLayout>
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">合伙人管理</h1>
-      </div>
-
-      {/* 搜索栏和筛选器 */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex items-center gap-2">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="搜索合伙人姓名或城市名称..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <Select value={dateFilter} onValueChange={setDateFilter}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="选择时间范围" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部时间</SelectItem>
-                  <SelectItem value="thisMonth">本月</SelectItem>
-                  <SelectItem value="thisYear">今年</SelectItem>
-                  <SelectItem value="custom">自定义</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            {dateFilter === "custom" && (
-              <>
-                <Input
-                  type="date"
-                  value={customStartDate}
-                  onChange={(e) => setCustomStartDate(e.target.value)}
-                  className="w-[150px]"
-                  placeholder="开始日期"
-                />
-                <span className="text-muted-foreground">至</span>
-                <Input
-                  type="date"
-                  value={customEndDate}
-                  onChange={(e) => setCustomEndDate(e.target.value)}
-                  className="w-[150px]"
-                  placeholder="结束日期"
-                />
-              </>
-            )}
+      <div className="container py-8 space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">合伙人管理</h1>
+            <p className="text-muted-foreground mt-1">管理合伙人信息、合同、分红等</p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* 合伙人列表 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>合伙人列表</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>姓名</TableHead>
-                <TableHead>城市</TableHead>
-                <TableHead>订单数</TableHead>
-                <TableHead>课程金额</TableHead>
-                <TableHead>老师费用</TableHead>
-                <TableHead>车费</TableHead>
-                <TableHead>房租</TableHead>
-                <TableHead>物业</TableHead>
-                <TableHead>水电</TableHead>
-                <TableHead>耗材</TableHead>
-                <TableHead>后付款</TableHead>
-                <TableHead>分红金额</TableHead>
-                <TableHead>操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPartnerStats?.map((stat) => (
-                <TableRow key={stat.partnerId}>
-                  <TableCell className="font-medium">{stat.partnerName}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{stat.cities || "-"}</TableCell>
-                  <TableCell>{stat.orderCount}</TableCell>
-                  <TableCell>￥{Number(stat.courseAmount).toFixed(2)}</TableCell>
-                  <TableCell>￥{Number(stat.teacherFee).toFixed(2)}</TableCell>
-                  <TableCell>￥{Number(stat.transportFee).toFixed(2)}</TableCell>
-                  <TableCell>￥{Number(stat.rentFee).toFixed(2)}</TableCell>
-                  <TableCell>￥{Number(stat.propertyFee).toFixed(2)}</TableCell>
-                  <TableCell>￥{Number(stat.utilityFee).toFixed(2)}</TableCell>
-                  <TableCell>￥{Number(stat.consumablesFee).toFixed(2)}</TableCell>
-                  <TableCell>￥{Number(stat.deferredPayment).toFixed(2)}</TableCell>
-                  <TableCell className="font-semibold text-green-600">￥{Number(stat.partnerFee).toFixed(2)}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* 左侧：合伙人列表 */}
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle>合伙人列表</CardTitle>
+              <CardDescription>共 {partners?.length || 0} 个合伙人</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {partnersLoading ? (
+                  <div className="text-center text-muted-foreground py-8">加载中...</div>
+                ) : partners && partners.length > 0 ? (
+                  partners.map((partner) => {
+                    const stats = partnerStats?.find((s) => s.partnerId === partner.id);
+                    return (
+                      <div
+                        key={partner.id}
+                        className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                          selectedPartnerId === partner.id
+                            ? "bg-primary/10 border-primary"
+                            : "hover:bg-accent"
+                        }`}
                         onClick={() => {
-                          setSelectedPartnerId(stat.partnerId);
-                          setEditOpen(true);
+                          setSelectedPartnerId(partner.id);
+                          setSelectedCityId(null);
                         }}
                       >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(stat.partnerId)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                        <div className="font-medium">{partner.name}</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {stats?.cities || "未分配城市"}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          订单：{stats?.orderCount || 0} | 销售额：¥{stats?.courseAmount || "0.00"}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">暂无合伙人</div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* 编辑对话框 */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>编辑合伙人 - {partnerDetail?.name}</DialogTitle>
-          </DialogHeader>
-          {partnerDetail && (
-            <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="basic">基本信息</TabsTrigger>
-                <TabsTrigger value="contract">合同信息</TabsTrigger>
-                <TabsTrigger value="cities">城市管理</TabsTrigger>
-                <TabsTrigger value="orders">订单统计</TabsTrigger>
-                <TabsTrigger value="expenses">费用明细</TabsTrigger>
-                <TabsTrigger value="account">收款账户</TabsTrigger>
-              </TabsList>
+          {/* 右侧：详情区域 */}
+          <Card className="lg:col-span-2">
+            {selectedPartnerId ? (
+              <Tabs defaultValue="cities" className="w-full">
+                <CardHeader>
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="cities">城市管理</TabsTrigger>
+                    <TabsTrigger value="contract">合同信息</TabsTrigger>
+                    <TabsTrigger value="account">收款账户</TabsTrigger>
+                    <TabsTrigger value="profit">分红记录</TabsTrigger>
+                  </TabsList>
+                </CardHeader>
 
-              <TabsContent value="basic">
-                <form onSubmit={handleUpdate} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>姓名</Label>
-                      <Input value={partnerDetail.name} disabled className="bg-muted" />
+                <CardContent>
+                  {/* 城市管理Tab */}
+                  <TabsContent value="cities" className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-semibold">关联城市</h3>
                     </div>
-                    <div>
-                      <Label htmlFor="profitRatio">利润分成比例 *</Label>
-                      <Input
-                        id="profitRatio"
-                        name="profitRatio"
-                        defaultValue={partnerDetail.profitRatio}
-                        required
-                      />
+                    <div className="space-y-2">
+                      {partnerCities && partnerCities.length > 0 ? (
+                        partnerCities.map((city) => (
+                          <div
+                            key={city.id}
+                            className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                              selectedCityId === city.cityId
+                                ? "bg-primary/10 border-primary"
+                                : "hover:bg-accent"
+                            }`}
+                            onClick={() => setSelectedCityId(city.cityId)}
+                          >
+                            <div className="font-medium">{city.cityName}</div>
+                            <div className="text-sm text-muted-foreground mt-1">
+                              点击查看合同信息
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center text-muted-foreground py-8">
+                          该合伙人暂未关联城市
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="profitRule">分成规则</Label>
-                    <Textarea
-                      id="profitRule"
-                      name="profitRule"
-                      defaultValue={partnerDetail.profitRule || ""}
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="notes">备注</Label>
-                    <Textarea
-                      id="notes"
-                      name="notes"
-                      defaultValue={partnerDetail.notes || ""}
-                      rows={2}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
-                      取消
-                    </Button>
-                    <Button type="submit" disabled={updateMutation.isPending}>
-                      {updateMutation.isPending ? "保存中..." : "保存"}
-                    </Button>
-                  </div>
-                </form>
-              </TabsContent>
+                  </TabsContent>
 
-              <TabsContent value="contract">
-                <form onSubmit={handleUpdate} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="brandFee">品牌使用费</Label>
-                      <Input
-                        id="brandFee"
-                        name="brandFee"
-                        defaultValue={partnerDetail.brandFee || ""}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="techServiceFee">技术服务费</Label>
-                      <Input
-                        id="techServiceFee"
-                        name="techServiceFee"
-                        defaultValue={partnerDetail.techServiceFee || ""}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="deferredPaymentTotal">延期支付总额</Label>
-                      <Input
-                        id="deferredPaymentTotal"
-                        name="deferredPaymentTotal"
-                        defaultValue={partnerDetail.deferredPaymentTotal || ""}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="contractStartDate">合同开始日期</Label>
-                      <Input
-                        id="contractStartDate"
-                        name="contractStartDate"
-                        type="date"
-                        defaultValue={
-                          partnerDetail.contractStartDate
-                            ? new Date(partnerDetail.contractStartDate).toISOString().split("T")[0]
-                            : ""
-                        }
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="contractEndDate">合同结束日期</Label>
-                      <Input
-                        id="contractEndDate"
-                        name="contractEndDate"
-                        type="date"
-                        defaultValue={
-                          partnerDetail.contractEndDate
-                            ? new Date(partnerDetail.contractEndDate).toISOString().split("T")[0]
-                            : ""
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="deferredPaymentRule">延期支付规则</Label>
-                    <Textarea
-                      id="deferredPaymentRule"
-                      name="deferredPaymentRule"
-                      defaultValue={partnerDetail.deferredPaymentRule || ""}
-                      rows={3}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
-                      取消
-                    </Button>
-                    <Button type="submit" disabled={updateMutation.isPending}>
-                      {updateMutation.isPending ? "保存中..." : "保存"}
-                    </Button>
-                  </div>
-                </form>
-              </TabsContent>
+                  {/* 合同信息Tab */}
+                  <TabsContent value="contract" className="space-y-4">
+                    {selectedCityId ? (
+                      contractInfo ? (
+                        <div className="space-y-6">
+                          {/* 合同基本信息 */}
+                          <div>
+                            <div className="flex justify-between items-center mb-4">
+                              <h3 className="text-lg font-semibold">合同基本信息</h3>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleCalculateProfitStage}
+                                  disabled={calculateProfitStageMutation.isPending}
+                                >
+                                  <Calculator className="w-4 h-4 mr-2" />
+                                  {calculateProfitStageMutation.isPending ? "计算中..." : "更新分红阶段"}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => setContractDialogOpen(true)}
+                                >
+                                  <FileUp className="w-4 h-4 mr-2" />
+                                  上传新合同
+                                </Button>
+                              </div>
+                            </div>
 
-              <TabsContent value="cities">
-                <CityManagementTab partnerId={selectedPartnerId!} />
-              </TabsContent>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-muted-foreground">合同状态</Label>
+                                <div className="mt-1">
+                                  {getContractStatusBadge(contractInfo.contractStatus)}
+                                </div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">合同签署日期</Label>
+                                <div className="mt-1">
+                                  {contractInfo.contractSignDate
+                                    ? new Date(contractInfo.contractSignDate).toLocaleDateString()
+                                    : "未设置"}
+                                </div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">合同起始日期</Label>
+                                <div className="mt-1">
+                                  {contractInfo.contractStartDate
+                                    ? new Date(contractInfo.contractStartDate).toLocaleDateString()
+                                    : "未设置"}
+                                </div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">合同结束日期</Label>
+                                <div className="mt-1">
+                                  {contractInfo.contractEndDate
+                                    ? new Date(contractInfo.contractEndDate).toLocaleDateString()
+                                    : "未设置"}
+                                </div>
+                              </div>
+                              {contractInfo.contractFileUrl && (
+                                <div className="col-span-2">
+                                  <Label className="text-muted-foreground">合同文件</Label>
+                                  <div className="mt-1">
+                                    <a
+                                      href={contractInfo.contractFileUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-primary hover:underline flex items-center gap-2"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                      查看合同PDF
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
 
-              <TabsContent value="orders">
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">订单统计功能开发中...</p>
+                          {/* 股权结构 */}
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4">股权结构（工商股权）</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-muted-foreground">合伙人股权比例</Label>
+                                <div className="mt-1 text-2xl font-bold">
+                                  {contractInfo.equityRatioPartner || 0}%
+                                </div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">品牌方股权比例</Label>
+                                <div className="mt-1 text-2xl font-bold">
+                                  {contractInfo.equityRatioBrand || 0}%
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 分红阶段和比例 */}
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4">当前分红阶段</h3>
+                            <div className="p-4 bg-primary/10 rounded-lg">
+                              <div className="text-lg font-medium">
+                                {getProfitStageText(
+                                  contractInfo.currentProfitStage || 1,
+                                  contractInfo.isInvestmentRecovered || false
+                                )}
+                              </div>
+                              <div className="mt-2 flex gap-8">
+                                <div>
+                                  <span className="text-muted-foreground">合伙人分红：</span>
+                                  <span className="text-xl font-bold ml-2">
+                                    {contractInfo.currentProfitStage === 1
+                                      ? contractInfo.profitRatioStage1Partner
+                                      : contractInfo.currentProfitStage === 2
+                                      ? contractInfo.isInvestmentRecovered
+                                        ? contractInfo.profitRatioStage2BPartner
+                                        : contractInfo.profitRatioStage2APartner
+                                      : contractInfo.profitRatioStage3Partner || 0}
+                                    %
+                                  </span>
+                                </div>
+                                <div>
+                                  <span className="text-muted-foreground">品牌方分红：</span>
+                                  <span className="text-xl font-bold ml-2">
+                                    {contractInfo.currentProfitStage === 1
+                                      ? contractInfo.profitRatioStage1Brand
+                                      : contractInfo.currentProfitStage === 2
+                                      ? contractInfo.isInvestmentRecovered
+                                        ? contractInfo.profitRatioStage2BBrand
+                                        : contractInfo.profitRatioStage2ABrand
+                                      : contractInfo.profitRatioStage3Brand || 0}
+                                    %
+                                  </span>
+                                </div>
+                              </div>
+                              {contractInfo.isInvestmentRecovered !== undefined && (
+                                <div className="mt-2">
+                                  <Badge variant={contractInfo.isInvestmentRecovered ? "default" : "secondary"}>
+                                    {contractInfo.isInvestmentRecovered ? "已回本" : "未回本"}
+                                  </Badge>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 投资费用 */}
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4">投资费用明细</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label className="text-muted-foreground">品牌使用费</Label>
+                                <div className="mt-1">¥{contractInfo.brandUsageFee || "0.00"}</div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">品牌授权押金</Label>
+                                <div className="mt-1">¥{contractInfo.brandAuthDeposit || "0.00"}</div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">管理费</Label>
+                                <div className="mt-1">¥{contractInfo.managementFee || "0.00"}</div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">运营岗位费</Label>
+                                <div className="mt-1">¥{contractInfo.operationPositionFee || "0.00"}</div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">老师招聘及培训费</Label>
+                                <div className="mt-1">¥{contractInfo.teacherRecruitmentFee || "0.00"}</div>
+                              </div>
+                              <div>
+                                <Label className="text-muted-foreground">营销推广费</Label>
+                                <div className="mt-1">¥{contractInfo.marketingFee || "0.00"}</div>
+                              </div>
+                              <div className="col-span-2">
+                                <Label className="text-muted-foreground">总预估成本</Label>
+                                <div className="mt-1 text-2xl font-bold">
+                                  ¥{contractInfo.totalEstimatedCost || "0.00"}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-12">
+                          <p className="text-muted-foreground mb-4">该城市暂无合同信息</p>
+                          <Button onClick={() => setContractDialogOpen(true)}>
+                            <FileUp className="w-4 h-4 mr-2" />
+                            上传合同
+                          </Button>
+                        </div>
+                      )
+                    ) : (
+                      <div className="text-center text-muted-foreground py-12">
+                        请先在"城市管理"中选择一个城市
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  {/* 收款账户Tab */}
+                  <TabsContent value="account" className="space-y-4">
+                    {selectedCityId && contractInfo ? (
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold">收款账户信息</h3>
+                        <div className="grid grid-cols-1 gap-4">
+                          <div>
+                            <Label className="text-muted-foreground">开户行</Label>
+                            <div className="mt-1">{contractInfo.partnerBankName || "未设置"}</div>
+                          </div>
+                          <div>
+                            <Label className="text-muted-foreground">银行账号</Label>
+                            <div className="mt-1">{contractInfo.partnerBankAccount || "未设置"}</div>
+                          </div>
+                          <div>
+                            <Label className="text-muted-foreground">账户名</Label>
+                            <div className="mt-1">{contractInfo.partnerAccountHolder || "未设置"}</div>
+                          </div>
+                          <div>
+                            <Label className="text-muted-foreground">支付宝账号</Label>
+                            <div className="mt-1">{contractInfo.partnerAlipayAccount || "未设置"}</div>
+                          </div>
+                          <div>
+                            <Label className="text-muted-foreground">微信账号</Label>
+                            <div className="mt-1">{contractInfo.partnerWechatAccount || "未设置"}</div>
+                          </div>
+                          <div>
+                            <Label className="text-muted-foreground">每月分红支付日</Label>
+                            <div className="mt-1">每月 {contractInfo.profitPaymentDay || 25} 日</div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center text-muted-foreground py-12">
+                        请先在"城市管理"中选择一个城市
+                      </div>
+                    )}
+                  </TabsContent>
+
+                  {/* 分红记录Tab */}
+                  <TabsContent value="profit" className="space-y-4">
+                    <div className="text-center text-muted-foreground py-12">
+                      分红记录功能开发中...
+                    </div>
+                  </TabsContent>
+                </CardContent>
+              </Tabs>
+            ) : (
+              <CardContent className="py-12">
+                <div className="text-center text-muted-foreground">
+                  请从左侧选择一个合伙人查看详情
                 </div>
-              </TabsContent>
+              </CardContent>
+            )}
+          </Card>
+        </div>
 
-              <TabsContent value="expenses">
-                <ExpenseManagementTab partnerId={selectedPartnerId!} />
-              </TabsContent>
-
-              <TabsContent value="account">
-                <form onSubmit={handleUpdate} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="accountName">账户名称</Label>
-                      <Input
-                        id="accountName"
-                        name="accountName"
-                        defaultValue={partnerDetail.accountName || ""}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="bankName">开户行</Label>
-                      <Input
-                        id="bankName"
-                        name="bankName"
-                        defaultValue={partnerDetail.bankName || ""}
-                      />
-                    </div>
-                    <div className="col-span-2">
-                      <Label htmlFor="accountNumber">账号</Label>
-                      <Input
-                        id="accountNumber"
-                        name="accountNumber"
-                        defaultValue={partnerDetail.accountNumber || ""}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
-                      取消
-                    </Button>
-                    <Button type="submit" disabled={updateMutation.isPending}>
-                      {updateMutation.isPending ? "保存中..." : "保存"}
-                    </Button>
-                  </div>
-                </form>
-              </TabsContent>
-            </Tabs>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+        {/* 合同上传对话框 */}
+        <Dialog open={contractDialogOpen} onOpenChange={setContractDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>上传合同文件</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>选择PDF合同文件</Label>
+                <Input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleContractUpload}
+                  disabled={uploadingContract}
+                  className="mt-2"
+                />
+                <p className="text-sm text-muted-foreground mt-2">
+                  支持PDF格式，文件大小不超过10MB。上传后将自动识别合同内容。
+                </p>
+              </div>
+              {uploadingContract && (
+                <div className="text-center text-muted-foreground">
+                  正在上传和识别合同，请稍候...
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </DashboardLayout>
   );
 }

@@ -4,6 +4,8 @@ import { getDb } from "./db";
 import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { uploadAndParseContract } from "./contractParser";
+import { updateProfitStageAndRecoveryStatus } from "./profitCalculator";
 
 export const partnerManagementRouter = router({
   /**
@@ -585,5 +587,265 @@ export const partnerManagementRouter = router({
       }
       
       return stats;
+    }),
+
+  /**
+   * 上传合同文件并智能识别
+   */
+  uploadContract: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number(),
+      fileBase64: z.string(), // Base64编码的PDF文件
+      fileName: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      try {
+        // 将Base64转换为Buffer
+        const fileBuffer = Buffer.from(input.fileBase64, 'base64');
+        
+        // 上传并识别合同
+        const { contractFileUrl, contractInfo } = await uploadAndParseContract(
+          fileBuffer,
+          input.fileName,
+          input.partnerId,
+          input.cityId
+        );
+        
+        // 查询是否已存在该合伙人-城市关联
+        const existing = await db
+          .select()
+          .from(partnerCities)
+          .where(and(
+            eq(partnerCities.partnerId, input.partnerId),
+            eq(partnerCities.cityId, input.cityId)
+          ))
+          .limit(1);
+        
+        if (existing.length > 0) {
+          // 更新现有记录
+          // 将contractInfo中的number类型转换为string（decimal字段）
+          const convertedInfo: any = {};
+          for (const [key, value] of Object.entries(contractInfo)) {
+            if (typeof value === 'number' && !['profitPaymentDay', 'currentProfitStage'].includes(key)) {
+              convertedInfo[key] = value.toString();
+            } else if (key.includes('Date') && typeof value === 'string') {
+              convertedInfo[key] = new Date(value);
+            } else {
+              convertedInfo[key] = value;
+            }
+          }
+          
+          await db
+            .update(partnerCities)
+            .set({
+              contractFileUrl,
+              contractStatus: 'active',
+              ...convertedInfo,
+              updatedBy: ctx.user.id,
+            })
+            .where(eq(partnerCities.id, existing[0].id));
+          
+          return {
+            success: true,
+            partnerCityId: existing[0].id,
+            contractFileUrl,
+            contractInfo,
+          };
+        } else {
+          // 创建新记录
+          // 将contractInfo中的number类型转换为string（decimal字段）
+          const convertedInfo: any = {};
+          for (const [key, value] of Object.entries(contractInfo)) {
+            if (typeof value === 'number' && !['profitPaymentDay', 'currentProfitStage'].includes(key)) {
+              convertedInfo[key] = value.toString();
+            } else if (key.includes('Date') && typeof value === 'string') {
+              convertedInfo[key] = new Date(value);
+            } else {
+              convertedInfo[key] = value;
+            }
+          }
+          
+          const result = await db.insert(partnerCities).values({
+            partnerId: input.partnerId,
+            cityId: input.cityId,
+            contractFileUrl,
+            contractStatus: 'active',
+            ...convertedInfo,
+            createdBy: ctx.user.id,
+          });
+          
+          return {
+            success: true,
+            partnerCityId: Number(result[0].insertId),
+            contractFileUrl,
+            contractInfo,
+          };
+        }
+      } catch (error: any) {
+        console.error("合同上传失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `合同上传失败: ${error.message}`,
+        });
+      }
+    }),
+
+  /**
+   * 获取合伙人-城市合同详情
+   */
+  getContractInfo: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      const result = await db
+        .select()
+        .from(partnerCities)
+        .where(and(
+          eq(partnerCities.partnerId, input.partnerId),
+          eq(partnerCities.cityId, input.cityId)
+        ))
+        .limit(1);
+      
+      if (result.length === 0) {
+        return null;
+      }
+      
+      return result[0];
+    }),
+
+  /**
+   * 更新合同信息
+   */
+  updateContractInfo: protectedProcedure
+    .input(z.object({
+      partnerCityId: z.number(),
+      contractStatus: z.enum(["draft", "active", "expired", "terminated"]).optional(),
+      contractStartDate: z.string().optional(),
+      contractEndDate: z.string().optional(),
+      contractSignDate: z.string().optional(),
+      equityRatioPartner: z.number().optional(),
+      equityRatioBrand: z.number().optional(),
+      profitRatioStage1Partner: z.number().optional(),
+      profitRatioStage1Brand: z.number().optional(),
+      profitRatioStage2APartner: z.number().optional(),
+      profitRatioStage2ABrand: z.number().optional(),
+      profitRatioStage2BPartner: z.number().optional(),
+      profitRatioStage2BBrand: z.number().optional(),
+      profitRatioStage3Partner: z.number().optional(),
+      profitRatioStage3Brand: z.number().optional(),
+      brandUsageFee: z.number().optional(),
+      brandAuthDeposit: z.number().optional(),
+      managementFee: z.number().optional(),
+      operationPositionFee: z.number().optional(),
+      teacherRecruitmentFee: z.number().optional(),
+      marketingFee: z.number().optional(),
+      totalEstimatedCost: z.number().optional(),
+      partnerBankName: z.string().optional(),
+      partnerBankAccount: z.string().optional(),
+      partnerAccountHolder: z.string().optional(),
+      partnerAlipayAccount: z.string().optional(),
+      partnerWechatAccount: z.string().optional(),
+      legalRepresentative: z.string().optional(),
+      supervisor: z.string().optional(),
+      financialOfficer: z.string().optional(),
+      profitPaymentDay: z.number().optional(),
+      profitPaymentRule: z.string().optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      const {
+        partnerCityId,
+        contractStartDate,
+        contractEndDate,
+        contractSignDate,
+        equityRatioPartner,
+        equityRatioBrand,
+        profitRatioStage1Partner,
+        profitRatioStage1Brand,
+        profitRatioStage2APartner,
+        profitRatioStage2ABrand,
+        profitRatioStage2BPartner,
+        profitRatioStage2BBrand,
+        profitRatioStage3Partner,
+        profitRatioStage3Brand,
+        brandUsageFee,
+        brandAuthDeposit,
+        managementFee,
+        operationPositionFee,
+        teacherRecruitmentFee,
+        marketingFee,
+        totalEstimatedCost,
+        ...updateData
+      } = input;
+      
+      await db
+        .update(partnerCities)
+        .set({
+          ...updateData,
+          ...(contractStartDate ? { contractStartDate: new Date(contractStartDate) } : {}),
+          ...(contractEndDate ? { contractEndDate: new Date(contractEndDate) } : {}),
+          ...(contractSignDate ? { contractSignDate: new Date(contractSignDate) } : {}),
+          ...(equityRatioPartner !== undefined ? { equityRatioPartner: equityRatioPartner.toString() } : {}),
+          ...(equityRatioBrand !== undefined ? { equityRatioBrand: equityRatioBrand.toString() } : {}),
+          ...(profitRatioStage1Partner !== undefined ? { profitRatioStage1Partner: profitRatioStage1Partner.toString() } : {}),
+          ...(profitRatioStage1Brand !== undefined ? { profitRatioStage1Brand: profitRatioStage1Brand.toString() } : {}),
+          ...(profitRatioStage2APartner !== undefined ? { profitRatioStage2APartner: profitRatioStage2APartner.toString() } : {}),
+          ...(profitRatioStage2ABrand !== undefined ? { profitRatioStage2ABrand: profitRatioStage2ABrand.toString() } : {}),
+          ...(profitRatioStage2BPartner !== undefined ? { profitRatioStage2BPartner: profitRatioStage2BPartner.toString() } : {}),
+          ...(profitRatioStage2BBrand !== undefined ? { profitRatioStage2BBrand: profitRatioStage2BBrand.toString() } : {}),
+          ...(profitRatioStage3Partner !== undefined ? { profitRatioStage3Partner: profitRatioStage3Partner.toString() } : {}),
+          ...(profitRatioStage3Brand !== undefined ? { profitRatioStage3Brand: profitRatioStage3Brand.toString() } : {}),
+          ...(brandUsageFee !== undefined ? { brandUsageFee: brandUsageFee.toString() } : {}),
+          ...(brandAuthDeposit !== undefined ? { brandAuthDeposit: brandAuthDeposit.toString() } : {}),
+          ...(managementFee !== undefined ? { managementFee: managementFee.toString() } : {}),
+          ...(operationPositionFee !== undefined ? { operationPositionFee: operationPositionFee.toString() } : {}),
+          ...(teacherRecruitmentFee !== undefined ? { teacherRecruitmentFee: teacherRecruitmentFee.toString() } : {}),
+          ...(marketingFee !== undefined ? { marketingFee: marketingFee.toString() } : {}),
+          ...(totalEstimatedCost !== undefined ? { totalEstimatedCost: totalEstimatedCost.toString() } : {}),
+          updatedBy: ctx.user.id,
+        })
+        .where(eq(partnerCities.id, partnerCityId));
+      
+      return { success: true };
+    }),
+
+  /**
+   * 计算并更新分红阶段和回本状态
+   */
+  calculateProfitStage: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number(),
+    }))
+    .mutation(async ({ input }) => {
+      try {
+        const result = await updateProfitStageAndRecoveryStatus(
+          input.partnerId,
+          input.cityId
+        );
+        
+        return {
+          success: true,
+          ...result,
+        };
+      } catch (error: any) {
+        console.error("分红阶段计算失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `分红阶段计算失败: ${error.message}`,
+        });
+      }
     }),
 });

@@ -698,20 +698,83 @@ export type PartnerProfitRecord = typeof partnerProfitRecords.$inferSelect;
 export type InsertPartnerProfitRecord = typeof partnerProfitRecords.$inferInsert;
 
 /**
- * 合伙人-城市关联表
+ * 合伙人-城市关联表（扩展为合同信息表）
+ * 一个城市对应一个合伙人，一份合作协议
  */
 export const partnerCities = mysqlTable("partner_cities", {
   id: int("id").autoincrement().primaryKey(),
   partnerId: int("partnerId").notNull(), // 关联partners表
   cityId: int("cityId").notNull(), // 关联cities表
   
+  // 合同基本信息
+  contractStatus: mysqlEnum("contractStatus", ["draft", "active", "expired", "terminated"]).default("draft").notNull(), // 合同状态
+  contractStartDate: date("contractStartDate"), // 合同起始日期
+  contractEndDate: date("contractEndDate"), // 合同结束日期
+  contractSignDate: date("contractSignDate"), // 合同签署日期
+  contractFileUrl: text("contractFileUrl"), // 合同文件URL（S3存储）
+  
+  // 股权结构（工商股权，用于法定权利）
+  equityRatioPartner: decimal("equityRatioPartner", { precision: 5, scale: 2 }), // 合伙人工商股权比例（如60%）
+  equityRatioBrand: decimal("equityRatioBrand", { precision: 5, scale: 2 }), // 品牌方工商股权比例（如40%）
+  
+  // 分红比例（阶段性，与工商股权独立）
+  profitRatioStage1Partner: decimal("profitRatioStage1Partner", { precision: 5, scale: 2 }), // 第1阶段合伙人分红比例（0-12个月）
+  profitRatioStage1Brand: decimal("profitRatioStage1Brand", { precision: 5, scale: 2 }), // 第1阶段品牌方分红比例
+  profitRatioStage2APartner: decimal("profitRatioStage2APartner", { precision: 5, scale: 2 }), // 第2阶段A合伙人分红比例（13-24个月，未回本）
+  profitRatioStage2ABrand: decimal("profitRatioStage2ABrand", { precision: 5, scale: 2 }), // 第2阶段A品牌方分红比例
+  profitRatioStage2BPartner: decimal("profitRatioStage2BPartner", { precision: 5, scale: 2 }), // 第2阶段B合伙人分红比例（13-24个月，已回本）
+  profitRatioStage2BBrand: decimal("profitRatioStage2BBrand", { precision: 5, scale: 2 }), // 第2阶段B品牌方分红比例
+  profitRatioStage3Partner: decimal("profitRatioStage3Partner", { precision: 5, scale: 2 }), // 第3阶段合伙人分红比例（25个月后）
+  profitRatioStage3Brand: decimal("profitRatioStage3Brand", { precision: 5, scale: 2 }), // 第3阶段品牌方分红比例
+  currentProfitStage: int("currentProfitStage").default(1), // 当前所处分红阶段（1/2/3）
+  isInvestmentRecovered: boolean("isInvestmentRecovered").default(false), // 前12个月是否已回本
+  
+  // 投资费用
+  brandUsageFee: decimal("brandUsageFee", { precision: 10, scale: 2 }).default("0.00"), // 品牌使用费
+  brandAuthDeposit: decimal("brandAuthDeposit", { precision: 10, scale: 2 }).default("0.00"), // 品牌授权押金
+  managementFee: decimal("managementFee", { precision: 10, scale: 2 }).default("0.00"), // 管理费
+  operationPositionFee: decimal("operationPositionFee", { precision: 10, scale: 2 }).default("0.00"), // 运营岗位费
+  teacherRecruitmentFee: decimal("teacherRecruitmentFee", { precision: 10, scale: 2 }).default("0.00"), // 老师招聘及培训费
+  marketingFee: decimal("marketingFee", { precision: 10, scale: 2 }).default("0.00"), // 营销推广费
+  
+  // 固定成本预估
+  estimatedRentDeposit: decimal("estimatedRentDeposit", { precision: 10, scale: 2 }).default("0.00"), // 预估租金押金
+  estimatedPropertyFee: decimal("estimatedPropertyFee", { precision: 10, scale: 2 }).default("0.00"), // 预估物业费
+  estimatedUtilityFee: decimal("estimatedUtilityFee", { precision: 10, scale: 2 }).default("0.00"), // 预估水电费
+  estimatedRegistrationFee: decimal("estimatedRegistrationFee", { precision: 10, scale: 2 }).default("0.00"), // 预估注册代理记账费
+  estimatedRenovationFee: decimal("estimatedRenovationFee", { precision: 10, scale: 2 }).default("0.00"), // 预估装修及基础工具成本
+  totalEstimatedCost: decimal("totalEstimatedCost", { precision: 10, scale: 2 }).default("0.00"), // 总预估成本
+  
+  // 收款账户信息
+  partnerBankName: varchar("partnerBankName", { length: 200 }), // 合伙人开户行
+  partnerBankAccount: varchar("partnerBankAccount", { length: 100 }), // 合伙人银行账号
+  partnerAccountHolder: varchar("partnerAccountHolder", { length: 100 }), // 合伙人账户名
+  partnerAlipayAccount: varchar("partnerAlipayAccount", { length: 100 }), // 合伙人支付宝账号
+  partnerWechatAccount: varchar("partnerWechatAccount", { length: 100 }), // 合伙人微信账号
+  
+  // 运营信息
+  legalRepresentative: varchar("legalRepresentative", { length: 100 }), // 法人代表
+  supervisor: varchar("supervisor", { length: 100 }), // 监事
+  financialOfficer: varchar("financialOfficer", { length: 100 }), // 财务
+  phoneNumbers: text("phoneNumbers"), // 运营手机号（JSON数组）
+  mediaAccounts: text("mediaAccounts"), // 新媒体账号（JSON数组）
+  
+  // 分红支付规则
+  profitPaymentDay: int("profitPaymentDay").default(25), // 每月分红支付日
+  profitPaymentRule: text("profitPaymentRule"), // 分红支付规则说明
+  
+  // 备注
+  notes: text("notes"),
+  
   createdBy: int("createdBy").notNull(), // 创建人
+  updatedBy: int("updatedBy"), // 更新人
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   partnerIdx: index("partner_city_partner_idx").on(table.partnerId),
   cityIdx: index("partner_city_city_idx").on(table.cityId),
   uniquePartnerCity: index("unique_partner_city").on(table.partnerId, table.cityId),
+  contractStatusIdx: index("contract_status_idx").on(table.contractStatus),
 }));
 
 export type PartnerCity = typeof partnerCities.$inferSelect;
