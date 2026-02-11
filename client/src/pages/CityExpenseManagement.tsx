@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, Calendar } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar, Download, Upload, FileDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -17,6 +17,7 @@ export default function CityExpenseManagement() {
   const utils = trpc.useUtils();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [isImporting, setIsImporting] = useState(false);
   
   // 筛选条件
   const [selectedCityId, setSelectedCityId] = useState<number | undefined>(undefined);
@@ -70,6 +71,50 @@ export default function CityExpenseManagement() {
     },
     onError: (error) => {
       toast.error(`删除失败: ${error.message}`);
+    },
+  });
+  
+  // 下载模板
+  const downloadTemplateMutation = trpc.cityExpense.downloadTemplate.useMutation({
+    onSuccess: (data) => {
+      const link = document.createElement("a");
+      link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${data.data}`;
+      link.download = data.filename;
+      link.click();
+      toast.success("模板下载成功");
+    },
+    onError: (error) => {
+      toast.error(`模板下载失败: ${error.message}`);
+    },
+  });
+  
+  // 批量导入
+  const batchImportMutation = trpc.cityExpense.batchImport.useMutation({
+    onSuccess: (result) => {
+      toast.success(`导入完成！成功: ${result.success} 条，失败: ${result.failed} 条`);
+      if (result.failedRecords.length > 0) {
+        console.log("失败记录:", result.failedRecords);
+      }
+      utils.cityExpense.list.invalidate();
+      setIsImporting(false);
+    },
+    onError: (error) => {
+      toast.error(`导入失败: ${error.message}`);
+      setIsImporting(false);
+    },
+  });
+  
+  // 导出数据
+  const exportDataMutation = trpc.cityExpense.exportData.useMutation({
+    onSuccess: (data) => {
+      const link = document.createElement("a");
+      link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${data.data}`;
+      link.download = data.filename;
+      link.click();
+      toast.success("数据导出成功");
+    },
+    onError: (error) => {
+      toast.error(`导出失败: ${error.message}`);
     },
   });
   
@@ -133,6 +178,34 @@ export default function CityExpenseManagement() {
     }
   };
   
+  const handleDownloadTemplate = () => {
+    downloadTemplateMutation.mutate();
+  };
+  
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      const base64Data = base64.split(",")[1];
+      setIsImporting(true);
+      batchImportMutation.mutate({ fileData: base64Data });
+    };
+    reader.readAsDataURL(file);
+    
+    // 重置input以便能多次上传同一文件
+    event.target.value = "";
+  };
+  
+  const handleExport = () => {
+    exportDataMutation.mutate({
+      cityId: selectedCityId,
+      month: selectedMonth || undefined,
+    });
+  };
+  
   const handleCityChange = (cityId: string) => {
     const city = cities?.find(c => c.id === parseInt(cityId));
     if (city) {
@@ -167,6 +240,27 @@ export default function CityExpenseManagement() {
           <div>
             <h1 className="text-3xl font-bold">城市费用账单管理</h1>
             <p className="text-muted-foreground mt-1">管理每个城市的月度费用支出记录</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleDownloadTemplate} disabled={downloadTemplateMutation.isPending}>
+              <FileDown className="h-4 w-4 mr-2" />
+              {downloadTemplateMutation.isPending ? "下载中..." : "下载模板"}
+            </Button>
+            <Button variant="outline" onClick={() => document.getElementById("file-upload")?.click()} disabled={isImporting}>
+              <Upload className="h-4 w-4 mr-2" />
+              {isImporting ? "导入中..." : "批量导入"}
+            </Button>
+            <input
+              id="file-upload"
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={handleFileUpload}
+              style={{ display: "none" }}
+            />
+            <Button variant="outline" onClick={handleExport} disabled={exportDataMutation.isPending}>
+              <Download className="h-4 w-4 mr-2" />
+              {exportDataMutation.isPending ? "导出中..." : "导出"}
+            </Button>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
