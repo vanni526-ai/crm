@@ -1,0 +1,402 @@
+{
+  "query": "SHOW COLUMNS FROM partner_cities;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SHOW COLUMNS FROM partner_cities;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "partnerId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cityId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdBy",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "contractStatus",
+      "Type": "enum('draft','active','expired','terminated')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "draft",
+      "Extra": ""
+    },
+    {
+      "Field": "contractStartDate",
+      "Type": "date",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "contractEndDate",
+      "Type": "date",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "contractSignDate",
+      "Type": "date",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "contractFileUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "equityRatioPartner",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "equityRatioBrand",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage1Partner",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage1Brand",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage2APartner",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage2ABrand",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage2BPartner",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage2BBrand",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage3Partner",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitRatioStage3Brand",
+      "Type": "decimal(5,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "currentProfitStage",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "isInvestmentRecovered",
+      "Type": "tinyint(1)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "brandUsageFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "brandAuthDeposit",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "managementFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "operationPositionFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "teacherRecruitmentFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "marketingFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "estimatedRentDeposit",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "estimatedPropertyFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "estimatedUtilityFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "estimatedRegistrationFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "estimatedRenovationFee",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "totalEstimatedCost",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0.00",
+      "Extra": ""
+    },
+    {
+      "Field": "partnerBankName",
+      "Type": "varchar(200)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "partnerBankAccount",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "partnerAccountHolder",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "partnerAlipayAccount",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "partnerWechatAccount",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "legalRepresentative",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "supervisor",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "financialOfficer",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "phoneNumbers",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "mediaAccounts",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "profitPaymentDay",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "25",
+      "Extra": ""
+    },
+    {
+      "Field": "profitPaymentRule",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "notes",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedBy",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\npartnerId\tint(11)\tNO\tMUL\tNULL\t\ncityId\tint(11)\tNO\tMUL\tNULL\t\ncreatedBy\tint(11)\tNO\t\tNULL\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ncontractStatus\tenum('draft','active','expired','terminated')\tNO\t\tdraft\t\ncontractStartDate\tdate\tYES\t\tNULL\t\ncontractEndDate\tdate\tYES\t\tNULL\t\ncontractSignDate\tdate\tYES\t\tNULL\t\ncontractFileUrl\ttext\tYES\t\tNULL\t\nequityRatioPartner\tdecimal(5,2)\tYES\t\tNULL\t\nequityRatioBrand\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage1Partner\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage1Brand\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage2APartner\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage2ABrand\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage2BPartner\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage2BBrand\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage3Partner\tdecimal(5,2)\tYES\t\tNULL\t\nprofitRatioStage3Brand\tdecimal(5,2)\tYES\t\tNULL\t\ncurrentProfitStage\tint(11)\tYES\t\t1\t\nisInvestmentRecovered\ttinyint(1)\tYES\t\t0\t\nbrandUsageFee\tdecimal(10,2)\tYES\t\t0.00\t\nbrandAuthDeposit\tdecimal(10,2)\tYES\t\t0.00\t\nmanagementFee\tdecimal(10,2)\tYES\t\t0.00\t\noperationPositionFee\tdecimal(10,2)\tYES\t\t0.00\t\nteacherRecruitmentFee\tdecimal(10,2)\tYES\t\t0.00\t\nmarketingFee\tdecimal(10,2)\tYES\t\t0.00\t\nestimatedRentDeposit\tdecimal(10,2)\tYES\t\t0.00\t\nestimatedPropertyFee\tdecimal(10,2)\tYES\t\t0.00\t\nestimatedUtilityFee\tdecimal(10,2)\tYES\t\t0.00\t\nestimatedRegistrationFee\tdecimal(10,2)\tYES\t\t0.00\t\nestimatedRenovationFee\tdecimal(10,2)\tYES\t\t0.00\t\ntotalEstimatedCost\tdecimal(10,2)\tYES\t\t0.00\t\npartnerBankName\tvarchar(200)\tYES\t\tNULL\t\npartnerBankAccount\tvarchar(100)\tYES\t\tNULL\t\npartnerAccountHolder\tvarchar(100)\tYES\t\tNULL\t\npartnerAlipayAccount\tvarchar(100)\tYES\t\tNULL\t\npartnerWechatAccount\tvarchar(100)\tYES\t\tNULL\t\nlegalRepresentative\tvarchar(100)\tYES\t\tNULL\t\nsupervisor\tvarchar(100)\tYES\t\tNULL\t\nfinancialOfficer\tvarchar(100)\tYES\t\tNULL\t\nphoneNumbers\ttext\tYES\t\tNULL\t\nmediaAccounts\ttext\tYES\t\tNULL\t\nprofitPaymentDay\tint(11)\tYES\t\t25\t\nprofitPaymentRule\ttext\tYES\t\tNULL\t\nnotes\ttext\tYES\t\tNULL\t\nupdatedBy\tint(11)\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 1596
+}
