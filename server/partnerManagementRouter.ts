@@ -609,7 +609,7 @@ export const partnerManagementRouter = router({
     }),
 
   /**
-   * 上传合同文件并智能识别
+   * 上传合同文件并智能识别（预览模式，不保存到数据库）
    */
   uploadContract: protectedProcedure
     .input(z.object({
@@ -619,9 +619,6 @@ export const partnerManagementRouter = router({
       fileName: z.string(),
     }))
     .mutation(async ({ input, ctx }) => {
-      const db = await getDb();
-      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
-      
       try {
         // 将Base64转换为Buffer
         const fileBuffer = Buffer.from(input.fileBase64, 'base64');
@@ -633,6 +630,76 @@ export const partnerManagementRouter = router({
           input.partnerId,
           input.cityId
         );
+        
+        // 只返回识别结果，不保存到数据库
+        return {
+          success: true,
+          contractFileUrl,
+          contractInfo,
+        };
+      } catch (error: any) {
+        console.error("合同上传失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `合同上传失败: ${error.message}`,
+        });
+      }
+    }),
+
+  /**
+   * 保存用户确认后的合同信息
+   */
+  saveContractInfo: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number(),
+      contractFileUrl: z.string(),
+      contractInfo: z.object({
+        contractStartDate: z.string().optional(),
+        contractEndDate: z.string().optional(),
+        contractSignDate: z.string().optional(),
+        equityRatioPartner: z.number().optional(),
+        equityRatioBrand: z.number().optional(),
+        profitRatioStage1Partner: z.number().optional(),
+        profitRatioStage1Brand: z.number().optional(),
+        profitRatioStage2APartner: z.number().optional(),
+        profitRatioStage2ABrand: z.number().optional(),
+        profitRatioStage2BPartner: z.number().optional(),
+        profitRatioStage2BBrand: z.number().optional(),
+        profitRatioStage3Partner: z.number().optional(),
+        profitRatioStage3Brand: z.number().optional(),
+        brandUsageFee: z.number().optional(),
+        brandAuthDeposit: z.number().optional(),
+        managementFee: z.number().optional(),
+        operationPositionFee: z.number().optional(),
+        teacherRecruitmentFee: z.number().optional(),
+        marketingFee: z.number().optional(),
+        totalEstimatedCost: z.number().optional(),
+        partnerBankName: z.string().optional(),
+        partnerBankAccount: z.string().optional(),
+        partnerAccountHolder: z.string().optional(),
+        legalRepresentative: z.string().optional(),
+        profitPaymentDay: z.number().optional(),
+      }),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      try {
+        // 将contractInfo中的number类型转换为string（decimal字段）
+        const convertedInfo: any = {};
+        for (const [key, value] of Object.entries(input.contractInfo)) {
+          if (value === undefined) continue;
+          
+          if (typeof value === 'number' && !['profitPaymentDay', 'currentProfitStage'].includes(key)) {
+            convertedInfo[key] = value.toString();
+          } else if (key.includes('Date') && typeof value === 'string') {
+            convertedInfo[key] = new Date(value);
+          } else {
+            convertedInfo[key] = value;
+          }
+        }
         
         // 查询是否已存在该合伙人-城市关联
         const existing = await db
@@ -646,22 +713,10 @@ export const partnerManagementRouter = router({
         
         if (existing.length > 0) {
           // 更新现有记录
-          // 将contractInfo中的number类型转换为string（decimal字段）
-          const convertedInfo: any = {};
-          for (const [key, value] of Object.entries(contractInfo)) {
-            if (typeof value === 'number' && !['profitPaymentDay', 'currentProfitStage'].includes(key)) {
-              convertedInfo[key] = value.toString();
-            } else if (key.includes('Date') && typeof value === 'string') {
-              convertedInfo[key] = new Date(value);
-            } else {
-              convertedInfo[key] = value;
-            }
-          }
-          
           await db
             .update(partnerCities)
             .set({
-              contractFileUrl,
+              contractFileUrl: input.contractFileUrl,
               contractStatus: 'active',
               ...convertedInfo,
               updatedBy: ctx.user.id,
@@ -671,27 +726,13 @@ export const partnerManagementRouter = router({
           return {
             success: true,
             partnerCityId: existing[0].id,
-            contractFileUrl,
-            contractInfo,
           };
         } else {
           // 创建新记录
-          // 将contractInfo中的number类型转换为string（decimal字段）
-          const convertedInfo: any = {};
-          for (const [key, value] of Object.entries(contractInfo)) {
-            if (typeof value === 'number' && !['profitPaymentDay', 'currentProfitStage'].includes(key)) {
-              convertedInfo[key] = value.toString();
-            } else if (key.includes('Date') && typeof value === 'string') {
-              convertedInfo[key] = new Date(value);
-            } else {
-              convertedInfo[key] = value;
-            }
-          }
-          
           const result = await db.insert(partnerCities).values({
             partnerId: input.partnerId,
             cityId: input.cityId,
-            contractFileUrl,
+            contractFileUrl: input.contractFileUrl,
             contractStatus: 'active',
             ...convertedInfo,
             createdBy: ctx.user.id,
@@ -700,15 +741,13 @@ export const partnerManagementRouter = router({
           return {
             success: true,
             partnerCityId: Number(result[0].insertId),
-            contractFileUrl,
-            contractInfo,
           };
         }
       } catch (error: any) {
-        console.error("合同上传失败:", error);
+        console.error("保存合同信息失败:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `合同上传失败: ${error.message}`,
+          message: `保存失败: ${error.message}`,
         });
       }
     }),

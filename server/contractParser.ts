@@ -1,6 +1,6 @@
 import { invokeLLM } from "./_core/llm";
 import { storagePut } from "./storage";
-import * as pdfParse from "pdf-parse";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 
 /**
  * 合同信息接口
@@ -80,9 +80,31 @@ export async function uploadContractFile(
  */
 export async function extractTextFromPDF(fileBuffer: Buffer): Promise<string> {
   try {
-    // @ts-ignore
-    const data = await pdfParse.default(fileBuffer);
-    return data.text;
+    // 加载PDF文档
+    const loadingTask = pdfjsLib.getDocument({
+      data: new Uint8Array(fileBuffer),
+      useSystemFonts: true,
+    });
+    
+    const pdfDocument = await loadingTask.promise;
+    const numPages = pdfDocument.numPages;
+    
+    let fullText = "";
+    
+    // 遍历所有页面提取文本
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      
+      // 提取文本项并拼接
+      const pageText = textContent.items
+        .map((item: any) => item.str)
+        .join(" ");
+      
+      fullText += pageText + "\n";
+    }
+    
+    return fullText.trim();
   } catch (error) {
     console.error("PDF文本提取失败:", error);
     throw new Error("无法提取PDF文本内容");

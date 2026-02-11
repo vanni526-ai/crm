@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { FileUp, Calculator, Download, Eye } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
+import ContractInfoEditor from "@/components/ContractInfoEditor";
 
 export default function PartnerManagement() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
@@ -18,6 +19,11 @@ export default function PartnerManagement() {
   const [contractDialogOpen, setContractDialogOpen] = useState(false);
   const [uploadingContract, setUploadingContract] = useState(false);
   const [citySearchQuery, setCitySearchQuery] = useState("");
+  
+  // 合同预览和编辑状态
+  const [contractPreview, setContractPreview] = useState<any>(null); // 识别结果预览
+  const [editingContract, setEditingContract] = useState(false); // 是否处于编辑模式
+  const [editFormData, setEditFormData] = useState<any>({}); // 编辑表单数据
 
   // 查询合伙人列表
   const { data: partners, isLoading: partnersLoading } = trpc.partnerManagement.list.useQuery();
@@ -37,15 +43,40 @@ export default function PartnerManagement() {
     { enabled: !!selectedPartnerId && !!selectedCityId }
   );
 
-  // 上传合同
+  // 上传合同（只识别，不保存）
   const uploadContractMutation = trpc.partnerManagement.uploadContract.useMutation({
-    onSuccess: () => {
-      toast.success("合同上传成功，信息已自动识别");
+    onSuccess: (data) => {
+      toast.success("合同识别成功，请检查并修改信息");
       setContractDialogOpen(false);
-      refetchContract();
+      setUploadingContract(false);
+      
+      // 设置预览数据
+      setContractPreview({
+        contractFileUrl: data.contractFileUrl,
+        contractInfo: data.contractInfo,
+      });
+      
+      // 初始化编辑表单数据
+      setEditFormData(data.contractInfo);
+      setEditingContract(true);
     },
     onError: (error) => {
       toast.error(`合同上传失败: ${error.message}`);
+      setUploadingContract(false);
+    },
+  });
+  
+  // 保存合同信息
+  const saveContractMutation = trpc.partnerManagement.saveContractInfo.useMutation({
+    onSuccess: () => {
+      toast.success("合同信息已保存");
+      setContractPreview(null);
+      setEditingContract(false);
+      setEditFormData({});
+      refetchContract();
+    },
+    onError: (error) => {
+      toast.error(`保存失败: ${error.message}`);
     },
   });
 
@@ -271,7 +302,26 @@ export default function PartnerManagement() {
                   {/* 合同信息Tab */}
                   <TabsContent value="contract" className="space-y-4">
                     {selectedCityId ? (
-                      contractInfo ? (
+                      editingContract && contractPreview ? (
+                        <ContractInfoEditor
+                          contractFileUrl={contractPreview.contractFileUrl}
+                          initialData={contractPreview.contractInfo}
+                          onSave={(data) => {
+                            saveContractMutation.mutate({
+                              partnerId: selectedPartnerId!,
+                              cityId: selectedCityId!,
+                              contractFileUrl: contractPreview.contractFileUrl,
+                              contractInfo: data,
+                            });
+                          }}
+                          onCancel={() => {
+                            setEditingContract(false);
+                            setContractPreview(null);
+                            setEditFormData({});
+                          }}
+                          isSaving={saveContractMutation.isPending}
+                        />
+                      ) : contractInfo ? (
                         <div className="space-y-6">
                           {/* 合同基本信息 */}
                           <div>
