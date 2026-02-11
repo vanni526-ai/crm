@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { cityMonthlyExpenses, cities } from "../drizzle/schema";
+import { cityMonthlyExpenses, cities, partnerCities } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import ExcelJS from "exceljs";
@@ -40,8 +40,39 @@ export const cityExpenseRouter = router({
       }
       
       const result = await db
-        .select()
+        .select({
+          id: cityMonthlyExpenses.id,
+          cityId: cityMonthlyExpenses.cityId,
+          cityName: cities.name,
+          month: cityMonthlyExpenses.month,
+          rentFee: cityMonthlyExpenses.rentFee,
+          propertyFee: cityMonthlyExpenses.propertyFee,
+          utilityFee: cityMonthlyExpenses.utilityFee,
+          consumablesFee: cityMonthlyExpenses.consumablesFee,
+          cleaningFee: cityMonthlyExpenses.cleaningFee,
+          phoneFee: cityMonthlyExpenses.phoneFee,
+          deferredPayment: cityMonthlyExpenses.deferredPayment,
+          expressFee: cityMonthlyExpenses.expressFee,
+          promotionFee: cityMonthlyExpenses.promotionFee,
+          otherFee: cityMonthlyExpenses.otherFee,
+          totalExpense: cityMonthlyExpenses.totalExpense,
+          notes: cityMonthlyExpenses.notes,
+          createdAt: cityMonthlyExpenses.createdAt,
+          updatedAt: cityMonthlyExpenses.updatedAt,
+          // 费用分摄比例：根据当前分红阶段获取合伙人分红比例
+          costShareRatio: sql<string>`
+            CASE 
+              WHEN ${partnerCities.currentProfitStage} = 1 THEN ${partnerCities.profitRatioStage1Partner}
+              WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 0 THEN ${partnerCities.profitRatioStage2APartner}
+              WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 1 THEN ${partnerCities.profitRatioStage2BPartner}
+              WHEN ${partnerCities.currentProfitStage} = 3 THEN ${partnerCities.profitRatioStage3Partner}
+              ELSE NULL
+            END
+          `.as('costShareRatio'),
+        })
         .from(cityMonthlyExpenses)
+        .leftJoin(cities, eq(cityMonthlyExpenses.cityId, cities.id))
+        .leftJoin(partnerCities, eq(cityMonthlyExpenses.cityId, partnerCities.cityId))
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(desc(cityMonthlyExpenses.month), desc(cityMonthlyExpenses.cityId));
       

@@ -509,6 +509,7 @@ export default function CityExpenseManagement() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>城市</TableHead>
+                    <TableHead className="text-right">费用分摄比例</TableHead>
                     <TableHead>月份</TableHead>
                     <TableHead className="text-right">房租</TableHead>
                     <TableHead className="text-right">物业费</TableHead>
@@ -527,7 +528,7 @@ export default function CityExpenseManagement() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={14} className="text-center text-muted-foreground">
+                      <TableCell colSpan={15} className="text-center text-muted-foreground">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -535,8 +536,11 @@ export default function CityExpenseManagement() {
                     expenses.map((expense) => (
                       <TableRow key={expense.id}>
                         <TableCell className="font-medium">{expense.cityName}</TableCell>
+                        <TableCell className="text-right">
+                          {expense.costShareRatio ? `${parseFloat(expense.costShareRatio).toFixed(0)}%` : '-'}
+                        </TableCell>
                         <TableCell>{expense.month}</TableCell>
-                        <TableCell className="text-right">¥{parseFloat(expense.rentFee || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right">￥{parseFloat(expense.rentFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">¥{parseFloat(expense.propertyFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">¥{parseFloat(expense.utilityFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">¥{parseFloat(expense.consumablesFee || "0").toLocaleString()}</TableCell>
@@ -569,7 +573,7 @@ export default function CityExpenseManagement() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={14} className="text-center text-muted-foreground">
+                      <TableCell colSpan={15} className="text-center text-muted-foreground">
                         暂无费用账单数据
                       </TableCell>
                     </TableRow>
