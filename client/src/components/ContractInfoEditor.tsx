@@ -57,6 +57,24 @@ export default function ContractInfoEditor({
       }
     });
     
+    // 将日期字段从Dat e对象转换为字符串格式 (YYYY-MM-DD)
+    const dateFields = ['contractStartDate', 'contractEndDate', 'contractSignDate'];
+    dateFields.forEach(field => {
+      if (convertedData[field]) {
+        if (convertedData[field] instanceof Date) {
+          // Date对象转换为 YYYY-MM-DD 格式
+          const date = convertedData[field];
+          convertedData[field] = date.toISOString().split('T')[0];
+        } else if (typeof convertedData[field] === 'string') {
+          // 如果已经是字符串，确保格式正确
+          const date = new Date(convertedData[field]);
+          if (!isNaN(date.getTime())) {
+            convertedData[field] = date.toISOString().split('T')[0];
+          }
+        }
+      }
+    });
+    
     onSave(convertedData);
   };
 

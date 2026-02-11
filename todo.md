@@ -2286,3 +2286,6 @@
 ### 142. 修复合同编辑保存时的类型转换错误
 - [x] 修复ContractInfoEditor组件保存时数字字段的类型转换（数据库返回的decimal字段是字符串，需要转换为number）
 - [x] 确保所有数字字段（品牌使用费、押金、各项费用等）在保存前正确转换为number类型
+### 143. 修复合同编辑保存时的日期类型转换错误
+- [x] 修复ContractInfoEditor组件保存时日期字段的类型转换（API期望字符串格式，但前端传递的是Date对象）
+- [x] 将contractStartDate、contractEndDate、contractSignDate从Da te对象转换为字符串格式（YYYY-MM-DD）
