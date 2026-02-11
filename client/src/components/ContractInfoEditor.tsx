@@ -110,6 +110,7 @@ export default function ContractInfoEditor({
               type="date"
               value={formData.contractSignDate || ""}
               onChange={(e) => handleChange("contractSignDate", e.target.value)}
+              required
             />
           </div>
           <div>
@@ -118,6 +119,7 @@ export default function ContractInfoEditor({
               type="date"
               value={formData.contractStartDate || ""}
               onChange={(e) => handleChange("contractStartDate", e.target.value)}
+              required
             />
           </div>
           <div>
@@ -126,6 +128,7 @@ export default function ContractInfoEditor({
               type="date"
               value={formData.contractEndDate || ""}
               onChange={(e) => handleChange("contractEndDate", e.target.value)}
+              required
             />
           </div>
           <div>
@@ -134,6 +137,7 @@ export default function ContractInfoEditor({
               value={formData.legalRepresentative || ""}
               onChange={(e) => handleChange("legalRepresentative", e.target.value)}
               placeholder="请输入法人代表姓名"
+              required
             />
           </div>
         </CardContent>
@@ -152,6 +156,7 @@ export default function ContractInfoEditor({
               value={formData.equityRatioPartner || ""}
               onChange={(e) => handleChange("equityRatioPartner", parseFloat(e.target.value))}
               placeholder="如：60"
+              required
             />
           </div>
           <div>
@@ -161,6 +166,7 @@ export default function ContractInfoEditor({
               value={formData.equityRatioBrand || ""}
               onChange={(e) => handleChange("equityRatioBrand", parseFloat(e.target.value))}
               placeholder="如：40"
+              required
             />
           </div>
         </CardContent>
@@ -179,6 +185,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage1Partner || ""}
               onChange={(e) => handleChange("profitRatioStage1Partner", parseFloat(e.target.value))}
               placeholder="如：30"
+              required
             />
           </div>
           <div>
@@ -188,6 +195,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage1Brand || ""}
               onChange={(e) => handleChange("profitRatioStage1Brand", parseFloat(e.target.value))}
               placeholder="如：70"
+              required
             />
           </div>
         </CardContent>
@@ -206,6 +214,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage2APartner || ""}
               onChange={(e) => handleChange("profitRatioStage2APartner", parseFloat(e.target.value))}
               placeholder="如：30"
+              required
             />
           </div>
           <div>
@@ -215,6 +224,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage2ABrand || ""}
               onChange={(e) => handleChange("profitRatioStage2ABrand", parseFloat(e.target.value))}
               placeholder="如：70"
+              required
             />
           </div>
         </CardContent>
@@ -233,6 +243,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage2BPartner || ""}
               onChange={(e) => handleChange("profitRatioStage2BPartner", parseFloat(e.target.value))}
               placeholder="如：20"
+              required
             />
           </div>
           <div>
@@ -242,6 +253,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage2BBrand || ""}
               onChange={(e) => handleChange("profitRatioStage2BBrand", parseFloat(e.target.value))}
               placeholder="如：80"
+              required
             />
           </div>
         </CardContent>
@@ -260,6 +272,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage3Partner || ""}
               onChange={(e) => handleChange("profitRatioStage3Partner", parseFloat(e.target.value))}
               placeholder="如：20"
+              required
             />
           </div>
           <div>
@@ -269,6 +282,7 @@ export default function ContractInfoEditor({
               value={formData.profitRatioStage3Brand || ""}
               onChange={(e) => handleChange("profitRatioStage3Brand", parseFloat(e.target.value))}
               placeholder="如：80"
+              required
             />
           </div>
         </CardContent>
@@ -290,6 +304,7 @@ export default function ContractInfoEditor({
                 onChange={(e) => handleChange("brandUsageFee", parseFloat(e.target.value))}
                 placeholder="如：50000"
                 className="mt-2"
+                required
               />
               <p className="text-sm text-muted-foreground mt-2">包含：管理费 + 运营岗位费 + 老师招聘培训费 + 营销推广费</p>
             </div>
@@ -302,6 +317,7 @@ export default function ContractInfoEditor({
                   value={formData.managementFee || ""}
                   onChange={(e) => handleChange("managementFee", parseFloat(e.target.value))}
                   placeholder="如：5000"
+                  required
                 />
               </div>
               <div>
@@ -311,6 +327,7 @@ export default function ContractInfoEditor({
                   value={formData.operationPositionFee || ""}
                   onChange={(e) => handleChange("operationPositionFee", parseFloat(e.target.value))}
                   placeholder="如：18000"
+                  required
                 />
               </div>
               <div>
@@ -320,6 +337,7 @@ export default function ContractInfoEditor({
                   value={formData.teacherRecruitmentFee || ""}
                   onChange={(e) => handleChange("teacherRecruitmentFee", parseFloat(e.target.value))}
                   placeholder="如：7000"
+                  required
                 />
               </div>
               <div>
@@ -329,6 +347,7 @@ export default function ContractInfoEditor({
                   value={formData.marketingFee || ""}
                   onChange={(e) => handleChange("marketingFee", parseFloat(e.target.value))}
                   placeholder="如：20000"
+                  required
                 />
               </div>
             </div>
@@ -343,6 +362,7 @@ export default function ContractInfoEditor({
               onChange={(e) => handleChange("brandAuthDeposit", parseFloat(e.target.value))}
               placeholder="如：5000"
               className="mt-2"
+              required
             />
           </div>
         </CardContent>
@@ -360,6 +380,7 @@ export default function ContractInfoEditor({
               value={formData.partnerAccountHolder || ""}
               onChange={(e) => handleChange("partnerAccountHolder", e.target.value)}
               placeholder="请输入账户名称"
+              required
             />
           </div>
           <div>
@@ -368,6 +389,7 @@ export default function ContractInfoEditor({
               value={formData.partnerBankName || ""}
               onChange={(e) => handleChange("partnerBankName", e.target.value)}
               placeholder="请输入开户行"
+              required
             />
           </div>
           <div className="col-span-2">
@@ -376,6 +398,7 @@ export default function ContractInfoEditor({
               value={formData.partnerBankAccount || ""}
               onChange={(e) => handleChange("partnerBankAccount", e.target.value)}
               placeholder="请输入银行账号"
+              required
             />
           </div>
         </CardContent>
@@ -396,6 +419,7 @@ export default function ContractInfoEditor({
               placeholder="如：25（表示每月25日）"
               min="1"
               max="31"
+              required
             />
           </div>
         </CardContent>

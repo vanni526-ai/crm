@@ -2289,3 +2289,7 @@
 ### 143. 修复合同编辑保存时的日期类型转换错误
 - [x] 修复ContractInfoEditor组件保存时日期字段的类型转换（API期望字符串格式，但前端传递的是Date对象）
 - [x] 将contractStartDate、contractEndDate、contractSignDate从Da te对象转换为字符串格式（YYYY-MM-DD）
+
+### 144. 将合同编辑表单中的所有字段设置为必填项
+- [ ] 修改ContractInfoEditor组件，为所有输入字段添加required属性
+- [ ] 确保用户必须填写完整的合同信息才能保存
