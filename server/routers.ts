@@ -24,6 +24,7 @@ import { notificationRouter } from "./notificationRouter";
 import { salesCityPerformanceRouter } from "./salesCityPerformanceRouter";
 import { teacherPaymentRouter } from "./teacherPaymentRouter";
 import { partnerManagementRouter } from "./partnerManagementRouter";
+import { cityExpenseRouter } from "./cityExpenseRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -95,6 +96,7 @@ export const appRouter = router({
   salesCityPerformance: salesCityPerformanceRouter,
   teacherPayments: teacherPaymentRouter,
   partnerManagement: partnerManagementRouter,
+  cityExpense: cityExpenseRouter,
 
   // 数据质量检查
   dataQuality: router({

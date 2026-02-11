@@ -1024,3 +1024,39 @@ export const salesCommissionConfigs = mysqlTable("sales_commission_configs", {
 
 export type SalesCommissionConfig = typeof salesCommissionConfigs.$inferSelect;
 export type InsertSalesCommissionConfig = typeof salesCommissionConfigs.$inferInsert;
+
+/**
+ * 城市月度费用账单表 - 记录每个城市每月的实际费用支出
+ */
+export const cityMonthlyExpenses = mysqlTable("city_monthly_expenses", {
+  id: int("id").autoincrement().primaryKey(),
+  cityId: int("cityId").notNull(), // 关联城市ID
+  cityName: varchar("cityName", { length: 50 }).notNull(), // 城市名称(冗余字段)
+  month: varchar("month", { length: 7 }).notNull(), // 月份 (格式: YYYY-MM)
+  
+  // 10种费用类型
+  rentFee: decimal("rentFee", { precision: 10, scale: 2 }).default("0.00"), // 房租
+  propertyFee: decimal("propertyFee", { precision: 10, scale: 2 }).default("0.00"), // 物业费
+  utilityFee: decimal("utilityFee", { precision: 10, scale: 2 }).default("0.00"), // 水电费
+  consumablesFee: decimal("consumablesFee", { precision: 10, scale: 2 }).default("0.00"), // 道具耗材
+  cleaningFee: decimal("cleaningFee", { precision: 10, scale: 2 }).default("0.00"), // 保洁费
+  phoneFee: decimal("phoneFee", { precision: 10, scale: 2 }).default("0.00"), // 话费
+  deferredPayment: decimal("deferredPayment", { precision: 10, scale: 2 }).default("0.00"), // 合同后付款
+  expressFee: decimal("expressFee", { precision: 10, scale: 2 }).default("0.00"), // 快递费
+  promotionFee: decimal("promotionFee", { precision: 10, scale: 2 }).default("0.00"), // 推广费
+  otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
+  
+  totalExpense: decimal("totalExpense", { precision: 10, scale: 2 }).default("0.00"), // 总费用（自动计算）
+  notes: text("notes"), // 备注
+  
+  uploadedBy: int("uploadedBy").notNull(), // 上传人ID
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  cityIdx: index("monthly_expense_city_idx").on(table.cityId),
+  monthIdx: index("monthly_expense_month_idx").on(table.month),
+  uniqueCityMonth: unique("unique_city_month").on(table.cityId, table.month),
+}));
+
+export type CityMonthlyExpense = typeof cityMonthlyExpenses.$inferSelect;
+export type InsertCityMonthlyExpense = typeof cityMonthlyExpenses.$inferInsert;

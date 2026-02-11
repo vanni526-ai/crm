@@ -14,6 +14,144 @@ const financeOrAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 
 export const financeRouter = router({
+  /**
+   * 获取合伙人分红统计数据
+   */
+  getPartnerDividends: financeOrAdminProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+        partnerId: z.number().optional(),
+      })
+    )
+    .query(async ({ input }) => {
+      try {
+        const { startDate, endDate, partnerId } = input;
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+        
+        // 获取所有合伙人
+        const { partners: partnersTable, partnerCities: partnerCitiesTable, cities: citiesTable, orders: ordersTable } = await import("../drizzle/schema");
+        const { eq, and, sql } = await import("drizzle-orm");
+        
+        const allPartners = await dbInstance.select().from(partnersTable);
+        
+        const result = [];
+        
+        for (const partner of allPartners) {
+          // 如果指定了partnerId，只处理该合伙人
+          if (partnerId && partner.id !== partnerId) continue;
+          
+          // 获取合伙人关联的城市和合同信息
+          const partnerCities = await dbInstance
+            .select({
+              id: partnerCitiesTable.id,
+              partnerId: partnerCitiesTable.partnerId,
+              cityId: partnerCitiesTable.cityId,
+              cityName: citiesTable.name,
+              currentProfitStage: partnerCitiesTable.currentProfitStage,
+              isInvestmentRecovered: partnerCitiesTable.isInvestmentRecovered,
+              profitRatioStage1Partner: partnerCitiesTable.profitRatioStage1Partner,
+              profitRatioStage2APartner: partnerCitiesTable.profitRatioStage2APartner,
+              profitRatioStage2BPartner: partnerCitiesTable.profitRatioStage2BPartner,
+              profitRatioStage3Partner: partnerCitiesTable.profitRatioStage3Partner,
+            })
+            .from(partnerCitiesTable)
+            .leftJoin(citiesTable, eq(partnerCitiesTable.cityId, citiesTable.id))
+            .where(eq(partnerCitiesTable.partnerId, partner.id));
+          
+          if (partnerCities.length === 0) continue;
+          
+          // 获取该合伙人所有城市的订单
+          const cityNames = partnerCities.map(pc => pc.cityName).filter(Boolean) as string[];
+          
+          const conditions = [
+            sql`${ordersTable.deliveryCity} IN (${sql.join(cityNames.map(name => sql`${name}`), sql`, `)})`
+          ];
+          
+          if (startDate) {
+            conditions.push(sql`${ordersTable.classDate} >= ${startDate}`);
+          }
+          if (endDate) {
+            conditions.push(sql`${ordersTable.classDate} <= ${endDate}`);
+          }
+          
+          const orders = cityNames.length > 0 
+            ? await dbInstance
+                .select()
+                .from(ordersTable)
+                .where(and(...conditions))
+            : [];
+          
+          // 计算总收入和总成本
+          let totalRevenue = 0;
+          let totalCost = 0;
+          
+          orders.forEach(order => {
+            totalRevenue += parseFloat(order.courseAmount || "0");
+            totalCost += parseFloat(order.teacherFee || "0");
+            totalCost += parseFloat(order.transportFee || "0");
+            totalCost += parseFloat(order.consumablesFee || "0");
+            totalCost += parseFloat(order.rentFee || "0");
+            totalCost += parseFloat(order.propertyFee || "0");
+            totalCost += parseFloat(order.utilityFee || "0");
+            totalCost += parseFloat(order.otherFee || "0");
+          });
+          
+          const profit = totalRevenue - totalCost;
+          
+          // 获取合伙人的分红比例（从第一个城市的合同信息中获取）
+          const firstCity = partnerCities[0];
+          let profitRatio = 0;
+          let profitStage = "未设置";
+          
+          if (firstCity) {
+            // 根据当前分红阶段获取分红比例
+            const stage = firstCity.currentProfitStage || 1;
+            profitStage = `第${stage}阶段`;
+            
+            if (stage === 1) {
+              profitRatio = parseFloat(firstCity.profitRatioStage1Partner || "0");
+            } else if (stage === 2) {
+              // 判断是否已回本
+              if (firstCity.isInvestmentRecovered) {
+                profitRatio = parseFloat(firstCity.profitRatioStage2BPartner || "0");
+                profitStage = "第2阶段B（已回本）";
+              } else {
+                profitRatio = parseFloat(firstCity.profitRatioStage2APartner || "0");
+                profitStage = "第2阶段A（未回本）";
+              }
+            } else if (stage === 3) {
+              profitRatio = parseFloat(firstCity.profitRatioStage3Partner || "0");
+            }
+          }
+          
+          const dividendAmount = profit * (profitRatio / 100);
+          
+          result.push({
+            partnerId: partner.id,
+            partnerName: partner.name,
+            cities: partnerCities.map(pc => pc.cityName).join(", "),
+            profitStage,
+            profitRatio: profitRatio.toFixed(2),
+            totalRevenue: totalRevenue.toFixed(2),
+            totalCost: totalCost.toFixed(2),
+            profit: profit.toFixed(2),
+            dividendAmount: dividendAmount.toFixed(2),
+            orderCount: orders.length,
+          });
+        }
+        
+        return result;
+      } catch (error) {
+        console.error("获取合伙人分红统计失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "获取合伙人分红统计失败",
+        });
+      }
+    }),
   // 导出财务报表为Excel
   exportExcel: financeOrAdminProcedure
     .input(

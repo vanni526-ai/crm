@@ -18,6 +18,216 @@ import { toast } from "sonner";
 import { formatDateBJ } from "@/lib/timezone";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from "recharts";
 
+// 合伙人分红Tab组件
+function PartnerDividendsTab() {
+  const [dateRange, setDateRange] = useState<string>("thisMonth");
+  const [customDateFrom, setCustomDateFrom] = useState<Date | undefined>(undefined);
+  const [customDateTo, setCustomDateTo] = useState<Date | undefined>(undefined);
+  
+  // 计算日期范围
+  const { startDate, endDate } = useMemo(() => {
+    const now = new Date();
+    let start: string | undefined;
+    let end: string | undefined;
+
+    switch (dateRange) {
+      case "today":
+        start = format(now, "yyyy-MM-dd");
+        end = format(now, "yyyy-MM-dd");
+        break;
+      case "thisWeek": {
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay());
+        start = format(weekStart, "yyyy-MM-dd");
+        end = format(now, "yyyy-MM-dd");
+        break;
+      }
+      case "thisMonth": {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        start = format(monthStart, "yyyy-MM-dd");
+        end = format(now, "yyyy-MM-dd");
+        break;
+      }
+      case "thisYear": {
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+        start = format(yearStart, "yyyy-MM-dd");
+        end = format(now, "yyyy-MM-dd");
+        break;
+      }
+      case "custom":
+        if (customDateFrom) start = format(customDateFrom, "yyyy-MM-dd");
+        if (customDateTo) end = format(customDateTo, "yyyy-MM-dd");
+        break;
+      default:
+        break;
+    }
+
+    return { startDate: start, endDate: end };
+  }, [dateRange, customDateFrom, customDateTo]);
+  
+  const { data: partnerDividends, isLoading, refetch } = trpc.finance.getPartnerDividends.useQuery({
+    startDate,
+    endDate,
+  });
+  
+  return (
+    <div className="space-y-4">
+      {/* 日期筛选 */}
+      <div className="flex gap-2 items-center">
+        <Select value={dateRange} onValueChange={setDateRange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="选择时间范围" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="today">今日</SelectItem>
+            <SelectItem value="thisWeek">本周</SelectItem>
+            <SelectItem value="thisMonth">本月</SelectItem>
+            <SelectItem value="thisYear">今年</SelectItem>
+            <SelectItem value="custom">自定义</SelectItem>
+          </SelectContent>
+        </Select>
+        
+        {dateRange === "custom" && (
+          <>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-[150px] justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customDateFrom ? format(customDateFrom, "yyyy-MM-dd") : "开始日期"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={customDateFrom}
+                  onSelect={setCustomDateFrom}
+                  initialFocus
+                  locale={zhCN}
+                />
+              </PopoverContent>
+            </Popover>
+            <span className="text-muted-foreground">至</span>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-[150px] justify-start text-left font-normal">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customDateTo ? format(customDateTo, "yyyy-MM-dd") : "结束日期"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0">
+                <Calendar
+                  mode="single"
+                  selected={customDateTo}
+                  onSelect={setCustomDateTo}
+                  initialFocus
+                  locale={zhCN}
+                />
+              </PopoverContent>
+            </Popover>
+          </>
+        )}
+        
+        <Button onClick={() => refetch()} variant="outline" size="sm">
+          <RefreshCw className="h-4 w-4 mr-1" />
+          刷新
+        </Button>
+      </div>
+      
+      {/* 分红统计表格 */}
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>合伙人</TableHead>
+              <TableHead>城市</TableHead>
+              <TableHead>分红阶段</TableHead>
+              <TableHead className="text-right">分红比例</TableHead>
+              <TableHead className="text-right">订单数</TableHead>
+              <TableHead className="text-right">总收入</TableHead>
+              <TableHead className="text-right">总成本</TableHead>
+              <TableHead className="text-right">利润</TableHead>
+              <TableHead className="text-right">应付分红</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center text-muted-foreground">
+                  加载中...
+                </TableCell>
+              </TableRow>
+            ) : partnerDividends && partnerDividends.length > 0 ? (
+              partnerDividends.map((item) => (
+                <TableRow key={item.partnerId}>
+                  <TableCell className="font-medium">{item.partnerName}</TableCell>
+                  <TableCell>{item.cities}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{item.profitStage}</Badge>
+                  </TableCell>
+                  <TableCell className="text-right">{item.profitRatio}%</TableCell>
+                  <TableCell className="text-right">{item.orderCount}</TableCell>
+                  <TableCell className="text-right">￥{parseFloat(item.totalRevenue).toLocaleString()}</TableCell>
+                  <TableCell className="text-right">￥{parseFloat(item.totalCost).toLocaleString()}</TableCell>
+                  <TableCell className="text-right">
+                    <span className={parseFloat(item.profit) >= 0 ? "text-green-600" : "text-red-600"}>
+                      ￥{parseFloat(item.profit).toLocaleString()}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right font-semibold">
+                    <span className={parseFloat(item.dividendAmount) >= 0 ? "text-green-600" : "text-red-600"}>
+                      ￥{parseFloat(item.dividendAmount).toLocaleString()}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center text-muted-foreground">
+                  暂无分红数据
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      
+      {/* 总计 */}
+      {partnerDividends && partnerDividends.length > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <div className="text-sm text-muted-foreground">总订单数</div>
+                <div className="text-2xl font-bold">
+                  {partnerDividends.reduce((sum, item) => sum + item.orderCount, 0)}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">总收入</div>
+                <div className="text-2xl font-bold">
+                  ￥{partnerDividends.reduce((sum, item) => sum + parseFloat(item.totalRevenue), 0).toLocaleString()}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">总利润</div>
+                <div className="text-2xl font-bold text-green-600">
+                  ￥{partnerDividends.reduce((sum, item) => sum + parseFloat(item.profit), 0).toLocaleString()}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground">应付分红总额</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  ￥{partnerDividends.reduce((sum, item) => sum + parseFloat(item.dividendAmount), 0).toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 export default function Finance() {
   const utils = trpc.useUtils();
   const { data: orders, refetch: refetchOrders } = trpc.orders.list.useQuery();
@@ -1138,10 +1348,11 @@ export default function Finance() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="income">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="income">收入明细</TabsTrigger>
                 <TabsTrigger value="expense">支出明细</TabsTrigger>
                 <TabsTrigger value="feeAnalysis">费用分析</TabsTrigger>
+                <TabsTrigger value="partnerDividends">合伙人分红</TabsTrigger>
               </TabsList>
 
               <TabsContent value="income" className="mt-4">
@@ -1407,6 +1618,10 @@ export default function Finance() {
                     </CardContent>
                   </Card>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="partnerDividends" className="mt-4">
+                <PartnerDividendsTab />
               </TabsContent>
             </Tabs>
           </CardContent>

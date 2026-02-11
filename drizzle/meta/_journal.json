@@ -190,6 +190,13 @@
       "when": 1770780939918,
       "tag": "0026_bitter_zzzax",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "5",
+      "when": 1770805214229,
+      "tag": "0027_faulty_clint_barton",
+      "breakpoints": true
     }
   ]
 }

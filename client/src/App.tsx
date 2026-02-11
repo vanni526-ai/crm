@@ -38,6 +38,7 @@ import Notifications from "./pages/Notifications";
 import SalesCityPerformance from "./pages/SalesCityPerformance";
 import TeacherPaymentApproval from "./pages/TeacherPaymentApproval";
 import PartnerManagement from "./pages/PartnerManagement";
+import CityExpenseManagement from "./pages/CityExpenseManagement";
 
 
 function Router() {
@@ -77,6 +78,7 @@ function Router() {
       <Route path={"/sales-city-performance"} component={SalesCityPerformance} />
       <Route path={"/teacher-payment-approval"} component={TeacherPaymentApproval} />
       <Route path={"/partner-management"} component={PartnerManagement} />
+      <Route path={"/city-expense-management"} component={CityExpenseManagement} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
