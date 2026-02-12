@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name, accountName, bankName, accountNumber, profitPaymentDay FROM partners WHERE name = '瀛姬直营' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, accountName, bankName, accountNumber, profitPaymentDay FROM partners WHERE name = '瀛姬直营' LIMIT 1;",
+  "rows": [
+    {
+      "id": "27",
+      "name": "瀛姬直营",
+      "accountName": "朱利闻",
+      "bankName": "中国银行股份有限公司苏州市相城支行",
+      "accountNumber": "6217876101018119082",
+      "profitPaymentDay": "10"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\taccountName\tbankName\taccountNumber\tprofitPaymentDay\n27\t瀛姬直营\t朱利闻\t中国银行股份有限公司苏州市相城支行\t6217876101018119082\t10\n",
+  "stderr": "",
+  "execution_time_ms": 1527
+}

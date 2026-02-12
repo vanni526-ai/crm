@@ -24,6 +24,15 @@ export default function PartnerManagement() {
   const [citySearchQuery, setCitySearchQuery] = useState("");
   const [createPartnerDialogOpen, setCreatePartnerDialogOpen] = useState(false);
   
+  // 收款账户编辑状态
+  const [isEditingAccount, setIsEditingAccount] = useState(false);
+  const [accountFormData, setAccountFormData] = useState({
+    accountName: "",
+    bankName: "",
+    accountNumber: "",
+    profitPaymentDay: 25,
+  });
+  
   // 合同预览和编辑状态
   const [contractPreview, setContractPreview] = useState<any>(null); // 识别结果预览
   const [editingContract, setEditingContract] = useState(false); // 是否处于编辑模式
@@ -599,47 +608,83 @@ export default function PartnerManagement() {
                       <div className="space-y-6">
                         <div className="flex justify-between items-center">
                           <h3 className="text-lg font-semibold">收款账户信息</h3>
+                          {!isEditingAccount ? (
+                            <Button
+                              onClick={() => {
+                                setIsEditingAccount(true);
+                                setAccountFormData({
+                                  accountName: selectedPartner.accountName || "",
+                                  bankName: selectedPartner.bankName || "",
+                                  accountNumber: selectedPartner.accountNumber || "",
+                                  profitPaymentDay: (selectedPartner as any).profitPaymentDay || 25,
+                                });
+                              }}
+                              variant="outline"
+                              size="sm"
+                            >
+                              <Edit className="w-4 h-4 mr-2" />
+                              编辑
+                            </Button>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => {
+                                  updatePartnerAccountMutation.mutate({
+                                    id: selectedPartnerId!,
+                                    ...accountFormData,
+                                  } as any);
+                                  setIsEditingAccount(false);
+                                }}
+                                size="sm"
+                                disabled={updatePartnerAccountMutation.isPending}
+                              >
+                                保存
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  setIsEditingAccount(false);
+                                  setAccountFormData({
+                                    accountName: "",
+                                    bankName: "",
+                                    accountNumber: "",
+                                    profitPaymentDay: 25,
+                                  });
+                                }}
+                                variant="outline"
+                                size="sm"
+                              >
+                                取消
+                              </Button>
+                            </div>
+                          )}
                         </div>
                         <div className="grid grid-cols-1 gap-4">
                           <div>
                             <Label className="text-muted-foreground">开户名</Label>
                             <Input
-                              value={selectedPartner.accountName || ""}
+                              value={isEditingAccount ? accountFormData.accountName : (selectedPartner.accountName || "未设置")}
                               onChange={(e) => {
-                                updatePartnerAccountMutation.mutate({
-                                  id: selectedPartnerId!,
-                                  accountName: e.target.value,
-                                });
-                              }}
-                              onBlur={(e) => {
-                                if (e.target.value !== selectedPartner.accountName) {
-                                  updatePartnerAccountMutation.mutate({
-                                    id: selectedPartnerId!,
-                                    accountName: e.target.value,
-                                  });
+                                if (isEditingAccount) {
+                                  setAccountFormData({ ...accountFormData, accountName: e.target.value });
                                 }
                               }}
                               placeholder="请输入开户名"
                               className="mt-1"
+                              disabled={!isEditingAccount}
                             />
                           </div>
                           <div>
                             <Label className="text-muted-foreground">开户行</Label>
                             <Input
-                              value={selectedPartner.bankName || ""}
+                              value={isEditingAccount ? accountFormData.bankName : (selectedPartner.bankName || "未设置")}
                               onChange={(e) => {
-                                // 实时更新UI,但不立即保存
-                              }}
-                              onBlur={(e) => {
-                                if (e.target.value !== selectedPartner.bankName) {
-                                  updatePartnerAccountMutation.mutate({
-                                    id: selectedPartnerId!,
-                                    bankName: e.target.value,
-                                  });
+                                if (isEditingAccount) {
+                                  setAccountFormData({ ...accountFormData, bankName: e.target.value });
                                 }
                               }}
                               placeholder="请输入开户行全称"
                               className="mt-1"
+                              disabled={!isEditingAccount}
                             />
                             <div className="text-xs text-muted-foreground mt-1">
                               例如:中国银行股份有限公司苏州市相城支行
@@ -648,20 +693,15 @@ export default function PartnerManagement() {
                           <div>
                             <Label className="text-muted-foreground">银行账号</Label>
                             <Input
-                              value={selectedPartner.accountNumber || ""}
+                              value={isEditingAccount ? accountFormData.accountNumber : (selectedPartner.accountNumber || "未设置")}
                               onChange={(e) => {
-                                // 实时更新UI,但不立即保存
-                              }}
-                              onBlur={(e) => {
-                                if (e.target.value !== selectedPartner.accountNumber) {
-                                  updatePartnerAccountMutation.mutate({
-                                    id: selectedPartnerId!,
-                                    accountNumber: e.target.value,
-                                  });
+                                if (isEditingAccount) {
+                                  setAccountFormData({ ...accountFormData, accountNumber: e.target.value });
                                 }
                               }}
                               placeholder="请输入银行账号"
                               className="mt-1"
+                              disabled={!isEditingAccount}
                             />
                           </div>
                           <div>
@@ -670,24 +710,18 @@ export default function PartnerManagement() {
                               type="number"
                               min="1"
                               max="31"
-                              value={(selectedPartner as any).profitPaymentDay || 25}
+                              value={isEditingAccount ? accountFormData.profitPaymentDay : ((selectedPartner as any).profitPaymentDay || 25)}
                               onChange={(e) => {
-                                // 实时更新UI,但不立即保存
-                              }}
-                              onBlur={(e) => {
-                                const newValue = parseInt(e.target.value) || 25;
-                                if (newValue !== (selectedPartner as any).profitPaymentDay) {
-                                  updatePartnerAccountMutation.mutate({
-                                    id: selectedPartnerId!,
-                                    profitPaymentDay: newValue,
-                                  } as any);
+                                if (isEditingAccount) {
+                                  setAccountFormData({ ...accountFormData, profitPaymentDay: parseInt(e.target.value) || 25 });
                                 }
                               }}
                               placeholder="请输入分红支付日(1-31)"
                               className="mt-1"
+                              disabled={!isEditingAccount}
                             />
                             <div className="text-xs text-muted-foreground mt-1">
-                              每月 {(selectedPartner as any).profitPaymentDay || 25} 日
+                              每月 {isEditingAccount ? accountFormData.profitPaymentDay : ((selectedPartner as any).profitPaymentDay || 25)} 日
                             </div>
                           </div>
                         </div>
