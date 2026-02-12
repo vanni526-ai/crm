@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, profitPaymentDay FROM partners WHERE name = '测试分红支付日';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, profitPaymentDay FROM partners WHERE name = '测试分红支付日';",
+  "rows": [
+    {
+      "id": "90005",
+      "name": "测试分红支付日",
+      "profitPaymentDay": "15"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprofitPaymentDay\n90005\t测试分红支付日\t15\n",
+  "stderr": "",
+  "execution_time_ms": 1533
+}

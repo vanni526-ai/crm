@@ -186,6 +186,7 @@ export const partnerManagementRouter = router({
       accountName: z.string().optional(),
       bankName: z.string().optional(),
       accountNumber: z.string().optional(),
+      profitPaymentDay: z.number().optional(), // 每月分红支付日(1-31)
       isActive: z.boolean().optional(),
       notes: z.string().optional(),
     }))

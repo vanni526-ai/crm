@@ -1,0 +1,38 @@
+{
+  "query": "SELECT id, username, name, role, createdAt \nFROM users \nWHERE id IN (16020692, 16020693, 16020694, 16020710) \n   OR username IN ('13900000200', '13900000602', '13900000989') \n   OR name LIKE '%测试合伙人%' \n   OR name LIKE '%多城市合伙人%' \n   OR name LIKE '%无城市合伙人%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, username, name, role, createdAt \nFROM users \nWHERE id IN (16020692, 16020693, 16020694, 16020710) \n   OR username IN ('13900000200', '13900000602', '13900000989') \n   OR name LIKE '%测试合伙人%' \n   OR name LIKE '%多城市合伙人%' \n   OR name LIKE '%无城市合伙人%';",
+  "rows": [
+    {
+      "id": "16020692",
+      "username": "NULL",
+      "name": "测试合伙人",
+      "role": "user",
+      "createdAt": "2026-02-12 07:01:58"
+    },
+    {
+      "id": "16020693",
+      "username": "NULL",
+      "name": "多城市合伙人",
+      "role": "user",
+      "createdAt": "2026-02-12 07:01:59"
+    },
+    {
+      "id": "16020694",
+      "username": "NULL",
+      "name": "无城市合伙人",
+      "role": "user",
+      "createdAt": "2026-02-12 07:02:01"
+    },
+    {
+      "id": "16020710",
+      "username": "NULL",
+      "name": "测试合伙人",
+      "role": "user",
+      "createdAt": "2026-02-12 07:04:25"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\trole\tcreatedAt\n16020692\tNULL\t测试合伙人\tuser\t2026-02-12 07:01:58\n16020693\tNULL\t多城市合伙人\tuser\t2026-02-12 07:01:59\n16020694\tNULL\t无城市合伙人\tuser\t2026-02-12 07:02:01\n16020710\tNULL\t测试合伙人\tuser\t2026-02-12 07:04:25\n",
+  "stderr": "",
+  "execution_time_ms": 1539
+}

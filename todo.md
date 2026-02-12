@@ -2581,3 +2581,10 @@
 - [x] 编写单元测试验证创建功能(partnerManagement.create.test.ts)
 - [x] 浏览器测试验证完整流程(表单填写、提交、城市关联显示)
 - [x] 保存检查点
+
+### 137. 修复合伙人管理页面"每月分红支付日"字段无法保存的问题
+- [x] 诊断分红日期无法保存的根本原因(partners表缺少profitPaymentDay字段)
+- [x] 在partners表schema中添加profitPaymentDay字段(默认值25)
+- [x] 在后端API的input schema中添加profitPaymentDay字段
+- [x] 测试验证修复效果(数据库显示20,前端正确显示)
+- [x] 保存检查点

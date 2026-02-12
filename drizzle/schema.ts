@@ -617,6 +617,7 @@ export const partners = mysqlTable("partners", {
   accountName: varchar("accountName", { length: 100 }), // 开户名
   bankName: varchar("bankName", { length: 200 }), // 开户行
   accountNumber: varchar("accountNumber", { length: 50 }), // 账号
+  profitPaymentDay: int("profitPaymentDay").default(25), // 每月分红支付日(1-31)
   
   // 费用承担配置
   expenseCoverage: json("expenseCoverage").$type<{
