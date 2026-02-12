@@ -1,0 +1,31 @@
+{
+  "query": "\nSELECT \n  c.name AS cityName,\n  pc.expenseCoverage,\n  pc.profitRatioStage1Partner,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered\nFROM partner_cities pc\nJOIN cities c ON pc.cityId = c.id\nWHERE c.name IN ('武汉', '济南', '深圳')\nORDER BY c.name;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  c.name AS cityName,\n  pc.expenseCoverage,\n  pc.profitRatioStage1Partner,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered\nFROM partner_cities pc\nJOIN cities c ON pc.cityId = c.id\nWHERE c.name IN ('武汉', '济南', '深圳')\nORDER BY c.name;\n",
+  "rows": [
+    {
+      "cityName": "武汉",
+      "expenseCoverage": "{\"cleaningFee\": true, \"consumablesFee\": true, \"courierFee\": true, \"deferredPayment\": false, \"otherFee\": true, \"phoneFee\": true, \"promotionFee\": true, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}",
+      "profitRatioStage1Partner": "40.00",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0"
+    },
+    {
+      "cityName": "济南",
+      "expenseCoverage": "{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}",
+      "profitRatioStage1Partner": "30.00",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0"
+    },
+    {
+      "cityName": "深圳",
+      "expenseCoverage": "NULL",
+      "profitRatioStage1Partner": "30.00",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "cityName\texpenseCoverage\tprofitRatioStage1Partner\tcurrentProfitStage\tisInvestmentRecovered\n武汉\t{\"cleaningFee\": true, \"consumablesFee\": true, \"courierFee\": true, \"deferredPayment\": false, \"otherFee\": true, \"phoneFee\": true, \"promotionFee\": true, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\t40.00\t1\t0\n济南\t{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\t30.00\t1\t0\n深圳\tNULL\t30.00\t1\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1543
+}

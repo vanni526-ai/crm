@@ -85,6 +85,8 @@ async function updateCityExpenseTeacherFees() {
       // 计算合伙人承担 = 勾选费用总和 × 费用分摄比例 / 100
       const costShareRatio = parseFloat(expense.costShareRatio || "0");
       const expenseCoverage = expense.expenseCoverage || {};
+      console.log(`  expenseCoverage: ${JSON.stringify(expenseCoverage)}`);
+      console.log(`  costShareRatio: ${costShareRatio}%`);
       
       // 只计算被勾选的费用项目
       let coveredExpenseTotal = 0;

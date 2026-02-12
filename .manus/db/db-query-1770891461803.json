@@ -1,0 +1,44 @@
+{
+  "query": "\nSELECT \n  cityName,\n  rentFee,\n  propertyFee,\n  utilityFee,\n  consumablesFee,\n  cleaningFee,\n  phoneFee,\n  deferredPayment,\n  expressFee,\n  promotionFee,\n  otherFee,\n  teacherFee,\n  transportFee,\n  totalExpense,\n  partnerShare\nFROM city_monthly_expenses\nWHERE cityName IN ('武汉', '济南')\nAND month = '2026-01'\nORDER BY cityName;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  cityName,\n  rentFee,\n  propertyFee,\n  utilityFee,\n  consumablesFee,\n  cleaningFee,\n  phoneFee,\n  deferredPayment,\n  expressFee,\n  promotionFee,\n  otherFee,\n  teacherFee,\n  transportFee,\n  totalExpense,\n  partnerShare\nFROM city_monthly_expenses\nWHERE cityName IN ('武汉', '济南')\nAND month = '2026-01'\nORDER BY cityName;\n",
+  "rows": [
+    {
+      "cityName": "武汉",
+      "rentFee": "2232.00",
+      "propertyFee": "0.00",
+      "utilityFee": "450.00",
+      "consumablesFee": "151.86",
+      "cleaningFee": "0.00",
+      "phoneFee": "0.00",
+      "deferredPayment": "2173.23",
+      "expressFee": "0.00",
+      "promotionFee": "0.00",
+      "otherFee": "0.00",
+      "teacherFee": "3200.00",
+      "transportFee": "100.00",
+      "totalExpense": "6133.86",
+      "partnerShare": "0.00"
+    },
+    {
+      "cityName": "济南",
+      "rentFee": "6000.00",
+      "propertyFee": "0.00",
+      "utilityFee": "0.00",
+      "consumablesFee": "0.00",
+      "cleaningFee": "50.00",
+      "phoneFee": "300.00",
+      "deferredPayment": "0.00",
+      "expressFee": "0.00",
+      "promotionFee": "0.00",
+      "otherFee": "0.00",
+      "teacherFee": "5000.00",
+      "transportFee": "1200.00",
+      "totalExpense": "12550.00",
+      "partnerShare": "0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "cityName\trentFee\tpropertyFee\tutilityFee\tconsumablesFee\tcleaningFee\tphoneFee\tdeferredPayment\texpressFee\tpromotionFee\totherFee\tteacherFee\ttransportFee\ttotalExpense\tpartnerShare\n武汉\t2232.00\t0.00\t450.00\t151.86\t0.00\t0.00\t2173.23\t0.00\t0.00\t0.00\t3200.00\t100.00\t6133.86\t0.00\n济南\t6000.00\t0.00\t0.00\t0.00\t50.00\t300.00\t0.00\t0.00\t0.00\t0.00\t5000.00\t1200.00\t12550.00\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 1703
+}
