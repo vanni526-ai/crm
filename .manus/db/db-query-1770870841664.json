@@ -1,0 +1,127 @@
+{
+  "query": "SELECT p.id, p.name, p.accountName, p.bankName, p.accountNumber, urc.cities, p.createdAt \nFROM partners p \nLEFT JOIN user_role_cities urc ON p.userId = urc.userId AND urc.role = 'cityPartner'\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.accountName, p.bankName, p.accountNumber, urc.cities, p.createdAt \nFROM partners p \nLEFT JOIN user_role_cities urc ON p.userId = urc.userId AND urc.role = 'cityPartner'\nORDER BY p.id;",
+  "rows": [
+    {
+      "id": "16",
+      "name": "苏州加盟商",
+      "accountName": "NULL",
+      "bankName": "NULL",
+      "accountNumber": "NULL",
+      "cities": "[\"苏州\"]",
+      "createdAt": "2026-02-10 09:39:08"
+    },
+    {
+      "id": "17",
+      "name": "重庆加盟商",
+      "accountName": "NULL",
+      "bankName": "NULL",
+      "accountNumber": "NULL",
+      "cities": "[\"重庆\"]",
+      "createdAt": "2026-02-10 09:39:09"
+    },
+    {
+      "id": "18",
+      "name": "张雪婷",
+      "accountName": "NULL",
+      "bankName": "中国工商银行股份有限公司上海市临空支行",
+      "accountNumber": "6215581001003177634",
+      "cities": "[\"天津\",\"石家庄\",\"大连\"]",
+      "createdAt": "2026-02-10 09:39:11"
+    },
+    {
+      "id": "19",
+      "name": "孙志俊",
+      "accountName": "NULL",
+      "bankName": "中国工商银行上海市联洋第二支行",
+      "accountNumber": "6222031001031112142",
+      "cities": "[\"济南\"]",
+      "createdAt": "2026-02-10 09:39:13"
+    },
+    {
+      "id": "20",
+      "name": "王开霖",
+      "accountName": "NULL",
+      "bankName": "中国银行上海市宁虹路支行",
+      "accountNumber": "6216600800002731878",
+      "cities": "[\"武汉\"]",
+      "createdAt": "2026-02-10 09:39:15"
+    },
+    {
+      "id": "21",
+      "name": "李一涵",
+      "accountName": "NULL",
+      "bankName": "中国银行股份有限公司郑州嵩山南路支行",
+      "accountNumber": "6217858000108793883",
+      "cities": "[\"郑州\"]",
+      "createdAt": "2026-02-10 09:39:16"
+    },
+    {
+      "id": "22",
+      "name": "康红祥",
+      "accountName": "NULL",
+      "bankName": "中国农业银行股份有限公司沁源县支行",
+      "accountNumber": "6230521680005143173",
+      "cities": "[\"太原\"]",
+      "createdAt": "2026-02-10 09:39:18"
+    },
+    {
+      "id": "23",
+      "name": "曹心茹",
+      "accountName": "NULL",
+      "bankName": "中国邮政储蓄银行股份有限公司灵璧县建设中路支行",
+      "accountNumber": "6221803740000968392",
+      "cities": "[\"东莞\"]",
+      "createdAt": "2026-02-10 09:39:19"
+    },
+    {
+      "id": "24",
+      "name": "赵浩然",
+      "accountName": "NULL",
+      "bankName": "上海浦东发展银行天津分行浦诚支行",
+      "accountNumber": "6217931552994917",
+      "cities": "[\"南京\"]",
+      "createdAt": "2026-02-10 09:39:20"
+    },
+    {
+      "id": "25",
+      "name": "冯玉智",
+      "accountName": "NULL",
+      "bankName": "上海浦东发展银行西藏南路支行",
+      "accountNumber": "6225210115938350",
+      "cities": "[\"福州\",\"泉州\"]",
+      "createdAt": "2026-02-10 09:39:22"
+    },
+    {
+      "id": "26",
+      "name": "周建虎",
+      "accountName": "NULL",
+      "bankName": "招商银行股份有限公司苏州干将路支行",
+      "accountNumber": "6214835126410255",
+      "cities": "[\"无锡\"]",
+      "createdAt": "2026-02-10 09:39:24"
+    },
+    {
+      "id": "27",
+      "name": "瀛姬直营",
+      "accountName": "NULL",
+      "bankName": "中国银行股份有限公司苏州市相城支行",
+      "accountNumber": "6217876101018119082",
+      "cities": "[\"深圳\"]",
+      "createdAt": "2026-02-10 09:39:25"
+    },
+    {
+      "id": "28",
+      "name": "朱利闻",
+      "accountName": "NULL",
+      "bankName": "NULL",
+      "accountNumber": "NULL",
+      "cities": "[\"宁波\"]",
+      "createdAt": "2026-02-10 09:39:27"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\taccountName\tbankName\taccountNumber\tcities\tcreatedAt\n16\t苏州加盟商\tNULL\tNULL\tNULL\t[\"苏州\"]\t2026-02-10 09:39:08\n17\t重庆加盟商\tNULL\tNULL\tNULL\t[\"重庆\"]\t2026-02-10 09:39:09\n18\t张雪婷\tNULL\t中国工商银行股份有限公司上海市临空支行\t6215581001003177634\t[\"天津\",\"石家庄\",\"大连\"]\t2026-02-10 09:39:11\n19\t孙志俊\tNULL\t中国工商银行上海市联洋第二支行\t6222031001031112142\t[\"济南\"]\t2026-02-10 09:39:13\n20\t王开霖\tNULL\t中国银行上海市宁虹路支行\t6216600800002731878\t[\"武汉\"]\t2026-02-10 09:39:15\n21\t李一涵\tNULL\t中国银行股份有限公司郑州嵩山南路支行\t6217858000108793883\t[\"郑州\"]\t2026-02-10 09:39:16\n22\t康红祥\tNULL\t中国农业银行股份有限公司沁源县支行\t6230521680005143173\t[\"太原\"]\t2026-02-10 09:39:18\n23\t曹心茹\tNULL\t中国邮政储蓄银行股份有限公司灵璧县建设中路支行\t6221803740000968392\t[\"东莞\"]\t2026-02-10 09:39:19\n24\t赵浩然\tNULL\t上海浦东发展银行天津分行浦诚支行\t6217931552994917\t[\"南京\"]\t2026-02-10 09:39:20\n25\t冯玉智\tNULL\t上海浦东发展银行西藏南路支行\t6225210115938350\t[\"福州\",\"泉州\"]\t2026-02-10 09:39:22\n26\t周建虎\tNULL\t招商银行股份有限公司苏州干将路支行\t6214835126410255\t[\"无锡\"]\t2026-02-10 09:39:24\n27\t瀛姬直营\tNULL\t中国银行股份有限公司苏州市相城支行\t6217876101018119082\t[\"深圳\"]\t2026-02-10 09:39:25\n28\t朱利闻\tNULL\tNULL\tNULL\t[\"宁波\"]\t2026-02-10 09:39:27\n",
+  "stderr": "",
+  "execution_time_ms": 1514
+}

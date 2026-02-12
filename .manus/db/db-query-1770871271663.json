@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, name, profitPaymentDay FROM partners LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, profitPaymentDay FROM partners LIMIT 5;",
+  "rows": [
+    {
+      "id": "16",
+      "name": "苏州加盟商",
+      "profitPaymentDay": "10"
+    },
+    {
+      "id": "17",
+      "name": "重庆加盟商",
+      "profitPaymentDay": "10"
+    },
+    {
+      "id": "18",
+      "name": "张雪婷",
+      "profitPaymentDay": "10"
+    },
+    {
+      "id": "19",
+      "name": "孙志俊",
+      "profitPaymentDay": "10"
+    },
+    {
+      "id": "20",
+      "name": "王开霖",
+      "profitPaymentDay": "10"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprofitPaymentDay\n16\t苏州加盟商\t10\n17\t重庆加盟商\t10\n18\t张雪婷\t10\n19\t孙志俊\t10\n20\t王开霖\t10\n",
+  "stderr": "",
+  "execution_time_ms": 1567
+}

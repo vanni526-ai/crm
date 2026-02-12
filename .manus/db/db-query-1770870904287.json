@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, name, phone, accountName, bankName, accountNumber FROM partners LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, accountName, bankName, accountNumber FROM partners LIMIT 5;",
+  "rows": [
+    {
+      "id": "16",
+      "name": "苏州加盟商",
+      "phone": "13800138000",
+      "accountName": "NULL",
+      "bankName": "NULL",
+      "accountNumber": "NULL"
+    },
+    {
+      "id": "17",
+      "name": "重庆加盟商",
+      "phone": "13800000002",
+      "accountName": "NULL",
+      "bankName": "NULL",
+      "accountNumber": "NULL"
+    },
+    {
+      "id": "18",
+      "name": "张雪婷",
+      "phone": "13800000003",
+      "accountName": "NULL",
+      "bankName": "中国工商银行股份有限公司上海市临空支行",
+      "accountNumber": "6215581001003177634"
+    },
+    {
+      "id": "19",
+      "name": "孙志俊",
+      "phone": "13800000004",
+      "accountName": "NULL",
+      "bankName": "中国工商银行上海市联洋第二支行",
+      "accountNumber": "6222031001031112142"
+    },
+    {
+      "id": "20",
+      "name": "王开霖",
+      "phone": "13800000005",
+      "accountName": "NULL",
+      "bankName": "中国银行上海市宁虹路支行",
+      "accountNumber": "6216600800002731878"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\taccountName\tbankName\taccountNumber\n16\t苏州加盟商\t13800138000\tNULL\tNULL\tNULL\n17\t重庆加盟商\t13800000002\tNULL\tNULL\tNULL\n18\t张雪婷\t13800000003\tNULL\t中国工商银行股份有限公司上海市临空支行\t6215581001003177634\n19\t孙志俊\t13800000004\tNULL\t中国工商银行上海市联洋第二支行\t6222031001031112142\n20\t王开霖\t13800000005\tNULL\t中国银行上海市宁虹路支行\t6216600800002731878\n",
+  "stderr": "",
+  "execution_time_ms": 1533
+}
