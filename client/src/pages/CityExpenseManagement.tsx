@@ -303,18 +303,13 @@ export default function CityExpenseManagement() {
                     </Select>
                   </div>
               <div className="space-y-2">
-                <Label>月份</Label>
-                <Select value={selectedMonth || "all"} onValueChange={(val) => setSelectedMonth(val === "all" ? "" : val)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="全部月份" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部月份</SelectItem>
-                    {expenses && Array.from(new Set(expenses.map(e => e.month))).sort().reverse().map(month => (
-                      <SelectItem key={month} value={month}>{month}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>月份 *</Label>
+                <Input
+                  type="month"
+                  value={formData.month}
+                  onChange={(e) => setFormData({ ...formData, month: e.target.value })}
+                  disabled={!!editingExpense}
+                />
               </div>
                 </div>
                 
