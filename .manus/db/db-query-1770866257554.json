@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE partners \nSET expenseCoverage = JSON_OBJECT(\n  'rentFee', true,\n  'propertyFee', true,\n  'utilityFee', true,\n  'consumablesFee', false,\n  'cleaningFee', false,\n  'phoneFee', false,\n  'deferredPayment', false,\n  'expressFee', false,\n  'promotionFee', false,\n  'teacherFee', true,\n  'transportFee', true,\n  'otherFee', false\n)\nWHERE id IS NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE partners \nSET expenseCoverage = JSON_OBJECT(\n  'rentFee', true,\n  'propertyFee', true,\n  'utilityFee', true,\n  'consumablesFee', false,\n  'cleaningFee', false,\n  'phoneFee', false,\n  'deferredPayment', false,\n  'expressFee', false,\n  'promotionFee', false,\n  'teacherFee', true,\n  'transportFee', true,\n  'otherFee', false\n)\nWHERE id IS NOT NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1739
+}

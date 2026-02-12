@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, name, phone, expenseCoverage FROM partners LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, expenseCoverage FROM partners LIMIT 10;",
+  "rows": [
+    {
+      "id": "16",
+      "name": "苏州加盟商",
+      "phone": "13800138000",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "17",
+      "name": "重庆加盟商",
+      "phone": "13800000002",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "18",
+      "name": "张雪婷",
+      "phone": "13800000003",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "19",
+      "name": "孙志俊",
+      "phone": "13800000004",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "20",
+      "name": "王开霖",
+      "phone": "13800000005",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "21",
+      "name": "张浩炜",
+      "phone": "13800000006",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "22",
+      "name": "康红祥",
+      "phone": "13800000007",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "23",
+      "name": "曹心茹",
+      "phone": "13800000008",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "24",
+      "name": "赵浩然",
+      "phone": "13800000009",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    },
+    {
+      "id": "25",
+      "name": "冯玉智",
+      "phone": "13800000010",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\texpenseCoverage\n16\t苏州加盟商\t13800138000\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n17\t重庆加盟商\t13800000002\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n18\t张雪婷\t13800000003\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n19\t孙志俊\t13800000004\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n20\t王开霖\t13800000005\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n21\t张浩炜\t13800000006\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n22\t康红祥\t13800000007\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n23\t曹心茹\t13800000008\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n24\t赵浩然\t13800000009\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n25\t冯玉智\t13800000010\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

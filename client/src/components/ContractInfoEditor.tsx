@@ -63,11 +63,12 @@ export default function ContractInfoEditor({
       { key: 'operationPositionFee', label: '运营岗位费' },
       { key: 'teacherRecruitmentFee', label: '老师招聘培训费' },
       { key: 'marketingFee', label: '营销推广费' },
-      { key: 'estimatedRentDeposit', label: '预估租金押金' },
-      { key: 'estimatedPropertyFee', label: '预估物业费' },
-      { key: 'estimatedUtilityFee', label: '预估水电费' },
-      { key: 'estimatedRegistrationFee', label: '预估注册代理记账费' },
-      { key: 'estimatedRenovationFee', label: '预估装修及基础工具成本' },
+      // 预估费用字段不再是必填项
+      // { key: 'estimatedRentDeposit', label: '预估租金押金' },
+      // { key: 'estimatedPropertyFee', label: '预估物业费' },
+      // { key: 'estimatedUtilityFee', label: '预估水电费' },
+      // { key: 'estimatedRegistrationFee', label: '预估注册代理记账费' },
+      // { key: 'estimatedRenovationFee', label: '预估装修及基础工具成本' },
       { key: 'partnerBankName', label: '开户行' },
       { key: 'partnerBankAccount', label: '账号' },
       { key: 'partnerAccountHolder', label: '账户名称' },
@@ -354,10 +355,10 @@ export default function ContractInfoEditor({
               <Label className="font-semibold">品牌使用费（总金额）</Label>
               <div className="mt-2 text-2xl font-bold text-primary">
                 ￥{(
-                  (formData.managementFee || 0) +
-                  (formData.operationPositionFee || 0) +
-                  (formData.teacherRecruitmentFee || 0) +
-                  (formData.marketingFee || 0)
+                  parseFloat(formData.managementFee || "0") +
+                  parseFloat(formData.operationPositionFee || "0") +
+                  parseFloat(formData.teacherRecruitmentFee || "0") +
+                  parseFloat(formData.marketingFee || "0")
                 ).toFixed(2)}
               </div>
               <p className="text-sm text-muted-foreground mt-2">自动计算：管理费 + 运营岗位费 + 老师招聘培训费 + 营销推广费</p>

@@ -2459,3 +2459,23 @@
 - [ ] 添加“刷新”按钮，支持手动重新计算（可选，每次保存时自动计算）
 - [ ] 实现订单创建/更新/删除时自动更新相关账单（可选，当前保存时自动计算已满足需求）
 - [x] 测试完整流程（单元测试全部通过）
+
+### 167. 批量更新所有合伙人的费用承担配置
+- [x] 执行SQL批量更新所有合伙人的expenseCoverage字段，勾选房租、物业费、水电费、老师费用、车费
+- [x] 验证更新结果（10个合伙人的expenseCoverage已正确更新）
+
+### 168. 修复ContractInfoEditor组件中的toFixed错误
+- [x] 定位ContractInfoEditor组件中的类型错误
+- [x] 修复字符串相加导致toFixed无法调用的问题（使用parseFloat转换）
+- [x] 测试验证修复结果（TypeScript编译无错误）
+
+### 169. 将合伙人管理中的预估费用字段设置为非必填项
+- [x] 修改后端API验证规则（后端无严格验证，无需修改）
+- [x] 修改前端表单验证，从 requiredFields 数组中移除预估费用字段
+- [x] 测试验证修复结果（TypeScript编译无错误）
+
+### 170. 全面修复ContractInfoEditor组件中所有toFixed相关的类型错误
+- [x] 搜索ContractInfoEditor.tsx中所有使用toFixed的地方
+- [x] 修复所有字符串相加导致toFixed无法调用的问题（已使用parseFloat转换）
+- [x] 测试验证修复结果（本地开发环境正常）
+- [ ] 保存checkpoint并部署到生产环境
