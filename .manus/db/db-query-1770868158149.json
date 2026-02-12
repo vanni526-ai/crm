@@ -1,0 +1,28 @@
+{
+  "query": "SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'partners' AND TABLE_SCHEMA = DATABASE() AND (COLUMN_NAME LIKE '%bank%' OR COLUMN_NAME LIKE '%account%' OR COLUMN_NAME LIKE '%card%');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'partners' AND TABLE_SCHEMA = DATABASE() AND (COLUMN_NAME LIKE '%bank%' OR COLUMN_NAME LIKE '%account%' OR COLUMN_NAME LIKE '%card%');",
+  "rows": [
+    {
+      "COLUMN_NAME": "accountName",
+      "COLUMN_TYPE": "varchar(100)",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "bankName",
+      "COLUMN_TYPE": "varchar(200)",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL"
+    },
+    {
+      "COLUMN_NAME": "accountNumber",
+      "COLUMN_TYPE": "varchar(50)",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tCOLUMN_TYPE\tIS_NULLABLE\tCOLUMN_DEFAULT\naccountName\tvarchar(100)\tYES\tNULL\nbankName\tvarchar(200)\tYES\tNULL\naccountNumber\tvarchar(50)\tYES\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1490
+}

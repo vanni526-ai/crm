@@ -1,0 +1,85 @@
+{
+  "query": "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'partners' AND TABLE_SCHEMA = DATABASE() ORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'partners' AND TABLE_SCHEMA = DATABASE() ORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id"
+    },
+    {
+      "COLUMN_NAME": "userId"
+    },
+    {
+      "COLUMN_NAME": "name"
+    },
+    {
+      "COLUMN_NAME": "phone"
+    },
+    {
+      "COLUMN_NAME": "profitRatio"
+    },
+    {
+      "COLUMN_NAME": "profitRule"
+    },
+    {
+      "COLUMN_NAME": "brandFee"
+    },
+    {
+      "COLUMN_NAME": "techServiceFee"
+    },
+    {
+      "COLUMN_NAME": "deferredPaymentTotal"
+    },
+    {
+      "COLUMN_NAME": "deferredPaymentRule"
+    },
+    {
+      "COLUMN_NAME": "contractStartDate"
+    },
+    {
+      "COLUMN_NAME": "contractEndDate"
+    },
+    {
+      "COLUMN_NAME": "contractHistory"
+    },
+    {
+      "COLUMN_NAME": "accountName"
+    },
+    {
+      "COLUMN_NAME": "bankName"
+    },
+    {
+      "COLUMN_NAME": "accountNumber"
+    },
+    {
+      "COLUMN_NAME": "isActive"
+    },
+    {
+      "COLUMN_NAME": "notes"
+    },
+    {
+      "COLUMN_NAME": "createdBy"
+    },
+    {
+      "COLUMN_NAME": "createdAt"
+    },
+    {
+      "COLUMN_NAME": "updatedAt"
+    },
+    {
+      "COLUMN_NAME": "idCardNumber"
+    },
+    {
+      "COLUMN_NAME": "idCardFrontUrl"
+    },
+    {
+      "COLUMN_NAME": "idCardBackUrl"
+    },
+    {
+      "COLUMN_NAME": "expenseCoverage"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\nid\nuserId\nname\nphone\nprofitRatio\nprofitRule\nbrandFee\ntechServiceFee\ndeferredPaymentTotal\ndeferredPaymentRule\ncontractStartDate\ncontractEndDate\ncontractHistory\naccountName\nbankName\naccountNumber\nisActive\nnotes\ncreatedBy\ncreatedAt\nupdatedAt\nidCardNumber\nidCardFrontUrl\nidCardBackUrl\nexpenseCoverage\n",
+  "stderr": "",
+  "execution_time_ms": 1524
+}

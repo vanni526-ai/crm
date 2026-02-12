@@ -123,6 +123,14 @@ export default function PartnerInfoTab({ partnerId }: PartnerInfoTabProps) {
     });
   };
 
+  // 处理收款账户信息修改
+  const handleAccountUpdate = (field: 'accountName' | 'bankName' | 'accountNumber', value: string) => {
+    updateMutation.mutate({
+      id: partnerId,
+      [field]: value,
+    });
+  };
+
   // 查看照片
   const handleViewImage = (url: string) => {
     setPreviewImage(url);
@@ -183,6 +191,59 @@ export default function PartnerInfoTab({ partnerId }: PartnerInfoTabProps) {
           <p className="text-xs text-muted-foreground">
             身份证号由身份证识别自动填充，不可手动修改。如需修改，请重新上传身份证照片
           </p>
+        </div>
+
+        {/* 收款账户信息 */}
+        <div className="border-t pt-6 mt-6">
+          <h3 className="text-lg font-semibold mb-4">收款账户信息</h3>
+          
+          {/* 开户名 */}
+          <div className="space-y-2 mb-4">
+            <Label>开户名</Label>
+            <Input
+              value={partner.accountName || ""}
+              onChange={(e) => {
+                // 只在失去焦点时保存
+              }}
+              onBlur={(e) => handleAccountUpdate('accountName', e.target.value)}
+              placeholder="请输入开户名"
+            />
+            <p className="text-xs text-muted-foreground">
+              请填写银行账户的开户名称
+            </p>
+          </div>
+
+          {/* 开户行 */}
+          <div className="space-y-2 mb-4">
+            <Label>开户行</Label>
+            <Input
+              value={partner.bankName || ""}
+              onChange={(e) => {
+                // 只在失去焦点时保存
+              }}
+              onBlur={(e) => handleAccountUpdate('bankName', e.target.value)}
+              placeholder="请输入开户行全称"
+            />
+            <p className="text-xs text-muted-foreground">
+              例如：招商银行股份有限公司苏州干将路支行
+            </p>
+          </div>
+
+          {/* 账号 */}
+          <div className="space-y-2 mb-4">
+            <Label>银行账号</Label>
+            <Input
+              value={partner.accountNumber || ""}
+              onChange={(e) => {
+                // 只在失去焦点时保存
+              }}
+              onBlur={(e) => handleAccountUpdate('accountNumber', e.target.value)}
+              placeholder="请输入银行账号"
+            />
+            <p className="text-xs text-muted-foreground">
+              请填写用于接收分红的银行账号
+            </p>
+          </div>
         </div>
 
         {/* 身份证正面 */}
