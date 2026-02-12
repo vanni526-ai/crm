@@ -618,6 +618,22 @@ export const partners = mysqlTable("partners", {
   bankName: varchar("bankName", { length: 200 }), // 开户行
   accountNumber: varchar("accountNumber", { length: 50 }), // 账号
   
+  // 费用承担配置
+  expenseCoverage: json("expenseCoverage").$type<{
+    rentFee?: boolean;           // 房租
+    propertyFee?: boolean;       // 物业费
+    utilityFee?: boolean;        // 水电费
+    consumablesFee?: boolean;    // 道具耗材
+    cleaningFee?: boolean;       // 保洁费
+    phoneFee?: boolean;          // 话费
+    deferredPayment?: boolean;   // 合同后付款
+    courierFee?: boolean;        // 快递费
+    promotionFee?: boolean;      // 推广费
+    teacherFee?: boolean;        // 老师费用
+    transportFee?: boolean;      // 车费
+    otherFee?: boolean;          // 其他费用
+  }>(), // 费用承担配置(JSON格式)
+  
   isActive: boolean("isActive").default(true).notNull(),
   notes: text("notes"),
   createdBy: int("createdBy").notNull(),

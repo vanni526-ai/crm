@@ -201,6 +201,7 @@ function ExpenseManagementTab({ partnerId }: { partnerId: number }) {
                       <TableHead className="text-right">其他</TableHead>
                       <TableHead className="text-right">后付款</TableHead>
                       <TableHead className="text-right">总费用</TableHead>
+                      <TableHead className="text-right text-primary">合伙人承担总费用</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -227,6 +228,7 @@ function ExpenseManagementTab({ partnerId }: { partnerId: number }) {
                           <TableCell className="text-right">￥{parseFloat(expense.otherFee || "0").toFixed(2)}</TableCell>
                           <TableCell className="text-right">￥{parseFloat(expense.deferredPayment || "0").toFixed(2)}</TableCell>
                           <TableCell className="text-right font-semibold">￥{totalFee.toFixed(2)}</TableCell>
+                          <TableCell className="text-right font-semibold text-primary">￥{parseFloat(expense.partnerCoveredTotal || "0").toFixed(2)}</TableCell>
                         </TableRow>
                       );
                     })}

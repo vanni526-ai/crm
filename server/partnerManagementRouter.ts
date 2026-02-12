@@ -219,6 +219,80 @@ export const partnerManagementRouter = router({
     }),
 
   /**
+   * 获取合伙人的费用承担配置
+   */
+  getExpenseCoverage: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      const result = await db
+        .select({ expenseCoverage: partners.expenseCoverage })
+        .from(partners)
+        .where(eq(partners.id, input.partnerId))
+        .limit(1);
+      
+      if (result.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "合伙人不存在",
+        });
+      }
+      
+      // 如果没有配置，返回默认值（全部不承担）
+      return result[0].expenseCoverage || {
+        rentFee: false,
+        propertyFee: false,
+        utilityFee: false,
+        consumablesFee: false,
+        cleaningFee: false,
+        phoneFee: false,
+        deferredPayment: false,
+        courierFee: false,
+        promotionFee: false,
+        teacherFee: false,
+        transportFee: false,
+        otherFee: false,
+      };
+    }),
+
+  /**
+   * 更新合伙人的费用承担配置
+   */
+  updateExpenseCoverage: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      expenseCoverage: z.object({
+        rentFee: z.boolean().optional(),
+        propertyFee: z.boolean().optional(),
+        utilityFee: z.boolean().optional(),
+        consumablesFee: z.boolean().optional(),
+        cleaningFee: z.boolean().optional(),
+        phoneFee: z.boolean().optional(),
+        deferredPayment: z.boolean().optional(),
+        courierFee: z.boolean().optional(),
+        promotionFee: z.boolean().optional(),
+        teacherFee: z.boolean().optional(),
+        transportFee: z.boolean().optional(),
+        otherFee: z.boolean().optional(),
+      }),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      await db
+        .update(partners)
+        .set({ expenseCoverage: input.expenseCoverage as any })
+        .where(eq(partners.id, input.partnerId));
+      
+      return { success: true };
+    }),
+
+  /**
    * 删除合伙人（软删除）
    */
   delete: protectedProcedure
@@ -265,11 +339,48 @@ export const partnerManagementRouter = router({
         conditions.push(sql`${partnerExpenses.month} <= ${input.endMonth}`);
       }
       
-      const result = await db
+      const expenses = await db
         .select()
         .from(partnerExpenses)
         .where(and(...conditions))
         .orderBy(desc(partnerExpenses.month));
+      
+      // 获取合伙人的费用承担配置
+      const partnerResult = await db
+        .select({ expenseCoverage: partners.expenseCoverage })
+        .from(partners)
+        .where(eq(partners.id, input.partnerId))
+        .limit(1);
+      
+      const expenseCoverage = partnerResult[0]?.expenseCoverage || {};
+      
+      // 为每个费用记录计算合伙人承担总费用
+      const result = expenses.map((expense: any) => {
+        let partnerCoveredTotal = 0;
+        const expenseShareRatio = Number(expense.expenseShareRatio || 0) / 100;
+        
+        // 根据费用承担配置计算
+        if (expenseCoverage.rentFee) partnerCoveredTotal += Number(expense.rentFee || 0);
+        if (expenseCoverage.propertyFee) partnerCoveredTotal += Number(expense.propertyFee || 0);
+        if (expenseCoverage.utilityFee) partnerCoveredTotal += Number(expense.utilityFee || 0);
+        if (expenseCoverage.consumablesFee) partnerCoveredTotal += Number(expense.consumablesFee || 0);
+        if (expenseCoverage.cleaningFee) partnerCoveredTotal += Number(expense.cleaningFee || 0);
+        if (expenseCoverage.phoneFee) partnerCoveredTotal += Number(expense.phoneFee || 0);
+        if (expenseCoverage.deferredPayment) partnerCoveredTotal += Number(expense.deferredPayment || 0);
+        if (expenseCoverage.courierFee) partnerCoveredTotal += Number(expense.courierFee || 0);
+        if (expenseCoverage.promotionFee) partnerCoveredTotal += Number(expense.promotionFee || 0);
+        if (expenseCoverage.teacherFee) partnerCoveredTotal += Number(expense.teacherFee || 0);
+        if (expenseCoverage.transportFee) partnerCoveredTotal += Number(expense.transportFee || 0);
+        if (expenseCoverage.otherFee) partnerCoveredTotal += Number(expense.otherFee || 0);
+        
+        // 乘以费用分摆比例
+        partnerCoveredTotal = partnerCoveredTotal * expenseShareRatio;
+        
+        return {
+          ...expense,
+          partnerCoveredTotal: partnerCoveredTotal.toFixed(2),
+        };
+      });
       
       return result;
     }),
