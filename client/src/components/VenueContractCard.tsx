@@ -118,35 +118,47 @@ export default function VenueContractCard({ partnerCityId, contractData, onUpdat
     }
 
     const startDate = new Date(formData.venueLeaseStartDate);
-    const nextDate = new Date(startDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    startDate.setHours(0, 0, 0, 0);
 
+    // 获取付款周期的月数
+    let cycleMonths = 0;
     switch (formData.venuePaymentCycle) {
       case "monthly":
-        nextDate.setMonth(nextDate.getMonth() + 1);
+        cycleMonths = 1;
         break;
       case "bimonthly":
-        nextDate.setMonth(nextDate.getMonth() + 2);
+        cycleMonths = 2;
         break;
       case "quarterly":
-        nextDate.setMonth(nextDate.getMonth() + 3);
+        cycleMonths = 3;
         break;
       case "semiannual":
-        nextDate.setMonth(nextDate.getMonth() + 6);
+        cycleMonths = 6;
         break;
       case "annual":
-        nextDate.setFullYear(nextDate.getFullYear() + 1);
+        cycleMonths = 12;
         break;
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    nextDate.setHours(0, 0, 0, 0);
+    // 从起租日期开始,找到最后一个已过去的交租日
+    let lastPaymentDate = new Date(startDate);
+    let nextPaymentDate = new Date(startDate);
+    nextPaymentDate.setMonth(nextPaymentDate.getMonth() + cycleMonths);
 
-    const diffTime = nextDate.getTime() - today.getTime();
+    // 循环找到最近的未来支付日期
+    while (nextPaymentDate.getTime() <= today.getTime()) {
+      lastPaymentDate = new Date(nextPaymentDate);
+      nextPaymentDate.setMonth(nextPaymentDate.getMonth() + cycleMonths);
+    }
+
+    nextPaymentDate.setHours(0, 0, 0, 0);
+    const diffTime = nextPaymentDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return {
-      date: nextDate,
+      date: nextPaymentDate,
       days: diffDays,
     };
   };
