@@ -59,6 +59,7 @@ export const cityExpenseRouter = router({
           teacherFee: cityMonthlyExpenses.teacherFee,
           transportFee: cityMonthlyExpenses.transportFee,
           totalExpense: cityMonthlyExpenses.totalExpense,
+          partnerShare: cityMonthlyExpenses.partnerShare,
           notes: cityMonthlyExpenses.notes,
           createdAt: cityMonthlyExpenses.createdAt,
           updatedAt: cityMonthlyExpenses.updatedAt,

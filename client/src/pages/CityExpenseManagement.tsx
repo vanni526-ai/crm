@@ -559,13 +559,14 @@ export default function CityExpenseManagement() {
                     <TableHead className="text-right">老师费用</TableHead>
                     <TableHead className="text-right">车费</TableHead>
                     <TableHead className="text-right">总费用</TableHead>
+                    <TableHead className="text-right">合伙人承担</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={17} className="text-center text-muted-foreground">
+                      <TableCell colSpan={18} className="text-center text-muted-foreground">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -590,6 +591,7 @@ export default function CityExpenseManagement() {
                         <TableCell className="text-right bg-blue-50">¥{parseFloat(expense.teacherFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right bg-blue-50">¥{parseFloat(expense.transportFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right font-semibold">¥{parseFloat(expense.totalExpense || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right text-blue-600 font-medium">¥{parseFloat(expense.partnerShare || "0").toLocaleString()}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button
@@ -612,7 +614,7 @@ export default function CityExpenseManagement() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={17} className="text-center text-muted-foreground">
+                      <TableCell colSpan={18} className="text-center text-muted-foreground">
                         暂无费用账单数据
                       </TableCell>
                     </TableRow>

@@ -1,0 +1,1 @@
+ALTER TABLE `city_monthly_expenses` ADD `partnerShare` decimal(10,2) DEFAULT '0.00';

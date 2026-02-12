@@ -1089,6 +1089,7 @@ export const cityMonthlyExpenses = mysqlTable("city_monthly_expenses", {
   transportFee: decimal("transportFee", { precision: 10, scale: 2 }).default("0.00"), // 车费（从订单汇总）
   
   totalExpense: decimal("totalExpense", { precision: 10, scale: 2 }).default("0.00"), // 总费用（自动计算）
+  partnerShare: decimal("partnerShare", { precision: 10, scale: 2 }).default("0.00"), // 合伙人承担
   notes: text("notes"), // 备注
   
   uploadedBy: int("uploadedBy").notNull(), // 上传人ID

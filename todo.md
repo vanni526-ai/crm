@@ -2654,3 +2654,12 @@
 - [x] 更新cityFinancialStats.test.ts单元测试(移除partnerFee,添加新字段验证)
 - [x] 测试验证所有功能(8个测试用例全部通过,浏览器显示正常)
 - [x] 保存检查点
+
+### 141. 在城市费用账单管理列表中添加“合伙人承担”列
+- [x] 分析当前城市费用账单页面实现(CityExpenseManagement.tsx)
+- [x] 在cityMonthlyExpenses表schema中添加partnerShare字段
+- [x] 运行数据库迁移添加partnerShare字段到city_monthly_expenses表
+- [x] 在cityExpenseRouter.ts的list方法中添加partnerShare字段返回
+- [x] 在CityExpenseManagement.tsx表格中添加“合伙人承担”列显示partnerShare字段
+- [x] 测试验证显示效果(表格正确显示合伙人承担列,位置在总费用之后)
+- [x] 保存检查点并交付
