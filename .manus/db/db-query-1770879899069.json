@@ -1,0 +1,17 @@
+{
+  "query": "SELECT p.id, p.name, p.phone, pc.cityId, c.name as cityName \nFROM partners p \nLEFT JOIN partner_cities pc ON p.id = pc.partnerId \nLEFT JOIN cities c ON pc.cityId = c.id \nWHERE p.name = '测试合伙人' \nORDER BY p.id DESC \nLIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.phone, pc.cityId, c.name as cityName \nFROM partners p \nLEFT JOIN partner_cities pc ON p.id = pc.partnerId \nLEFT JOIN cities c ON pc.cityId = c.id \nWHERE p.name = '测试合伙人' \nORDER BY p.id DESC \nLIMIT 1;",
+  "rows": [
+    {
+      "id": "90004",
+      "name": "测试合伙人",
+      "phone": "13900001234",
+      "cityId": "1",
+      "cityName": "上海"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tcityId\tcityName\n90004\t测试合伙人\t13900001234\t1\t上海\n",
+  "stderr": "",
+  "execution_time_ms": 1635
+}

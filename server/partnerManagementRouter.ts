@@ -72,7 +72,7 @@ export const partnerManagementRouter = router({
       idCardNumber: z.string().optional(), // 身份证号码
       idCardFrontUrl: z.string().optional(), // 身份证正面照片URL
       idCardBackUrl: z.string().optional(), // 身份证反面照片URL
-      profitRatio: z.string(), // decimal类型需要字符串
+      profitRatio: z.string().optional().default("0.10"), // decimal类型需要字符串，默认10%
       profitRule: z.string().optional(),
       brandFee: z.string().optional(),
       techServiceFee: z.string().optional(),
@@ -84,6 +84,7 @@ export const partnerManagementRouter = router({
       bankName: z.string().optional(),
       accountNumber: z.string().optional(),
       notes: z.string().optional(),
+      cityIds: z.array(z.number()).optional(), // 关联的城市ID列表
     }))
     .mutation(async ({ input, ctx }) => {
       const db = await getDb();
@@ -127,18 +128,36 @@ export const partnerManagementRouter = router({
         userId = Number(userResult[0].insertId);
       }
       
-      const { contractStartDate, contractEndDate, ...insertData } = input;
+      const { contractStartDate, contractEndDate, cityIds, ...insertData } = input;
+      
+      // 设置默认分红比例
+      const profitRatio = input.profitRatio || "0.10";
       
       const result = await db.insert(partners).values({
         ...insertData,
+        profitRatio, // 使用默认值或用户提供的值
         userId,
         ...(contractStartDate ? { contractStartDate: new Date(contractStartDate) } : {}),
         ...(contractEndDate ? { contractEndDate: new Date(contractEndDate) } : {}),
         createdBy: ctx.user.id,
       });
       
+      const partnerId = Number(result[0].insertId);
+      
+      // 如果提供了cityIds，则关联城市
+      if (input.cityIds && input.cityIds.length > 0) {
+        await db.insert(partnerCities).values(
+          input.cityIds.map(cityId => ({
+            partnerId,
+            cityId,
+            expenseCoverage: {}, // 初始化空的费用承担配置
+            createdBy: ctx.user.id, // 添加创建人ID
+          } as any))
+        );
+      }
+      
       return { 
-        id: Number(result[0].insertId),
+        id: partnerId,
         userId,
         userCreated: !input.userId // 标记是否新创建了用户
       };

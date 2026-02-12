@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface CreatePartnerDialogProps {
@@ -16,14 +17,17 @@ export default function CreatePartnerDialog({ open, onOpenChange, onSuccess }: C
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    profitRatio: "0.10", // 默认10%
+    cityId: "", // 选中的城市ID
   });
+
+  // 获取城市列表
+  const { data: cities, isLoading: citiesLoading } = trpc.city.getAll.useQuery();
 
   const utils = trpc.useUtils();
 
   const createMutation = trpc.partnerManagement.create.useMutation({
     onSuccess: (data) => {
-      toast.success(`合伙人创建成功！${data.userCreated ? "已自动创建登录账号（默认密码：123456）" : ""}`);
+      toast.success(`合伙人创建成功！已自动创建登录账号（默认密码：123456）`);
       utils.partnerManagement.list.invalidate();
       onSuccess();
       onOpenChange(false);
@@ -31,7 +35,7 @@ export default function CreatePartnerDialog({ open, onOpenChange, onSuccess }: C
       setFormData({
         name: "",
         phone: "",
-        profitRatio: "0.10",
+        cityId: "",
       });
     },
     onError: (error) => {
@@ -59,17 +63,16 @@ export default function CreatePartnerDialog({ open, onOpenChange, onSuccess }: C
       return;
     }
 
-    // 验证分红比例
-    const ratio = parseFloat(formData.profitRatio);
-    if (isNaN(ratio) || ratio < 0 || ratio > 1) {
-      toast.error("分红比例必须在0-1之间");
+    // 验证城市选择
+    if (!formData.cityId) {
+      toast.error("请选择城市");
       return;
     }
 
     createMutation.mutate({
       name: formData.name,
       phone: formData.phone,
-      profitRatio: formData.profitRatio,
+      cityIds: [parseInt(formData.cityId)], // 将城市ID转换为数组
     });
   };
 
@@ -109,25 +112,27 @@ export default function CreatePartnerDialog({ open, onOpenChange, onSuccess }: C
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="profitRatio">
-              初始分红比例 <span className="text-destructive">*</span>
+            <Label htmlFor="cityId">
+              城市 <span className="text-destructive">*</span>
             </Label>
-            <div className="flex gap-2 items-center">
-              <Input
-                id="profitRatio"
-                type="number"
-                step="0.01"
-                min="0"
-                max="1"
-                value={formData.profitRatio}
-                onChange={(e) => setFormData({ ...formData, profitRatio: e.target.value })}
-              />
-              <span className="text-sm text-muted-foreground">
-                ({(parseFloat(formData.profitRatio) * 100).toFixed(0)}%)
-              </span>
-            </div>
+            <Select
+              value={formData.cityId}
+              onValueChange={(value) => setFormData({ ...formData, cityId: value })}
+              disabled={citiesLoading}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="请选择城市" />
+              </SelectTrigger>
+              <SelectContent>
+                {cities?.map((city) => (
+                  <SelectItem key={city.id} value={city.id.toString()}>
+                    {city.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <p className="text-xs text-muted-foreground">
-              输入0-1之间的小数，例如0.10表示10%
+              选择合伙人负责管理的城市
             </p>
           </div>
 

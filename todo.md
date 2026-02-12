@@ -2561,3 +2561,23 @@
 - [x] 删除ExpenseCoverageTab组件导入
 - [x] 测试验证合伙人管理页面正常显示（5个Tab布局正常）
 - [x] 保存检查点
+
+
+### 138. 修改新增合伙人对话框，添加城市选择器
+- [x] 查看CreatePartnerDialog组件的当前实现
+- [x] 删除“初始分红比例”字段
+- [x] 添加“城市”下拉选择器（使用metadata.getCities接口）
+- [ ] 修改后端API支持创建合伙人时关联城市
+- [ ] 测试验证新增合伙人功能
+- [ ] 保存检查点
+
+### 136. 新增合伙人页面功能
+- [x] 创建CreatePartnerDialog组件(姓名、手机号、城市选择)
+- [x] 添加城市下拉选择器,从城市管理列表加载选项
+- [x] 实现后端create API创建合伙人和城市关联
+- [x] 自动创建用户账号(默认密码123456)
+- [x] 修复partner_cities表的createdBy字段问题
+- [x] 修复expenseCoverage字段类型错误
+- [x] 编写单元测试验证创建功能(partnerManagement.create.test.ts)
+- [x] 浏览器测试验证完整流程(表单填写、提交、城市关联显示)
+- [x] 保存检查点
