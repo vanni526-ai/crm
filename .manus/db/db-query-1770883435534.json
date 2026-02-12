@@ -1,0 +1,16 @@
+{
+  "query": "SELECT p.id, p.name, p.userId, u.phone FROM partners p LEFT JOIN users u ON p.userId = u.id WHERE p.name = '测试分红支付日';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.userId, u.phone FROM partners p LEFT JOIN users u ON p.userId = u.id WHERE p.name = '测试分红支付日';",
+  "rows": [
+    {
+      "id": "90005",
+      "name": "测试分红支付日",
+      "userId": "16020945",
+      "phone": "13900000410"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tuserId\tphone\n90005\t测试分红支付日\t16020945\t13900000410\n",
+  "stderr": "",
+  "execution_time_ms": 1538
+}

@@ -13,6 +13,7 @@ interface CityExpenseCoveragePanelProps {
 }
 
 // 费用项目配置
+// 注意:合同后付款(deferredPayment)永远100%由合伙人承担,不需要在此配置
 const EXPENSE_ITEMS = [
   { key: "rentFee", label: "房租" },
   { key: "propertyFee", label: "物业费" },
@@ -20,7 +21,6 @@ const EXPENSE_ITEMS = [
   { key: "consumablesFee", label: "道具耗材" },
   { key: "cleaningFee", label: "保洁费" },
   { key: "phoneFee", label: "话费" },
-  { key: "deferredPayment", label: "合同后付款" },
   { key: "courierFee", label: "快递费" },
   { key: "promotionFee", label: "推广费" },
   { key: "teacherFee", label: "老师费用" },
@@ -38,7 +38,6 @@ export function CityExpenseCoveragePanel({ partnerId, cityId, cityName }: CityEx
     consumablesFee: false,
     cleaningFee: false,
     phoneFee: false,
-    deferredPayment: false,
     courierFee: false,
     promotionFee: false,
     teacherFee: false,

@@ -292,12 +292,12 @@ export const partnerManagementRouter = router({
         consumablesFee: z.boolean().optional(),
         cleaningFee: z.boolean().optional(),
         phoneFee: z.boolean().optional(),
-        deferredPayment: z.boolean().optional(),
         courierFee: z.boolean().optional(),
         promotionFee: z.boolean().optional(),
         teacherFee: z.boolean().optional(),
         transportFee: z.boolean().optional(),
         otherFee: z.boolean().optional(),
+        // 注意: deferredPayment(合同后付款)永远100%由合伙人承担,不需要在此配置
       }),
     }))
     .mutation(async ({ input }) => {
@@ -1166,12 +1166,12 @@ export const partnerManagementRouter = router({
         consumablesFee: z.boolean().optional(),
         cleaningFee: z.boolean().optional(),
         phoneFee: z.boolean().optional(),
-        deferredPayment: z.boolean().optional(),
         courierFee: z.boolean().optional(),
         promotionFee: z.boolean().optional(),
         teacherFee: z.boolean().optional(),
         transportFee: z.boolean().optional(),
         otherFee: z.boolean().optional(),
+        // 注意: deferredPayment(合同后付款)永远100%由合伙人承担,不需要在此配置
       }),
     }))
     .mutation(async ({ input, ctx }) => {

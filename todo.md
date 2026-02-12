@@ -2588,3 +2588,10 @@
 - [x] 在后端API的input schema中添加profitPaymentDay字段
 - [x] 测试验证修复效果(数据库显示20,前端正确显示)
 - [x] 保存检查点
+
+### 138. 从城市管理承担配置中移除合同后付款费用
+- [x] 查看当前承担配置的实现逻辑(CityExpenseCoveragePanel组件)
+- [x] 从CityExpenseCoveragePanel组件中移除合同后付款配置项
+- [x] 从后端API schema中移除deferredPayment字段
+- [x] 测试验证修改效果(承担配置页面只显示11个费用项,不包含合同后付款)
+- [x] 保存检查点
