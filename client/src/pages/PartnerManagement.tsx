@@ -14,7 +14,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import ContractInfoEditor from "@/components/ContractInfoEditor";
 import PartnerInfoTab from "@/components/PartnerInfoTab";
 import CreatePartnerDialog from "@/components/CreatePartnerDialog";
-import { ExpenseCoverageTab } from "@/components/ExpenseCoverageTab";
+
 import { CityExpenseCoveragePanel } from "@/components/CityExpenseCoveragePanel";
 
 export default function PartnerManagement() {
@@ -281,9 +281,8 @@ export default function PartnerManagement() {
             {selectedPartnerId ? (
               <Tabs defaultValue="info" className="w-full">
                 <CardHeader>
-                  <TabsList className="grid w-full grid-cols-6">
+                  <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="info">合伙人信息</TabsTrigger>
-                    <TabsTrigger value="coverage">费用承担</TabsTrigger>
                     <TabsTrigger value="cities">城市管理</TabsTrigger>
                     <TabsTrigger value="contract">合同信息</TabsTrigger>
                     <TabsTrigger value="account">收款账户</TabsTrigger>
@@ -295,11 +294,6 @@ export default function PartnerManagement() {
                   {/* 合伙人信息Tab */}
                   <TabsContent value="info" className="space-y-4">
                     <PartnerInfoTab partnerId={selectedPartnerId} />
-                  </TabsContent>
-
-                  {/* 费用承担Tab */}
-                  <TabsContent value="coverage" className="space-y-4">
-                    <ExpenseCoverageTab partnerId={selectedPartnerId} />
                   </TabsContent>
 
                   {/* 城市管理Tab */}

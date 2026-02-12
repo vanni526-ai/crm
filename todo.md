@@ -2554,3 +2554,10 @@
 - [x] 修改前端UI,在城市管理Tab中显示和编辑各城市的费用承担配置(创建CityExpenseCoveragePanel组件)
 - [x] 测试验证功能(为天津配置3个费用项,石家庄和大连保持0个,验证独立性)
 - [x] 保存检查点
+
+
+### 137. 删除合伙人管理中的费用承担Tab
+- [x] 从PartnerManagement.tsx中删除费用承担Tab
+- [x] 删除ExpenseCoverageTab组件导入
+- [x] 测试验证合伙人管理页面正常显示（5个Tab布局正常）
+- [x] 保存检查点
