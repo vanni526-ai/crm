@@ -2748,3 +2748,22 @@
   - 添加账单对话框:月份字段显示为"February 2026"的日期选择器 ✅
   - 编辑账单对话框(天津):月份字段显示为"February 2026" ✅
 - [x] 保存检查点并交付
+
+### 150. 在城市费用账单列表中新增销售额、订单数、老师费用、车费列
+- [x] 分析需求:在月份列右侧新增4个列(销售额、订单数、老师费用、车费)
+- [x] 检查后端API:老师费用和车费已返回,需要添加销售额和订单数的统计
+- [x] 在orderAggregation.ts中新增aggregateOrderSalesByMonthAndCity方法统计销售额和订单数
+- [x] 修改cityExpenseRouter.ts的list方法,为每个账单添加salesAmount和orderCount
+- [x] 修复代码错误:
+  - 修复paymentAmount字段名(orders表中为totalAmount) ✅
+  - 处理cityName可能为null的情况 ✅
+- [x] 修改CityExpenseManagement.tsx表格结构:
+  - 在月份列后添加销售额、订单数、老师费用、车费列 ✅
+  - 删除重复的老师费用和车费列 ✅
+  - 更新colSpan从18到20 ✅
+- [x] 测试验证:
+  - 销售额显示为绿色加粗文字(天津￥77,626) ✅
+  - 订单数显示正确(天津29单) ✅
+  - 老师费用和车费显示正确 ✅
+  - 表格结构清晰,无重复列 ✅
+- [x] 保存检查点并交付

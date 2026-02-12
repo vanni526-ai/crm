@@ -5,7 +5,7 @@ import { cityMonthlyExpenses, cities, partnerCities } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import ExcelJS from "exceljs";
-import { aggregateOrderFeesByMonthAndCity } from "./orderAggregation";
+import { aggregateOrderFeesByMonthAndCity, aggregateOrderSalesByMonthAndCity } from "./orderAggregation";
 
 export const cityExpenseRouter = router({
   /**
@@ -40,7 +40,7 @@ export const cityExpenseRouter = router({
         conditions.push(sql`${cityMonthlyExpenses.month} <= ${input.endMonth}`);
       }
       
-      const result = await db
+      const expenses = await db
         .select({
           id: cityMonthlyExpenses.id,
           cityId: cityMonthlyExpenses.cityId,
@@ -79,6 +79,30 @@ export const cityExpenseRouter = router({
         .leftJoin(partnerCities, eq(cityMonthlyExpenses.cityId, partnerCities.cityId))
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(desc(cityMonthlyExpenses.month), desc(cityMonthlyExpenses.cityId));
+      
+      // 为每个账单添加销售额和订单数
+      const result = await Promise.all(
+        expenses.map(async (expense) => {
+          // 如果城市名称为null,返回默认值
+          if (!expense.cityName) {
+            return {
+              ...expense,
+              salesAmount: "0.00",
+              orderCount: 0,
+            };
+          }
+          
+          const { salesAmount, orderCount } = await aggregateOrderSalesByMonthAndCity(
+            expense.month,
+            expense.cityName
+          );
+          return {
+            ...expense,
+            salesAmount,
+            orderCount,
+          };
+        })
+      );
       
       return result;
     }),

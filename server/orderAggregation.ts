@@ -8,6 +8,57 @@ import { eq, and, sql } from "drizzle-orm";
  * @param cityName 城市名称
  * @returns { teacherFee: string, transportFee: string }
  */
+/**
+ * 根据月份和城市汇总订单的销售额和订单数
+ * @param month 月份，格式：YYYY-MM
+ * @param cityName 城市名称
+ * @returns { salesAmount: string, orderCount: number }
+ */
+export async function aggregateOrderSalesByMonthAndCity(
+  month: string,
+  cityName: string
+): Promise<{ salesAmount: string; orderCount: number }> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("数据库连接失败");
+  }
+
+  // 解析月份，获取开始和结束日期
+  const [year, monthNum] = month.split("-").map(Number);
+  const startDate = new Date(year, monthNum - 1, 1);
+  const endDate = new Date(year, monthNum, 0); // 当月最后一天
+
+  const startDateStr = startDate.toISOString().split("T")[0];
+  const endDateStr = endDate.toISOString().split("T")[0];
+
+  // 查询该月份、该城市的所有订单，汇总销售额和订单数
+  const result = await db
+    .select({
+      totalSalesAmount: sql<string>`COALESCE(SUM(${orders.paymentAmount}), 0)`,
+      orderCount: sql<number>`COUNT(*)`,
+    })
+    .from(orders)
+    .where(
+      and(
+        eq(orders.deliveryCity, cityName),
+        sql`${orders.classDate} >= ${startDateStr}`,
+        sql`${orders.classDate} <= ${endDateStr}`
+      )
+    );
+
+  if (!result || result.length === 0) {
+    return {
+      salesAmount: "0.00",
+      orderCount: 0,
+    };
+  }
+
+  return {
+    salesAmount: Number(result[0].totalSalesAmount || 0).toFixed(2),
+    orderCount: Number(result[0].orderCount || 0),
+  };
+}
+
 export async function aggregateOrderFeesByMonthAndCity(
   month: string,
   cityName: string
