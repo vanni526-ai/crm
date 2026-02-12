@@ -849,13 +849,18 @@ export default function Finance() {
                         <TableHead className="text-right">销售额</TableHead>
                         <TableHead className="text-right">老师费用</TableHead>
                         <TableHead className="text-right">车费</TableHead>
-                        <TableHead className="text-right">合伙人费</TableHead>
-                        <TableHead className="text-right">耗材</TableHead>
                         <TableHead className="text-right">房租</TableHead>
-                        <TableHead className="text-right">物业</TableHead>
-                        <TableHead className="text-right">水电</TableHead>
+                        <TableHead className="text-right">物业费</TableHead>
+                        <TableHead className="text-right">水电费</TableHead>
+                        <TableHead className="text-right">道具耗材</TableHead>
+                        <TableHead className="text-right">保洁费</TableHead>
+                        <TableHead className="text-right">话费</TableHead>
+                        <TableHead className="text-right">快递费</TableHead>
+                        <TableHead className="text-right">推广费</TableHead>
                         <TableHead className="text-right">其他费用</TableHead>
                         <TableHead className="text-right">总费用</TableHead>
+                        <TableHead className="text-right">合伙人承担</TableHead>
+                        <TableHead className="text-right">合同后付款</TableHead>
                         <TableHead className="text-right">净利润</TableHead>
                         <TableHead className="text-right">利润率</TableHead>
                       </TableRow>
@@ -880,12 +885,6 @@ export default function Finance() {
                             ￥{stat.transportFee.toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right">
-                            ￥{stat.partnerFee.toFixed(2)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            ￥{stat.consumablesFee.toFixed(2)}
-                          </TableCell>
-                          <TableCell className="text-right">
                             ￥{stat.rentFee.toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right">
@@ -895,10 +894,31 @@ export default function Finance() {
                             ￥{stat.utilityFee.toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right">
+                            ￥{stat.consumablesFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.cleaningFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.phoneFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.expressFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ￥{stat.promotionFee.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
                             ￥{stat.otherFee.toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right text-red-600">
                             ￥{stat.totalExpense.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right text-blue-600">
+                            ￥{stat.partnerShare.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right text-purple-600">
+                            ￥{stat.deferredPayment.toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right font-medium">
                             <span className={stat.profit >= 0 ? "text-blue-600" : "text-red-600"}>

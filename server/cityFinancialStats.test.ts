@@ -19,7 +19,7 @@ describe('城市财务统计功能测试', () => {
         teacherFee: '300.00',
         transportFee: '50.00',
         otherFee: '20.00',
-        partnerFee: '0.00',
+
         classDate: new Date().toISOString().split('T')[0],
         status: 'completed' as const,
       },
@@ -34,7 +34,7 @@ describe('城市财务统计功能测试', () => {
         teacherFee: '400.00',
         transportFee: '60.00',
         otherFee: '30.00',
-        partnerFee: '10.00',
+
         classDate: new Date().toISOString().split('T')[0],
         status: 'completed' as const,
       },
@@ -49,7 +49,7 @@ describe('城市财务统计功能测试', () => {
         teacherFee: '500.00',
         transportFee: '80.00',
         otherFee: '40.00',
-        partnerFee: '20.00',
+
         classDate: new Date().toISOString().split('T')[0],
         status: 'completed' as const,
       },
@@ -64,7 +64,7 @@ describe('城市财务统计功能测试', () => {
         teacherFee: '350.00',
         transportFee: '55.00',
         otherFee: '25.00',
-        partnerFee: '0.00',
+
         classDate: new Date().toISOString().split('T')[0],
         status: 'completed' as const,
       },
@@ -79,7 +79,7 @@ describe('城市财务统计功能测试', () => {
         teacherFee: '200.00',
         transportFee: '40.00',
         otherFee: '10.00',
-        partnerFee: '0.00',
+
         classDate: new Date().toISOString().split('T')[0],
         status: 'completed' as const,
       },
@@ -198,12 +198,19 @@ describe('城市财务统计功能测试', () => {
     expect(shanghaiStats).toBeDefined();
     
     if (shanghaiStats) {
-      // 验证总费用 = 老师费用 + 车费 + 其他费用 + 合伙人费用
+      // 验证总费用 = 老师费用 + 车费 + 房租 + 物业费 + 水电费 + 道具耗材 + 保洁费 + 话费 + 快递费 + 推广费 + 其他费用
       const expectedTotalExpense = 
         shanghaiStats.teacherFee + 
         shanghaiStats.transportFee + 
-        shanghaiStats.otherFee + 
-        shanghaiStats.partnerFee;
+        shanghaiStats.rentFee + 
+        shanghaiStats.propertyFee + 
+        shanghaiStats.utilityFee + 
+        shanghaiStats.consumablesFee + 
+        shanghaiStats.cleaningFee + 
+        shanghaiStats.phoneFee + 
+        shanghaiStats.expressFee + 
+        shanghaiStats.promotionFee + 
+        shanghaiStats.otherFee;
       
       expect(shanghaiStats.totalExpense).toBeCloseTo(expectedTotalExpense, 2);
     }
@@ -217,7 +224,16 @@ describe('城市财务统计功能测试', () => {
       expect(typeof stat.teacherFee).toBe('number');
       expect(typeof stat.transportFee).toBe('number');
       expect(typeof stat.otherFee).toBe('number');
-      expect(typeof stat.partnerFee).toBe('number');
+      expect(typeof stat.rentFee).toBe('number');
+      expect(typeof stat.propertyFee).toBe('number');
+      expect(typeof stat.utilityFee).toBe('number');
+      expect(typeof stat.consumablesFee).toBe('number');
+      expect(typeof stat.cleaningFee).toBe('number');
+      expect(typeof stat.phoneFee).toBe('number');
+      expect(typeof stat.expressFee).toBe('number');
+      expect(typeof stat.promotionFee).toBe('number');
+      expect(typeof stat.partnerShare).toBe('number');
+      expect(typeof stat.deferredPayment).toBe('number');
       expect(typeof stat.totalExpense).toBe('number');
       expect(typeof stat.profit).toBe('number');
       expect(typeof stat.profitMargin).toBe('number');

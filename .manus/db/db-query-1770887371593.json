@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE partner_expenses \nADD COLUMN IF NOT EXISTS cleaningFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '保洁费',\nADD COLUMN IF NOT EXISTS phoneFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '话费',\nADD COLUMN IF NOT EXISTS expressFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '快递费',\nADD COLUMN IF NOT EXISTS promotionFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '推广费',\nADD COLUMN IF NOT EXISTS partnerShare DECIMAL(10,2) DEFAULT 0.00 COMMENT '合伙人承担';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE partner_expenses \nADD COLUMN IF NOT EXISTS cleaningFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '保洁费',\nADD COLUMN IF NOT EXISTS phoneFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '话费',\nADD COLUMN IF NOT EXISTS expressFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '快递费',\nADD COLUMN IF NOT EXISTS promotionFee DECIMAL(10,2) DEFAULT 0.00 COMMENT '推广费',\nADD COLUMN IF NOT EXISTS partnerShare DECIMAL(10,2) DEFAULT 0.00 COMMENT '合伙人承担';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3527
+}

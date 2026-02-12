@@ -659,13 +659,18 @@ export const partnerExpenses = mysqlTable("partner_expenses", {
   
   // 费用明细
   rentFee: decimal("rentFee", { precision: 10, scale: 2 }).default("0.00"), // 房租
-  propertyFee: decimal("propertyFee", { precision: 10, scale: 2 }).default("0.00"), // 物业
-  utilityFee: decimal("utilityFee", { precision: 10, scale: 2 }).default("0.00"), // 水电
-  consumablesFee: decimal("consumablesFee", { precision: 10, scale: 2 }).default("0.00"), // 耗材
-  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }).default("0.00"), // 老师费用
-  transportFee: decimal("transportFee", { precision: 10, scale: 2 }).default("0.00"), // 车费
+  propertyFee: decimal("propertyFee", { precision: 10, scale: 2 }).default("0.00"), // 物业费
+  utilityFee: decimal("utilityFee", { precision: 10, scale: 2 }).default("0.00"), // 水电费
+  consumablesFee: decimal("consumablesFee", { precision: 10, scale: 2 }).default("0.00"), // 道具耗材
+  cleaningFee: decimal("cleaningFee", { precision: 10, scale: 2 }).default("0.00"), // 保洁费
+  phoneFee: decimal("phoneFee", { precision: 10, scale: 2 }).default("0.00"), // 话费
+  expressFee: decimal("expressFee", { precision: 10, scale: 2 }).default("0.00"), // 快递费
+  promotionFee: decimal("promotionFee", { precision: 10, scale: 2 }).default("0.00"), // 推广费
   otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
+  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }).default("0.00"), // 老师费用(从订单汇总)
+  transportFee: decimal("transportFee", { precision: 10, scale: 2 }).default("0.00"), // 车费(从订单汇总)
   totalFee: decimal("totalFee", { precision: 10, scale: 2 }).default("0.00"), // 总费用
+  partnerShare: decimal("partnerShare", { precision: 10, scale: 2 }).default("0.00"), // 合伙人承担
   
   // 合同后付款
   deferredPayment: decimal("deferredPayment", { precision: 10, scale: 2 }).default("0.00"), // 本月后付款扣款

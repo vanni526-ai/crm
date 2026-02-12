@@ -41,7 +41,6 @@ export const cityRouter = router({
       { header: "销售额", key: "revenue", width: 15 },
       { header: "老师费用", key: "teacherFee", width: 15 },
       { header: "车费", key: "transportFee", width: 12 },
-      { header: "合伙人费", key: "partnerFee", width: 15 },
       { header: "耗材费用", key: "consumablesFee", width: 15 },
       { header: "房租费用", key: "rentFee", width: 15 },
       { header: "物业费用", key: "propertyFee", width: 15 },
@@ -72,7 +71,6 @@ export const cityRouter = router({
         revenue: stat.totalRevenue,
         teacherFee: stat.teacherFee,
         transportFee: stat.transportFee,
-        partnerFee: stat.partnerFee,
         consumablesFee: stat.consumablesFee,
         rentFee: stat.rentFee,
         propertyFee: stat.propertyFee,
@@ -86,7 +84,7 @@ export const cityRouter = router({
     });
 
     // 设置数字格式
-    const numberColumns = ["revenue", "teacherFee", "transportFee", "partnerFee", "consumablesFee", "rentFee", "propertyFee", "utilityFee", "otherFee", "totalCost", "profit"];
+    const numberColumns = ["revenue", "teacherFee", "transportFee", "consumablesFee", "rentFee", "propertyFee", "utilityFee", "otherFee", "totalCost", "profit"];
     numberColumns.forEach((colKey) => {
       const col = worksheet.getColumn(colKey);
       col.numFmt = "¥#,##0.00";

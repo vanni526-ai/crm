@@ -742,13 +742,18 @@ export async function getCityFinancialStats(dateRange?: string) {
     totalRevenue: number;
     teacherFee: number;
     transportFee: number;
-    partnerFee: number;
-    consumablesFee: number;
     rentFee: number;
     propertyFee: number;
     utilityFee: number;
+    consumablesFee: number;
+    cleaningFee: number;
+    phoneFee: number;
+    expressFee: number;
+    promotionFee: number;
     otherFee: number;
     totalExpense: number;
+    partnerShare: number;
+    deferredPayment: number;
     profit: number;
     profitMargin: number;
   }> = {};
@@ -763,13 +768,18 @@ export async function getCityFinancialStats(dateRange?: string) {
         totalRevenue: 0,
         teacherFee: 0,
         transportFee: 0,
-        partnerFee: 0,
-        consumablesFee: 0,
         rentFee: 0,
         propertyFee: 0,
         utilityFee: 0,
+        consumablesFee: 0,
+        cleaningFee: 0,
+        phoneFee: 0,
+        expressFee: 0,
+        promotionFee: 0,
         otherFee: 0,
         totalExpense: 0,
+        partnerShare: 0,
+        deferredPayment: 0,
         profit: 0,
         profitMargin: 0,
       };
@@ -778,30 +788,73 @@ export async function getCityFinancialStats(dateRange?: string) {
     const revenue = parseFloat(order.paymentAmount || '0');
     const teacherFee = parseFloat(order.teacherFee || '0');
     const transportFee = parseFloat(order.transportFee || '0');
-    const partnerFee = parseFloat(order.partnerFee || '0');
-    const consumablesFee = parseFloat(order.consumablesFee || '0');
-    const rentFee = parseFloat(order.rentFee || '0');
-    const propertyFee = parseFloat(order.propertyFee || '0');
-    const utilityFee = parseFloat(order.utilityFee || '0');
-    const otherFee = parseFloat(order.otherFee || '0');
-    const totalExpense = teacherFee + transportFee + partnerFee + consumablesFee + rentFee + propertyFee + utilityFee + otherFee;
 
     cityStats[city].orderCount += 1;
     cityStats[city].totalRevenue += revenue;
     cityStats[city].teacherFee += teacherFee;
     cityStats[city].transportFee += transportFee;
-    cityStats[city].partnerFee += partnerFee;
-    cityStats[city].consumablesFee += consumablesFee;
-    cityStats[city].rentFee += rentFee;
-    cityStats[city].propertyFee += propertyFee;
-    cityStats[city].utilityFee += utilityFee;
-    cityStats[city].otherFee += otherFee;
-    cityStats[city].totalExpense += totalExpense;
-    cityStats[city].profit += revenue - totalExpense;
   });
 
-  // 计算利润率
+  // 从 partner_expenses 表获取城市费用数据(房租、物业费、水电费等)
+  // 需要JOIN cities表获取城市名称
+  const partnerExpensesData = await db
+    .select({
+      expense: partnerExpenses,
+      cityName: cities.name,
+    })
+    .from(partnerExpenses)
+    .leftJoin(cities, eq(partnerExpenses.cityId, cities.id));
+  
+  partnerExpensesData.forEach(({ expense, cityName }) => {
+    const city = cityName || '未知城市';
+    
+    if (!cityStats[city]) {
+      cityStats[city] = {
+        city,
+        orderCount: 0,
+        totalRevenue: 0,
+        teacherFee: 0,
+        transportFee: 0,
+        rentFee: 0,
+        propertyFee: 0,
+        utilityFee: 0,
+        consumablesFee: 0,
+        cleaningFee: 0,
+        phoneFee: 0,
+        expressFee: 0,
+        promotionFee: 0,
+        otherFee: 0,
+        totalExpense: 0,
+        partnerShare: 0,
+        deferredPayment: 0,
+        profit: 0,
+        profitMargin: 0,
+      };
+    }
+    
+    cityStats[city].rentFee += parseFloat(expense.rentFee || '0');
+    cityStats[city].propertyFee += parseFloat(expense.propertyFee || '0');
+    cityStats[city].utilityFee += parseFloat(expense.utilityFee || '0');
+    cityStats[city].consumablesFee += parseFloat(expense.consumablesFee || '0');
+    cityStats[city].cleaningFee += parseFloat(expense.cleaningFee || '0');
+    cityStats[city].phoneFee += parseFloat(expense.phoneFee || '0');
+    cityStats[city].expressFee += parseFloat(expense.expressFee || '0');
+    cityStats[city].promotionFee += parseFloat(expense.promotionFee || '0');
+    cityStats[city].otherFee += parseFloat(expense.otherFee || '0');
+    cityStats[city].partnerShare += parseFloat(expense.partnerShare || '0');
+    cityStats[city].deferredPayment += parseFloat(expense.deferredPayment || '0');
+  });
+
+  // 计算总费用、净利润和利润率
   Object.values(cityStats).forEach((stat) => {
+    // 总费用 = 老师费用 + 车费 + 房租 + 物业费 + 水电费 + 道具耗材 + 保洁费 + 话费 + 快递费 + 推广费 + 其他费用
+    // 注意:不包含合同后付款
+    stat.totalExpense = stat.teacherFee + stat.transportFee + stat.rentFee + stat.propertyFee + 
+                        stat.utilityFee + stat.consumablesFee + stat.cleaningFee + stat.phoneFee + 
+                        stat.expressFee + stat.promotionFee + stat.otherFee;
+    
+    // 净利润 = 销售额 - 总费用 + 合伙人承担 + 合同后付款
+    stat.profit = stat.totalRevenue - stat.totalExpense + stat.partnerShare + stat.deferredPayment;
     stat.profitMargin = stat.totalRevenue > 0 ? (stat.profit / stat.totalRevenue) * 100 : 0;
   });
 
