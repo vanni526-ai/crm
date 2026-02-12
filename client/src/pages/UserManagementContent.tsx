@@ -155,6 +155,7 @@ function RolesSelector({
 
 export default function UserManagementContent() {
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all"); // 角色筛选器
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
@@ -236,14 +237,25 @@ export default function UserManagementContent() {
 
   // 过滤用户
   const filteredUsers = users?.filter((user) => {
-    if (!searchKeyword) return true;
-    const keyword = searchKeyword.toLowerCase();
-    return (
-      user.name?.toLowerCase().includes(keyword) ||
-      user.nickname?.toLowerCase().includes(keyword) ||
-      user.email?.toLowerCase().includes(keyword) ||
-      user.phone?.toLowerCase().includes(keyword)
-    );
+    // 关键词筛选
+    if (searchKeyword) {
+      const keyword = searchKeyword.toLowerCase();
+      const matchesKeyword = (
+        user.name?.toLowerCase().includes(keyword) ||
+        user.nickname?.toLowerCase().includes(keyword) ||
+        user.email?.toLowerCase().includes(keyword) ||
+        user.phone?.toLowerCase().includes(keyword)
+      );
+      if (!matchesKeyword) return false;
+    }
+    
+    // 角色筛选
+    if (roleFilter !== "all") {
+      const userRoles = parseRoles((user as any).roles || user.role);
+      if (!userRoles.includes(roleFilter)) return false;
+    }
+    
+    return true;
   });
 
   const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -351,6 +363,19 @@ export default function UserManagementContent() {
               className="pl-10"
             />
           </div>
+          {/* 角色筛选器 */}
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="px-3 py-2 border rounded-md bg-white hover:bg-gray-50 min-w-[150px]"
+          >
+            <option value="all">全部角色</option>
+            {ALL_ROLES.map((role) => (
+              <option key={role.value} value={role.value}>
+                {role.label}
+              </option>
+            ))}
+          </select>
         </div>
       </Card>
 
@@ -668,6 +693,26 @@ export default function UserManagementContent() {
                           </select>
                         </div>
                       )}
+                    </div>
+
+                    {/* 管理员角色行 */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center gap-2 w-24 flex-shrink-0">
+                        <input
+                          type="checkbox"
+                          id="role-admin"
+                          checked={editRoles.includes('admin')}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEditRoles([...editRoles, 'admin']);
+                            } else {
+                              setEditRoles(editRoles.filter(r => r !== 'admin'));
+                            }
+                          }}
+                          className="w-4 h-4"
+                        />
+                        <label htmlFor="role-admin" className="text-sm font-medium cursor-pointer">管理员</label>
+                      </div>
                     </div>
 
                     {/* 销售角色行 */}
