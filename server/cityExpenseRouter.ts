@@ -5,6 +5,7 @@ import { cityMonthlyExpenses, cities, partnerCities } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import ExcelJS from "exceljs";
+import { aggregateOrderFeesByMonthAndCity } from "./orderAggregation";
 
 export const cityExpenseRouter = router({
   /**
@@ -55,6 +56,8 @@ export const cityExpenseRouter = router({
           expressFee: cityMonthlyExpenses.expressFee,
           promotionFee: cityMonthlyExpenses.promotionFee,
           otherFee: cityMonthlyExpenses.otherFee,
+          teacherFee: cityMonthlyExpenses.teacherFee,
+          transportFee: cityMonthlyExpenses.transportFee,
           totalExpense: cityMonthlyExpenses.totalExpense,
           notes: cityMonthlyExpenses.notes,
           createdAt: cityMonthlyExpenses.createdAt,
@@ -154,6 +157,12 @@ export const cityExpenseRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
+      // 自动计算老师费用和车费（从订单数据汇总）
+      const { teacherFee, transportFee } = await aggregateOrderFeesByMonthAndCity(
+        input.month,
+        input.cityName
+      );
+      
       // 计算总费用
       const totalExpense = (
         parseFloat(input.rentFee || "0") +
@@ -165,7 +174,9 @@ export const cityExpenseRouter = router({
         parseFloat(input.deferredPayment || "0") +
         parseFloat(input.expressFee || "0") +
         parseFloat(input.promotionFee || "0") +
-        parseFloat(input.otherFee || "0")
+        parseFloat(input.otherFee || "0") +
+        parseFloat(teacherFee) +
+        parseFloat(transportFee)
       ).toFixed(2);
       
       // 检查是否已存在该城市该月份的记录
@@ -193,6 +204,8 @@ export const cityExpenseRouter = router({
             expressFee: input.expressFee || "0.00",
             promotionFee: input.promotionFee || "0.00",
             otherFee: input.otherFee || "0.00",
+            teacherFee,
+            transportFee,
             totalExpense,
             notes: input.notes,
             uploadedBy: ctx.user.id,
@@ -216,6 +229,8 @@ export const cityExpenseRouter = router({
           expressFee: input.expressFee || "0.00",
           promotionFee: input.promotionFee || "0.00",
           otherFee: input.otherFee || "0.00",
+          teacherFee,
+          transportFee,
           totalExpense,
           notes: input.notes,
           uploadedBy: ctx.user.id,

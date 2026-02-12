@@ -38,6 +38,8 @@ export default function CityExpenseManagement() {
     expressFee: "",
     promotionFee: "",
     otherFee: "",
+    teacherFee: "0.00",
+    transportFee: "0.00",
     notes: "",
   });
   
@@ -133,6 +135,8 @@ export default function CityExpenseManagement() {
       expressFee: "",
       promotionFee: "",
       otherFee: "",
+      teacherFee: "0.00",
+      transportFee: "0.00",
       notes: "",
     });
     setEditingExpense(null);
@@ -155,6 +159,8 @@ export default function CityExpenseManagement() {
         expressFee: expense.expressFee || "",
         promotionFee: expense.promotionFee || "",
         otherFee: expense.otherFee || "",
+        teacherFee: expense.teacherFee || "0.00",
+        transportFee: expense.transportFee || "0.00",
         notes: expense.notes || "",
       });
     } else {
@@ -425,6 +431,33 @@ export default function CityExpenseManagement() {
                   </div>
                 </div>
                 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>老师费用（自动计算）</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.teacherFee || "0.00"}
+                      disabled
+                      className="bg-blue-50"
+                    />
+                    <p className="text-xs text-muted-foreground">根据订单数据自动汇总</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>车费（自动计算）</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={formData.transportFee || "0.00"}
+                      disabled
+                      className="bg-blue-50"
+                    />
+                    <p className="text-xs text-muted-foreground">根据订单数据自动汇总</p>
+                  </div>
+                </div>
+                
                 <div className="space-y-2">
                   <Label>备注</Label>
                   <Textarea
@@ -521,6 +554,8 @@ export default function CityExpenseManagement() {
                     <TableHead className="text-right">快递费</TableHead>
                     <TableHead className="text-right">推广费</TableHead>
                     <TableHead className="text-right">其他费用</TableHead>
+                    <TableHead className="text-right">老师费用</TableHead>
+                    <TableHead className="text-right">车费</TableHead>
                     <TableHead className="text-right">总费用</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
@@ -528,7 +563,7 @@ export default function CityExpenseManagement() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={15} className="text-center text-muted-foreground">
+                      <TableCell colSpan={17} className="text-center text-muted-foreground">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -550,6 +585,8 @@ export default function CityExpenseManagement() {
                         <TableCell className="text-right">¥{parseFloat(expense.expressFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">¥{parseFloat(expense.promotionFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">¥{parseFloat(expense.otherFee || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right bg-blue-50">¥{parseFloat(expense.teacherFee || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right bg-blue-50">¥{parseFloat(expense.transportFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right font-semibold">¥{parseFloat(expense.totalExpense || "0").toLocaleString()}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
@@ -573,7 +610,7 @@ export default function CityExpenseManagement() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={15} className="text-center text-muted-foreground">
+                      <TableCell colSpan={17} className="text-center text-muted-foreground">
                         暂无费用账单数据
                       </TableCell>
                     </TableRow>

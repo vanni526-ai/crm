@@ -211,6 +211,13 @@
       "when": 1770864719103,
       "tag": "0029_new_squadron_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1770865677737,
+      "tag": "0030_worried_elektra",
+      "breakpoints": true
     }
   ]
 }

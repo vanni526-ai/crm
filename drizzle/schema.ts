@@ -1064,6 +1064,8 @@ export const cityMonthlyExpenses = mysqlTable("city_monthly_expenses", {
   expressFee: decimal("expressFee", { precision: 10, scale: 2 }).default("0.00"), // 快递费
   promotionFee: decimal("promotionFee", { precision: 10, scale: 2 }).default("0.00"), // 推广费
   otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
+  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }).default("0.00"), // 老师费用（从订单汇总）
+  transportFee: decimal("transportFee", { precision: 10, scale: 2 }).default("0.00"), // 车费（从订单汇总）
   
   totalExpense: decimal("totalExpense", { precision: 10, scale: 2 }).default("0.00"), // 总费用（自动计算）
   notes: text("notes"), // 备注
