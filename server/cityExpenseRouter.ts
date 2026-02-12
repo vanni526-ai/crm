@@ -163,7 +163,8 @@ export const cityExpenseRouter = router({
         input.cityName
       );
       
-      // 计算总费用
+      // 计算总费用 = 房租 + 物业费 + 水电费 + 道具耗材 + 保洁费 + 话费 + 快递费 + 推广费 + 其他费用 + 老师费用 + 车费
+      // 注意:合同后付款不计入总费用
       const totalExpense = (
         parseFloat(input.rentFee || "0") +
         parseFloat(input.propertyFee || "0") +
@@ -171,7 +172,6 @@ export const cityExpenseRouter = router({
         parseFloat(input.consumablesFee || "0") +
         parseFloat(input.cleaningFee || "0") +
         parseFloat(input.phoneFee || "0") +
-        parseFloat(input.deferredPayment || "0") +
         parseFloat(input.expressFee || "0") +
         parseFloat(input.promotionFee || "0") +
         parseFloat(input.otherFee || "0") +
@@ -404,6 +404,14 @@ export const cityExpenseRouter = router({
           const otherFee = row.getCell(12).value?.toString() || "0";
           const notes = row.getCell(13).value?.toString() || "";
           
+          // 自动计算老师费用和车费（从订单数据汇总）
+          const { teacherFee, transportFee } = await aggregateOrderFeesByMonthAndCity(
+            month,
+            cityName
+          );
+          
+          // 计算总费用 = 房租 + 物业费 + 水电费 + 道具耗材 + 保洁费 + 话费 + 快递费 + 推广费 + 其他费用 + 老师费用 + 车费
+          // 注意:合同后付款不计入总费用
           const totalExpense = (
             parseFloat(rentFee) +
             parseFloat(propertyFee) +
@@ -411,10 +419,11 @@ export const cityExpenseRouter = router({
             parseFloat(consumablesFee) +
             parseFloat(cleaningFee) +
             parseFloat(phoneFee) +
-            parseFloat(deferredPayment) +
             parseFloat(expressFee) +
             parseFloat(promotionFee) +
-            parseFloat(otherFee)
+            parseFloat(otherFee) +
+            parseFloat(teacherFee) +
+            parseFloat(transportFee)
           ).toFixed(2);
           
           // 检查是否已存在该城市该月份的记录
@@ -442,6 +451,8 @@ export const cityExpenseRouter = router({
                 expressFee,
                 promotionFee,
                 otherFee,
+                teacherFee,
+                transportFee,
                 totalExpense,
                 notes,
                 uploadedBy: ctx.user.id,
@@ -463,6 +474,8 @@ export const cityExpenseRouter = router({
               expressFee,
               promotionFee,
               otherFee,
+              teacherFee,
+              transportFee,
               totalExpense,
               notes,
               uploadedBy: ctx.user.id,

@@ -223,7 +223,8 @@ export default function CityExpenseManagement() {
     }
   };
   
-  // 计算总费用
+  // 计算总费用 = 房租 + 物业费 + 水电费 + 道具耗材 + 保洁费 + 话费 + 快递费 + 推广费 + 其他费用 + 老师费用 + 车费
+  // 注意:合同后付款不计入总费用
   const calculateTotal = () => {
     return (
       parseFloat(formData.rentFee || "0") +
@@ -232,10 +233,11 @@ export default function CityExpenseManagement() {
       parseFloat(formData.consumablesFee || "0") +
       parseFloat(formData.cleaningFee || "0") +
       parseFloat(formData.phoneFee || "0") +
-      parseFloat(formData.deferredPayment || "0") +
       parseFloat(formData.expressFee || "0") +
       parseFloat(formData.promotionFee || "0") +
-      parseFloat(formData.otherFee || "0")
+      parseFloat(formData.otherFee || "0") +
+      parseFloat(formData.teacherFee || "0") +
+      parseFloat(formData.transportFee || "0")
     ).toFixed(2);
   };
   

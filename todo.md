@@ -499,6 +499,36 @@
 - [x] 配置Capacitor项目和Android环境(已配置)
 - [x] 测试验证Web应用在移动端的完整性(已构建)
 
+### 136. 新增合伙人页面功能
+- [x] 创建CreatePartnerDialog对话框组件(姓名、手机号、城市选择)
+- [x] 城市选择器从城市管理列表动态加载
+- [x] 自动创建用户账号(默认密码123456)
+- [x] 自动创建合伙人与城市的关联记录
+- [x] 完成单元测试验证(所有测试通过)
+- [x] 完成浏览器端到端测试(表单填写、提交、城市关联显示均正常)
+
+### 137. 修复合伙人管理页面"每月分红支付日"字段无法保存的问题
+- [x] 诊断分红日期无法保存的根本原因(partners表缺少profitPaymentDay字段)
+- [x] 在partners表schema中添加profitPaymentDay字段(默认值25)
+- [x] 在后端API的input schema中添加profitPaymentDay字段
+- [x] 测试验证修复效果(数据库显示20,前端正确显示)
+- [x] 保存检查点
+
+### 138. 从城市管理承担配置中移除合同后付款费用
+- [x] 查看当前承担配置的实现逻辑(CityExpenseCoveragePanel组件)
+- [x] 从CityExpenseCoveragePanel组件中移除合同后付款配置项
+- [x] 从后端API schema中移除deferredPayment字段
+- [x] 测试验证修改效果(承担配置页面只显示11个费用项,不包含合同后付款)
+- [x] 保存检查点
+
+### 139. 修复城市费用账单的计算逻辑
+- [x] 查看当前城市费用账单页面的实现(CityExpenseManagement.tsx)
+- [x] 修复前端calculateTotal函数(移除deferredPayment,添加teacherFee和transportFee)
+- [x] 修复后端upsert API的totalExpense计算(移除deferredPayment)
+- [x] 修复后端batchImport API的totalExpense计算(移除deferredPayment,添加teacherFee和transportFee)
+- [x] 测试验证计算逻辑(房租1000+物业费200=总费用1200,合同后付款500不计入)
+- [x] 保存检查点
+
 ### 136. 基于真实合同重构合伙人管理模块
 - [x] 扩展partnerCities表支持完整合同信息
 - [x] 实现合同上传和LLM智能识别功能
@@ -2595,3 +2625,11 @@
 - [x] 从后端API schema中移除deferredPayment字段
 - [x] 测试验证修改效果(承担配置页面只显示11个费用项,不包含合同后付款)
 - [x] 保存检查点
+
+### 139. 修复城市费用账单的计算逻辑
+- [ ] 查看当前城市费用账单页面的实现(CityExpenseManagement.tsx)
+- [ ] 修复总费用计算公式(应包含所有11个费用项)
+- [ ] 修复合伙人承担费用计算公式(总费用×费用分摄比例)
+- [ ] 确认合同后付款字段为手工填入,不参与自动计算
+- [ ] 测试验证计算逻辑正确性
+- [ ] 保存检查点
