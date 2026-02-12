@@ -1,0 +1,9 @@
+{
+  "query": "-- 查找测试城市的ID\nSELECT id, name FROM cities WHERE name LIKE '测试%';\n\n-- 删除测试城市的合伙人配置\nDELETE FROM partner_cities WHERE cityId IN (SELECT id FROM cities WHERE name LIKE '测试%');\n\n-- 删除测试城市的费用账单\nDELETE FROM city_monthly_expenses WHERE cityId IN (SELECT id FROM cities WHERE name LIKE '测试%');\n\n-- 删除测试城市\nDELETE FROM cities WHERE name LIKE '测试%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 查找测试城市的ID\nSELECT id, name FROM cities WHERE name LIKE '测试%';\n\n-- 删除测试城市的合伙人配置\nDELETE FROM partner_cities WHERE cityId IN (SELECT id FROM cities WHERE name LIKE '测试%');\n\n-- 删除测试城市的费用账单\nDELETE FROM city_monthly_expenses WHERE cityId IN (SELECT id FROM cities WHERE name LIKE '测试%');\n\n-- 删除测试城市\nDELETE FROM cities WHERE name LIKE '测试%';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2679
+}

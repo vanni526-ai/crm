@@ -180,6 +180,27 @@ export const cityExpenseRouter = router({
         parseFloat(transportFee)
       ).toFixed(2);
       
+      // 获取该城市的费用分摄比例（合伙人分红比例）
+      const partnerCityInfo = await db
+        .select({
+          costShareRatio: sql<string>`
+            CASE 
+              WHEN ${partnerCities.currentProfitStage} = 1 THEN ${partnerCities.profitRatioStage1Partner}
+              WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 0 THEN ${partnerCities.profitRatioStage2APartner}
+              WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 1 THEN ${partnerCities.profitRatioStage2BPartner}
+              WHEN ${partnerCities.currentProfitStage} = 3 THEN ${partnerCities.profitRatioStage3Partner}
+              ELSE NULL
+            END
+          `.as('costShareRatio'),
+        })
+        .from(partnerCities)
+        .where(eq(partnerCities.cityId, input.cityId))
+        .limit(1);
+      
+      // 计算合伙人承担 = 总费用 × 费用分摄比例 / 100
+      const costShareRatio = partnerCityInfo[0]?.costShareRatio ? parseFloat(partnerCityInfo[0].costShareRatio) : 0;
+      const partnerShare = (parseFloat(totalExpense) * costShareRatio / 100).toFixed(2);
+      
       // 检查是否已存在该城市该月份的记录
       const existing = await db
         .select()
@@ -208,6 +229,7 @@ export const cityExpenseRouter = router({
             teacherFee,
             transportFee,
             totalExpense,
+            partnerShare,
             notes: input.notes,
             uploadedBy: ctx.user.id,
           })
@@ -233,6 +255,7 @@ export const cityExpenseRouter = router({
           teacherFee,
           transportFee,
           totalExpense,
+          partnerShare,
           notes: input.notes,
           uploadedBy: ctx.user.id,
         });

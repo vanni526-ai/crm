@@ -2663,3 +2663,13 @@
 - [x] 在CityExpenseManagement.tsx表格中添加“合伙人承担”列显示partnerShare字段
 - [x] 测试验证显示效果(表格正确显示合伙人承担列,位置在总费用之后)
 - [x] 保存检查点并交付
+
+### 142. 检查费用账单列表中合伙人承担的计算公式
+- [x] 检查cityExpenseRouter.ts中 partnerShare字段的计算逻辑(发现没有计算partnerShare)
+- [x] 在cityExpenseRouter.ts的upsert方法中添加partnerShare自动计算逻辑
+- [x] 确认合伙人承担的计算公式: partnerShare = totalExpense × costShareRatio / 100
+- [x] 实现自动计算功能(通过JOIN partnerCities表获取费用分摄比例)
+- [x] 浏览器测试验证(宁波30%: 2500×030% = 750✓, 济南30%: 6350×030% = 1905✓)
+- [x] 编写单元测试(3个测试用例: 30%, 40%, 10%费用分摄比例)
+- [x] 所有测试通过(3/3 passed)
+- [x] 保存检查点并交付
