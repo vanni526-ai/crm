@@ -1101,4 +1101,97 @@ export const partnerManagementRouter = router({
         });
       }
     }),
+
+  /**
+   * 获取城市的费用承担配置
+   */
+  getCityExpenseCoverage: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      const result = await db
+        .select({
+          expenseCoverage: partnerCities.expenseCoverage,
+        })
+        .from(partnerCities)
+        .where(and(
+          eq(partnerCities.partnerId, input.partnerId),
+          eq(partnerCities.cityId, input.cityId)
+        ))
+        .limit(1);
+      
+      if (result.length === 0) {
+        return null;
+      }
+      
+      return result[0].expenseCoverage || {};
+    }),
+
+  /**
+   * 更新城市的费用承担配置
+   */
+  updateCityExpenseCoverage: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number(),
+      expenseCoverage: z.object({
+        rentFee: z.boolean().optional(),
+        propertyFee: z.boolean().optional(),
+        utilityFee: z.boolean().optional(),
+        consumablesFee: z.boolean().optional(),
+        cleaningFee: z.boolean().optional(),
+        phoneFee: z.boolean().optional(),
+        deferredPayment: z.boolean().optional(),
+        courierFee: z.boolean().optional(),
+        promotionFee: z.boolean().optional(),
+        teacherFee: z.boolean().optional(),
+        transportFee: z.boolean().optional(),
+        otherFee: z.boolean().optional(),
+      }),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      try {
+        // 查询是否存在该合伙人-城市关联
+        const existing = await db
+          .select()
+          .from(partnerCities)
+          .where(and(
+            eq(partnerCities.partnerId, input.partnerId),
+            eq(partnerCities.cityId, input.cityId)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "未找到该合伙人-城市关联记录",
+          });
+        }
+        
+        // 更新费用承担配置
+        await db
+          .update(partnerCities)
+          .set({
+            expenseCoverage: input.expenseCoverage,
+            updatedBy: ctx.user.id,
+          })
+          .where(eq(partnerCities.id, existing[0].id));
+        
+        return { success: true };
+      } catch (error: any) {
+        console.error("更新费用承担配置失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `更新失败: ${error.message}`,
+        });
+      }
+    }),
 });

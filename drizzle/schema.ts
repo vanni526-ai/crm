@@ -765,11 +765,26 @@ export const partnerCities = mysqlTable("partner_cities", {
   totalEstimatedCost: decimal("totalEstimatedCost", { precision: 10, scale: 2 }).default("0.00"), // 总预估成本
   
   // 收款账户信息
-  partnerBankName: varchar("partnerBankName", { length: 200 }), // 合伙人开户行
-  partnerBankAccount: varchar("partnerBankAccount", { length: 100 }), // 合伙人银行账号
-  partnerAccountHolder: varchar("partnerAccountHolder", { length: 100 }), // 合伙人账户名
-  partnerAlipayAccount: varchar("partnerAlipayAccount", { length: 100 }), // 合伙人支付宝账号
+  partnerAccountHolder: varchar("partnerAccountHolder", { length: 100 }), // 收款人姓名
+  partnerBankName: varchar("partnerBankName", { length: 200 }), // 开户行
+  partnerBankAccount: varchar("partnerBankAccount", { length: 50 }), // 银行账号
   partnerWechatAccount: varchar("partnerWechatAccount", { length: 100 }), // 合伙人微信账号
+  
+  // 费用承担配置（城市级别）
+  expenseCoverage: json("expenseCoverage").$type<{
+    rentFee?: boolean;           // 房租
+    propertyFee?: boolean;       // 物业费
+    utilityFee?: boolean;        // 水电费
+    consumablesFee?: boolean;    // 道具耗材
+    cleaningFee?: boolean;       // 保洁费
+    phoneFee?: boolean;          // 话费
+    deferredPayment?: boolean;   // 合同后付款
+    courierFee?: boolean;        // 快递费
+    promotionFee?: boolean;      // 推广费
+    teacherFee?: boolean;        // 老师费用
+    transportFee?: boolean;      // 车费
+    otherFee?: boolean;          // 其他费用
+  }>(),
   
   // 运营信息
   legalRepresentative: varchar("legalRepresentative", { length: 100 }), // 法人代表

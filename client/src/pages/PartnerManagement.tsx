@@ -15,6 +15,7 @@ import ContractInfoEditor from "@/components/ContractInfoEditor";
 import PartnerInfoTab from "@/components/PartnerInfoTab";
 import CreatePartnerDialog from "@/components/CreatePartnerDialog";
 import { ExpenseCoverageTab } from "@/components/ExpenseCoverageTab";
+import { CityExpenseCoveragePanel } from "@/components/CityExpenseCoveragePanel";
 
 export default function PartnerManagement() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
@@ -303,50 +304,70 @@ export default function PartnerManagement() {
 
                   {/* 城市管理Tab */}
                   <TabsContent value="cities" className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-semibold">关联城市</h3>
-                    </div>
-                    <div className="space-y-2">
-                      {partnerCities && partnerCities.length > 0 ? (
-                        partnerCities.map((city) => {
-                          // 计算合同剩余有效期
-                          let remainingDays: number | null = null;
-                          if (city.contractEndDate) {
-                            const endDate = new Date(city.contractEndDate);
-                            const today = new Date();
-                            const diffTime = endDate.getTime() - today.getTime();
-                            remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                          }
-                          
-                          return (
-                            <div
-                              key={city.id}
-                              className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                                selectedCityId === city.cityId
-                                  ? "bg-primary/10 border-primary"
-                                  : "hover:bg-accent"
-                              }`}
-                              onClick={() => setSelectedCityId(city.cityId)}
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="font-medium">{city.cityName}</div>
-                                {remainingDays !== null && (
-                                  <Badge variant={remainingDays > 90 ? "default" : remainingDays > 30 ? "secondary" : "destructive"}>
-                                    {remainingDays > 0 ? `剩余${remainingDays}天` : "已过期"}
-                                  </Badge>
-                                )}
-                              </div>
-                              <div className="text-sm text-muted-foreground mt-1">
-                                点击查看合同信息
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="text-center text-muted-foreground py-8">
-                          该合伙人暂未关联城市
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      {/* 左侧：城市列表 */}
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-lg font-semibold">关联城市</h3>
                         </div>
-                      )}
+                        <div className="space-y-2">
+                          {partnerCities && partnerCities.length > 0 ? (
+                            partnerCities.map((city) => {
+                              // 计算合同剩余有效期
+                              let remainingDays: number | null = null;
+                              if (city.contractEndDate) {
+                                const endDate = new Date(city.contractEndDate);
+                                const today = new Date();
+                                const diffTime = endDate.getTime() - today.getTime();
+                                remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                              }
+                              
+                              return (
+                                <div
+                                  key={city.id}
+                                  className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                                    selectedCityId === city.cityId
+                                      ? "bg-primary/10 border-primary"
+                                      : "hover:bg-accent"
+                                  }`}
+                                  onClick={() => setSelectedCityId(city.cityId)}
+                                >
+                                  <div className="flex justify-between items-start">
+                                    <div className="font-medium">{city.cityName}</div>
+                                    {remainingDays !== null && (
+                                      <Badge variant={remainingDays > 90 ? "default" : remainingDays > 30 ? "secondary" : "destructive"}>
+                                        {remainingDays > 0 ? `剩余${remainingDays}天` : "已过期"}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground mt-1">
+                                    点击查看费用承担配置
+                                  </div>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <div className="text-center text-muted-foreground py-8">
+                              该合伙人暂未关联城市
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* 右侧：城市费用承担配置 */}
+                      <div>
+                        {selectedCityId ? (
+                          <CityExpenseCoveragePanel 
+                            partnerId={selectedPartnerId} 
+                            cityId={selectedCityId}
+                            cityName={partnerCities?.find(c => c.cityId === selectedCityId)?.cityName || ""}
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full border rounded-lg bg-muted/20">
+                            <p className="text-muted-foreground">请先在左侧选择一个城市</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </TabsContent>
 

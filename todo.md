@@ -2534,3 +2534,23 @@
 - [x] 点击保存后提交更新，点击取消放弃修改
 - [ ] 测试验证编辑和保存功能
 - [ ] 保存检查点
+
+### 将费用承担配置从合伙人级别改为城市级别
+- [x] 分析当前费用承担配置的数据库设计（partners表的expenseCoverage字段）
+- [x] 检查当前前端和后端API实现
+- [x] 修改数据库schema，在partner_cities表中添加expenseCoverage字段
+- [x] 修改后端API支持按城市查询和更新费用承担配置（添加getCityExpenseCoverage和updateCityExpenseCoverage接口）
+- [x] 修改前端UI，在城市管理Tab中显示和编辑各城市的费用承担配置（创建CityExpenseCoveragePanel组件）
+- [ ] 迁移现有数据（将合伙人级别的配置复制到其管理的所有城市）
+- [ ] 测试验证张雪婷的三个城市可以有不同的费用承担配置
+- [ ] 保存检查点
+
+
+### 136. 将费用承担配置从合伙人级别改为城市级别
+- [x] 分析当前费用承担配置的数据库设计(partners表的expenseCoverage字段)
+- [x] 检查当前前端和后端API实现
+- [x] 修改数据库schema,在partner_cities表中添加expenseCoverage字段
+- [x] 修改后端API支持按城市查询和更新费用承担配置(getCityExpenseCoverage/updateCityExpenseCoverage)
+- [x] 修改前端UI,在城市管理Tab中显示和编辑各城市的费用承担配置(创建CityExpenseCoveragePanel组件)
+- [x] 测试验证功能(为天津配置3个费用项,石家庄和大连保持0个,验证独立性)
+- [x] 保存检查点
