@@ -62,6 +62,8 @@ export default function VenueContractCard({ partnerCityId, contractData, onUpdat
     },
   });
 
+  const uploadFileMutation = trpc.upload.uploadFile.useMutation();
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -73,21 +75,22 @@ export default function VenueContractCard({ partnerCityId, contractData, onUpdat
 
     setUploading(true);
     try {
-      // 创建FormData并上传到S3
-      const formDataToUpload = new FormData();
-      formDataToUpload.append("file", file);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formDataToUpload,
+      // 将文件转换为base64
+      const reader = new FileReader();
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
 
-      if (!response.ok) {
-        throw new Error("文件上传失败");
-      }
+      // 使用tRPC上传文件
+      const result = await uploadFileMutation.mutateAsync({
+        base64Data,
+        fileName: file.name,
+        fileType: file.type,
+      });
 
-      const { url } = await response.json();
-      setFormData((prev) => ({ ...prev, venueContractFileUrl: url }));
+      setFormData((prev) => ({ ...prev, venueContractFileUrl: result.url }));
       toast.success("合同文件上传成功");
     } catch (error: any) {
       toast.error(`上传失败: ${error.message}`);

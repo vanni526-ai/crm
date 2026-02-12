@@ -1,0 +1,20 @@
+{
+  "query": "SELECT pc.id, c.name as cityName, pc.venueRentAmount, pc.venueDeposit, pc.venueLeaseStartDate, pc.venueLeaseEndDate, pc.venuePaymentCycle, pc.venueContractFileUrl FROM partner_cities pc JOIN cities c ON pc.cityId = c.id WHERE c.name LIKE '%宁波%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT pc.id, c.name as cityName, pc.venueRentAmount, pc.venueDeposit, pc.venueLeaseStartDate, pc.venueLeaseEndDate, pc.venuePaymentCycle, pc.venueContractFileUrl FROM partner_cities pc JOIN cities c ON pc.cityId = c.id WHERE c.name LIKE '%宁波%';",
+  "rows": [
+    {
+      "id": "41",
+      "cityName": "宁波",
+      "venueRentAmount": "5000.00",
+      "venueDeposit": "10000.00",
+      "venueLeaseStartDate": "2025-12-31",
+      "venueLeaseEndDate": "2026-12-30",
+      "venuePaymentCycle": "quarterly",
+      "venueContractFileUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663214896586/jtCSa4Dgw9WMNzinVreVWF/uploads/1770895251958-8vhbdo.pdf"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcityName\tvenueRentAmount\tvenueDeposit\tvenueLeaseStartDate\tvenueLeaseEndDate\tvenuePaymentCycle\tvenueContractFileUrl\n41\t宁波\t5000.00\t10000.00\t2025-12-31\t2026-12-30\tquarterly\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663214896586/jtCSa4Dgw9WMNzinVreVWF/uploads/1770895251958-8vhbdo.pdf\n",
+  "stderr": "",
+  "execution_time_ms": 1531
+}

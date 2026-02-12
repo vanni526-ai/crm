@@ -2703,15 +2703,16 @@
 - [x] 确认编辑保存后自动更新(已实现)
 
 ### 146. 在合伙人管理中增加"场地合同"功能
-- [ ] 更新partnerCities表schema添加场地合同字段(rentAmount, deposit, leaseStartDate, leaseEndDate, paymentCycle, contractFileUrl)
-- [ ] 运行数据库迁移
-- [ ] 实现后端API支持场地合同的CRUD操作
-- [ ] 实现文件上传功能(使用S3存储合同文件)
-- [ ] 实现下次支付日期自动计算逻辑(根据起租日期和付款方式)
-- [ ] 修改合伙人管理页面UI添加场地合同卡片和编辑对话框
-- [ ] 场地合同带有独立的编辑和保存按钮
-- [ ] 测试验证功能(文件上传、查看、数据保存、日期计算)
-- [ ] 保存检查点并交付
+- [x] 更新partnerCities表schema添加场地合同字段(rentAmount, deposit, leaseStartDate, leaseEndDate, paymentCycle, contractFileUrl)
+- [x] 运行数据库迁移(db:push成功)
+- [x] 实现后端API支持场地合同的CRUD操作(updateVenueContract)
+- [x] 实现文件上传功能(使用tRPC upload.uploadFile上传到S3)
+- [x] 实现下次支付日期自动计算逻辑(根据起租日期和付款方式)
+- [x] 修改合伙人管理页面UI添加场地合同卡片和编辑对话框(VenueContractCard组件)
+- [x] 场地合同带有独立的编辑和保存按钮
+- [x] 测试验证功能(文件上传、查看、数据保存、日期计算)
+- [x] 删除测试数据
+- [x] 保存检查点并交付
 
 ### 147. 修复城市费用账单管理列表中车费和老师费用列背景色显示为白色的问题
 - [x] 检查CityExpenseManagement.tsx中车费和老师费用列的样式设置(发现bg-blue-50样式类)

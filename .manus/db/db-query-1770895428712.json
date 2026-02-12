@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE partner_cities SET venueContractFileUrl = NULL, venueRentAmount = NULL, venueDeposit = NULL, venueLeaseStartDate = NULL, venueLeaseEndDate = NULL, venuePaymentCycle = NULL WHERE id IN (SELECT pc.id FROM partner_cities pc JOIN cities c ON pc.cityId = c.id WHERE c.name LIKE '%宁波%');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE partner_cities SET venueContractFileUrl = NULL, venueRentAmount = NULL, venueDeposit = NULL, venueLeaseStartDate = NULL, venueLeaseEndDate = NULL, venuePaymentCycle = NULL WHERE id IN (SELECT pc.id FROM partner_cities pc JOIN cities c ON pc.cityId = c.id WHERE c.name LIKE '%宁波%');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1602
+}
