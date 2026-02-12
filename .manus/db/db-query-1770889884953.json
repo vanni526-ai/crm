@@ -1,0 +1,178 @@
+{
+  "query": "SELECT \n  deliveryCity,\n  COUNT(*) as orderCount,\n  SUM(teacherFee) as totalTeacherFee,\n  SUM(transportFee) as totalTransportFee\nFROM orders\nWHERE classDate >= '2026-01-01' AND classDate <= '2026-01-31'\nGROUP BY deliveryCity\nORDER BY deliveryCity;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  deliveryCity,\n  COUNT(*) as orderCount,\n  SUM(teacherFee) as totalTeacherFee,\n  SUM(transportFee) as totalTransportFee\nFROM orders\nWHERE classDate >= '2026-01-01' AND classDate <= '2026-01-31'\nGROUP BY deliveryCity\nORDER BY deliveryCity;",
+  "rows": [
+    {
+      "deliveryCity": "",
+      "orderCount": "17",
+      "totalTeacherFee": "6004.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "上海",
+      "orderCount": "92",
+      "totalTeacherFee": "37685.00",
+      "totalTransportFee": "750.00"
+    },
+    {
+      "deliveryCity": "东莞",
+      "orderCount": "4",
+      "totalTeacherFee": "1500.00",
+      "totalTransportFee": "200.00"
+    },
+    {
+      "deliveryCity": "互联网课",
+      "orderCount": "15",
+      "totalTeacherFee": "1750.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "北京",
+      "orderCount": "7",
+      "totalTeacherFee": "5430.00",
+      "totalTransportFee": "300.00"
+    },
+    {
+      "deliveryCity": "南京",
+      "orderCount": "14",
+      "totalTeacherFee": "5850.00",
+      "totalTransportFee": "500.00"
+    },
+    {
+      "deliveryCity": "合肥",
+      "orderCount": "1",
+      "totalTeacherFee": "1410.00",
+      "totalTransportFee": "800.00"
+    },
+    {
+      "deliveryCity": "大连",
+      "orderCount": "1",
+      "totalTeacherFee": "500.00",
+      "totalTransportFee": "100.00"
+    },
+    {
+      "deliveryCity": "天津",
+      "orderCount": "29",
+      "totalTeacherFee": "14845.00",
+      "totalTransportFee": "1050.00"
+    },
+    {
+      "deliveryCity": "宁波",
+      "orderCount": "9",
+      "totalTeacherFee": "3700.00",
+      "totalTransportFee": "300.00"
+    },
+    {
+      "deliveryCity": "安徽",
+      "orderCount": "1",
+      "totalTeacherFee": "720.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "广州",
+      "orderCount": "4",
+      "totalTeacherFee": "4890.00",
+      "totalTransportFee": "750.00"
+    },
+    {
+      "deliveryCity": "待定",
+      "orderCount": "1",
+      "totalTeacherFee": "500.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "成都",
+      "orderCount": "2",
+      "totalTeacherFee": "5260.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "无锡",
+      "orderCount": "3",
+      "totalTeacherFee": "1300.00",
+      "totalTransportFee": "100.00"
+    },
+    {
+      "deliveryCity": "杭州",
+      "orderCount": "5",
+      "totalTeacherFee": "6330.00",
+      "totalTransportFee": "800.00"
+    },
+    {
+      "deliveryCity": "武汉",
+      "orderCount": "10",
+      "totalTeacherFee": "3200.00",
+      "totalTransportFee": "100.00"
+    },
+    {
+      "deliveryCity": "沈阳",
+      "orderCount": "1",
+      "totalTeacherFee": "1470.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "河南南阳",
+      "orderCount": "1",
+      "totalTeacherFee": "1500.00",
+      "totalTransportFee": "1500.00"
+    },
+    {
+      "deliveryCity": "泉州",
+      "orderCount": "6",
+      "totalTeacherFee": "2900.00",
+      "totalTransportFee": "400.00"
+    },
+    {
+      "deliveryCity": "济南",
+      "orderCount": "6",
+      "totalTeacherFee": "5000.00",
+      "totalTransportFee": "1200.00"
+    },
+    {
+      "deliveryCity": "淮安",
+      "orderCount": "1",
+      "totalTeacherFee": "1800.00",
+      "totalTransportFee": "800.00"
+    },
+    {
+      "deliveryCity": "深圳",
+      "orderCount": "8",
+      "totalTeacherFee": "7860.00",
+      "totalTransportFee": "1800.00"
+    },
+    {
+      "deliveryCity": "石家庄",
+      "orderCount": "3",
+      "totalTeacherFee": "1300.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "福州",
+      "orderCount": "5",
+      "totalTeacherFee": "1850.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "苏州",
+      "orderCount": "12",
+      "totalTeacherFee": "10250.00",
+      "totalTransportFee": "200.00"
+    },
+    {
+      "deliveryCity": "郑州",
+      "orderCount": "2",
+      "totalTeacherFee": "600.00",
+      "totalTransportFee": "0.00"
+    },
+    {
+      "deliveryCity": "重庆",
+      "orderCount": "5",
+      "totalTeacherFee": "7410.00",
+      "totalTransportFee": "2500.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "deliveryCity\torderCount\ttotalTeacherFee\ttotalTransportFee\n\t17\t6004.00\t0.00\n上海\t92\t37685.00\t750.00\n东莞\t4\t1500.00\t200.00\n互联网课\t15\t1750.00\t0.00\n北京\t7\t5430.00\t300.00\n南京\t14\t5850.00\t500.00\n合肥\t1\t1410.00\t800.00\n大连\t1\t500.00\t100.00\n天津\t29\t14845.00\t1050.00\n宁波\t9\t3700.00\t300.00\n安徽\t1\t720.00\t0.00\n广州\t4\t4890.00\t750.00\n待定\t1\t500.00\t0.00\n成都\t2\t5260.00\t0.00\n无锡\t3\t1300.00\t100.00\n杭州\t5\t6330.00\t800.00\n武汉\t10\t3200.00\t100.00\n沈阳\t1\t1470.00\t0.00\n河南南阳\t1\t1500.00\t1500.00\n泉州\t6\t2900.00\t400.00\n济南\t6\t5000.00\t1200.00\n淮安\t1\t1800.00\t800.00\n深圳\t8\t7860.00\t1800.00\n石家庄\t3\t1300.00\t0.00\n福州\t5\t1850.00\t0.00\n苏州\t12\t10250.00\t200.00\n郑州\t2\t600.00\t0.00\n重庆\t5\t7410.00\t2500.00\n",
+  "stderr": "",
+  "execution_time_ms": 1712
+}

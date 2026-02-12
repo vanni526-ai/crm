@@ -1,0 +1,9 @@
+{
+  "query": "SELECT \n  deliveryCity,\n  COUNT(*) as orderCount,\n  SUM(teacherFee) as totalTeacherFee,\n  SUM(transportFee) as totalTransportFee\nFROM orders\nWHERE classDate >= '2025-01-01' AND classDate <= '2025-01-31'\nGROUP BY deliveryCity\nORDER BY deliveryCity\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  deliveryCity,\n  COUNT(*) as orderCount,\n  SUM(teacherFee) as totalTeacherFee,\n  SUM(transportFee) as totalTransportFee\nFROM orders\nWHERE classDate >= '2025-01-01' AND classDate <= '2025-01-31'\nGROUP BY deliveryCity\nORDER BY deliveryCity\nLIMIT 20;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1731
+}

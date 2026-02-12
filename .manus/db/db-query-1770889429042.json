@@ -1,0 +1,52 @@
+{
+  "query": "-- 查看orders表中的总记录数\nSELECT COUNT(*) as totalOrders FROM orders;\n\n-- 查看classDate不为空的记录数\nSELECT COUNT(*) as ordersWithClassDate FROM orders WHERE classDate IS NOT NULL AND classDate != '';\n\n-- 查看前10条订单的关键字段\nSELECT id, deliveryCity, classDate, paymentDate, teacherFee, transportFee \nFROM orders \nORDER BY id DESC \nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 查看orders表中的总记录数\nSELECT COUNT(*) as totalOrders FROM orders;\n\n-- 查看classDate不为空的记录数\nSELECT COUNT(*) as ordersWithClassDate FROM orders WHERE classDate IS NOT NULL AND classDate != '';\n\n-- 查看前10条订单的关键字段\nSELECT id, deliveryCity, classDate, paymentDate, teacherFee, transportFee \nFROM orders \nORDER BY id DESC \nLIMIT 10;",
+  "rows": [
+    {
+      "totalOrders": "415"
+    },
+    {
+      "totalOrders": "ordersWithClassDate"
+    },
+    {
+      "totalOrders": "0"
+    },
+    {
+      "totalOrders": "id\tdeliveryCity\tclassDate\tpaymentDate\tteacherFee\ttransportFee"
+    },
+    {
+      "totalOrders": "2400040\t石家庄\t2026-02-11\tNULL\t300.00\t0.00"
+    },
+    {
+      "totalOrders": "2400039\t宁波\t2026-02-10\tNULL\t300.00\t100.00"
+    },
+    {
+      "totalOrders": "2400038\t上海\t2026-02-10\tNULL\t300.00\t0.00"
+    },
+    {
+      "totalOrders": "2400037\t上海\t2026-02-06\tNULL\t400.00\t0.00"
+    },
+    {
+      "totalOrders": "2400036\t上海\t2026-02-10\tNULL\t400.00\t0.00"
+    },
+    {
+      "totalOrders": "2400035\t上海\t2026-02-10\tNULL\t300.00\t0.00"
+    },
+    {
+      "totalOrders": "2400034\t苏州\t2026-02-08\tNULL\t4000.00\t0.00"
+    },
+    {
+      "totalOrders": "2400033\t郑州\t2026-02-10\tNULL\t200.00\t0.00"
+    },
+    {
+      "totalOrders": "2400032\t深圳\t2026-02-12\tNULL\t850.00\t350.00"
+    },
+    {
+      "totalOrders": "2400031\t深圳\t2026-02-11\tNULL\t400.00\t0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "totalOrders\n415\nordersWithClassDate\n0\nid\tdeliveryCity\tclassDate\tpaymentDate\tteacherFee\ttransportFee\n2400040\t石家庄\t2026-02-11\tNULL\t300.00\t0.00\n2400039\t宁波\t2026-02-10\tNULL\t300.00\t100.00\n2400038\t上海\t2026-02-10\tNULL\t300.00\t0.00\n2400037\t上海\t2026-02-06\tNULL\t400.00\t0.00\n2400036\t上海\t2026-02-10\tNULL\t400.00\t0.00\n2400035\t上海\t2026-02-10\tNULL\t300.00\t0.00\n2400034\t苏州\t2026-02-08\tNULL\t4000.00\t0.00\n2400033\t郑州\t2026-02-10\tNULL\t200.00\t0.00\n2400032\t深圳\t2026-02-12\tNULL\t850.00\t350.00\n2400031\t深圳\t2026-02-11\tNULL\t400.00\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 2277
+}

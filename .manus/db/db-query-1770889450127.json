@@ -1,0 +1,210 @@
+{
+  "query": "SELECT id, deliveryCity, classDate, paymentDate, classTime, paymentTime, teacherFee, transportFee \nFROM orders \nWHERE teacherFee > 0 OR transportFee > 0\nORDER BY id DESC \nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, deliveryCity, classDate, paymentDate, classTime, paymentTime, teacherFee, transportFee \nFROM orders \nWHERE teacherFee > 0 OR transportFee > 0\nORDER BY id DESC \nLIMIT 20;",
+  "rows": [
+    {
+      "id": "2400040",
+      "deliveryCity": "石家庄",
+      "classDate": "2026-02-11",
+      "paymentDate": "NULL",
+      "classTime": "20:00-21:00",
+      "paymentTime": "NULL",
+      "teacherFee": "300.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400039",
+      "deliveryCity": "宁波",
+      "classDate": "2026-02-10",
+      "paymentDate": "NULL",
+      "classTime": "21:10-22:10",
+      "paymentTime": "NULL",
+      "teacherFee": "300.00",
+      "transportFee": "100.00"
+    },
+    {
+      "id": "2400038",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-10",
+      "paymentDate": "NULL",
+      "classTime": "16:30-17:30",
+      "paymentTime": "NULL",
+      "teacherFee": "300.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400037",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-06",
+      "paymentDate": "NULL",
+      "classTime": "15:30-16:30",
+      "paymentTime": "NULL",
+      "teacherFee": "400.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400036",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-10",
+      "paymentDate": "NULL",
+      "classTime": "15:30-16:30",
+      "paymentTime": "NULL",
+      "teacherFee": "400.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400035",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-10",
+      "paymentDate": "NULL",
+      "classTime": "15:00-16:00",
+      "paymentTime": "NULL",
+      "teacherFee": "300.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400034",
+      "deliveryCity": "苏州",
+      "classDate": "2026-02-08",
+      "paymentDate": "NULL",
+      "classTime": "20:00-21:30",
+      "paymentTime": "NULL",
+      "teacherFee": "4000.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400033",
+      "deliveryCity": "郑州",
+      "classDate": "2026-02-10",
+      "paymentDate": "NULL",
+      "classTime": "21:00-22:00",
+      "paymentTime": "NULL",
+      "teacherFee": "200.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400032",
+      "deliveryCity": "深圳",
+      "classDate": "2026-02-12",
+      "paymentDate": "NULL",
+      "classTime": "19:30-20:30",
+      "paymentTime": "NULL",
+      "teacherFee": "850.00",
+      "transportFee": "350.00"
+    },
+    {
+      "id": "2400031",
+      "deliveryCity": "深圳",
+      "classDate": "2026-02-11",
+      "paymentDate": "NULL",
+      "classTime": "19:00-21:00",
+      "paymentTime": "NULL",
+      "teacherFee": "400.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400030",
+      "deliveryCity": "深圳",
+      "classDate": "2026-02-08",
+      "paymentDate": "NULL",
+      "classTime": "14:30-15:30",
+      "paymentTime": "NULL",
+      "teacherFee": "125.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400029",
+      "deliveryCity": "",
+      "classDate": "2026-02-08",
+      "paymentDate": "NULL",
+      "classTime": "13:00-14:00",
+      "paymentTime": "NULL",
+      "teacherFee": "400.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400027",
+      "deliveryCity": "宁波",
+      "classDate": "2026-02-08",
+      "paymentDate": "NULL",
+      "classTime": "18:30-20:30",
+      "paymentTime": "NULL",
+      "teacherFee": "500.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400026",
+      "deliveryCity": "深圳",
+      "classDate": "2026-02-09",
+      "paymentDate": "NULL",
+      "classTime": "12:00-13:30",
+      "paymentTime": "NULL",
+      "teacherFee": "300.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400025",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-19",
+      "paymentDate": "NULL",
+      "classTime": "14:00-15:00",
+      "paymentTime": "NULL",
+      "teacherFee": "300.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400023",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-09",
+      "paymentDate": "NULL",
+      "classTime": "15:00-16:00",
+      "paymentTime": "NULL",
+      "teacherFee": "410.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400022",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-10",
+      "paymentDate": "NULL",
+      "classTime": "13:00-13:30",
+      "paymentTime": "NULL",
+      "teacherFee": "50.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400021",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-11",
+      "paymentDate": "NULL",
+      "classTime": "13:30-15:30",
+      "paymentTime": "NULL",
+      "teacherFee": "600.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400020",
+      "deliveryCity": "上海",
+      "classDate": "2026-02-09",
+      "paymentDate": "NULL",
+      "classTime": "17:00-19:00",
+      "paymentTime": "NULL",
+      "teacherFee": "600.00",
+      "transportFee": "0.00"
+    },
+    {
+      "id": "2400019",
+      "deliveryCity": "成都",
+      "classDate": "2026-02-24",
+      "paymentDate": "NULL",
+      "classTime": "15:00-17:00",
+      "paymentTime": "NULL",
+      "teacherFee": "720.00",
+      "transportFee": "0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdeliveryCity\tclassDate\tpaymentDate\tclassTime\tpaymentTime\tteacherFee\ttransportFee\n2400040\t石家庄\t2026-02-11\tNULL\t20:00-21:00\tNULL\t300.00\t0.00\n2400039\t宁波\t2026-02-10\tNULL\t21:10-22:10\tNULL\t300.00\t100.00\n2400038\t上海\t2026-02-10\tNULL\t16:30-17:30\tNULL\t300.00\t0.00\n2400037\t上海\t2026-02-06\tNULL\t15:30-16:30\tNULL\t400.00\t0.00\n2400036\t上海\t2026-02-10\tNULL\t15:30-16:30\tNULL\t400.00\t0.00\n2400035\t上海\t2026-02-10\tNULL\t15:00-16:00\tNULL\t300.00\t0.00\n2400034\t苏州\t2026-02-08\tNULL\t20:00-21:30\tNULL\t4000.00\t0.00\n2400033\t郑州\t2026-02-10\tNULL\t21:00-22:00\tNULL\t200.00\t0.00\n2400032\t深圳\t2026-02-12\tNULL\t19:30-20:30\tNULL\t850.00\t350.00\n2400031\t深圳\t2026-02-11\tNULL\t19:00-21:00\tNULL\t400.00\t0.00\n2400030\t深圳\t2026-02-08\tNULL\t14:30-15:30\tNULL\t125.00\t0.00\n2400029\t\t2026-02-08\tNULL\t13:00-14:00\tNULL\t400.00\t0.00\n2400027\t宁波\t2026-02-08\tNULL\t18:30-20:30\tNULL\t500.00\t0.00\n2400026\t深圳\t2026-02-09\tNULL\t12:00-13:30\tNULL\t300.00\t0.00\n2400025\t上海\t2026-02-19\tNULL\t14:00-15:00\tNULL\t300.00\t0.00\n2400023\t上海\t2026-02-09\tNULL\t15:00-16:00\tNULL\t410.00\t0.00\n2400022\t上海\t2026-02-10\tNULL\t13:00-13:30\tNULL\t50.00\t0.00\n2400021\t上海\t2026-02-11\tNULL\t13:30-15:30\tNULL\t600.00\t0.00\n2400020\t上海\t2026-02-09\tNULL\t17:00-19:00\tNULL\t600.00\t0.00\n2400019\t成都\t2026-02-24\tNULL\t15:00-17:00\tNULL\t720.00\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 1672
+}
