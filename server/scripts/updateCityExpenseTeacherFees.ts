@@ -43,6 +43,8 @@ async function updateCityExpenseTeacherFees() {
           ELSE NULL
         END
       `.as('costShareRatio'),
+      // 费用承担配置
+      expenseCoverage: partnerCities.expenseCoverage,
     })
     .from(cityMonthlyExpenses)
     .leftJoin(cities, eq(cityMonthlyExpenses.cityId, cities.id))
@@ -80,9 +82,25 @@ async function updateCityExpenseTeacherFees() {
         parseFloat(transportFee)
       ).toFixed(2);
 
-      // 计算合伙人承担 = 总费用 × 费用分摄比例 / 100
+      // 计算合伙人承担 = 勾选费用总和 × 费用分摄比例 / 100
       const costShareRatio = parseFloat(expense.costShareRatio || "0");
-      const partnerShare = (parseFloat(totalExpense) * costShareRatio / 100).toFixed(2);
+      const expenseCoverage = expense.expenseCoverage || {};
+      
+      // 只计算被勾选的费用项目
+      let coveredExpenseTotal = 0;
+      if (expenseCoverage.rentFee) coveredExpenseTotal += parseFloat(expense.rentFee || "0");
+      if (expenseCoverage.propertyFee) coveredExpenseTotal += parseFloat(expense.propertyFee || "0");
+      if (expenseCoverage.utilityFee) coveredExpenseTotal += parseFloat(expense.utilityFee || "0");
+      if (expenseCoverage.consumablesFee) coveredExpenseTotal += parseFloat(expense.consumablesFee || "0");
+      if (expenseCoverage.cleaningFee) coveredExpenseTotal += parseFloat(expense.cleaningFee || "0");
+      if (expenseCoverage.phoneFee) coveredExpenseTotal += parseFloat(expense.phoneFee || "0");
+      if (expenseCoverage.courierFee) coveredExpenseTotal += parseFloat(expense.expressFee || "0");
+      if (expenseCoverage.promotionFee) coveredExpenseTotal += parseFloat(expense.promotionFee || "0");
+      if (expenseCoverage.otherFee) coveredExpenseTotal += parseFloat(expense.otherFee || "0");
+      if (expenseCoverage.teacherFee) coveredExpenseTotal += parseFloat(teacherFee);
+      if (expenseCoverage.transportFee) coveredExpenseTotal += parseFloat(transportFee);
+      
+      const partnerShare = (coveredExpenseTotal * costShareRatio / 100).toFixed(2);
 
       console.log(`  总费用: ${totalExpense}, 合伙人承担: ${partnerShare} (${costShareRatio}%)`);
 

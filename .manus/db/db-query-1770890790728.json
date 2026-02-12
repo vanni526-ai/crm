@@ -1,0 +1,15 @@
+{
+  "query": "SELECT \n  c.name as cityName,\n  pc.expenseCoverage,\n  pc.profitRatioStage1Partner as costShareRatio\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '泉州';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  c.name as cityName,\n  pc.expenseCoverage,\n  pc.profitRatioStage1Partner as costShareRatio\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '泉州';",
+  "rows": [
+    {
+      "cityName": "泉州",
+      "expenseCoverage": "{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}",
+      "costShareRatio": "30.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "cityName\texpenseCoverage\tcostShareRatio\n泉州\t{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\t30.00\n",
+  "stderr": "",
+  "execution_time_ms": 1711
+}
