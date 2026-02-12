@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE partner_cities\nADD COLUMN venueContractFileUrl TEXT COMMENT '场地合同文件URL（S3存储）',\nADD COLUMN venueRentAmount DECIMAL(10, 2) COMMENT '房租金额',\nADD COLUMN venueDeposit DECIMAL(10, 2) COMMENT '押金',\nADD COLUMN venueLeaseStartDate DATE COMMENT '起租日期',\nADD COLUMN venueLeaseEndDate DATE COMMENT '到期日期',\nADD COLUMN venuePaymentCycle ENUM('monthly', 'bimonthly', 'quarterly', 'semiannual', 'annual') COMMENT '付款方式：月付、两月付、季付、半年付、年付';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nALTER TABLE partner_cities\nADD COLUMN venueContractFileUrl TEXT COMMENT '场地合同文件URL（S3存储）',\nADD COLUMN venueRentAmount DECIMAL(10, 2) COMMENT '房租金额',\nADD COLUMN venueDeposit DECIMAL(10, 2) COMMENT '押金',\nADD COLUMN venueLeaseStartDate DATE COMMENT '起租日期',\nADD COLUMN venueLeaseEndDate DATE COMMENT '到期日期',\nADD COLUMN venuePaymentCycle ENUM('monthly', 'bimonthly', 'quarterly', 'semiannual', 'annual') COMMENT '付款方式：月付、两月付、季付、半年付、年付';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 4216
+}

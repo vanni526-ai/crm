@@ -588,8 +588,8 @@ export default function CityExpenseManagement() {
                         <TableCell className="text-right">¥{parseFloat(expense.expressFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">¥{parseFloat(expense.promotionFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">¥{parseFloat(expense.otherFee || "0").toLocaleString()}</TableCell>
-                        <TableCell className="text-right bg-blue-50">¥{parseFloat(expense.teacherFee || "0").toLocaleString()}</TableCell>
-                        <TableCell className="text-right bg-blue-50">¥{parseFloat(expense.transportFee || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right">¥{parseFloat(expense.teacherFee || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right">¥{parseFloat(expense.transportFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right font-semibold">¥{parseFloat(expense.totalExpense || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right text-blue-600 font-medium">¥{parseFloat(expense.partnerShare || "0").toLocaleString()}</TableCell>
                         <TableCell>

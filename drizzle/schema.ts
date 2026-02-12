@@ -775,8 +775,7 @@ export const partnerCities = mysqlTable("partner_cities", {
   partnerBankName: varchar("partnerBankName", { length: 200 }), // 开户行
   partnerBankAccount: varchar("partnerBankAccount", { length: 50 }), // 银行账号
   partnerWechatAccount: varchar("partnerWechatAccount", { length: 100 }), // 合伙人微信账号
-  
-  // 费用承担配置（城市级别）
+    // 费用承担配置（城市级别）
   expenseCoverage: json("expenseCoverage").$type<{
     rentFee?: boolean;           // 房租
     propertyFee?: boolean;       // 物业费
@@ -791,6 +790,14 @@ export const partnerCities = mysqlTable("partner_cities", {
     transportFee?: boolean;      // 车费
     otherFee?: boolean;          // 其他费用
   }>(),
+  
+  // 场地合同信息
+  venueContractFileUrl: text("venueContractFileUrl"), // 场地合同文件URL（S3存储）
+  venueRentAmount: decimal("venueRentAmount", { precision: 10, scale: 2 }), // 房租金额
+  venueDeposit: decimal("venueDeposit", { precision: 10, scale: 2 }), // 押金
+  venueLeaseStartDate: date("venueLeaseStartDate"), // 起租日期
+  venueLeaseEndDate: date("venueLeaseEndDate"), // 到期日期
+  venuePaymentCycle: mysqlEnum("venuePaymentCycle", ["monthly", "bimonthly", "quarterly", "semiannual", "annual"]), // 付款方式：月付、两月付、季付、半年付、年付
   
   // 运营信息
   legalRepresentative: varchar("legalRepresentative", { length: 100 }), // 法人代表

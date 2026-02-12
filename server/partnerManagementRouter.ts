@@ -1214,4 +1214,45 @@ export const partnerManagementRouter = router({
         });
       }
     }),
+
+  /**
+   * 更新场地合同信息
+   */
+  updateVenueContract: protectedProcedure
+    .input(z.object({
+      partnerCityId: z.number(),
+      venueContractFileUrl: z.string().optional(),
+      venueRentAmount: z.number().optional(),
+      venueDeposit: z.number().optional(),
+      venueLeaseStartDate: z.string().optional(),
+      venueLeaseEndDate: z.string().optional(),
+      venuePaymentCycle: z.enum(["monthly", "bimonthly", "quarterly", "semiannual", "annual"]).optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      const {
+        partnerCityId,
+        venueLeaseStartDate,
+        venueLeaseEndDate,
+        venueRentAmount,
+        venueDeposit,
+        ...updateData
+      } = input;
+      
+      await db
+        .update(partnerCities)
+        .set({
+          ...updateData,
+          ...(venueLeaseStartDate ? { venueLeaseStartDate: new Date(venueLeaseStartDate) } : {}),
+          ...(venueLeaseEndDate ? { venueLeaseEndDate: new Date(venueLeaseEndDate) } : {}),
+          ...(venueRentAmount !== undefined ? { venueRentAmount: venueRentAmount.toString() } : {}),
+          ...(venueDeposit !== undefined ? { venueDeposit: venueDeposit.toString() } : {}),
+          updatedBy: ctx.user.id,
+        })
+        .where(eq(partnerCities.id, partnerCityId));
+      
+      return { success: true };
+    }),
 });

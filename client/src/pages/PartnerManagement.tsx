@@ -16,6 +16,7 @@ import PartnerInfoTab from "@/components/PartnerInfoTab";
 import CreatePartnerDialog from "@/components/CreatePartnerDialog";
 
 import { CityExpenseCoveragePanel } from "@/components/CityExpenseCoveragePanel";
+import VenueContractCard from "@/components/VenueContractCard";
 
 export default function PartnerManagement() {
   const [selectedPartnerId, setSelectedPartnerId] = useState<number | null>(null);
@@ -600,6 +601,20 @@ export default function PartnerManagement() {
                               </div>
                             </div>
                           </div>
+
+                          {/* 场地合同 */}
+                          <VenueContractCard
+                            partnerCityId={contractInfo.id}
+                            contractData={{
+                              venueContractFileUrl: contractInfo.venueContractFileUrl || undefined,
+                              venueRentAmount: contractInfo.venueRentAmount || undefined,
+                              venueDeposit: contractInfo.venueDeposit || undefined,
+                              venueLeaseStartDate: contractInfo.venueLeaseStartDate || undefined,
+                              venueLeaseEndDate: contractInfo.venueLeaseEndDate || undefined,
+                              venuePaymentCycle: contractInfo.venuePaymentCycle || undefined,
+                            }}
+                            onUpdate={() => refetchContract()}
+                          />
                         </div>
                       ) : (
                         <div className="text-center py-12">
