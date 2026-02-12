@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, profitPaymentDay FROM partners WHERE name LIKE '%瀛姬%' OR name LIKE '%深圳%' OR id IN (SELECT partnerId FROM partnerCities WHERE cityName LIKE '%深圳%');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, profitPaymentDay FROM partners WHERE name LIKE '%瀛姬%' OR name LIKE '%深圳%' OR id IN (SELECT partnerId FROM partnerCities WHERE cityName LIKE '%深圳%');",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'jtcsa4dgw9wmnzinvrevwf.partnerCities' doesn't exist"
+  ]
+}

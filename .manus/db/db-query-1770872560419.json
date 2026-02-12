@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, profitPaymentDay FROM partners WHERE name LIKE '%瀛姬%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, profitPaymentDay FROM partners WHERE name LIKE '%瀛姬%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "27",
+      "name": "瀛姬直营",
+      "profitPaymentDay": "10"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprofitPaymentDay\n27\t瀛姬直营\t10\n",
+  "stderr": "",
+  "execution_time_ms": 1537
+}

@@ -34,6 +34,23 @@ export default function PartnerManagement() {
   // 查询合伙人列表
   const { data: partners, isLoading: partnersLoading } = trpc.partnerManagement.list.useQuery();
   
+  // 查询选中的合伙人详情
+  const { data: selectedPartner } = trpc.partnerManagement.getById.useQuery(
+    { id: selectedPartnerId! },
+    { enabled: !!selectedPartnerId }
+  );
+  
+  // 更新合伙人收款账户信息
+  const updatePartnerAccountMutation = trpc.partnerManagement.update.useMutation({
+    onSuccess: () => {
+      toast.success("收款账户信息已更新");
+      utils.partnerManagement.getById.invalidate({ id: selectedPartnerId! });
+    },
+    onError: (error) => {
+      toast.error(`更新失败: ${error.message}`);
+    },
+  });
+  
   // 查询合伙人统计数据
   const { data: partnerStats } = trpc.partnerManagement.getPartnerStats.useQuery();
 
@@ -578,31 +595,106 @@ export default function PartnerManagement() {
 
                   {/* 收款账户Tab */}
                   <TabsContent value="account" className="space-y-4">
-                    {selectedCityId && contractInfo ? (
+                    {selectedPartner ? (
                       <div className="space-y-6">
-                        <h3 className="text-lg font-semibold">收款账户信息</h3>
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-lg font-semibold">收款账户信息</h3>
+                        </div>
                         <div className="grid grid-cols-1 gap-4">
                           <div>
-                            <Label className="text-muted-foreground">账户名称</Label>
-                            <div className="mt-1">{contractInfo.partnerAccountHolder || "未设置"}</div>
+                            <Label className="text-muted-foreground">开户名</Label>
+                            <Input
+                              value={selectedPartner.accountName || ""}
+                              onChange={(e) => {
+                                updatePartnerAccountMutation.mutate({
+                                  id: selectedPartnerId!,
+                                  accountName: e.target.value,
+                                });
+                              }}
+                              onBlur={(e) => {
+                                if (e.target.value !== selectedPartner.accountName) {
+                                  updatePartnerAccountMutation.mutate({
+                                    id: selectedPartnerId!,
+                                    accountName: e.target.value,
+                                  });
+                                }
+                              }}
+                              placeholder="请输入开户名"
+                              className="mt-1"
+                            />
                           </div>
                           <div>
                             <Label className="text-muted-foreground">开户行</Label>
-                            <div className="mt-1">{contractInfo.partnerBankName || "未设置"}</div>
+                            <Input
+                              value={selectedPartner.bankName || ""}
+                              onChange={(e) => {
+                                // 实时更新UI,但不立即保存
+                              }}
+                              onBlur={(e) => {
+                                if (e.target.value !== selectedPartner.bankName) {
+                                  updatePartnerAccountMutation.mutate({
+                                    id: selectedPartnerId!,
+                                    bankName: e.target.value,
+                                  });
+                                }
+                              }}
+                              placeholder="请输入开户行全称"
+                              className="mt-1"
+                            />
+                            <div className="text-xs text-muted-foreground mt-1">
+                              例如:中国银行股份有限公司苏州市相城支行
+                            </div>
                           </div>
                           <div>
-                            <Label className="text-muted-foreground">账号</Label>
-                            <div className="mt-1">{contractInfo.partnerBankAccount || "未设置"}</div>
+                            <Label className="text-muted-foreground">银行账号</Label>
+                            <Input
+                              value={selectedPartner.accountNumber || ""}
+                              onChange={(e) => {
+                                // 实时更新UI,但不立即保存
+                              }}
+                              onBlur={(e) => {
+                                if (e.target.value !== selectedPartner.accountNumber) {
+                                  updatePartnerAccountMutation.mutate({
+                                    id: selectedPartnerId!,
+                                    accountNumber: e.target.value,
+                                  });
+                                }
+                              }}
+                              placeholder="请输入银行账号"
+                              className="mt-1"
+                            />
                           </div>
                           <div>
                             <Label className="text-muted-foreground">每月分红支付日</Label>
-                            <div className="mt-1">每月 {contractInfo.profitPaymentDay || 25} 日</div>
+                            <Input
+                              type="number"
+                              min="1"
+                              max="31"
+                              value={(selectedPartner as any).profitPaymentDay || 25}
+                              onChange={(e) => {
+                                // 实时更新UI,但不立即保存
+                              }}
+                              onBlur={(e) => {
+                                const newValue = parseInt(e.target.value) || 25;
+                                if (newValue !== (selectedPartner as any).profitPaymentDay) {
+                                  updatePartnerAccountMutation.mutate({
+                                    id: selectedPartnerId!,
+                                    profitPaymentDay: newValue,
+                                  } as any);
+                                }
+                              }}
+                              placeholder="请输入分红支付日(1-31)"
+                              className="mt-1"
+                            />
+                            <div className="text-xs text-muted-foreground mt-1">
+                              每月 {(selectedPartner as any).profitPaymentDay || 25} 日
+                            </div>
                           </div>
                         </div>
                       </div>
                     ) : (
                       <div className="text-center text-muted-foreground py-12">
-                        请先在"城市管理"中选择一个城市
+                        请先选择一个合伙人
                       </div>
                     )}
                   </TabsContent>
