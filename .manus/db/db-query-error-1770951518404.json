@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  pc.partner_bank_name,\n  pc.partner_bank_account,\n  pc.partner_account_holder,\n  p.account_name,\n  p.bank_name,\n  p.account_number\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partner_id = p.id\nWHERE pc.city_id = (SELECT id FROM cities WHERE name = '宁波' LIMIT 1);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  pc.partner_bank_name,\n  pc.partner_bank_account,\n  pc.partner_account_holder,\n  p.account_name,\n  p.bank_name,\n  p.account_number\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partner_id = p.id\nWHERE pc.city_id = (SELECT id FROM cities WHERE name = '宁波' LIMIT 1);\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'pc.partner_id' in 'on clause'"
+  ]
+}

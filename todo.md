@@ -2798,3 +2798,41 @@
   - 郑州(30%, 合同后付款￥67.5): 1,525 × 30% - 870 - 67.5 = ￥-480 ✅
   - 天津(50%, 无合同后付款): 77,626 × 50% - 10,743.69 - 0 = ￥28,069.31 ✅
 - [x] 保存检查点并交付
+
+### 154. 创建前端App调用城市账单所有数据的接口文档
+- [x] 查看cityExpenseRouter.ts中的所有API路由(6个接口)
+- [x] 查看相关的数据结构和类型定义
+- [x] 创建接口文档,包括:
+  - 基础信息(Base URL, 认证方式, tRPC路由前缀)
+  - 6个接口的详细说明(list, getById, getByCityAndMonth, upsert, delete, getCities)
+  - 请求参数表格和响应数据类型
+  - 计算公式说明(老师费用、车费、总费用、合伙人承担、合伙人分红)
+  - 数据结构说明(费用项目字段、费用分摄比例、合伙人承担、合伙人分红)
+  - 错误处理说明
+  - 3个完整使用示例(React组件)
+  - 注意事项和更新日志
+- [x] 交付文档
+
+### 155. 修复合伙人管理中城市合同的两个bug
+- [ ] 问题1:收款账户信息保存后,在收款账户Tab中没有同步显示
+  - [ ] 查看ContractInfoTab组件中收款账户的保存逻辑
+  - [ ] 查看PaymentAccountsTab组件中收款账户的读取逻辑
+  - [ ] 分析为什么保存后没有同步显示
+  - [ ] 修复同步问题
+- [ ] 问题2:编辑城市合同时,法人字段为空会报错"Invalid input: expected string, received null"
+  - [ ] 查看后端API的输入验证schema
+  - [ ] 将法人字段从必填改为可选
+  - [ ] 测试验证修复效果
+- [ ] 保存检查点并交付
+
+### 155. 修复合伙人管理中城市合同的两个bug
+- [x] 问题1:在城市合同中填入收款账户信息并保存后,收款账户Tab中没有同步显示
+- [x] 分析问题1:合同信息保存到partnerCities表,但收款账户Tab读取partners表
+- [x] 修复问题1:在saveContractInfo方法中同步更新partners表的收款账户信息(accountName, bankName, accountNumber, profitPaymentDay)
+- [x] 问题2:编辑城市合同时,如果法人字段为空,会报错"Invalid input: expected string, received null"
+- [x] 分析问题2:后端期望string类型,但前端发送null值
+- [x] 修复问题2:将legalRepresentative字段的验证改为z.string().nullable().optional()
+- [x] 测试验证修复效果:
+  - 问题1:在合同信息中填写收款账户信息,保存后收款账户Tab正确显示新数据 ✅
+  - 问题2:清空法人字段并保存,没有出现错误提示,合同信息成功保存 ✅
+- [x] 保存检查点并交付

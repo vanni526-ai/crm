@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT \n  pc.partnerBankName,\n  pc.partnerBankAccount,\n  pc.partnerAccountHolder,\n  p.accountName,\n  p.bankName,\n  p.accountNumber\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nWHERE pc.cityId = (SELECT id FROM cities WHERE name = '宁波' LIMIT 1);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  pc.partnerBankName,\n  pc.partnerBankAccount,\n  pc.partnerAccountHolder,\n  p.accountName,\n  p.bankName,\n  p.accountNumber\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nWHERE pc.cityId = (SELECT id FROM cities WHERE name = '宁波' LIMIT 1);\n",
+  "rows": [
+    {
+      "partnerBankName": "中国工商银行宁波分行",
+      "partnerBankAccount": "6222021234567890123",
+      "partnerAccountHolder": "朱利闻",
+      "accountName": "朱利闻",
+      "bankName": "中国工商银行宁波分行",
+      "accountNumber": "6222021234567890123"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerBankName\tpartnerBankAccount\tpartnerAccountHolder\taccountName\tbankName\taccountNumber\n中国工商银行宁波分行\t6222021234567890123\t朱利闻\t朱利闻\t中国工商银行宁波分行\t6222021234567890123\n",
+  "stderr": "",
+  "execution_time_ms": 1677
+}

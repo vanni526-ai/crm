@@ -893,7 +893,7 @@ export const partnerManagementRouter = router({
         partnerBankName: z.string().optional(),
         partnerBankAccount: z.string().optional(),
         partnerAccountHolder: z.string().optional(),
-        legalRepresentative: z.string().optional(),
+        legalRepresentative: z.string().nullable().optional(),
         profitPaymentDay: z.number().optional(),
       }),
     }))
@@ -938,6 +938,19 @@ export const partnerManagementRouter = router({
             })
             .where(eq(partnerCities.id, existing[0].id));
           
+          // 同步更新partners表中的收款账户信息
+          if (input.contractInfo.partnerBankName || input.contractInfo.partnerBankAccount || input.contractInfo.partnerAccountHolder || input.contractInfo.profitPaymentDay) {
+            await db
+              .update(partners)
+              .set({
+                accountName: input.contractInfo.partnerAccountHolder || undefined,
+                bankName: input.contractInfo.partnerBankName || undefined,
+                accountNumber: input.contractInfo.partnerBankAccount || undefined,
+                profitPaymentDay: input.contractInfo.profitPaymentDay || undefined,
+              })
+              .where(eq(partners.id, input.partnerId));
+          }
+          
           return {
             success: true,
             partnerCityId: existing[0].id,
@@ -952,6 +965,19 @@ export const partnerManagementRouter = router({
             ...convertedInfo,
             createdBy: ctx.user.id,
           });
+          
+          // 同步更新partners表中的收款账户信息
+          if (input.contractInfo.partnerBankName || input.contractInfo.partnerBankAccount || input.contractInfo.partnerAccountHolder || input.contractInfo.profitPaymentDay) {
+            await db
+              .update(partners)
+              .set({
+                accountName: input.contractInfo.partnerAccountHolder || undefined,
+                bankName: input.contractInfo.partnerBankName || undefined,
+                accountNumber: input.contractInfo.partnerBankAccount || undefined,
+                profitPaymentDay: input.contractInfo.profitPaymentDay || undefined,
+              })
+              .where(eq(partners.id, input.partnerId));
+          }
           
           return {
             success: true,
