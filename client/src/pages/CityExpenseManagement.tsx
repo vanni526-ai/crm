@@ -246,7 +246,7 @@ export default function CityExpenseManagement() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">城市费用账单管理</h1>
+            <h1 className="text-3xl font-bold">城市账单管理</h1>
             <p className="text-muted-foreground mt-1">管理每个城市的月度费用支出记录</p>
           </div>
           <div className="flex gap-2">
@@ -557,13 +557,14 @@ export default function CityExpenseManagement() {
                     <TableHead className="text-right">其他费用</TableHead>
                     <TableHead className="text-right">总费用</TableHead>
                     <TableHead className="text-right">合伙人承担</TableHead>
+                    <TableHead className="text-right">合伙人分红</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={20} className="text-center text-muted-foreground">
+                      <TableCell colSpan={21} className="text-center text-muted-foreground">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -590,7 +591,8 @@ export default function CityExpenseManagement() {
                         <TableCell className="text-right">¥{parseFloat(expense.promotionFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right">￥{parseFloat(expense.otherFee || "0").toLocaleString()}</TableCell>
                         <TableCell className="text-right font-semibold">￥{parseFloat(expense.totalExpense || "0").toLocaleString()}</TableCell>
-                        <TableCell className="text-right text-blue-600 font-medium">¥{parseFloat(expense.partnerShare || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right text-blue-600 font-medium">￥{parseFloat(expense.partnerShare || "0").toLocaleString()}</TableCell>
+                        <TableCell className="text-right text-red-600 font-semibold">￥{parseFloat((expense as any).partnerDividend || "0").toLocaleString()}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button
@@ -613,7 +615,7 @@ export default function CityExpenseManagement() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={20} className="text-center text-muted-foreground">
+                      <TableCell colSpan={21} className="text-center text-muted-foreground">
                         暂无费用账单数据
                       </TableCell>
                     </TableRow>

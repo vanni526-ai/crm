@@ -2767,3 +2767,31 @@
   - 老师费用和车费显示正确 ✅
   - 表格结构清晰,无重复列 ✅
 - [x] 保存检查点并交付
+
+### 151. 修改城市费用账单名称为城市账单
+- [x] 修改导航栏中的"城市费用账单"为"城市账单"(DashboardLayout.tsx)
+- [x] 修改页面标题"城市费用账单管理"为"城市账单管理"(CityExpenseManagement.tsx)
+- [x] 其他相关文案保持不变(ExpenseCoverageTab.tsx中的提示文案保留)
+
+### 152. 在城市账单列表中新增合伙人分红列
+- [x] 查看partnerCities表的schema,了解分红阶段配置逻辑
+- [x] 确定如何获取"当前分红阶段的合伙人分红百分比":
+  - 阶段1: profitRatioStage1Partner
+  - 阶段2未回本: profitRatioStage2APartner
+  - 阶段2已回本: profitRatioStage2BPartner
+  - 阶段3: profitRatioStage3Partner
+- [x] 在cityExpenseRouter.ts的list方法中添加合佩人分红计算逻辑
+- [x] 计算公式:合佩人分红 = (销售额 × costShareRatio / 100) - 合佩人承担
+- [x] 在CityExpenseManagement.tsx表格中添加"合佩人分红"列,位置在"合佩人承担"右侧
+- [x] 使用红色加粗文字标记合佩人分红金额(text-red-600 font-semibold)
+- [x] 测试验证计算结果:
+  - 天津(50%): 77,626 × 50% - 10,743.69 = ￥28,069.31 ✅
+  - 宁波(30%): 15,900 × 30% - 1,950 = ￥2,820 ✅
+  - 武汉(40%): 15,750 × 40% - 2,453.54 = ￥3,846.46 ✅
+- [x] 保存检查点并交付
+
+### 153. 调整合伙人分红计算公式
+- [ ] 修改cityExpenseRouter.ts中的partnerDividend计算逻辑
+- [ ] 新公式:合伙人分红 = (销售额 × 当前分红阶段的合伙人分红百分比) - 合伙人承担 - 合同后付款
+- [ ] 测试验证修改后的计算结果
+- [ ] 保存检查点并交付

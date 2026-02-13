@@ -96,10 +96,17 @@ export const cityExpenseRouter = router({
             expense.month,
             expense.cityName
           );
+          
+          // 计算合伙人分红 = (销售额 × 当前分红阶段的合伙人分红百分比) - 合伙人承担
+          const partnerDividend = expense.costShareRatio 
+            ? (parseFloat(salesAmount) * parseFloat(expense.costShareRatio) / 100 - parseFloat(expense.partnerShare || "0")).toFixed(2)
+            : "0.00";
+          
           return {
             ...expense,
             salesAmount,
             orderCount,
+            partnerDividend,
           };
         })
       );

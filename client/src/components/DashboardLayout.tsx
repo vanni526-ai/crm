@@ -39,7 +39,7 @@ const menuItems = [
   { icon: MapPin, label: "城市管理", path: "/cities" },
   { icon: Handshake, label: "合伙人管理", path: "/partner-management" },
   { icon: DollarSign, label: "财务管理", path: "/finance" },
-  { icon: Receipt, label: "城市费用账单", path: "/city-expense-management" },
+  { icon: Receipt, label: "城市账单", path: "/city-expense-management" },
   { icon: FileCheck, label: "财务对账", path: "/reconciliation-match" },
   { icon: Upload, label: "数据导入", path: "/import" },
   { icon: Mail, label: "Gmail导入", path: "/gmail-import" },
