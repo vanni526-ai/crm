@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 删除所有无效和测试老师数据\nDELETE FROM teachers WHERE id IN (\n  570046, 570045, 570044, 570043, 570042, 570041, 570040, 570039,\n  570030, 570029, 570028, 570027, 570026, 570025, 570024, 570023, 570022, 570021,\n  510027, 510012, 420016, 420012, 300009\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 删除所有无效和测试老师数据\nDELETE FROM teachers WHERE id IN (\n  570046, 570045, 570044, 570043, 570042, 570041, 570040, 570039,\n  570030, 570029, 570028, 570027, 570026, 570025, 570024, 570023, 570022, 570021,\n  510027, 510012, 420016, 420012, 300009\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1595
+}
