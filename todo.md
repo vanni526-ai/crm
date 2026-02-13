@@ -3160,4 +3160,15 @@
 - [x] 移除"合伙人费比例(%)"字段及相关验证逻辑(formData, handleCreate, DialogDescription)
 - [x] 更新后端API,移除partnerFeeRate参数(routers.ts createCityConfig, db.ts createCityConfig)
 - [x] 测试添加新城市功能(修改schema并更新数据库字段约束)
+- [x] 保存检查点(version: 663e3e72)
+
+### 173. 帮助用户找到前端读取城市合伙人所承担费用的代码
+- [x] 搜索合伙人管理相关页面和组件
+- [x] 定位费用承担勾选相关代码(CityExpenseCoveragePanel.tsx)
+- [x] 分析代码逻辑并提供说明
+
+### 174. 修复getCityExpenseCoverage接口返回null的问题
+- [x] 检查后端getCityExpenseCoverage接口代码(partnerManagementRouter.ts 第1205行)
+- [x] 修复接口逻辑,当数据库无配置时返回默认值(所有费用项为false)
+- [x] 测试验证partnerId=13860029, cityId=3的情况(代码已修复,等待用户测试)
 - [ ] 保存检查点

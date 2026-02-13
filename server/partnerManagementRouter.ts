@@ -1222,11 +1222,37 @@ export const partnerManagementRouter = router({
         ))
         .limit(1);
       
+      // 如果没有配置数据,返回默认值(所有费用项为false)
       if (result.length === 0) {
-        return null;
+        return {
+          rentFee: false,
+          propertyFee: false,
+          utilityFee: false,
+          consumablesFee: false,
+          cleaningFee: false,
+          phoneFee: false,
+          courierFee: false,
+          promotionFee: false,
+          teacherFee: false,
+          transportFee: false,
+          otherFee: false,
+        };
       }
       
-      return result[0].expenseCoverage || {};
+      // 如果expenseCoverage为null或undefined,也返回默认值
+      return result[0].expenseCoverage || {
+        rentFee: false,
+        propertyFee: false,
+        utilityFee: false,
+        consumablesFee: false,
+        cleaningFee: false,
+        phoneFee: false,
+        courierFee: false,
+        promotionFee: false,
+        teacherFee: false,
+        transportFee: false,
+        otherFee: false,
+      };
     }),
 
   /**
