@@ -985,10 +985,86 @@ export async function batchCreateTeachers(teacherList: InsertTeacher[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const results = [];
+  
   for (const teacher of teacherList) {
-    const result = await db.insert(teachers).values(teacher);
-    results.push({ id: result[0].insertId, name: teacher.name });
+    // 1. 创建老师记录
+    const teacherResult = await db.insert(teachers).values(teacher);
+    const teacherId = teacherResult[0].insertId;
+    
+    // 2. 创建对应的users记录
+    // 检查是否已存在同名用户
+    const existingUser = await db.select().from(users).where(eq(users.name, teacher.name)).limit(1);
+    
+    let userId: number;
+    if (existingUser.length > 0) {
+      // 用户已存在,使用现有用户ID
+      userId = existingUser[0].id;
+      
+      // 更新用户角色(添加老师角色)
+      const currentRoles = existingUser[0].roles ? existingUser[0].roles.split(',') : [];
+      if (!currentRoles.includes('teacher')) {
+        currentRoles.push('teacher');
+      }
+      if (!currentRoles.includes('user')) {
+        currentRoles.push('user');
+      }
+      await db.update(users).set({ 
+        roles: currentRoles.join(','),
+        phone: teacher.phone || existingUser[0].phone,
+      }).where(eq(users.id, userId));
+    } else {
+      // 创建新用户
+      // 生成唯一的openId(使用teacher_+时间戳+随机数)
+      const openId = `teacher_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      
+      const userResult = await db.insert(users).values({
+        openId,
+        name: teacher.name,
+        phone: teacher.phone || null,
+        password: '123456', // 默认密码
+        roles: 'user,teacher', // 普通用户+老师
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      userId = userResult[0].insertId;
+    }
+    
+    // 3. 如果有城市信息,创建userRoleCities关联记录
+    if (teacher.city) {
+      const cityNames = teacher.city.split(';').map(c => c.trim()).filter(c => c !== '');
+      
+      if (cityNames.length > 0) {
+        // 检查是否已存在teacher角色的城市关联
+        const existingRoleCity = await db.select().from(userRoleCities)
+          .where(and(
+            eq(userRoleCities.userId, userId),
+            eq(userRoleCities.role, 'teacher')
+          ))
+          .limit(1);
+        
+        if (existingRoleCity.length > 0) {
+          // 已存在,合并城市列表
+          const existingCities = JSON.parse(existingRoleCity[0].cities);
+          const mergedCities = Array.from(new Set([...existingCities, ...cityNames]));
+          await db.update(userRoleCities)
+            .set({ cities: JSON.stringify(mergedCities) })
+            .where(eq(userRoleCities.id, existingRoleCity[0].id));
+        } else {
+          // 不存在,创建新关联
+          await db.insert(userRoleCities).values({
+            userId,
+            role: 'teacher',
+            cities: JSON.stringify(cityNames),
+            createdAt: new Date(),
+          });
+        }
+      }
+    }
+    
+    results.push({ id: teacherId, name: teacher.name, userId });
   }
+  
   return results;
 }
 
