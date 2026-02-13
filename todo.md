@@ -3172,4 +3172,11 @@
 - [x] 检查partner_cities表schema中expenseCoverage字段定义(json类型,第780行)
 - [x] 修复接口返回逻辑,正确解包JSON字段(直接返回coverage对象)
 - [x] 测试验证partnerId=13860029, cityId=3的情况(代码已修复,等待用户测试)
-- [ ] 保存检查点
+- [x] 保存检查点(version: 02c1d091)
+
+### 175. 检查API文档中提到的接口是否存在JSON字段包装问题
+- [ ] 阅读用户提供的5份API文档,提取关键接口列表
+- [ ] 检查后端代码中使用JSON字段的接口
+- [ ] 验证是否存在类似getCityExpenseCoverage的JSON包装问题
+- [ ] 修复发现的问题
+- [ ] 汇总检查结果并交付
