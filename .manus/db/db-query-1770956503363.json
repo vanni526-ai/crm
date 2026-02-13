@@ -1,0 +1,19 @@
+{
+  "query": "SELECT \n  u.id as user_id,\n  u.name,\n  u.phone,\n  u.roles,\n  p.id as partner_id,\n  p.name as partner_name,\n  p.isActive as partner_is_active\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.phone LIKE '%15372545%' OR u.name LIKE '%苏州%' OR p.name LIKE '%苏州%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  u.id as user_id,\n  u.name,\n  u.phone,\n  u.roles,\n  p.id as partner_id,\n  p.name as partner_name,\n  p.isActive as partner_is_active\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.phone LIKE '%15372545%' OR u.name LIKE '%苏州%' OR p.name LIKE '%苏州%';",
+  "rows": [
+    {
+      "user_id": "15372545",
+      "name": "苏州加盟商",
+      "phone": "13800138000",
+      "roles": "user",
+      "partner_id": "16",
+      "partner_name": "苏州加盟商",
+      "partner_is_active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tname\tphone\troles\tpartner_id\tpartner_name\tpartner_is_active\n15372545\t苏州加盟商\t13800138000\tuser\t16\t苏州加盟商\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1916
+}
