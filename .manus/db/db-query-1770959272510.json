@@ -1,0 +1,20 @@
+{
+  "query": "\nSELECT \n  u.id as user_id,\n  u.name as user_name,\n  u.roles,\n  p.id as partner_id,\n  p.isActive as partner_is_active,\n  pc.id as partner_city_id,\n  pc.cityId,\n  c.name as city_name\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE u.phone LIKE '%13860029%' OR u.name LIKE '%test%';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  u.id as user_id,\n  u.name as user_name,\n  u.roles,\n  p.id as partner_id,\n  p.isActive as partner_is_active,\n  pc.id as partner_city_id,\n  pc.cityId,\n  c.name as city_name\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE u.phone LIKE '%13860029%' OR u.name LIKE '%test%';\n",
+  "rows": [
+    {
+      "user_id": "13860029",
+      "user_name": "test",
+      "roles": "teacher,user,sales,admin,cityPartner",
+      "partner_id": "90006",
+      "partner_is_active": "1",
+      "partner_city_id": "NULL",
+      "cityId": "NULL",
+      "city_name": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tuser_name\troles\tpartner_id\tpartner_is_active\tpartner_city_id\tcityId\tcity_name\n13860029\ttest\tteacher,user,sales,admin,cityPartner\t90006\t1\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1742
+}

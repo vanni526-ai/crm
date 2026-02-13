@@ -1,0 +1,31 @@
+{
+  "query": "\nSELECT * FROM users WHERE name LIKE '%test%' LIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT * FROM users WHERE name LIKE '%test%' LIMIT 5;\n",
+  "rows": [
+    {
+      "id": "13860029",
+      "openId": "user_1770021458467_egfufs",
+      "name": "test",
+      "nickname": "test测试用户526",
+      "email": "test@example.com",
+      "loginMethod": "NULL",
+      "role": "teacher",
+      "isActive": "1",
+      "createdAt": "2026-02-02 08:37:38",
+      "updatedAt": "2026-02-13 05:06:06",
+      "lastSignedIn": "2026-02-13 03:23:32",
+      "username": "NULL",
+      "passwordHash": "NULL",
+      "password": "$2b$10$D1vOLcE6KdgggoHUqXrssOW1MGy45LI32DEzmsgJNzMfa9cPDjV6S",
+      "salespersonId": "NULL",
+      "createdBy": "NULL",
+      "phone": "13800138013",
+      "roles": "teacher,user,sales,admin,cityPartner",
+      "city": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\tnickname\temail\tloginMethod\trole\tisActive\tcreatedAt\tupdatedAt\tlastSignedIn\tusername\tpasswordHash\tpassword\tsalespersonId\tcreatedBy\tphone\troles\tcity\n13860029\tuser_1770021458467_egfufs\ttest\ttest测试用户526\ttest@example.com\tNULL\tteacher\t1\t2026-02-02 08:37:38\t2026-02-13 05:06:06\t2026-02-13 03:23:32\tNULL\tNULL\t$2b$10$D1vOLcE6KdgggoHUqXrssOW1MGy45LI32DEzmsgJNzMfa9cPDjV6S\tNULL\tNULL\t13800138013\tteacher,user,sales,admin,cityPartner\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1739
+}

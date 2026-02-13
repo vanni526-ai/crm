@@ -3,7 +3,7 @@ import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb, setUserRoleCities, getUserRoleCities } from "./db";
 import { users, teachers } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 import { USER_ROLE_VALUES } from "../shared/roles";
 
@@ -412,6 +412,39 @@ export const userManagementRouter = router({
               name: updateData.name || partnerRecords.name,
               phone: updateData.phone || partnerRecords.phone,
             } as any).where(eq(partners.userId, id));
+            
+            // 如果指定了城市，创建partnerCities记录
+            if (roleCities && roleCities.cityPartner && roleCities.cityPartner.length > 0) {
+              const partnerId = partnerRecords.id;
+              
+              for (const cityName of roleCities.cityPartner) {
+                // 查找城市ID
+                const [cityRecord] = await drizzle.select().from(cities).where(eq(cities.name, cityName)).limit(1);
+                if (cityRecord) {
+                  // 检查是否已经存在关联记录
+                  const [existingPartnerCity] = await drizzle.select().from(partnerCities)
+                    .where(
+                      and(
+                        eq(partnerCities.partnerId, partnerId),
+                        eq(partnerCities.cityId, cityRecord.id)
+                      )
+                    )
+                    .limit(1);
+                  
+                  // 如果不存在，创建partnerCities记录（草稿状态）
+                  if (!existingPartnerCity) {
+                    await drizzle.insert(partnerCities).values({
+                      partnerId: partnerId,
+                      cityId: cityRecord.id,
+                      contractStatus: 'draft',
+                      currentProfitStage: 1,
+                      isInvestmentRecovered: false,
+                      createdBy: 1,
+                    } as any);
+                  }
+                }
+              }
+            }
           } else {
             // 不存在记录，创建新记录
             const [newPartner] = await drizzle.insert(partners).values({
