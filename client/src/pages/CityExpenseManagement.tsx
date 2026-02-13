@@ -92,12 +92,22 @@ export default function CityExpenseManagement() {
   
   // 批量导入
   const batchImportMutation = trpc.cityExpense.batchImport.useMutation({
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       toast.success(`导入完成！成功: ${result.success} 条，失败: ${result.failed} 条`);
       if (result.failedRecords.length > 0) {
         console.log("失败记录:", result.failedRecords);
       }
       utils.cityExpense.list.invalidate();
+      
+      // 导入成功后自动刷新所有账单的合伙人承担费用
+      try {
+        const recalcResult = await batchRecalculateMutation.mutateAsync({});
+        toast.success(`自动刷新完成，共更新 ${recalcResult.updated} 条账单`);
+      } catch (error: any) {
+        console.error("自动刷新失败:", error);
+        toast.warning("导入成功，但自动刷新失败，请手动点击批量刷新按钮");
+      }
+      
       setIsImporting(false);
     },
     onError: (error) => {
@@ -178,7 +188,7 @@ export default function CityExpenseManagement() {
     upsertMutation.mutate(formData);
   };
   
-  // 重新计算合伙人承担费用
+  // 重新计算单个账单的合伙人承担费用
   const recalculateMutation = trpc.cityExpense.recalculatePartnerShare.useMutation({
     onSuccess: (data) => {
       toast.success(data.message || "重新计算成功");
@@ -186,6 +196,20 @@ export default function CityExpenseManagement() {
     },
     onError: (error) => {
       toast.error(`重新计算失败: ${error.message}`);
+    },
+  });
+  
+  // 批量重新计算合伙人承担费用
+  const batchRecalculateMutation = trpc.cityExpense.batchRecalculate.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message || `批量刷新完成，共更新 ${data.updated} 条账单`);
+      if (data.errors && data.errors.length > 0) {
+        console.log("失败记录:", data.errors);
+      }
+      utils.cityExpense.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`批量刷新失败: ${error.message}`);
     },
   });
   
@@ -198,6 +222,15 @@ export default function CityExpenseManagement() {
   const handleRecalculate = (cityId: number, month: string) => {
     if (confirm("确定要重新计算该账单的合伙人承担费用吗？\n\n此操作将根据最新的费用覆盖配置重新计算。")) {
       recalculateMutation.mutate({ cityId, month });
+    }
+  };
+  
+  const handleBatchRecalculate = () => {
+    if (confirm("确定要批量刷新所有符合条件的账单吗？\n\n此操作将根据最新的费用覆盖配置重新计算所有账单的合伙人承担费用。")) {
+      batchRecalculateMutation.mutate({
+        cityId: selectedCityId,
+        month: selectedMonth || undefined,
+      });
     }
   };
   
@@ -285,6 +318,15 @@ export default function CityExpenseManagement() {
             <Button variant="outline" onClick={handleExport} disabled={exportDataMutation.isPending}>
               <Download className="h-4 w-4 mr-2" />
               {exportDataMutation.isPending ? "导出中..." : "导出"}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleBatchRecalculate} 
+              disabled={batchRecalculateMutation.isPending}
+              title="批量重新计算所有账单的合伙人承担费用"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${batchRecalculateMutation.isPending ? 'animate-spin' : ''}`} />
+              {batchRecalculateMutation.isPending ? "刷新中..." : "批量刷新"}
             </Button>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

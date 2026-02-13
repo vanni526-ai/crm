@@ -793,4 +793,128 @@ export const cityExpenseRouter = router({
         });
       }
     }),
+
+  /**
+   * 批量重新计算合伙人承担费用
+   * 根据筛选条件批量更新账单的合伙人承担费用
+   */
+  batchRecalculate: protectedProcedure
+    .input(z.object({
+      cityId: z.number().optional(), // 可选:指定城市ID,不指定则刷新所有城市
+      month: z.string().optional(),  // 可选:指定月份,不指定则刷新所有月份
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      try {
+        // 1. 构建查询条件
+        const conditions = [];
+        if (input.cityId) {
+          conditions.push(eq(cityMonthlyExpenses.cityId, input.cityId));
+        }
+        if (input.month) {
+          conditions.push(eq(cityMonthlyExpenses.month, input.month));
+        }
+        
+        // 2. 查询所有符合条件的账单
+        const expenses = await db
+          .select()
+          .from(cityMonthlyExpenses)
+          .where(conditions.length > 0 ? and(...conditions) : undefined);
+        
+        if (expenses.length === 0) {
+          return { 
+            success: true, 
+            message: "没有找到符合条件的账单",
+            total: 0,
+            updated: 0,
+          };
+        }
+        
+        // 3. 逐个重新计算
+        let updatedCount = 0;
+        const errors: string[] = [];
+        
+        for (const expense of expenses) {
+          try {
+            // 查询该城市的合伙人配置
+            const partnerCityInfo = await db
+              .select()
+              .from(partnerCities)
+              .where(and(
+                eq(partnerCities.cityId, expense.cityId),
+                eq(partnerCities.contractStatus, 'active')
+              ))
+              .limit(1);
+            
+            if (partnerCityInfo.length === 0) {
+              // 没有找到合伙人配置,设为0
+              await db
+                .update(cityMonthlyExpenses)
+                .set({ partnerShare: "0.00" })
+                .where(eq(cityMonthlyExpenses.id, expense.id));
+              updatedCount++;
+              continue;
+            }
+            
+            // 计算合伙人承担费用
+            const expenseCoverage = partnerCityInfo[0]?.expenseCoverage || {};
+            const currentStage = partnerCityInfo[0]?.currentProfitStage || 1;
+            
+            // 根据当前分红阶段和是否回本,确定费用分摊比例
+            // 费用分摊比例 = 合伙人分红比例(因为费用按分红比例分摊)
+            let costShareRatio = 0;
+            if (currentStage === 1) {
+              costShareRatio = parseFloat(partnerCityInfo[0]?.profitRatioStage1Partner || "0");
+            } else if (currentStage === 2) {
+              const isRecovered = partnerCityInfo[0]?.isInvestmentRecovered || false;
+              costShareRatio = isRecovered 
+                ? parseFloat(partnerCityInfo[0]?.profitRatioStage2BPartner || "0")
+                : parseFloat(partnerCityInfo[0]?.profitRatioStage2APartner || "0");
+            } else if (currentStage === 3) {
+              costShareRatio = parseFloat(partnerCityInfo[0]?.profitRatioStage3Partner || "0");
+            }
+            
+            let coveredExpenseTotal = 0;
+            if (expenseCoverage.rentFee) coveredExpenseTotal += parseFloat(expense.rentFee || "0");
+            if (expenseCoverage.propertyFee) coveredExpenseTotal += parseFloat(expense.propertyFee || "0");
+            if (expenseCoverage.utilityFee) coveredExpenseTotal += parseFloat(expense.utilityFee || "0");
+            if (expenseCoverage.cleaningFee) coveredExpenseTotal += parseFloat(expense.cleaningFee || "0");
+            if (expenseCoverage.phoneFee) coveredExpenseTotal += parseFloat(expense.phoneFee || "0");
+            if (expenseCoverage.consumablesFee) coveredExpenseTotal += parseFloat(expense.consumablesFee || "0");
+            if (expenseCoverage.promotionFee) coveredExpenseTotal += parseFloat(expense.promotionFee || "0");
+            if (expenseCoverage.otherFee) coveredExpenseTotal += parseFloat(expense.otherFee || "0");
+            if (expenseCoverage.teacherFee) coveredExpenseTotal += parseFloat(expense.teacherFee || "0");
+            if (expenseCoverage.transportFee) coveredExpenseTotal += parseFloat(expense.transportFee || "0");
+            
+            const partnerShare = (coveredExpenseTotal * costShareRatio / 100).toFixed(2);
+            
+            // 更新账单
+            await db
+              .update(cityMonthlyExpenses)
+              .set({ partnerShare })
+              .where(eq(cityMonthlyExpenses.id, expense.id));
+            
+            updatedCount++;
+          } catch (error: any) {
+            errors.push(`${expense.cityName} ${expense.month}: ${error.message}`);
+          }
+        }
+        
+        return { 
+          success: true, 
+          message: `批量刷新完成,共处理 ${expenses.length} 条账单,成功更新 ${updatedCount} 条${errors.length > 0 ? `,失败 ${errors.length} 条` : ''}`,
+          total: expenses.length,
+          updated: updatedCount,
+          errors: errors.length > 0 ? errors : undefined,
+        };
+      } catch (error: any) {
+        console.error("批量重新计算失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `批量刷新失败: ${error.message}`,
+        });
+      }
+    }),
 });
