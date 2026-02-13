@@ -522,12 +522,12 @@ export default function CustomersContent() {
                             {customer.allTags && customer.allTags.length > 0 && (
                               <div className="flex flex-wrap gap-1">
                                 {customer.autoTags?.map((tag: string, idx: number) => (
-                                  <Badge key={`auto-${idx}`} variant="default" className="text-xs">
+                                  <Badge key={`${customer.id}-auto-${tag}-${idx}`} variant="default" className="text-xs">
                                     {tag}
                                   </Badge>
                                 ))}
                                 {customer.manualTags?.map((tag: string, idx: number) => (
-                                  <Badge key={`manual-${idx}`} variant="secondary" className="text-xs">
+                                  <Badge key={`${customer.id}-manual-${tag}-${idx}`} variant="secondary" className="text-xs">
                                     {tag}
                                   </Badge>
                                 ))}

@@ -2906,4 +2906,19 @@
 - [x] 测试验证:确认所有没有cityPartner角色的用户都不显示在合伙人管理中 ✅
   - 刷新合伙人管理页面,苏州加盟商已不再显示
   - 列表从13个合伙人减少到12个
+- [x] 保存检查点并交付
+
+### 160. 修复客户管理页面中重庆城市key重复的React错误
+- [x] 定位错误原因:
+  - 检查CustomersContent.tsx中使用key的地方
+  - 发现问题:标签(tags)的key使用了`auto-${idx}`和`manual-${idx}`
+  - 如果同一个客户有多个"重庆"标签,就会导致key重复
+- [x] 修复代码:
+  - 使用组合key:`${customer.id}-auto-${tag}-${idx}`
+  - 使用组合key:`${customer.id}-manual-${tag}-${idx}`
+  - 确保每个标签的key都是唯一的
+- [x] 测试验证:访问客户管理页面,确认不再有React key重复警告 ✅
+  - 访问客户管理页面,点击业务客户标签页
+  - 检查浏览器控制台,不再有"Encountered two children with the same key"错误
+  - 修复成功!
 - [ ] 保存检查点并交付
