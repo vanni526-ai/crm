@@ -1,0 +1,32 @@
+{
+  "query": "SELECT \n  pc.id,\n  c.name as city_name,\n  u.username as partner_name,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN users u ON pc.partnerId = u.id\nWHERE c.name = '重庆';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  pc.id,\n  c.name as city_name,\n  u.username as partner_name,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN users u ON pc.partnerId = u.id\nWHERE c.name = '重庆';",
+  "rows": [
+    {
+      "id": "27",
+      "city_name": "重庆",
+      "partner_name": "NULL",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0",
+      "profitRatioStage1Partner": "NULL",
+      "profitRatioStage2APartner": "NULL",
+      "profitRatioStage2BPartner": "NULL",
+      "profitRatioStage3Partner": "NULL"
+    },
+    {
+      "id": "60007",
+      "city_name": "重庆",
+      "partner_name": "NULL",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0",
+      "profitRatioStage1Partner": "50.00",
+      "profitRatioStage2APartner": "50.00",
+      "profitRatioStage2BPartner": "50.00",
+      "profitRatioStage3Partner": "50.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcity_name\tpartner_name\tcurrentProfitStage\tisInvestmentRecovered\tprofitRatioStage1Partner\tprofitRatioStage2APartner\tprofitRatioStage2BPartner\tprofitRatioStage3Partner\n27\t重庆\tNULL\t1\t0\tNULL\tNULL\tNULL\tNULL\n60007\t重庆\tNULL\t1\t0\t50.00\t50.00\t50.00\t50.00\n",
+  "stderr": "",
+  "execution_time_ms": 1666
+}

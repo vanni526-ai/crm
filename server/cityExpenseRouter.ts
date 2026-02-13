@@ -40,6 +40,7 @@ export const cityExpenseRouter = router({
         conditions.push(sql`${cityMonthlyExpenses.month} <= ${input.endMonth}`);
       }
       
+      // 首先获取基础的费用账单数据(不包含合伙人信息,避免重复)
       const expenses = await db
         .select({
           id: cityMonthlyExpenses.id,
@@ -63,26 +64,41 @@ export const cityExpenseRouter = router({
           notes: cityMonthlyExpenses.notes,
           createdAt: cityMonthlyExpenses.createdAt,
           updatedAt: cityMonthlyExpenses.updatedAt,
-          // 费用分摄比例：根据当前分红阶段获取合伙人分红比例
-          costShareRatio: sql<string>`
-            CASE 
-              WHEN ${partnerCities.currentProfitStage} = 1 THEN ${partnerCities.profitRatioStage1Partner}
-              WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 0 THEN ${partnerCities.profitRatioStage2APartner}
-              WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 1 THEN ${partnerCities.profitRatioStage2BPartner}
-              WHEN ${partnerCities.currentProfitStage} = 3 THEN ${partnerCities.profitRatioStage3Partner}
-              ELSE NULL
-            END
-          `.as('costShareRatio'),
         })
         .from(cityMonthlyExpenses)
         .leftJoin(cities, eq(cityMonthlyExpenses.cityId, cities.id))
-        .leftJoin(partnerCities, eq(cityMonthlyExpenses.cityId, partnerCities.cityId))
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(desc(cityMonthlyExpenses.month), desc(cityMonthlyExpenses.cityId));
       
+      // 为每个账单获取合伙人费用分摊比例(取第一个合伙人的比例)
+      const expensesWithPartnerInfo = await Promise.all(
+        expenses.map(async (expense) => {
+          const partnerInfo = await db
+            .select({
+              costShareRatio: sql<string>`
+                CASE 
+                  WHEN ${partnerCities.currentProfitStage} = 1 THEN ${partnerCities.profitRatioStage1Partner}
+                  WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 0 THEN ${partnerCities.profitRatioStage2APartner}
+                  WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 1 THEN ${partnerCities.profitRatioStage2BPartner}
+                  WHEN ${partnerCities.currentProfitStage} = 3 THEN ${partnerCities.profitRatioStage3Partner}
+                  ELSE NULL
+                END
+              `.as('costShareRatio'),
+            })
+            .from(partnerCities)
+            .where(eq(partnerCities.cityId, expense.cityId))
+            .limit(1);
+          
+          return {
+            ...expense,
+            costShareRatio: partnerInfo[0]?.costShareRatio || null,
+          };
+        })
+      );
+      
       // 为每个账单添加销售额和订单数
       const result = await Promise.all(
-        expenses.map(async (expense) => {
+        expensesWithPartnerInfo.map(async (expense) => {
           // 如果城市名称为null,返回默认值
           if (!expense.cityName) {
             return {

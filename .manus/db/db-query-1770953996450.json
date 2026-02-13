@@ -1,0 +1,24 @@
+{
+  "query": "SELECT pc.id, c.name as city_name, u.username as partner_name, pc.currentProfitStage, pc.isInvestmentRecovered\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN users u ON pc.partnerId = u.id\nWHERE c.name = '重庆';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT pc.id, c.name as city_name, u.username as partner_name, pc.currentProfitStage, pc.isInvestmentRecovered\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nLEFT JOIN users u ON pc.partnerId = u.id\nWHERE c.name = '重庆';",
+  "rows": [
+    {
+      "id": "27",
+      "city_name": "重庆",
+      "partner_name": "NULL",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0"
+    },
+    {
+      "id": "60007",
+      "city_name": "重庆",
+      "partner_name": "NULL",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcity_name\tpartner_name\tcurrentProfitStage\tisInvestmentRecovered\n27\t重庆\tNULL\t1\t0\n60007\t重庆\tNULL\t1\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1707
+}
