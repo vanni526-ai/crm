@@ -397,8 +397,9 @@ export default function Teachers() {
         const firstRow: any[] = allRows[0] || [];
         const hasExtraTitle = firstRow.length > 0 && 
           !firstRow.includes('姓名') && 
+          !firstRow.includes('老师') &&
           !firstRow.includes('name') &&
-          (firstRow[0]?.toString().includes('老师') || firstRow[0]?.toString().includes('合伙'));
+          (firstRow[0]?.toString().includes('老师信息') || firstRow[0]?.toString().includes('合伙'));
         
         // 根据是否有额外标题行决定跳过的行数
         const skipRows = hasExtraTitle ? 2 : 1;
@@ -407,14 +408,14 @@ export default function Teachers() {
         jsonData.forEach((row: any) => {
           console.log('解析行数据:', row);
           const teacher: any = {
-            name: row['姓名'] || row['name'] || '',
+            name: row['老师'] || row['姓名'] || row['name'] || '',
             phone: row['电话号码'] || row['phone'] ? String(row['电话号码'] || row['phone']) : '',
             status: row['活跃状态'] || row['status'] || '活跃',
             teacherAttribute: row['老师属性'] || row['teacherAttribute'] || undefined,
             customerType: row['受众客户类型'] || row['customerType'] || '',
             notes: row['备注'] || row['notes'] || '',
             category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他',
-            city: row['地区'] || (sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : ''),
+            city: row['城市'] || row['地区'] || (sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : ''),
           };
           
           // 处理日期字段，将字符串转换为Date对象
