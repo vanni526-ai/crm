@@ -1239,20 +1239,28 @@ export const partnerManagementRouter = router({
         };
       }
       
-      // 如果expenseCoverage为null或undefined,也返回默认值
-      return result[0].expenseCoverage || {
-        rentFee: false,
-        propertyFee: false,
-        utilityFee: false,
-        consumablesFee: false,
-        cleaningFee: false,
-        phoneFee: false,
-        courierFee: false,
-        promotionFee: false,
-        teacherFee: false,
-        transportFee: false,
-        otherFee: false,
-      };
+      // 解包JSON字段并返回
+      const coverage = result[0].expenseCoverage;
+      
+      // 如果expenseCoverage为null或undefined,返回默认值
+      if (!coverage) {
+        return {
+          rentFee: false,
+          propertyFee: false,
+          utilityFee: false,
+          consumablesFee: false,
+          cleaningFee: false,
+          phoneFee: false,
+          courierFee: false,
+          promotionFee: false,
+          teacherFee: false,
+          transportFee: false,
+          otherFee: false,
+        };
+      }
+      
+      // 返回实际的配置数据
+      return coverage;
     }),
 
   /**

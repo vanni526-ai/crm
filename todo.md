@@ -3167,8 +3167,9 @@
 - [x] 定位费用承担勾选相关代码(CityExpenseCoveragePanel.tsx)
 - [x] 分析代码逻辑并提供说明
 
-### 174. 修复getCityExpenseCoverage接口返回null的问题
+### 174. 修复getCityExpenseCoverage接口返回数据结构问题
 - [x] 检查后端getCityExpenseCoverage接口代码(partnerManagementRouter.ts 第1205行)
-- [x] 修复接口逻辑,当数据库无配置时返回默认值(所有费用项为false)
+- [x] 检查partner_cities表schema中expenseCoverage字段定义(json类型,第780行)
+- [x] 修复接口返回逻辑,正确解包JSON字段(直接返回coverage对象)
 - [x] 测试验证partnerId=13860029, cityId=3的情况(代码已修复,等待用户测试)
 - [ ] 保存检查点
