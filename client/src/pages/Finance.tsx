@@ -258,9 +258,21 @@ export default function Finance() {
   
   // 城市财务统计
   const [cityStatsDateRange, setCityStatsDateRange] = useState<string>("all");
-  const { data: cityFinancialStats } = trpc.analytics.cityFinancialStats.useQuery({ 
-    dateRange: cityStatsDateRange 
-  });
+  const [cityStatsCustomDateFrom, setCityStatsCustomDateFrom] = useState<Date | undefined>(undefined);
+  const [cityStatsCustomDateTo, setCityStatsCustomDateTo] = useState<Date | undefined>(undefined);
+  
+  // 计算城市统计的日期范围
+  const cityStatsActualDateRange = useMemo(() => {
+    if (cityStatsDateRange === "custom" && cityStatsCustomDateFrom && cityStatsCustomDateTo) {
+      return {
+        startDate: format(cityStatsCustomDateFrom, "yyyy-MM-dd"),
+        endDate: format(cityStatsCustomDateTo, "yyyy-MM-dd")
+      };
+    }
+    return { dateRange: cityStatsDateRange };
+  }, [cityStatsDateRange, cityStatsCustomDateFrom, cityStatsCustomDateTo]);
+  
+  const { data: cityFinancialStats } = trpc.analytics.cityFinancialStats.useQuery(cityStatsActualDateRange);
   
   const [dateRange, setDateRange] = useState("thisMonth");
   const [customDateFrom, setCustomDateFrom] = useState<Date | undefined>(undefined);
@@ -821,19 +833,60 @@ export default function Finance() {
                 <CardTitle>城市订单财务统计</CardTitle>
                 <p className="text-sm text-muted-foreground">按交付城市统计订单数据、销售额、费用和利润</p>
               </div>
-              <Select value={cityStatsDateRange} onValueChange={setCityStatsDateRange}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="选择时间范围" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部时间</SelectItem>
-                  <SelectItem value="today">今日</SelectItem>
-                  <SelectItem value="thisWeek">本周</SelectItem>
-                  <SelectItem value="thisMonth">本月</SelectItem>
-                  <SelectItem value="thisQuarter">本季度</SelectItem>
-                  <SelectItem value="thisYear">本年</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2 items-center">
+                <Select value={cityStatsDateRange} onValueChange={setCityStatsDateRange}>
+                  <SelectTrigger className="w-[150px]">
+                    <SelectValue placeholder="选择时间范围" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部时间</SelectItem>
+                    <SelectItem value="today">今日</SelectItem>
+                    <SelectItem value="thisWeek">本周</SelectItem>
+                    <SelectItem value="thisMonth">本月</SelectItem>
+                    <SelectItem value="thisQuarter">本季度</SelectItem>
+                    <SelectItem value="thisYear">本年度</SelectItem>
+                    <SelectItem value="custom">自定义</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                {cityStatsDateRange === "custom" && (
+                  <>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-[150px] justify-start text-left font-normal">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {cityStatsCustomDateFrom ? format(cityStatsCustomDateFrom, "yyyy-MM-dd") : "开始日期"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={cityStatsCustomDateFrom}
+                          onSelect={setCityStatsCustomDateFrom}
+                          locale={zhCN}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="w-[150px] justify-start text-left font-normal">
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {cityStatsCustomDateTo ? format(cityStatsCustomDateTo, "yyyy-MM-dd") : "结束日期"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={cityStatsCustomDateTo}
+                          onSelect={setCityStatsCustomDateTo}
+                          locale={zhCN}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent>

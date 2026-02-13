@@ -698,28 +698,50 @@ export async function deleteOrderByChannelOrderNo(channelOrderNo: string) {
 
 // ========== 城市财务统计 ==========
 
-export async function getCityFinancialStats(dateRange?: string) {
+export async function getCityFinancialStats(dateRange?: string, customStartDate?: string, customEndDate?: string) {
   const db = await getDb();
   if (!db) return [];
 
   // 根据时间范围过滤订单
   let query = db.select().from(orders);
   
-  if (dateRange) {
+  // 优先使用自定义日期范围
+  if (customStartDate && customEndDate) {
+    query = query.where(
+      sql`${orders.classDate} >= ${customStartDate} AND ${orders.classDate} <= ${customEndDate}`
+    ) as any;
+  } else if (dateRange) {
     const now = new Date();
     let startDate: Date;
     let endDate: Date = now;
 
     switch (dateRange) {
+      case 'today':
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        break;
+      case 'thisWeek': {
+        const weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - now.getDay() + 1); // 周一
+        weekStart.setHours(0, 0, 0, 0);
+        startDate = weekStart;
+        endDate = new Date(now);
+        endDate.setHours(23, 59, 59, 999);
+        break;
+      }
       case 'thisMonth':
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
         break;
-      case 'thisQuarter':
+      case 'thisQuarter': {
         const currentQuarter = Math.floor(now.getMonth() / 3);
         startDate = new Date(now.getFullYear(), currentQuarter * 3, 1);
+        endDate = new Date(now.getFullYear(), currentQuarter * 3 + 3, 0, 23, 59, 59);
         break;
+      }
       case 'thisYear':
         startDate = new Date(now.getFullYear(), 0, 1);
+        endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
         break;
       default:
         startDate = new Date(0); // 全部

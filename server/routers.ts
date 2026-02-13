@@ -1805,9 +1805,11 @@ export const appRouter = router({
     cityFinancialStats: protectedProcedure
       .input(z.object({
         dateRange: z.string().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
       }).optional())
       .query(async ({ input }) => {
-        return db.getCityFinancialStats(input?.dateRange);
+        return db.getCityFinancialStats(input?.dateRange, input?.startDate, input?.endDate);
       }),   customerStats: protectedProcedure.query(async () => {
       return db.getCustomerStats();
     }),
