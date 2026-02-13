@@ -409,10 +409,15 @@ export default function Teachers() {
           '备注', 'notes'
         ];
         
-        // 检查第一行是否包含任何有效列名
-        const isHeaderRow = firstRow.some(cell => 
-          validColumnNames.includes(cell?.toString().trim())
-        );
+        // 检查第一行是否包含任何有效列名(过滤null/undefined/空值)
+        const isHeaderRow = firstRow.some(cell => {
+          // 过滤null/undefined/空值
+          if (!cell || cell === null || cell === undefined) return false;
+          const cellStr = cell.toString().trim();
+          // 过滤字符串"null"和"undefined"
+          if (!cellStr || cellStr === 'null' || cellStr === 'undefined') return false;
+          return validColumnNames.includes(cellStr);
+        });
         
         // 如果第一行是标题行,则不需要跳过;  否则检查是否有额外标题行
         const hasExtraTitle = !isHeaderRow && firstRow.length > 0 &&
@@ -735,15 +740,15 @@ export default function Teachers() {
           </div>
           <div className="flex gap-2">
             <Button onClick={handleExport} variant="outline">
-              <Download className="w-4 h-4 mr-2" />
+              <Upload className="w-4 h-4 mr-2" />
               导出Excel
             </Button>
             <Button onClick={handleDownloadTemplate} variant="outline">
-              <Download className="w-4 h-4 mr-2" />
+              <Upload className="w-4 h-4 mr-2" />
               下载模板
             </Button>
             <Button onClick={handleImportClick} variant="outline" disabled={importing}>
-              <Upload className="w-4 h-4 mr-2" />
+              <Download className="w-4 h-4 mr-2" />
               {importing ? "导入中..." : "导入Excel"}
             </Button>
             <input

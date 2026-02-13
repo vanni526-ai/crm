@@ -1,0 +1,74 @@
+{
+  "query": "\n-- 查询ID在570031-570038范围内的无效记录\nSELECT id, name, phone, city, status, notes FROM teachers WHERE id >= 570031 AND id <= 570038;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询ID在570031-570038范围内的无效记录\nSELECT id, name, phone, city, status, notes FROM teachers WHERE id >= 570031 AND id <= 570038;\n",
+  "rows": [
+    {
+      "id": "570031",
+      "name": "电话号码",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    },
+    {
+      "id": "570032",
+      "name": "活跃状态",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    },
+    {
+      "id": "570033",
+      "name": "老师属性",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    },
+    {
+      "id": "570034",
+      "name": "受众客户类型",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    },
+    {
+      "id": "570035",
+      "name": "地区",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    },
+    {
+      "id": "570036",
+      "name": "合同到期时间",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    },
+    {
+      "id": "570037",
+      "name": "入职时间",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    },
+    {
+      "id": "570038",
+      "name": "备注",
+      "phone": "",
+      "city": "",
+      "status": "活跃",
+      "notes": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tcity\tstatus\tnotes\n570031\t电话号码\t\t\t活跃\t\n570032\t活跃状态\t\t\t活跃\t\n570033\t老师属性\t\t\t活跃\t\n570034\t受众客户类型\t\t\t活跃\t\n570035\t地区\t\t\t活跃\t\n570036\t合同到期时间\t\t\t活跃\t\n570037\t入职时间\t\t\t活跃\t\n570038\t备注\t\t\t活跃\t\n",
+  "stderr": "",
+  "execution_time_ms": 1535
+}

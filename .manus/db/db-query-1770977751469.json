@@ -1,0 +1,13 @@
+{
+  "query": "\n-- 查询剩余的老师数量\nSELECT COUNT(*) as total FROM teachers;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询剩余的老师数量\nSELECT COUNT(*) as total FROM teachers;\n",
+  "rows": [
+    {
+      "total": "69"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n69\n",
+  "stderr": "",
+  "execution_time_ms": 1593
+}
