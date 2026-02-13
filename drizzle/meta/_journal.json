@@ -260,6 +260,13 @@
       "when": 1770966433341,
       "tag": "0036_freezing_warhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1770979663565,
+      "tag": "0037_rare_sway",
+      "breakpoints": true
     }
   ]
 }

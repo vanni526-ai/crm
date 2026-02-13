@@ -3261,7 +3261,6 @@ export async function createCityConfig(
   data: {
     city: string;
     areaCode?: string;
-    partnerFeeRate: string;
     description?: string;
   },
   createdBy: number

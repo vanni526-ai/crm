@@ -1869,7 +1869,6 @@ export const appRouter = router({
       .input(z.object({
         city: z.string(),
         areaCode: z.string().optional(),
-        partnerFeeRate: z.string(),
         description: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {

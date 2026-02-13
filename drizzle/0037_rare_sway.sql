@@ -1,0 +1,1 @@
+ALTER TABLE `cityPartnerConfig` MODIFY COLUMN `partnerFeeRate` decimal(5,2);

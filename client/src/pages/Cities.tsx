@@ -36,7 +36,6 @@ export default function Cities() {
   const [formData, setFormData] = useState({
     city: "",
     areaCode: "",
-    partnerFeeRate: "",
     description: "",
   });
 
@@ -73,8 +72,8 @@ export default function Cities() {
   };
 
   const handleCreate = async () => {
-    if (!formData.city || !formData.partnerFeeRate) {
-      toast.error("请填写城市名称和合伙人费比例");
+    if (!formData.city) {
+      toast.error("请填写城市名称");
       return;
     }
 
@@ -82,7 +81,7 @@ export default function Cities() {
       await createMutation.mutateAsync(formData);
       toast.success("城市创建成功");
       setIsCreateDialogOpen(false);
-      setFormData({ city: "", areaCode: "", partnerFeeRate: "", description: "" });
+      setFormData({ city: "", areaCode: "", description: "" });
       refetch();
     } catch (error: any) {
       toast.error(error.message || "创建失败");
@@ -96,12 +95,11 @@ export default function Cities() {
       await updateMutation.mutateAsync({
         id: editingCity.id,
         areaCode: formData.areaCode,
-        partnerFeeRate: formData.partnerFeeRate,
         description: formData.description,
       });
       toast.success("城市更新成功");
       setEditingCity(null);
-      setFormData({ city: "", areaCode: "", partnerFeeRate: "", description: "" });
+      setFormData({ city: "", areaCode: "", description: "" });
       refetch();
     } catch (error: any) {
       toast.error(error.message || "更新失败");
@@ -125,7 +123,6 @@ export default function Cities() {
     setFormData({
       city: city.city,
       areaCode: city.areaCode || "",
-      partnerFeeRate: city.partnerFeeRate,
       description: city.description || "",
     });
   };
@@ -375,7 +372,7 @@ export default function Cities() {
             <DialogHeader>
               <DialogTitle>添加新城市</DialogTitle>
               <DialogDescription>
-                填写城市信息和合伙人费配置
+                填写城市信息
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -397,16 +394,7 @@ export default function Cities() {
                   placeholder="例如: 010"
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="partnerFeeRate">合伙人费比例(%) *</Label>
-                <Input
-                  id="partnerFeeRate"
-                  type="number"
-                  value={formData.partnerFeeRate}
-                  onChange={(e) => setFormData({ ...formData, partnerFeeRate: e.target.value })}
-                  placeholder="例如: 30"
-                />
-              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="description">说明</Label>
                 <Textarea
@@ -602,16 +590,7 @@ export default function Cities() {
                 placeholder="例如: 010"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="edit-partnerFeeRate">合伙人费比例(%) *</Label>
-              <Input
-                id="edit-partnerFeeRate"
-                type="number"
-                value={formData.partnerFeeRate}
-                onChange={(e) => setFormData({ ...formData, partnerFeeRate: e.target.value })}
-                placeholder="例如: 30"
-              />
-            </div>
+
             <div className="grid gap-2">
               <Label htmlFor="edit-description">说明</Label>
               <Textarea
