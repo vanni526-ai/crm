@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM teachers WHERE name LIKE '%测试%' OR name LIKE '%验证%' OR nickname LIKE '%测试%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute DELETE FROM teachers WHERE name LIKE '%测试%' OR name LIKE '%验证%' OR nickname LIKE '%测试%';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1505
+}

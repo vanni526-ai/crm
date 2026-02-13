@@ -1,0 +1,101 @@
+{
+  "query": "SELECT id, name, nickname, phone, city FROM teachers WHERE name LIKE '%测试%' OR name LIKE '%验证%' OR nickname LIKE '%测试%' ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, phone, city FROM teachers WHERE name LIKE '%测试%' OR name LIKE '%验证%' OR nickname LIKE '%测试%' ORDER BY id;",
+  "rows": [
+    {
+      "id": "360001",
+      "name": "测试老师1",
+      "nickname": "NULL",
+      "phone": "",
+      "city": "大连"
+    },
+    {
+      "id": "420001",
+      "name": "测试老师A",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "北京"
+    },
+    {
+      "id": "420014",
+      "name": "验证测试老师",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "NULL"
+    },
+    {
+      "id": "450001",
+      "name": "测试老师A",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "北京"
+    },
+    {
+      "id": "480001",
+      "name": "测试老师A",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "北京"
+    },
+    {
+      "id": "480004",
+      "name": "统计测试老师",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "NULL"
+    },
+    {
+      "id": "510001",
+      "name": "测试老师A",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "北京"
+    },
+    {
+      "id": "510014",
+      "name": "验证测试老师",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "NULL"
+    },
+    {
+      "id": "510016",
+      "name": "测试老师A",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "北京"
+    },
+    {
+      "id": "510029",
+      "name": "验证测试老师",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "city": "NULL"
+    },
+    {
+      "id": "540003",
+      "name": "测试用户",
+      "nickname": "测试用户",
+      "phone": "13800138001",
+      "city": "东莞"
+    },
+    {
+      "id": "540004",
+      "name": "测试新增老师526",
+      "nickname": "NULL",
+      "phone": "18321298886",
+      "city": "大连"
+    },
+    {
+      "id": "540005",
+      "name": "测试唯一性验证",
+      "nickname": "NULL",
+      "phone": "13900000001",
+      "city": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\tphone\tcity\n360001\t测试老师1\tNULL\t\t大连\n420001\t测试老师A\tNULL\tNULL\t北京\n420014\t验证测试老师\tNULL\tNULL\tNULL\n450001\t测试老师A\tNULL\tNULL\t北京\n480001\t测试老师A\tNULL\tNULL\t北京\n480004\t统计测试老师\tNULL\tNULL\tNULL\n510001\t测试老师A\tNULL\tNULL\t北京\n510014\t验证测试老师\tNULL\tNULL\tNULL\n510016\t测试老师A\tNULL\tNULL\t北京\n510029\t验证测试老师\tNULL\tNULL\tNULL\n540003\t测试用户\t测试用户\t13800138001\t东莞\n540004\t测试新增老师526\tNULL\t18321298886\t大连\n540005\t测试唯一性验证\tNULL\t13900000001\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1590
+}
