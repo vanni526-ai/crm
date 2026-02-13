@@ -3043,3 +3043,20 @@
   - 错误处理、最佳实践、常见问题FAQ
   - 完整的API客户端示例(TypeScript + React Native)
 - [x] 保存检查点并交付文档
+
+### 169. 为老师管理列表添加"老师属性"字段(S/M/Switch)
+- [x] 修改数据库schema添加teacherAttribute字段
+  - 在teachers表中添加teacherAttribute字段(enum: S/M/Switch)
+  - 使用SQL直接添加字段到数据库
+- [x] 更新前端UI显示老师属性字段
+  - 在表格头部添加"老师属性"列
+  - 在表格行中显示老师属性值
+  - 在编辑对话框中添加老师属性选择器(Select组件)
+  - 在teacherSchema中添加teacherAttribute字段验证
+- [x] 更新Excel导入模板和导入逻辑
+  - 在导入须知中添加老师属性字段说明
+  - 在字段说明中添加老师属性字段
+  - 在示例数据中添加老师属性字段
+  - 在routers.ts的importFromExcel中添加teacherAttribute字段验证
+  - 在handleFileChange中添加teacherAttribute字段映射
+- [x] 测试验证并保存检查点(5个测试用例全部通过)

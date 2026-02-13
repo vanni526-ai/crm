@@ -147,6 +147,7 @@ export const teachers = mysqlTable("teachers", {
   category: varchar("category", { length: 50 }), // 分类(本部老师/合伙店老师)
   city: varchar("city", { length: 50 }), // 所在城市(合伙店老师使用)
   avatarUrl: varchar("avatarUrl", { length: 500 }), // 头像URL(S3存储)
+  teacherAttribute: mysqlEnum("teacherAttribute", ["S", "M", "Switch"]), // 老师属性(S/M/Switch)
   // 保留原有字段以兼容
   nickname: varchar("nickname", { length: 50 }), // 花名
   email: varchar("email", { length: 320 }),

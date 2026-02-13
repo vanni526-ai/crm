@@ -28,6 +28,7 @@ const teacherSchema = z.object({
   name: z.string().min(1, "老师姓名不能为空"),
   phone: z.string().min(1, "电话号码不能为空"),
   status: z.enum(["激活", "不激活"], { message: "请选择活跃状态" }),
+  teacherAttribute: z.enum(["S", "M", "Switch"], { message: "请选择老师属性" }).optional(),
   customerType: z.string().optional(),
   notes: z.string().optional(),
   category: z.string().optional(),
@@ -409,6 +410,7 @@ export default function Teachers() {
             name: row['姓名'] || row['name'] || '',
             phone: row['电话号码'] || row['phone'] ? String(row['电话号码'] || row['phone']) : '',
             status: row['活跃状态'] || row['status'] || '活跃',
+            teacherAttribute: row['老师属性'] || row['teacherAttribute'] || undefined,
             customerType: row['受众客户类型'] || row['customerType'] || '',
             notes: row['备注'] || row['notes'] || '',
             category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他',
@@ -464,6 +466,7 @@ export default function Teachers() {
         '姓名': '张老师',
         '电话号码': '13800138000',
         '活跃状态': '活跃',
+        '老师属性': 'S',
         '受众客户类型': '成人',
         '地区': '重庆',
         '合同到期时间': '2026-12-31',
@@ -474,6 +477,7 @@ export default function Teachers() {
         '姓名': '李老师',
         '电话号码': '13900139000',
         '活跃状态': '活跃',
+        '老师属性': 'M',
         '受众客户类型': '青少年',
         '地区': '上海;天津',
         '合同到期时间': '2027-06-30',
@@ -499,8 +503,14 @@ export default function Teachers() {
       {
         '字段名': '活跃状态',
         '是否必填': '否',
-        '说明': '老师的工作状态，默认为"活跃"',
+        '说明': '老师的工作状态，默认为“活跃”',
         '示例': '活跃 或 休息',
+      },
+      {
+        '字段名': '老师属性',
+        '是否必填': '否',
+        '说明': '老师的属性类型，可选值：S、M、Switch',
+        '示例': 'S 或 M 或 Switch',
       },
       {
         '字段名': '受众客户类型',
@@ -558,7 +568,11 @@ export default function Teachers() {
       },
       {
         '序号': '6',
-        '重要说明': '请保持表头不变，从第二行开始填写数据',
+        '重要说明': '老师属性可选值：S、M、Switch，用于前端App显示',
+      },
+      {
+        '序号': '7',
+        '重要说明': '姓名和电话号码为必填字段，其他字段可选',
       },
     ];
 
@@ -895,7 +909,7 @@ export default function Teachers() {
                     <TableHead>昵称</TableHead>
                     <TableHead>电话</TableHead>
                     <TableHead>状态</TableHead>
-
+                    <TableHead>老师属性</TableHead>
                     <TableHead>分类</TableHead>
                     <TableHead>城市</TableHead>
                     <TableHead>合同到期</TableHead>
@@ -972,7 +986,13 @@ export default function Teachers() {
                           {teacher.status || '活跃'}
                         </Badge>
                       </TableCell>
-
+                      <TableCell>
+                        {teacher.teacherAttribute ? (
+                          <Badge variant="outline">{teacher.teacherAttribute}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
                       <TableCell>{teacher.category || '-'}</TableCell>
                       <TableCell>{teacher.city || '-'}</TableCell>
                       <TableCell>
@@ -1051,6 +1071,19 @@ export default function Teachers() {
                 <div>
                   <Label htmlFor="edit-status">活跃状态</Label>
                   <Input id="edit-status" {...register("status")} disabled className="bg-muted" />
+                </div>
+                <div>
+                  <Label htmlFor="edit-teacherAttribute">老师属性</Label>
+                  <select 
+                    id="edit-teacherAttribute" 
+                    {...register("teacherAttribute")} 
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">未设置</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="Switch">Switch</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="edit-category">分类</Label>

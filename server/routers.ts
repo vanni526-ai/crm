@@ -1361,6 +1361,7 @@ export const appRouter = router({
           name: z.string(),
           phone: z.string().optional(),
           status: z.string().optional(),
+          teacherAttribute: z.enum(["S", "M", "Switch"]).optional(),
           customerType: z.string().optional(),
           notes: z.string().optional(),
           category: z.string().optional(),
