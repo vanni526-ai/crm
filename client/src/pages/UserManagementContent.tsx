@@ -607,7 +607,7 @@ export default function UserManagementContent() {
                           {editTeacherCities.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                               {editTeacherCities.map((city) => (
-                                <Badge key={city} variant="secondary" className="bg-purple-100 text-purple-800">
+                                <Badge key={`teacher-${city}`} variant="secondary" className="bg-purple-100 text-purple-800">
                                   {city}
                                   <button
                                     type="button"
@@ -632,7 +632,7 @@ export default function UserManagementContent() {
                           >
                             <option value="">添加城市...</option>
                             {cities?.map((city) => (
-                              <option key={city.name} value={city.name}>{city.name}</option>
+                              <option key={city.id} value={city.name}>{city.name}</option>
                             ))}
                           </select>
                         </div>
@@ -663,7 +663,7 @@ export default function UserManagementContent() {
                           {editPartnerCities.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                               {editPartnerCities.map((city) => (
-                                <Badge key={city} variant="secondary" className="bg-amber-100 text-amber-800">
+                                <Badge key={`partner-${city}`} variant="secondary" className="bg-amber-100 text-amber-800">
                                   {city}
                                   <button
                                     type="button"
@@ -688,7 +688,7 @@ export default function UserManagementContent() {
                           >
                             <option value="">添加城市...</option>
                             {cities?.map((city) => (
-                              <option key={city.name} value={city.name}>{city.name}</option>
+                              <option key={city.id} value={city.name}>{city.name}</option>
                             ))}
                           </select>
                         </div>

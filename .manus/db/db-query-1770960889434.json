@@ -1,0 +1,19 @@
+{
+  "query": "SELECT * FROM cities WHERE name = '重庆';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT * FROM cities WHERE name = '重庆';",
+  "rows": [
+    {
+      "id": "3",
+      "name": "重庆",
+      "areaCode": "NULL",
+      "isActive": "1",
+      "sortOrder": "3",
+      "createdAt": "2026-02-04 05:23:06",
+      "updatedAt": "2026-02-04 05:23:06"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tareaCode\tisActive\tsortOrder\tcreatedAt\tupdatedAt\n3\t重庆\tNULL\t1\t3\t2026-02-04 05:23:06\t2026-02-04 05:23:06\n",
+  "stderr": "",
+  "execution_time_ms": 1713
+}

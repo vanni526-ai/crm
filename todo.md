@@ -2974,3 +2974,21 @@
   - 数据库验证:partner_cities表成功创建test用户的重庆关联记录
   - UI验证:合伙人管理页面正确显示"重庆 合伙人:test"
 - [x] 保存检查点并交付
+
+### 163. 修复客户管理页面中重复key"重庆"导致的React渲染错误
+- [ ] 定位重复key错误的源代码位置(UserManagementContent.tsx)
+- [ ] 分析为什么会出现重复的"重庆"key(可能是城市选择器渲染逻辑问题)
+- [ ] 修复重复key问题(使用唯一标识符作为key,如city.id或组合key)
+- [ ] 测试验证修复效果(确认React警告消失)
+- [ ] 保存检查点并交付
+
+### 163. 修复客户管理页面中重复key"重庆"导致的React渲染错误
+- [x] 定位重复key错误的源代码位置
+  - 问题一:城市标签使用city.name作key,如果同一用户既是老师又是合伙人,会出现重复key
+  - 问题二:城市选择器option使用city.name作key,如果cities数据有重复会出现重复key
+  - 根本原因:getAllCities方法leftJoin partner_cities表,当一个城市有多条partner_cities记录时返回重复数据
+- [x] 修复重复key问题并测试验证
+  - 修复一:城市标签的key改为`teacher-${city}`和`partner-${city}`,添加角色前缀
+  - 修复二:城市选择器option的key改为`city.id`,使用唯一ID
+  - 修复三:getAllCities方法添加去重逻辑,使用Map保留每个城市的第一条记录
+- [x] 保存检查点并交付修复结果

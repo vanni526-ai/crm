@@ -4269,8 +4269,17 @@ export async function getAllCities() {
       .leftJoin(partnerCities, eq(cities.id, partnerCities.cityId))
       .orderBy(asc(cities.sortOrder), asc(cities.name));
     
+    // 去重:当一个城市有多条partner_cities记录时,leftJoin会返回多行
+    // 使用Map去重,保留每个城市的第一条记录
+    const uniqueCities = new Map<number, typeof cityList[0]>();
+    for (const city of cityList) {
+      if (!uniqueCities.has(city.id)) {
+        uniqueCities.set(city.id, city);
+      }
+    }
+    
     // 计算每个城市的当前合佩人分红比例
-    return cityList.map(city => {
+    return Array.from(uniqueCities.values()).map(city => {
       let partnerFeeRate = 0;
       if (city.currentProfitStage === 1 && city.profitRatioStage1Partner) {
         partnerFeeRate = parseFloat(city.profitRatioStage1Partner);
