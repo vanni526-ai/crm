@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 查询users表中所有带有老师角色的账号\nSELECT id, name, roles FROM users WHERE roles LIKE '%老师%';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询users表中所有带有老师角色的账号\nSELECT id, name, roles FROM users WHERE roles LIKE '%老师%';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1516
+}

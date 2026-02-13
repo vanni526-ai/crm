@@ -1,0 +1,130 @@
+{
+  "query": "\n-- 检查是否所有老师都有对应城市角色\nSELECT \n  t.name as teacher_name,\n  t.city as teacher_city,\n  u.roles as user_roles,\n  CASE \n    WHEN u.roles LIKE CONCAT('%', t.city, '%') THEN '城市角色已分配'\n    WHEN t.city = '' OR t.city IS NULL THEN '无城市信息'\n    ELSE '缺少城市角色'\n  END as city_role_check\nFROM teachers t\nJOIN users u ON t.userId = u.id\nWHERE u.roles LIKE '%老师%'\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 检查是否所有老师都有对应城市角色\nSELECT \n  t.name as teacher_name,\n  t.city as teacher_city,\n  u.roles as user_roles,\n  CASE \n    WHEN u.roles LIKE CONCAT('%', t.city, '%') THEN '城市角色已分配'\n    WHEN t.city = '' OR t.city IS NULL THEN '无城市信息'\n    ELSE '缺少城市角色'\n  END as city_role_check\nFROM teachers t\nJOIN users u ON t.userId = u.id\nWHERE u.roles LIKE '%老师%'\nLIMIT 20;\n",
+  "rows": [
+    {
+      "teacher_name": "小小",
+      "teacher_city": "深圳",
+      "user_roles": "teacher,普通用户,老师,深圳",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "橘子",
+      "teacher_city": "天津",
+      "user_roles": "teacher,普通用户,老师,天津",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "声声",
+      "teacher_city": "天津",
+      "user_roles": "teacher,普通用户,老师,天津",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "皮皮",
+      "teacher_city": "济南",
+      "user_roles": "teacher,普通用户,老师,济南",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "兮灵",
+      "teacher_city": "石家庄",
+      "user_roles": "teacher,普通用户,老师,石家庄",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "絮絮",
+      "teacher_city": "石家庄",
+      "user_roles": "teacher,普通用户,老师,石家庄",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "雨凝",
+      "teacher_city": "石家庄",
+      "user_roles": "teacher,普通用户,老师,石家庄",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "小米",
+      "teacher_city": "郑州",
+      "user_roles": "teacher,普通用户,老师,郑州",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "奚敏",
+      "teacher_city": "郑州",
+      "user_roles": "teacher,普通用户,老师,郑州",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "Sherry",
+      "teacher_city": "南京",
+      "user_roles": "teacher,普通用户,老师,南京",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "苏苏",
+      "teacher_city": "南京",
+      "user_roles": "teacher,普通用户,老师,南京",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "小夜",
+      "teacher_city": "南京",
+      "user_roles": "teacher,普通用户,老师,南京",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "依一",
+      "teacher_city": "无锡",
+      "user_roles": "teacher,普通用户,老师,无锡",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "云云",
+      "teacher_city": "无锡",
+      "user_roles": "teacher,普通用户,老师,无锡",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "小羊",
+      "teacher_city": "武汉",
+      "user_roles": "teacher,普通用户,老师,武汉",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "汐梨",
+      "teacher_city": "武汉",
+      "user_roles": "teacher,普通用户,老师,武汉",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "欣欣",
+      "teacher_city": "武汉",
+      "user_roles": "teacher,普通用户,老师,武汉",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "兔子",
+      "teacher_city": "武汉",
+      "user_roles": "teacher,普通用户,老师,武汉",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "鱼鱼",
+      "teacher_city": "福州",
+      "user_roles": "teacher,普通用户,老师,福州",
+      "city_role_check": "城市角色已分配"
+    },
+    {
+      "teacher_name": "宥香",
+      "teacher_city": "东莞",
+      "user_roles": "teacher,普通用户,老师,东莞",
+      "city_role_check": "城市角色已分配"
+    }
+  ],
+  "messages": [],
+  "stdout": "teacher_name\tteacher_city\tuser_roles\tcity_role_check\n小小\t深圳\tteacher,普通用户,老师,深圳\t城市角色已分配\n橘子\t天津\tteacher,普通用户,老师,天津\t城市角色已分配\n声声\t天津\tteacher,普通用户,老师,天津\t城市角色已分配\n皮皮\t济南\tteacher,普通用户,老师,济南\t城市角色已分配\n兮灵\t石家庄\tteacher,普通用户,老师,石家庄\t城市角色已分配\n絮絮\t石家庄\tteacher,普通用户,老师,石家庄\t城市角色已分配\n雨凝\t石家庄\tteacher,普通用户,老师,石家庄\t城市角色已分配\n小米\t郑州\tteacher,普通用户,老师,郑州\t城市角色已分配\n奚敏\t郑州\tteacher,普通用户,老师,郑州\t城市角色已分配\nSherry\t南京\tteacher,普通用户,老师,南京\t城市角色已分配\n苏苏\t南京\tteacher,普通用户,老师,南京\t城市角色已分配\n小夜\t南京\tteacher,普通用户,老师,南京\t城市角色已分配\n依一\t无锡\tteacher,普通用户,老师,无锡\t城市角色已分配\n云云\t无锡\tteacher,普通用户,老师,无锡\t城市角色已分配\n小羊\t武汉\tteacher,普通用户,老师,武汉\t城市角色已分配\n汐梨\t武汉\tteacher,普通用户,老师,武汉\t城市角色已分配\n欣欣\t武汉\tteacher,普通用户,老师,武汉\t城市角色已分配\n兔子\t武汉\tteacher,普通用户,老师,武汉\t城市角色已分配\n鱼鱼\t福州\tteacher,普通用户,老师,福州\t城市角色已分配\n宥香\t东莞\tteacher,普通用户,老师,东莞\t城市角色已分配\n",
+  "stderr": "",
+  "execution_time_ms": 1522
+}

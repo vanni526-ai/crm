@@ -1,0 +1,100 @@
+{
+  "query": "\n-- 检查老师列表导入结果\nSELECT id, name, phone, city, status, teacherAttribute, category FROM teachers ORDER BY id LIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 检查老师列表导入结果\nSELECT id, name, phone, city, status, teacherAttribute, category FROM teachers ORDER BY id LIMIT 10;\n",
+  "rows": [
+    {
+      "id": "570055",
+      "name": "安雅",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "Switch",
+      "category": "本部老师"
+    },
+    {
+      "id": "570056",
+      "name": "烨",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "S",
+      "category": "本部老师"
+    },
+    {
+      "id": "570057",
+      "name": "圆圆",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "S",
+      "category": "本部老师"
+    },
+    {
+      "id": "570058",
+      "name": "小钰",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "S",
+      "category": "本部老师"
+    },
+    {
+      "id": "570059",
+      "name": "玥玥",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "S",
+      "category": "本部老师"
+    },
+    {
+      "id": "570060",
+      "name": "唐泽",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "Switch",
+      "category": "本部老师"
+    },
+    {
+      "id": "570061",
+      "name": "Nemo",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "S",
+      "category": "本部老师"
+    },
+    {
+      "id": "570062",
+      "name": "淼淼",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "S",
+      "category": "本部老师"
+    },
+    {
+      "id": "570063",
+      "name": "璐璐",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "Switch",
+      "category": "本部老师"
+    },
+    {
+      "id": "570064",
+      "name": "水水",
+      "phone": "",
+      "city": "上海",
+      "status": "活跃",
+      "teacherAttribute": "Switch",
+      "category": "本部老师"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tcity\tstatus\tteacherAttribute\tcategory\n570055\t安雅\t\t上海\t活跃\tSwitch\t本部老师\n570056\t烨\t\t上海\t活跃\tS\t本部老师\n570057\t圆圆\t\t上海\t活跃\tS\t本部老师\n570058\t小钰\t\t上海\t活跃\tS\t本部老师\n570059\t玥玥\t\t上海\t活跃\tS\t本部老师\n570060\t唐泽\t\t上海\t活跃\tSwitch\t本部老师\n570061\tNemo\t\t上海\t活跃\tS\t本部老师\n570062\t淼淼\t\t上海\t活跃\tS\t本部老师\n570063\t璐璐\t\t上海\t活跃\tSwitch\t本部老师\n570064\t水水\t\t上海\t活跃\tSwitch\t本部老师\n",
+  "stderr": "",
+  "execution_time_ms": 1505
+}

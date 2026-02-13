@@ -1,0 +1,76 @@
+{
+  "query": "\n-- 统计老师总数\nSELECT COUNT(*) as total FROM teachers;\n\n-- 按城市统计老师分布\nSELECT city, COUNT(*) as count FROM teachers GROUP BY city ORDER BY count DESC;\n\n-- 按老师属性统计\nSELECT teacherAttribute, COUNT(*) as count FROM teachers GROUP BY teacherAttribute;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 统计老师总数\nSELECT COUNT(*) as total FROM teachers;\n\n-- 按城市统计老师分布\nSELECT city, COUNT(*) as count FROM teachers GROUP BY city ORDER BY count DESC;\n\n-- 按老师属性统计\nSELECT teacherAttribute, COUNT(*) as count FROM teachers GROUP BY teacherAttribute;\n",
+  "rows": [
+    {
+      "total": "128"
+    },
+    {
+      "total": "city\tcount"
+    },
+    {
+      "total": "上海\t60"
+    },
+    {
+      "total": "武汉\t12"
+    },
+    {
+      "total": "天津\t10"
+    },
+    {
+      "total": "石家庄\t6"
+    },
+    {
+      "total": "深圳\t6"
+    },
+    {
+      "total": "南京\t6"
+    },
+    {
+      "total": "大连\t6"
+    },
+    {
+      "total": "无锡\t4"
+    },
+    {
+      "total": "郑州\t4"
+    },
+    {
+      "total": "济南\t2"
+    },
+    {
+      "total": "泉州\t2"
+    },
+    {
+      "total": "长沙\t2"
+    },
+    {
+      "total": "东莞\t2"
+    },
+    {
+      "total": "福州\t2"
+    },
+    {
+      "total": "宁波\t2"
+    },
+    {
+      "total": "太原\t2"
+    },
+    {
+      "total": "teacherAttribute\tcount"
+    },
+    {
+      "total": "M\t6"
+    },
+    {
+      "total": "S\t70"
+    },
+    {
+      "total": "Switch\t52"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n128\ncity\tcount\n上海\t60\n武汉\t12\n天津\t10\n石家庄\t6\n深圳\t6\n南京\t6\n大连\t6\n无锡\t4\n郑州\t4\n济南\t2\n泉州\t2\n长沙\t2\n东莞\t2\n福州\t2\n宁波\t2\n太原\t2\nteacherAttribute\tcount\nM\t6\nS\t70\nSwitch\t52\n",
+  "stderr": "",
+  "execution_time_ms": 1985
+}

@@ -1,0 +1,84 @@
+{
+  "query": "\n-- 检查用户管理中的老师账号角色\nSELECT id, name, phone, roles FROM users WHERE roles LIKE '%老师%' ORDER BY id LIMIT 10;\n\n-- 统计老师角色用户总数\nSELECT COUNT(*) as total FROM users WHERE roles LIKE '%老师%';\n\n-- 检查角色分配是否正确(应该包含\"普通用户+老师+对应城市\")\nSELECT \n  name, \n  roles,\n  CASE \n    WHEN roles LIKE '%普通用户%' AND roles LIKE '%老师%' THEN '正确'\n    ELSE '缺少角色'\n  END as role_check\nFROM users \nWHERE roles LIKE '%老师%'\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 检查用户管理中的老师账号角色\nSELECT id, name, phone, roles FROM users WHERE roles LIKE '%老师%' ORDER BY id LIMIT 10;\n\n-- 统计老师角色用户总数\nSELECT COUNT(*) as total FROM users WHERE roles LIKE '%老师%';\n\n-- 检查角色分配是否正确(应该包含\"普通用户+老师+对应城市\")\nSELECT \n  name, \n  roles,\n  CASE \n    WHEN roles LIKE '%普通用户%' AND roles LIKE '%老师%' THEN '正确'\n    ELSE '缺少角色'\n  END as role_check\nFROM users \nWHERE roles LIKE '%老师%'\nLIMIT 10;\n",
+  "rows": [
+    {
+      "id": "15362121",
+      "name": "安雅",
+      "phone": "15300822780",
+      "roles": "user,teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362122",
+      "name": "姜一",
+      "phone": "13936258496",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362124",
+      "name": "黑桃",
+      "phone": "15888248980",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362126",
+      "name": "水水",
+      "phone": "18817847691",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362127",
+      "name": "唐泽",
+      "phone": "19935377186",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362128",
+      "name": "无浪",
+      "phone": "13633805089",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362129",
+      "name": "米妮",
+      "phone": "13046640252",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362131",
+      "name": "小梨",
+      "phone": "17611021650",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362132",
+      "name": "韦德",
+      "phone": "13816823753",
+      "roles": "teacher,普通用户,老师,上海"
+    },
+    {
+      "id": "15362133",
+      "name": "枝",
+      "phone": "19872019665",
+      "roles": "teacher,普通用户,老师,上海"
+    }
+  ],
+  "messages": [
+    "total",
+    "63",
+    "name\troles\trole_check",
+    "安雅\tuser,teacher,普通用户,老师,上海\t正确",
+    "姜一\tteacher,普通用户,老师,上海\t正确",
+    "黑桃\tteacher,普通用户,老师,上海\t正确",
+    "水水\tteacher,普通用户,老师,上海\t正确",
+    "唐泽\tteacher,普通用户,老师,上海\t正确",
+    "无浪\tteacher,普通用户,老师,上海\t正确",
+    "米妮\tteacher,普通用户,老师,上海\t正确",
+    "小梨\tteacher,普通用户,老师,上海\t正确",
+    "韦德\tteacher,普通用户,老师,上海\t正确",
+    "枝\tteacher,普通用户,老师,上海\t正确"
+  ],
+  "stdout": "id\tname\tphone\troles\n15362121\t安雅\t15300822780\tuser,teacher,普通用户,老师,上海\n15362122\t姜一\t13936258496\tteacher,普通用户,老师,上海\n15362124\t黑桃\t15888248980\tteacher,普通用户,老师,上海\n15362126\t水水\t18817847691\tteacher,普通用户,老师,上海\n15362127\t唐泽\t19935377186\tteacher,普通用户,老师,上海\n15362128\t无浪\t13633805089\tteacher,普通用户,老师,上海\n15362129\t米妮\t13046640252\tteacher,普通用户,老师,上海\n15362131\t小梨\t17611021650\tteacher,普通用户,老师,上海\n15362132\t韦德\t13816823753\tteacher,普通用户,老师,上海\n15362133\t枝\t19872019665\tteacher,普通用户,老师,上海\ntotal\n63\nname\troles\trole_check\n安雅\tuser,teacher,普通用户,老师,上海\t正确\n姜一\tteacher,普通用户,老师,上海\t正确\n黑桃\tteacher,普通用户,老师,上海\t正确\n水水\tteacher,普通用户,老师,上海\t正确\n唐泽\tteacher,普通用户,老师,上海\t正确\n无浪\tteacher,普通用户,老师,上海\t正确\n米妮\tteacher,普通用户,老师,上海\t正确\n小梨\tteacher,普通用户,老师,上海\t正确\n韦德\tteacher,普通用户,老师,上海\t正确\n枝\tteacher,普通用户,老师,上海\t正确\n",
+  "stderr": "",
+  "execution_time_ms": 1945
+}
