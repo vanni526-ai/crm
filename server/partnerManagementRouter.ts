@@ -21,8 +21,11 @@ export const partnerManagementRouter = router({
       
       const conditions = [];
       
+      // 默认只显示isActive=true的合伙人
       if (input?.isActive !== undefined) {
         conditions.push(eq(partners.isActive, input.isActive));
+      } else {
+        conditions.push(eq(partners.isActive, true));
       }
       
       const result = await db

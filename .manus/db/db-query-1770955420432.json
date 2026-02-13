@@ -1,0 +1,19 @@
+{
+  "query": "SELECT \n  u.id as user_id,\n  u.name,\n  u.phone,\n  u.roles,\n  p.id as partner_id,\n  p.name as partner_name,\n  p.isActive as partner_is_active\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.name LIKE '%重庆%' OR p.name LIKE '%重庆%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  u.id as user_id,\n  u.name,\n  u.phone,\n  u.roles,\n  p.id as partner_id,\n  p.name as partner_name,\n  p.isActive as partner_is_active\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.name LIKE '%重庆%' OR p.name LIKE '%重庆%';",
+  "rows": [
+    {
+      "user_id": "15372547",
+      "name": "重庆加盟商",
+      "phone": "13800000002",
+      "roles": "user",
+      "partner_id": "17",
+      "partner_name": "重庆加盟商",
+      "partner_is_active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tname\tphone\troles\tpartner_id\tpartner_name\tpartner_is_active\n15372547\t重庆加盟商\t13800000002\tuser\t17\t重庆加盟商\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1661
+}

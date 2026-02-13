@@ -255,10 +255,27 @@ export async function deleteUserRoleCities(
 export async function updateUserRoles(userId: number, roles: string[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // 获取用户当前的角色
+  const currentUser = await db.select({ roles: users.roles }).from(users).where(eq(users.id, userId)).limit(1);
+  const oldRoles = currentUser[0]?.roles ? currentUser[0].roles.split(",") : [];
+  
   const rolesStr = roles.length > 0 ? roles.join(",") : "user";
   // 同时更新旧的role字段（取第一个角色作为主角色）
   const primaryRole = roles.includes("admin") ? "admin" : roles.includes("sales") ? "sales" : roles.includes("finance") ? "finance" : "user";
   await db.update(users).set({ roles: rolesStr, role: primaryRole as any }).where(eq(users.id, userId));
+  
+  // 如果去掉了cityPartner角色,同步禁用partners表中的对应记录
+  const hadCityPartner = oldRoles.includes("cityPartner");
+  const hasCityPartner = roles.includes("cityPartner");
+  
+  if (hadCityPartner && !hasCityPartner) {
+    // 用户之前有cityPartner角色,现在没有了,禁用partners表记录
+    await db.update(partners).set({ isActive: false }).where(eq(partners.userId, userId));
+  } else if (!hadCityPartner && hasCityPartner) {
+    // 用户之前没有cityPartner角色,现在有了,启用partners表记录
+    await db.update(partners).set({ isActive: true }).where(eq(partners.userId, userId));
+  }
 }
 
 export async function updateUserStatus(userId: number, isActive: boolean) {

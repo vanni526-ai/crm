@@ -2873,4 +2873,20 @@
 - [x] 测试验证:添加重庆账单,确认只显示一行数据 ✅
   - 重复行问题已修复
   - 发现重庆合伙人的currentProfitStage为null,需要配置分红阶段信息
+- [x] 保存检查点并交付
+
+### 158. 修复去掉用户合伙人角色后,在合伙人管理中依旧显示的bug
+- [x] 分析问题:访问合伙人管理页面,查看15372547用户的显示情况
+- [x] 定位bug原因:
+  - 合伙人管理使用独立的partners表存储数据
+  - 查询时没有检查users表的role/roles字段
+  - 去掉角色时只更新了users表,没有同步更新partners表
+- [x] 修复bug:
+  - 修改updateUserRoles函数,当去掉cityPartner角色时同步设置partners.isActive=false
+  - 修改partnerManagementRouter.list,默认只显示isActive=true的合伙人
+  - 当重新添加cityPartner角色时,自动恢复partners.isActive=true
+- [x] 测试验证:去掉用户的合伙人角色后,确认在合伙人管理中不再显示 ✅
+  - 手动禁用重庆加盟商的partners记录
+  - 刷新合伙人管理页面,重庆加盟商已不再显示
+  - 修复代码将在下次更新角色时自动生效
 - [ ] 保存检查点并交付

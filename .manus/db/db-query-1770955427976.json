@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE partners \nSET isActive = 0 \nWHERE name LIKE '%重庆%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE partners \nSET isActive = 0 \nWHERE name LIKE '%重庆%';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1667
+}
