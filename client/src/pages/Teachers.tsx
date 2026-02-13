@@ -395,10 +395,27 @@ export default function Teachers() {
         // 智能识别格式:检查第一行是否是标题行(非列名)
         const allRows: any[] = XLSX.utils.sheet_to_json(worksheet, { range: 0, header: 1 });
         const firstRow: any[] = allRows[0] || [];
-        const hasExtraTitle = firstRow.length > 0 && 
-          !firstRow.includes('姓名') && 
-          !firstRow.includes('老师') &&
-          !firstRow.includes('name') &&
+        
+        // 定义所有可能的列名(中英文)
+        const validColumnNames = [
+          '姓名', '老师', 'name',
+          '电话号码', 'phone',
+          '活跃状态', 'status',
+          '老师属性', 'teacherAttribute',
+          '受众客户类型', 'customerType',
+          '地区', '城市', 'city',
+          '合同到期时间', 'contractEndDate',
+          '入职时间', 'joinDate',
+          '备注', 'notes'
+        ];
+        
+        // 检查第一行是否包含任何有效列名
+        const isHeaderRow = firstRow.some(cell => 
+          validColumnNames.includes(cell?.toString().trim())
+        );
+        
+        // 如果第一行是标题行,则不需要跳过;  否则检查是否有额外标题行
+        const hasExtraTitle = !isHeaderRow && firstRow.length > 0 &&
           (firstRow[0]?.toString().includes('老师信息') || firstRow[0]?.toString().includes('合伙'));
         
         // 根据是否有额外标题行决定跳过的行数
