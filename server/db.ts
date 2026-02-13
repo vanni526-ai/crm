@@ -985,11 +985,50 @@ export async function batchCreateTeachers(teacherList: InsertTeacher[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const results = [];
+  const stats = { created: 0, updated: 0, skipped: 0 };
   
   for (const teacher of teacherList) {
-    // 1. 创建老师记录
-    const teacherResult = await db.insert(teachers).values(teacher);
-    const teacherId = teacherResult[0].insertId;
+    // 1. 使用姓名+城市查重,检查是否已存在同名同城市的老师
+    const cityName = teacher.city ? teacher.city.split(';')[0].trim() : '';
+    let existingTeacher = null;
+    
+    if (cityName) {
+      // 有城市信息,查找同名同城市的老师
+      existingTeacher = await db.select().from(teachers)
+        .where(and(
+          eq(teachers.name, teacher.name),
+          sql`${teachers.city} LIKE ${`%${cityName}%`}`
+        ))
+        .limit(1);
+    } else {
+      // 没有城市信息,只按姓名查找
+      existingTeacher = await db.select().from(teachers)
+        .where(eq(teachers.name, teacher.name))
+        .limit(1);
+    }
+    
+    let teacherId: number;
+    
+    if (existingTeacher && existingTeacher.length > 0) {
+      // 老师已存在,更新现有记录
+      teacherId = existingTeacher[0].id;
+      await db.update(teachers).set({
+        phone: teacher.phone || existingTeacher[0].phone,
+        isActive: teacher.isActive ?? existingTeacher[0].isActive,
+        customerType: teacher.customerType || existingTeacher[0].customerType,
+        city: teacher.city || existingTeacher[0].city,
+        contractEndDate: teacher.contractEndDate || existingTeacher[0].contractEndDate,
+        joinDate: teacher.joinDate || existingTeacher[0].joinDate,
+        notes: teacher.notes || existingTeacher[0].notes,
+        updatedAt: new Date(),
+      }).where(eq(teachers.id, teacherId));
+      stats.updated++;
+    } else {
+      // 老师不存在,创建新记录
+      const teacherResult = await db.insert(teachers).values(teacher);
+      teacherId = teacherResult[0].insertId;
+      stats.created++;
+    }
     
     // 2. 创建对应的users记录
     // 检查是否已存在同名用户
@@ -1065,7 +1104,7 @@ export async function batchCreateTeachers(teacherList: InsertTeacher[]) {
     results.push({ id: teacherId, name: teacher.name, userId });
   }
   
-  return results;
+  return { results, stats };
 }
 
 // 获取所有老师名字(用于验证)

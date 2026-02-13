@@ -110,7 +110,16 @@ export default function Teachers() {
   const importMutation = trpc.teachers.importFromExcel.useMutation({
     onSuccess: (data) => {
       utils.teachers.list.invalidate();
-      toast.success(`成功导入${data.importedCount}位老师`);
+      // 显示详细的导入统计信息
+      const { stats } = data;
+      if (stats) {
+        toast.success(
+          `导入完成！新增${stats.created}位，更新${stats.updated}位，跳过${stats.skipped}位`,
+          { duration: 5000 }
+        );
+      } else {
+        toast.success(`成功导入${data.importedCount}位老师`);
+      }
       setImporting(false);
     },
     onError: (error) => {

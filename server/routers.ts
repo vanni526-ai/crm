@@ -1378,11 +1378,12 @@ export const appRouter = router({
         })),
       }))
       .mutation(async ({ input }) => {
-        const results = await db.batchCreateTeachers(input.teachers);
+        const { results, stats } = await db.batchCreateTeachers(input.teachers);
         return { 
           success: true, 
           importedCount: results.length,
           teachers: results,
+          stats, // 添加统计信息
         };
       }),
 
