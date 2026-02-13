@@ -1,0 +1,34 @@
+{
+  "query": "SELECT pc.id, pc.cityId, c.name as cityName, \npc.currentProfitStage, \npc.profitRatioStage1Partner,\npc.profitRatioStage2APartner,\npc.profitRatioStage2BPartner,\npc.profitRatioStage3Partner,\npc.expenseCoverage,\npc.isInvestmentRecovered\nFROM partner_cities pc \nJOIN cities c ON pc.cityId = c.id \nWHERE c.name LIKE '%重庆%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT pc.id, pc.cityId, c.name as cityName, \npc.currentProfitStage, \npc.profitRatioStage1Partner,\npc.profitRatioStage2APartner,\npc.profitRatioStage2BPartner,\npc.profitRatioStage3Partner,\npc.expenseCoverage,\npc.isInvestmentRecovered\nFROM partner_cities pc \nJOIN cities c ON pc.cityId = c.id \nWHERE c.name LIKE '%重庆%';",
+  "rows": [
+    {
+      "id": "27",
+      "cityId": "3",
+      "cityName": "重庆",
+      "currentProfitStage": "1",
+      "profitRatioStage1Partner": "30.00",
+      "profitRatioStage2APartner": "40.00",
+      "profitRatioStage2BPartner": "50.00",
+      "profitRatioStage3Partner": "60.00",
+      "expenseCoverage": "NULL",
+      "isInvestmentRecovered": "0"
+    },
+    {
+      "id": "60008",
+      "cityId": "3",
+      "cityName": "重庆",
+      "currentProfitStage": "1",
+      "profitRatioStage1Partner": "43.00",
+      "profitRatioStage2APartner": "44.00",
+      "profitRatioStage2BPartner": "45.00",
+      "profitRatioStage3Partner": "46.00",
+      "expenseCoverage": "{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}",
+      "isInvestmentRecovered": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcityId\tcityName\tcurrentProfitStage\tprofitRatioStage1Partner\tprofitRatioStage2APartner\tprofitRatioStage2BPartner\tprofitRatioStage3Partner\texpenseCoverage\tisInvestmentRecovered\n27\t3\t重庆\t1\t30.00\t40.00\t50.00\t60.00\tNULL\t0\n60008\t3\t重庆\t1\t43.00\t44.00\t45.00\t46.00\t{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1690
+}

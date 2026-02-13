@@ -124,7 +124,10 @@ export async function aggregateOrderFeesByPartnerAndMonth(
   const partnerCitiesResult = await db
     .select()
     .from(partnerCities)
-    .where(eq(partnerCities.partnerId, partnerId));
+    .where(and(
+      eq(partnerCities.partnerId, partnerId),
+      eq(partnerCities.contractStatus, 'active')
+    ));
 
   if (!partnerCitiesResult || partnerCitiesResult.length === 0) {
     return {

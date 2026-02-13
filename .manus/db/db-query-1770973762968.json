@@ -1,0 +1,17 @@
+{
+  "query": "SELECT c.id, c.name FROM cities c WHERE c.name LIKE '%重庆%';\n\nSELECT e.* FROM city_monthly_expenses e \nJOIN cities c ON e.cityId = c.id \nWHERE c.name LIKE '%重庆%' \nORDER BY e.month DESC \nLIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT c.id, c.name FROM cities c WHERE c.name LIKE '%重庆%';\n\nSELECT e.* FROM city_monthly_expenses e \nJOIN cities c ON e.cityId = c.id \nWHERE c.name LIKE '%重庆%' \nORDER BY e.month DESC \nLIMIT 3;",
+  "rows": [
+    {
+      "id": "3",
+      "name": "重庆"
+    }
+  ],
+  "messages": [
+    "id\tcityId\tcityName\tmonth\trentFee\tpropertyFee\tutilityFee\tconsumablesFee\tcleaningFee\tphoneFee\tdeferredPayment\texpressFee\tpromotionFee\totherFee\ttotalExpense\tpartnerShare\tnotes\tuploadedBy\tcreatedAt\tupdatedAt\tteacherFee\ttransportFee",
+    "30021\t3\t重庆\t2026-01\t4500.00\t210.00\t300.00\t0.00\t400.00\t0.00\t500.00\t0.00\t0.00\t0.00\t15320.00\t0.00\t\t11040019\t2026-02-13 03:33:35\t2026-02-13 03:33:35\t7410.00\t2500.00"
+  ],
+  "stdout": "id\tname\n3\t重庆\nid\tcityId\tcityName\tmonth\trentFee\tpropertyFee\tutilityFee\tconsumablesFee\tcleaningFee\tphoneFee\tdeferredPayment\texpressFee\tpromotionFee\totherFee\ttotalExpense\tpartnerShare\tnotes\tuploadedBy\tcreatedAt\tupdatedAt\tteacherFee\ttransportFee\n30021\t3\t重庆\t2026-01\t4500.00\t210.00\t300.00\t0.00\t400.00\t0.00\t500.00\t0.00\t0.00\t0.00\t15320.00\t0.00\t\t11040019\t2026-02-13 03:33:35\t2026-02-13 03:33:35\t7410.00\t2500.00\n",
+  "stderr": "",
+  "execution_time_ms": 2703
+}

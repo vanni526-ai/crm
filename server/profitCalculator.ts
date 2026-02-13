@@ -57,7 +57,8 @@ export async function calculateFirst12MonthsRevenue(
     .from(partnerCities)
     .where(and(
       eq(partnerCities.partnerId, partnerId),
-      eq(partnerCities.cityId, cityId)
+      eq(partnerCities.cityId, cityId),
+      eq(partnerCities.contractStatus, 'active')
     ))
     .limit(1);
   
@@ -173,7 +174,8 @@ export async function updateProfitStageAndRecoveryStatus(
     .from(partnerCities)
     .where(and(
       eq(partnerCities.partnerId, partnerId),
-      eq(partnerCities.cityId, cityId)
+      eq(partnerCities.cityId, cityId),
+      eq(partnerCities.contractStatus, 'active')
     ))
     .limit(1);
   

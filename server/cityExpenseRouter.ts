@@ -89,7 +89,10 @@ export const cityExpenseRouter = router({
             })
             .from(partnerCities)
             .leftJoin(partners, eq(partnerCities.partnerId, partners.id))
-            .where(eq(partnerCities.cityId, expense.cityId))
+            .where(and(
+              eq(partnerCities.cityId, expense.cityId),
+              eq(partnerCities.contractStatus, 'active')
+            ))
             .orderBy(desc(partnerCities.createdAt))
             .limit(1);
           
@@ -246,7 +249,10 @@ export const cityExpenseRouter = router({
           expenseCoverage: partnerCities.expenseCoverage,
         })
         .from(partnerCities)
-        .where(eq(partnerCities.cityId, input.cityId))
+        .where(and(
+          eq(partnerCities.cityId, input.cityId),
+          eq(partnerCities.contractStatus, 'active')
+        ))
         .limit(1);
       
       // 计算合伙人承担 = 勾选费用总和 × 费用分摄比例 / 100

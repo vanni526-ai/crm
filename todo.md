@@ -3074,4 +3074,27 @@
 - [x] 修复标题行检测逻辑,添加对"老师"列名的检查(第398-402行)
 - [x] 创建测试脚本验证列名映射逻辑(test_column_mapping.mjs)
 - [x] 测试验证修复效果(3条测试记录全部成功映射)
+- [x] 保存检查点
+
+
+### 164. 修复城市账单中房租和合伙人承担费用显示不正确
+- [ ] 检查城市账单页面的数据获取逻辑
+- [ ] 检查房租字段的数据源和计算方式
+- [ ] 检查合伙人承担费用的计算逻辑
+- [ ] 确保使用最新保存的城市合同配置数据
+- [ ] 修复房租显示为4,500而不是4,501的问题
+- [ ] 修复合伙人承担显示为0的问题
+- [ ] 测试验证修复效果
+- [ ] 保存检查点
+
+
+### 165. 系统性修复partner_cities查询问题(只使用active状态记录)
+- [x] 查询重庆partner_cities表的2条记录详情(发现draft和active两条记录)
+- [ ] 查找所有查询partner_cities的代码位置(grep搜索)
+- [x] 修复cityExpenseRouter中的partner_cities查询(添加contractStatus='active')
+- [x] 修复partnerManagementRouter中的partner_cities查询(getPartnerStats, getPartnerCities等)
+- [x] 修复其他router中的partner_cities查询(orderAggregation, profitCalculator)
+- [x] 清理重庆的draft状态记录(id=27,已删除,现在只剩下1条active记录)
+- [x] 测试城市账单的合伙人承担费用计算(仍为0,因为expenseCoverage未配置)
+- [x] 测试合伙人管理页面是否只显示一个重庆记录(✅成功,只显示1个test)
 - [ ] 保存检查点

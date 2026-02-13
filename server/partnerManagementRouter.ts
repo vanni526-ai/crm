@@ -647,7 +647,10 @@ export const partnerManagementRouter = router({
         })
         .from(partnerCities)
         .leftJoin(cities, eq(partnerCities.cityId, cities.id))
-        .where(eq(partnerCities.partnerId, input.partnerId));
+        .where(and(
+          eq(partnerCities.partnerId, input.partnerId),
+          eq(partnerCities.contractStatus, 'active')
+        ));
       
       return result;
     }),
@@ -670,7 +673,10 @@ export const partnerManagementRouter = router({
         .select({ cityId: partnerCities.cityId, cityName: cities.name })
         .from(partnerCities)
         .leftJoin(cities, eq(partnerCities.cityId, cities.id))
-        .where(eq(partnerCities.partnerId, input.partnerId));
+        .where(and(
+          eq(partnerCities.partnerId, input.partnerId),
+          eq(partnerCities.contractStatus, 'active')
+        ));
       
       if (partnerCitiesList.length === 0) {
         return [];
@@ -746,7 +752,10 @@ export const partnerManagementRouter = router({
           })
           .from(partnerCities)
           .leftJoin(cities, eq(partnerCities.cityId, cities.id))
-          .where(eq(partnerCities.partnerId, partner.id));
+          .where(and(
+            eq(partnerCities.partnerId, partner.id),
+            eq(partnerCities.contractStatus, 'active')
+          ));
         
         // 统计所有城市的数据
         let totalOrderCount = 0;

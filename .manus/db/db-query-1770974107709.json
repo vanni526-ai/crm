@@ -1,0 +1,30 @@
+{
+  "query": "SELECT \n  pc.id,\n  pc.partnerId,\n  p.name as partnerName,\n  pc.contractStatus,\n  pc.currentProfitStage,\n  pc.profitRatioStage1Partner,\n  pc.createdAt,\n  pc.updatedAt\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE c.name LIKE '%重庆%'\nORDER BY pc.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  pc.id,\n  pc.partnerId,\n  p.name as partnerName,\n  pc.contractStatus,\n  pc.currentProfitStage,\n  pc.profitRatioStage1Partner,\n  pc.createdAt,\n  pc.updatedAt\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE c.name LIKE '%重庆%'\nORDER BY pc.id;",
+  "rows": [
+    {
+      "id": "27",
+      "partnerId": "17",
+      "partnerName": "重庆加盟商",
+      "contractStatus": "draft",
+      "currentProfitStage": "1",
+      "profitRatioStage1Partner": "30.00",
+      "createdAt": "2026-02-10 09:39:10",
+      "updatedAt": "2026-02-13 04:45:40"
+    },
+    {
+      "id": "60008",
+      "partnerId": "90006",
+      "partnerName": "test",
+      "contractStatus": "active",
+      "currentProfitStage": "1",
+      "profitRatioStage1Partner": "43.00",
+      "createdAt": "2026-02-13 05:21:44",
+      "updatedAt": "2026-02-13 09:06:01"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpartnerId\tpartnerName\tcontractStatus\tcurrentProfitStage\tprofitRatioStage1Partner\tcreatedAt\tupdatedAt\n27\t17\t重庆加盟商\tdraft\t1\t30.00\t2026-02-10 09:39:10\t2026-02-13 04:45:40\n60008\t90006\ttest\tactive\t1\t43.00\t2026-02-13 05:21:44\t2026-02-13 09:06:01\n",
+  "stderr": "",
+  "execution_time_ms": 1730
+}
