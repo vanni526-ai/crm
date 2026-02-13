@@ -447,6 +447,134 @@ export default function Teachers() {
     }
   };
 
+  // Excel模板下载
+  const handleDownloadTemplate = () => {
+    // 创建模板数据(包含字段说明和示例数据)
+    const templateData = [
+      {
+        '姓名': '张老师',
+        '电话号码': '13800138000',
+        '活跃状态': '活跃',
+        '受众客户类型': '成人',
+        '地区': '重庆',
+        '合同到期时间': '2026-12-31',
+        '入职时间': '2024-01-01',
+        '备注': '示例数据',
+      },
+      {
+        '姓名': '李老师',
+        '电话号码': '13900139000',
+        '活跃状态': '活跃',
+        '受众客户类型': '青少年',
+        '地区': '上海;天津',
+        '合同到期时间': '2027-06-30',
+        '入职时间': '2024-03-15',
+        '备注': '多个城市用分号分隔',
+      },
+    ];
+
+    // 创建字段说明工作表
+    const fieldDescriptions = [
+      {
+        '字段名': '姓名',
+        '是否必填': '是',
+        '说明': '老师的真实姓名',
+        '示例': '张老师',
+      },
+      {
+        '字段名': '电话号码',
+        '是否必填': '否',
+        '说明': '老师的联系电话',
+        '示例': '13800138000',
+      },
+      {
+        '字段名': '活跃状态',
+        '是否必填': '否',
+        '说明': '老师的工作状态，默认为"活跃"',
+        '示例': '活跃 或 休息',
+      },
+      {
+        '字段名': '受众客户类型',
+        '是否必填': '否',
+        '说明': '老师擅长的客户类型',
+        '示例': '成人、青少年、儿童',
+      },
+      {
+        '字段名': '地区',
+        '是否必填': '否',
+        '说明': '老师所在的城市，多个城市用分号分隔',
+        '示例': '重庆 或 上海;天津',
+      },
+      {
+        '字段名': '合同到期时间',
+        '是否必填': '否',
+        '说明': '老师合同的到期日期',
+        '示例': '2026-12-31',
+      },
+      {
+        '字段名': '入职时间',
+        '是否必填': '否',
+        '说明': '老师的入职日期',
+        '示例': '2024-01-01',
+      },
+      {
+        '字段名': '备注',
+        '是否必填': '否',
+        '说明': '其他需要记录的信息',
+        '示例': '擅长深度课程',
+      },
+    ];
+
+    // 创建导入须知工作表
+    const importNotes = [
+      {
+        '序号': '1',
+        '重要说明': '导入后系统会自动为每位老师创建用户账号',
+      },
+      {
+        '序号': '2',
+        '重要说明': '默认密码为: 123456，请提醒老师首次登录后修改密码',
+      },
+      {
+        '序号': '3',
+        '重要说明': '系统会自动分配"普通用户"+"老师"角色',
+      },
+      {
+        '序号': '4',
+        '重要说明': '如果填写了地区，系统会自动关联老师和城市',
+      },
+      {
+        '序号': '5',
+        '重要说明': '如果导入的老师姓名已存在，系统会更新现有用户的角色',
+      },
+      {
+        '序号': '6',
+        '重要说明': '请保持表头不变，从第二行开始填写数据',
+      },
+    ];
+
+    // 创建工作簿
+    const wb = XLSX.utils.book_new();
+
+    // 添加导入须知工作表
+    const wsNotes = XLSX.utils.json_to_sheet(importNotes);
+    XLSX.utils.book_append_sheet(wb, wsNotes, '导入须知');
+
+    // 添加字段说明工作表
+    const wsFields = XLSX.utils.json_to_sheet(fieldDescriptions);
+    XLSX.utils.book_append_sheet(wb, wsFields, '字段说明');
+
+    // 添加示例数据工作表
+    const wsTemplate = XLSX.utils.json_to_sheet(templateData);
+    XLSX.utils.book_append_sheet(wb, wsTemplate, '本部老师');
+
+    // 下载文件
+    const fileName = `老师导入模板_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+
+    toast.success('模板下载成功，请查看"导入须知"和"字段说明"工作表');
+  };
+
   // Excel导出
   const handleExport = () => {
     if (!teachers || teachers.length === 0) {
@@ -569,10 +697,7 @@ export default function Teachers() {
               <Download className="w-4 h-4 mr-2" />
               导出Excel
             </Button>
-            <Button 
-              onClick={() => window.open('/teacher-import-template.xlsx', '_blank')}
-              variant="outline"
-            >
+            <Button onClick={handleDownloadTemplate} variant="outline">
               <Download className="w-4 h-4 mr-2" />
               下载模板
             </Button>
