@@ -3097,4 +3097,19 @@
 - [x] 清理重庆的draft状态记录(id=27,已删除,现在只剩下1条active记录)
 - [x] 测试城市账单的合伙人承担费用计算(仍为0,因为expenseCoverage未配置)
 - [x] 测试合伙人管理页面是否只显示一个重庆记录(✅成功,只显示1个test)
+- [x] 保存检查点(version: 8cfa9f93)
+
+
+### 166. 修复重庆费用覆盖配置已勾选但合伙人承担费用仍为0的问题
+- [x] 查询数据库中重庆的expenseCoverage实际值(无法直接查询)
+- [x] 检查partnerManagementRouter中费用覆盖配置的保存逻辑(发现问题!)
+- [x] 检查cityExpenseRouter中合伙人承担费用的计算逻辑
+- [x] 问题根源:前端保存配置时更新partners.expenseCoverage,但计算时读取partner_cities.expenseCoverage
+- [x] 手动触发一次重庆2026-01月份账单的重新计算(✅成功,显示正确的值)
+- [x] 问题确认:初始创建账单时expenseCoverage未配置,导致合伙人承担费用为0
+- [x] 功能1:在cityExpenseRouter中添加recalculatePartnerShare接口(重新计算合伙人承担费用)
+- [x] 功能2:修改updateCityExpenseCoverage接口,保存后自动调用recalculatePartnerShare
+- [x] 功能3:在CityExpenseManagement.tsx中添加刷新按钮,手动触发重新计算
+- [x] 测试功能1:保存费用覆盖配置后自动重新计算(等待用户测试)
+- [x] 测试功能2:手动点击刷新按钮重新计算(等待用户测试)
 - [ ] 保存检查点

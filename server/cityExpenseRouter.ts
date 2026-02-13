@@ -684,7 +684,113 @@ export const cityExpenseRouter = router({
       const buffer = await workbook.xlsx.writeBuffer();
       return {
         data: Buffer.from(buffer).toString("base64"),
-        filename: `城市费用账单_${new Date().toISOString().split('T')[0]}.xlsx`,
+        filename: `城市账单_${new Date().toISOString().split('T')[0]}.xlsx`,
       };
+    }),
+
+  /**
+   * 重新计算合伙人承担费用
+   * 用于在费用覆盖配置变更后,自动更新已存在的账单记录
+   */
+  recalculatePartnerShare: protectedProcedure
+    .input(z.object({
+      cityId: z.number(),
+      month: z.string(), // 格式: YYYY-MM
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      try {
+        // 1. 查询该城市该月份的账单是否存在
+        const existing = await db
+          .select()
+          .from(cityMonthlyExpenses)
+          .where(and(
+            eq(cityMonthlyExpenses.cityId, input.cityId),
+            eq(cityMonthlyExpenses.month, input.month)
+          ))
+          .limit(1);
+        
+        if (existing.length === 0) {
+          // 账单不存在,无需重新计算
+          return { success: true, message: "账单不存在,无需重新计算" };
+        }
+        
+        const record = existing[0];
+        
+        // 2. 获取该城市的费用分摊比例和费用承担配置
+        const partnerCityInfo = await db
+          .select({
+            costShareRatio: sql<string>`
+              CASE 
+                WHEN ${partnerCities.currentProfitStage} = 1 THEN ${partnerCities.profitRatioStage1Partner}
+                WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 0 THEN ${partnerCities.profitRatioStage2APartner}
+                WHEN ${partnerCities.currentProfitStage} = 2 AND ${partnerCities.isInvestmentRecovered} = 1 THEN ${partnerCities.profitRatioStage2BPartner}
+                WHEN ${partnerCities.currentProfitStage} = 3 THEN ${partnerCities.profitRatioStage3Partner}
+                ELSE NULL
+              END
+            `.as('costShareRatio'),
+            expenseCoverage: partnerCities.expenseCoverage,
+          })
+          .from(partnerCities)
+          .where(and(
+            eq(partnerCities.cityId, input.cityId),
+            eq(partnerCities.contractStatus, 'active')
+          ))
+          .limit(1);
+        
+        if (partnerCityInfo.length === 0) {
+          // 没有找到合伙人配置,合伙人承担为0
+          await db
+            .update(cityMonthlyExpenses)
+            .set({
+              partnerShare: "0.00",
+            })
+            .where(eq(cityMonthlyExpenses.id, record.id));
+          
+          return { success: true, message: "未找到合伙人配置,合伙人承担设为0" };
+        }
+        
+        // 3. 计算合伙人承担 = 勾选费用总和 × 费用分摊比例 / 100
+        const costShareRatio = partnerCityInfo[0]?.costShareRatio ? parseFloat(partnerCityInfo[0].costShareRatio) : 0;
+        const expenseCoverage = partnerCityInfo[0]?.expenseCoverage || {};
+        
+        // 只计算被勾选的费用项目
+        let coveredExpenseTotal = 0;
+        if (expenseCoverage.rentFee) coveredExpenseTotal += parseFloat(record.rentFee || "0");
+        if (expenseCoverage.propertyFee) coveredExpenseTotal += parseFloat(record.propertyFee || "0");
+        if (expenseCoverage.utilityFee) coveredExpenseTotal += parseFloat(record.utilityFee || "0");
+        if (expenseCoverage.consumablesFee) coveredExpenseTotal += parseFloat(record.consumablesFee || "0");
+        if (expenseCoverage.cleaningFee) coveredExpenseTotal += parseFloat(record.cleaningFee || "0");
+        if (expenseCoverage.phoneFee) coveredExpenseTotal += parseFloat(record.phoneFee || "0");
+        if (expenseCoverage.courierFee) coveredExpenseTotal += parseFloat(record.expressFee || "0");
+        if (expenseCoverage.promotionFee) coveredExpenseTotal += parseFloat(record.promotionFee || "0");
+        if (expenseCoverage.otherFee) coveredExpenseTotal += parseFloat(record.otherFee || "0");
+        if (expenseCoverage.teacherFee) coveredExpenseTotal += parseFloat(record.teacherFee || "0");
+        if (expenseCoverage.transportFee) coveredExpenseTotal += parseFloat(record.transportFee || "0");
+        
+        const partnerShare = (coveredExpenseTotal * costShareRatio / 100).toFixed(2);
+        
+        // 4. 更新账单记录
+        await db
+          .update(cityMonthlyExpenses)
+          .set({
+            partnerShare,
+          })
+          .where(eq(cityMonthlyExpenses.id, record.id));
+        
+        return { 
+          success: true, 
+          message: `重新计算成功,合伙人承担费用: ￥${partnerShare}`,
+          partnerShare,
+        };
+      } catch (error: any) {
+        console.error("重新计算合伙人承担费用失败:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `重新计算失败: ${error.message}`,
+        });
+      }
     }),
 });

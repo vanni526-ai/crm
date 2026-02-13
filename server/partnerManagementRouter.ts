@@ -1282,6 +1282,20 @@ export const partnerManagementRouter = router({
           })
           .where(eq(partnerCities.id, existing[0].id));
         
+        // 自动触发当月账单的重新计算(如果存在)
+        const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+        try {
+          const { cityExpenseRouter } = await import('./cityExpenseRouter');
+          const recalculateResult = await cityExpenseRouter.createCaller(ctx).recalculatePartnerShare({
+            cityId: input.cityId,
+            month: currentMonth,
+          });
+          console.log('自动重新计算结果:', recalculateResult);
+        } catch (recalcError: any) {
+          console.error('自动重新计算失败:', recalcError.message);
+          // 不抛出错误,避免影响配置保存
+        }
+        
         return { success: true };
       } catch (error: any) {
         console.error("更新费用承担配置失败:", error);

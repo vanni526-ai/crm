@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, Calendar, Download, Upload, FileDown } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar, Download, Upload, FileDown, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -178,9 +178,26 @@ export default function CityExpenseManagement() {
     upsertMutation.mutate(formData);
   };
   
+  // 重新计算合伙人承担费用
+  const recalculateMutation = trpc.cityExpense.recalculatePartnerShare.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message || "重新计算成功");
+      utils.cityExpense.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`重新计算失败: ${error.message}`);
+    },
+  });
+  
   const handleDelete = (id: number) => {
     if (confirm("确定要删除这条费用账单吗？")) {
       deleteMutation.mutate({ id });
+    }
+  };
+  
+  const handleRecalculate = (cityId: number, month: string) => {
+    if (confirm("确定要重新计算该账单的合伙人承担费用吗？\n\n此操作将根据最新的费用覆盖配置重新计算。")) {
+      recalculateMutation.mutate({ cityId, month });
     }
   };
   
@@ -599,13 +616,24 @@ export default function CityExpenseManagement() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleOpenDialog(expense)}
+                              title="编辑账单"
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
+                              onClick={() => handleRecalculate(expense.cityId, expense.month)}
+                              disabled={recalculateMutation.isPending}
+                              title="重新计算合伙人承担费用"
+                            >
+                              <RefreshCw className={`h-4 w-4 ${recalculateMutation.isPending ? 'animate-spin' : ''}`} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleDelete(expense.id)}
+                              title="删除账单"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
