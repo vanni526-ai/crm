@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { cityMonthlyExpenses, cities, partnerCities } from "../drizzle/schema";
+import { cityMonthlyExpenses, cities, partnerCities, partners } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import ExcelJS from "exceljs";
@@ -73,6 +73,8 @@ export const cityExpenseRouter = router({
       // 为每个账单获取合伙人费用分摊比例(取第一个合伙人的比例)
       const expensesWithPartnerInfo = await Promise.all(
         expenses.map(async (expense) => {
+          // 注意:这里不过滤partners.isActive,因为当合伙人角色被取消时,
+          // partners.isActive会设为false,但partner_cities记录还在,我们仍然需要显示费用分摊比例
           const partnerInfo = await db
             .select({
               costShareRatio: sql<string>`
@@ -86,7 +88,9 @@ export const cityExpenseRouter = router({
               `.as('costShareRatio'),
             })
             .from(partnerCities)
+            .leftJoin(partners, eq(partnerCities.partnerId, partners.id))
             .where(eq(partnerCities.cityId, expense.cityId))
+            .orderBy(desc(partnerCities.createdAt))
             .limit(1);
           
           return {

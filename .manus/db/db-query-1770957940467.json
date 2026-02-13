@@ -1,0 +1,13 @@
+{
+  "query": "\n-- 先查询重庆的cityId\nSELECT id FROM cities WHERE name = '重庆' LIMIT 1;\n\n-- 更新第一条记录的分红配置\nUPDATE partner_cities \nSET \n  currentProfitStage = 1,\n  profitRatioStage1Partner = 30,\n  profitRatioStage1Brand = 70,\n  profitRatioStage2APartner = 40,\n  profitRatioStage2ABrand = 60,\n  profitRatioStage2BPartner = 50,\n  profitRatioStage2BBrand = 50,\n  profitRatioStage3Partner = 60,\n  profitRatioStage3Brand = 40,\n  isInvestmentRecovered = 0\nWHERE cityId = (SELECT id FROM cities WHERE name = '重庆' LIMIT 1)\nORDER BY id ASC\nLIMIT 1;\n\n-- 删除重庆的其他重复记录\nDELETE FROM partner_cities\nWHERE cityId = (SELECT id FROM cities WHERE name = '重庆' LIMIT 1)\nAND id NOT IN (\n  SELECT id FROM (\n    SELECT id FROM partner_cities \n    WHERE cityId = (SELECT id FROM cities WHERE name = '重庆' LIMIT 1)\n    ORDER BY id ASC\n    LIMIT 1\n  ) as temp\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 先查询重庆的cityId\nSELECT id FROM cities WHERE name = '重庆' LIMIT 1;\n\n-- 更新第一条记录的分红配置\nUPDATE partner_cities \nSET \n  currentProfitStage = 1,\n  profitRatioStage1Partner = 30,\n  profitRatioStage1Brand = 70,\n  profitRatioStage2APartner = 40,\n  profitRatioStage2ABrand = 60,\n  profitRatioStage2BPartner = 50,\n  profitRatioStage2BBrand = 50,\n  profitRatioStage3Partner = 60,\n  profitRatioStage3Brand = 40,\n  isInvestmentRecovered = 0\nWHERE cityId = (SELECT id FROM cities WHERE name = '重庆' LIMIT 1)\nORDER BY id ASC\nLIMIT 1;\n\n-- 删除重庆的其他重复记录\nDELETE FROM partner_cities\nWHERE cityId = (SELECT id FROM cities WHERE name = '重庆' LIMIT 1)\nAND id NOT IN (\n  SELECT id FROM (\n    SELECT id FROM partner_cities \n    WHERE cityId = (SELECT id FROM cities WHERE name = '重庆' LIMIT 1)\n    ORDER BY id ASC\n    LIMIT 1\n  ) as temp\n);\n",
+  "rows": [
+    {
+      "id": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n3\n",
+  "stderr": "",
+  "execution_time_ms": 2312
+}

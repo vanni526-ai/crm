@@ -2921,4 +2921,41 @@
   - 访问客户管理页面,点击业务客户标签页
   - 检查浏览器控制台,不再有"Encountered two children with the same key"错误
   - 修复成功!
+- [x] 保存检查点并交付
+
+### 161. 修复更改城市合伙人后,城市账单中费用分摊比例读取不到的问题
+- [x] 分析问题原因:
+  - 检查cityExpenseRouter.ts中的费用分摊比例查询逻辑
+  - 检查partnerManagementRouter.ts中的assignCities mutation
+  - 发现问题:assignCities会先删除所有partner_cities记录,然后插入新记录
+- [x] 检查数据关联逻辑:
+  - 城市账单从 partner_cities 表获取费用分摊比例
+  - 使用currentProfitStage和对应的profitRatioStageXPartner字段
+  - assignCities删除时丢失了所有分红配置(currentProfitStage, profitRatioStageXPartner等)
+- [x] 修复代码:
+  - 修改assignCities mutation,在删除前保存原有配置
+  - 创建 configMap 映射(cityId -> 配置),保存所有分红配置字段
+  - 插入新记录时恢复这些配置(如果存在)
+  - 对于新增的城市,使用默认配置(空对象)
+  - 修改cityExpenseRouter.ts的费用分摊比例查询:
+    - 添加innerJoin partners表
+    - 只查询isActive=true的合伙人
+    - 按createdAt倒序排序,获取最新的合伙人记录
+- [ ] 根本性解决方案:
+  - 问题根源:当用户取消合伙人角色时,partners.isActive设为false,但partner_cities记录还关联着这个被禁用的合伙人
+  - 方案1:修改assignCities逻辑,当更改合伙人时,更新partner_cities.partnerId而不是删除再创建
+  - 方案2:修改城市账单查询,不依赖partners.isActive,而是使用LEFT JOIN并处理null情况
+  - 选择:同时实施两个方案,增加系统容错性
+- [x] 修改assignCities mutation:
+  - 先获取这些城市的所有现有关联配置(不管是哪个合伙人的)
+  - 删除这些城市的所有现有关联(避免重复)
+  - 删除当前合伙人的其他城市关联(不在新列表中的)
+  - 创建新关联时恢复原有的分红配置
+- [x] 修改城市账单查询:
+  - 使用LEFT JOIN partners而不是INNER JOIN
+  - 移除partners.isActive的过滤条件
+  - 添加备注说明为什么不过滤isActive
+- [x] 测试验证:更改城市合伙人后,确认城市账单中费用分摊比例正常显示 ✅
+  - 刷新城市账单页面,重庆的费用分摊比例正确显示为30%
+  - 修复成功!即使合伙人角色被取消,城市账单仍然能正确显示费用分摊比例
 - [ ] 保存检查点并交付

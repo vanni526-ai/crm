@@ -1,0 +1,36 @@
+{
+  "query": "\nSELECT \n  pc.id,\n  pc.partnerId,\n  p.name as partnerName,\n  pc.cityId,\n  c.name as cityName,\n  pc.currentProfitStage,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner,\n  pc.isInvestmentRecovered\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '重庆'\nORDER BY pc.id DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  pc.id,\n  pc.partnerId,\n  p.name as partnerName,\n  pc.cityId,\n  c.name as cityName,\n  pc.currentProfitStage,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner,\n  pc.isInvestmentRecovered\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '重庆'\nORDER BY pc.id DESC;\n",
+  "rows": [
+    {
+      "id": "60007",
+      "partnerId": "90006",
+      "partnerName": "test",
+      "cityId": "3",
+      "cityName": "重庆",
+      "currentProfitStage": "1",
+      "profitRatioStage1Partner": "50.00",
+      "profitRatioStage2APartner": "50.00",
+      "profitRatioStage2BPartner": "50.00",
+      "profitRatioStage3Partner": "50.00",
+      "isInvestmentRecovered": "0"
+    },
+    {
+      "id": "27",
+      "partnerId": "17",
+      "partnerName": "重庆加盟商",
+      "cityId": "3",
+      "cityName": "重庆",
+      "currentProfitStage": "1",
+      "profitRatioStage1Partner": "NULL",
+      "profitRatioStage2APartner": "NULL",
+      "profitRatioStage2BPartner": "NULL",
+      "profitRatioStage3Partner": "NULL",
+      "isInvestmentRecovered": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpartnerId\tpartnerName\tcityId\tcityName\tcurrentProfitStage\tprofitRatioStage1Partner\tprofitRatioStage2APartner\tprofitRatioStage2BPartner\tprofitRatioStage3Partner\tisInvestmentRecovered\n60007\t90006\ttest\t3\t重庆\t1\t50.00\t50.00\t50.00\t50.00\t0\n27\t17\t重庆加盟商\t3\t重庆\t1\tNULL\tNULL\tNULL\tNULL\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1759
+}

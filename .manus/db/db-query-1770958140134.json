@@ -1,0 +1,21 @@
+{
+  "query": "\nSELECT \n  pc.id as pc_id,\n  pc.partnerId,\n  p.name as partnerName,\n  p.isActive as partnerIsActive,\n  pc.cityId,\n  c.name as cityName,\n  pc.currentProfitStage,\n  pc.profitRatioStage1Partner,\n  pc.createdAt\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '重庆'\nORDER BY pc.createdAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  pc.id as pc_id,\n  pc.partnerId,\n  p.name as partnerName,\n  p.isActive as partnerIsActive,\n  pc.cityId,\n  c.name as cityName,\n  pc.currentProfitStage,\n  pc.profitRatioStage1Partner,\n  pc.createdAt\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '重庆'\nORDER BY pc.createdAt DESC;\n",
+  "rows": [
+    {
+      "pc_id": "27",
+      "partnerId": "17",
+      "partnerName": "重庆加盟商",
+      "partnerIsActive": "0",
+      "cityId": "3",
+      "cityName": "重庆",
+      "currentProfitStage": "1",
+      "profitRatioStage1Partner": "30.00",
+      "createdAt": "2026-02-10 09:39:10"
+    }
+  ],
+  "messages": [],
+  "stdout": "pc_id\tpartnerId\tpartnerName\tpartnerIsActive\tcityId\tcityName\tcurrentProfitStage\tprofitRatioStage1Partner\tcreatedAt\n27\t17\t重庆加盟商\t0\t3\t重庆\t1\t30.00\t2026-02-10 09:39:10\n",
+  "stderr": "",
+  "execution_time_ms": 1714
+}

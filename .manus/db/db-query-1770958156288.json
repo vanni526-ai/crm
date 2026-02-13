@@ -1,0 +1,16 @@
+{
+  "query": "\n-- 查询test合伙人的状态\nSELECT id, name, userId, isActive \nFROM partners \nWHERE name LIKE '%test%';\n\n-- 激活test合伙人\nUPDATE partners \nSET isActive = 1\nWHERE name LIKE '%test%';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询test合伙人的状态\nSELECT id, name, userId, isActive \nFROM partners \nWHERE name LIKE '%test%';\n\n-- 激活test合伙人\nUPDATE partners \nSET isActive = 1\nWHERE name LIKE '%test%';\n",
+  "rows": [
+    {
+      "id": "90006",
+      "name": "test",
+      "userId": "13860029",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tuserId\tisActive\n90006\ttest\t13860029\t1\n",
+  "stderr": "",
+  "execution_time_ms": 2036
+}

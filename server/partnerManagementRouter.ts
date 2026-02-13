@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
 import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders, users } from "../drizzle/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, inArray, not } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { uploadAndParseContract } from "./contractParser";
 import { updateProfitStageAndRecoveryStatus } from "./profitCalculator";
@@ -568,17 +568,56 @@ export const partnerManagementRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
-      // 先删除现有的城市关联
-      await db.delete(partnerCities).where(eq(partnerCities.partnerId, input.partnerId));
+      // 先获取这些城市的所有现有关联配置(不管是哪个合伙人的)
+      const existingCities = await db
+        .select()
+        .from(partnerCities)
+        .where(inArray(partnerCities.cityId, input.cityIds));
       
-      // 添加新的城市关联
+      // 创建配置映射(cityId -> 配置)
+      const configMap = new Map();
+      existingCities.forEach((city) => {
+        configMap.set(city.cityId, {
+          currentProfitStage: city.currentProfitStage,
+          profitRatioStage1Partner: city.profitRatioStage1Partner,
+          profitRatioStage1Brand: city.profitRatioStage1Brand,
+          profitRatioStage2APartner: city.profitRatioStage2APartner,
+          profitRatioStage2ABrand: city.profitRatioStage2ABrand,
+          profitRatioStage2BPartner: city.profitRatioStage2BPartner,
+          profitRatioStage2BBrand: city.profitRatioStage2BBrand,
+          profitRatioStage3Partner: city.profitRatioStage3Partner,
+          profitRatioStage3Brand: city.profitRatioStage3Brand,
+          isInvestmentRecovered: city.isInvestmentRecovered,
+          contractEndDate: city.contractEndDate,
+          contractStatus: city.contractStatus,
+          expenseCoverage: city.expenseCoverage,
+        });
+      });
+      
+      // 删除这些城市的所有现有关联(不管是哪个合伙人的)
+      await db.delete(partnerCities).where(inArray(partnerCities.cityId, input.cityIds));
+      
+      // 同时删除当前合伙人的其他城市关联(不在新列表中的)
+      await db.delete(partnerCities).where(
+        and(
+          eq(partnerCities.partnerId, input.partnerId),
+          not(inArray(partnerCities.cityId, input.cityIds.length > 0 ? input.cityIds : [0]))
+        )
+      );
+      
+      // 添加新的城市关联(恢复原有配置)
       if (input.cityIds.length > 0) {
         await db.insert(partnerCities).values(
-          input.cityIds.map((cityId) => ({
-            partnerId: input.partnerId,
-            cityId,
-            createdBy: ctx.user.id,
-          }))
+          input.cityIds.map((cityId) => {
+            const savedConfig = configMap.get(cityId);
+            return {
+              partnerId: input.partnerId,
+              cityId,
+              createdBy: ctx.user.id,
+              // 如果有原有配置,则恢复;  否则使用默认值
+              ...(savedConfig || {}),
+            } as any;
+          })
         );
       }
       
