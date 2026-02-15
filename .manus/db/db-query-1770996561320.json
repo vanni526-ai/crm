@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, partnerId, cityId, expenseCoverage FROM partner_cities WHERE partnerId = (SELECT id FROM partners WHERE userId = 13860029 LIMIT 1);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, partnerId, cityId, expenseCoverage FROM partner_cities WHERE partnerId = (SELECT id FROM partners WHERE userId = 13860029 LIMIT 1);",
+  "rows": [
+    {
+      "id": "60008",
+      "partnerId": "90006",
+      "cityId": "3",
+      "expenseCoverage": "{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpartnerId\tcityId\texpenseCoverage\n60008\t90006\t3\t{\"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\n",
+  "stderr": "",
+  "execution_time_ms": 1526
+}

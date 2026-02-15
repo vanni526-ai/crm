@@ -9,6 +9,33 @@ import { updateProfitStageAndRecoveryStatus } from "./profitCalculator";
 
 export const partnerManagementRouter = router({
   /**
+   * 根据userId获取partnerId
+   */
+  getPartnerIdByUserId: protectedProcedure
+    .input(z.object({
+      userId: z.number(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      const result = await db
+        .select({ id: partners.id })
+        .from(partners)
+        .where(eq(partners.userId, input.userId))
+        .limit(1);
+      
+      if (result.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "未找到对应的合伙人记录",
+        });
+      }
+      
+      return { partnerId: result[0].id };
+    }),
+
+  /**
    * 获取所有合伙人列表
    */
   list: protectedProcedure

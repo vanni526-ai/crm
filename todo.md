@@ -3172,7 +3172,7 @@
 - [x] 检查partner_cities表schema中expenseCoverage字段定义(json类型,第780行)
 - [x] 修复接口返回逻辑,正确解包JSON字段(直接返回coverage对象)
 - [x] 测试验证partnerId=13860029, cityId=3的情况(代码已修复,等待用户测试)
-- [x] 保存检查点(version: 02c1d091)
+- [x] 保存检查点(version: 319924c5)
 
 ### 175. 检查API文档中提到的接口是否存在JSON字段包装问题
 - [ ] 阅读用户提供的5份API文档,提取关键接口列表
@@ -3180,3 +3180,16 @@
 - [ ] 验证是否存在类似getCityExpenseCoverage的JSON包装问题
 - [ ] 修复发现的问题
 - [ ] 汇总检查结果并交付
+
+### 176. 检查partnerId=13860029在重庆的费用承担配置数据
+- [ ] 查询partner_cities表中partnerId=13860029, cityId=3的expenseCoverage字段
+- [ ] 测试getCityExpenseCoverage接口返回结果
+- [ ] 对比数据库数据和接口返回,分析问题原因
+- [ ] 修复问题并验证
+- [ ] 保存检查点
+
+### 177. 回答用户的后端API接口需求文档
+- [x] 检查getPartnerIdByUserId接口是否存在(不存在,已创建)
+- [x] 确认getCityExpenseCoverage接口的正确实现(已修复)
+- [x] 编写接口文档回复,包含完整的接口信息
+- [x] 提供测试数据和示例(userId=13860029, partnerId=90006, cityId=3)

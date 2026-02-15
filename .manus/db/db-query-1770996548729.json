@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, userId, name, phone FROM partners WHERE id = 13860029 OR userId = 13860029;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, userId, name, phone FROM partners WHERE id = 13860029 OR userId = 13860029;",
+  "rows": [
+    {
+      "id": "90006",
+      "userId": "13860029",
+      "name": "test",
+      "phone": "13800138013"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\tphone\n90006\t13860029\ttest\t13800138013\n",
+  "stderr": "",
+  "execution_time_ms": 1495
+}
