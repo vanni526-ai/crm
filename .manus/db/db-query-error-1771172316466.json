@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, city, areaCode, createdAt \nFROM city_partner_config \nWHERE city IN ('杭州', '长沙')\nORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, city, areaCode, createdAt \nFROM city_partner_config \nWHERE city IN ('杭州', '长沙')\nORDER BY createdAt DESC;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 1: Table 'jtcsa4dgw9wmnzinvrevwf.city_partner_config' doesn't exist"
+  ]
+}

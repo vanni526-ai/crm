@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, name, phone, email, role, isActive, createdAt \nFROM users \nWHERE phone IN ('13860033', '13860036', '13860039', '14640014', '15150005', '15150012')\nORDER BY phone;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, email, role, isActive, createdAt \nFROM users \nWHERE phone IN ('13860033', '13860036', '13860039', '14640014', '15150005', '15150012')\nORDER BY phone;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1542
+}

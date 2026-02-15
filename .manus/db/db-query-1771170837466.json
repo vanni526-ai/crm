@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as remaining_count \nFROM users \nWHERE name = 'nopassword';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as remaining_count \nFROM users \nWHERE name = 'nopassword';",
+  "rows": [
+    {
+      "remaining_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "remaining_count\n0\n",
+  "stderr": "",
+  "execution_time_ms": 1558
+}

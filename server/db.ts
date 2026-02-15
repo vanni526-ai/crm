@@ -3286,6 +3286,24 @@ export async function createCityConfig(
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
+  // 检查cities表中是否已存在该城市
+  const existingCity = await db
+    .select()
+    .from(cities)
+    .where(eq(cities.name, data.city))
+    .limit(1);
+
+  // 如果城市不存在，则在cities表中创建记录
+  if (existingCity.length === 0) {
+    await db.insert(cities).values({
+      name: data.city,
+      areaCode: data.areaCode || '',
+      isActive: true,
+      sortOrder: 0,
+    });
+  }
+
+  // 然后在cityPartnerConfig表中创建配置记录
   return db.insert(cityPartnerConfig).values({
     ...data,
     updatedBy: createdBy,

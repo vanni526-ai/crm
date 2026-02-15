@@ -1,0 +1,64 @@
+{
+  "query": "SELECT id, name, phone, email, role, isActive, createdAt \nFROM users \nWHERE name = 'nopassword'\nORDER BY phone;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, email, role, isActive, createdAt \nFROM users \nWHERE name = 'nopassword'\nORDER BY phone;",
+  "rows": [
+    {
+      "id": "13860033",
+      "name": "nopassword",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-02 08:38:23"
+    },
+    {
+      "id": "13860036",
+      "name": "nopassword",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-02 08:38:52"
+    },
+    {
+      "id": "13860039",
+      "name": "nopassword",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-02 08:39:19"
+    },
+    {
+      "id": "14640014",
+      "name": "nopassword",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-04 16:46:56"
+    },
+    {
+      "id": "15150005",
+      "name": "nopassword",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-06 11:40:31"
+    },
+    {
+      "id": "15150012",
+      "name": "nopassword",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-06 11:42:22"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\temail\trole\tisActive\tcreatedAt\n13860033\tnopassword\tNULL\tNULL\tuser\t1\t2026-02-02 08:38:23\n13860036\tnopassword\tNULL\tNULL\tuser\t1\t2026-02-02 08:38:52\n13860039\tnopassword\tNULL\tNULL\tuser\t1\t2026-02-02 08:39:19\n14640014\tnopassword\tNULL\tNULL\tuser\t1\t2026-02-04 16:46:56\n15150005\tnopassword\tNULL\tNULL\tuser\t1\t2026-02-06 11:40:31\n15150012\tnopassword\tNULL\tNULL\tuser\t1\t2026-02-06 11:42:22\n",
+  "stderr": "",
+  "execution_time_ms": 1533
+}

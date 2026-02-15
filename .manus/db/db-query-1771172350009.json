@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, areaCode, isActive, createdAt \nFROM cities \nWHERE name IN ('杭州', '长沙');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, areaCode, isActive, createdAt \nFROM cities \nWHERE name IN ('杭州', '长沙');",
+  "rows": [
+    {
+      "id": "90003",
+      "name": "杭州",
+      "areaCode": "",
+      "isActive": "1",
+      "createdAt": "2026-02-15 16:19:04"
+    },
+    {
+      "id": "90004",
+      "name": "长沙",
+      "areaCode": "",
+      "isActive": "1",
+      "createdAt": "2026-02-15 16:19:04"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tareaCode\tisActive\tcreatedAt\n90003\t杭州\t\t1\t2026-02-15 16:19:04\n90004\t长沙\t\t1\t2026-02-15 16:19:04\n",
+  "stderr": "",
+  "execution_time_ms": 1545
+}

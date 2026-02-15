@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, city, areaCode, createdAt \nFROM cityPartnerConfig \nWHERE city IN ('杭州', '长沙')\nORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, city, areaCode, createdAt \nFROM cityPartnerConfig \nWHERE city IN ('杭州', '长沙')\nORDER BY createdAt DESC;",
+  "rows": [
+    {
+      "id": "360005",
+      "city": "长沙",
+      "areaCode": "",
+      "createdAt": "2026-02-15 16:17:16"
+    },
+    {
+      "id": "360004",
+      "city": "杭州",
+      "areaCode": "",
+      "createdAt": "2026-02-15 16:17:09"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcity\tareaCode\tcreatedAt\n360005\t长沙\t\t2026-02-15 16:17:16\n360004\t杭州\t\t2026-02-15 16:17:09\n",
+  "stderr": "",
+  "execution_time_ms": 1562
+}
