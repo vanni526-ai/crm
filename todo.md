@@ -3277,4 +3277,13 @@
 ### 144. 修复cityExpenseRouter.ts缺少zod导入
 - [x] 在cityExpenseRouter.ts顶部添加import { z } from "zod"
 - [x] 测试验证API调用(23个测试全部通过)
+- [x] 保存检查点并通知前端App开发
+
+
+### 145. 修复cityExpense.list API的HTTP调用参数接收问题
+- [x] 诊断curl调用时参数未被解析的原因(input参数为undefined)
+- [x] 检查tRPC的HTTP GET请求参数传递格式要求
+- [x] 修复参数解析逻辑,支持标准HTTP请求(移除.optional()只保留.default({}))
+- [x] 使用curl测试验证修复效果(所有测试返回UNAUTHORIZED而不是BAD_REQUEST)
+- [x] 更新API文档,添加正确的HTTP调用示例
 - [ ] 保存检查点并通知前端App开发

@@ -17,8 +17,8 @@ export const cityExpenseRouter = router({
       month: z.string().optional(), // 格式: YYYY-MM
       startMonth: z.string().optional(),
       endMonth: z.string().optional(),
-    }).optional().default({}))
-    .query(async ({ input, ctx }) => {
+    }).default({}))
+    .query(async ({ input = {}, ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
