@@ -1,0 +1,8 @@
+{
+  "query": "SELECT p.id, p.name, p.phone, p.userId, p.contractStatus, p.createdAt\nFROM partners p\nWHERE \n  (p.name LIKE '%test%' \n  OR p.phone LIKE '%test%'\n  OR p.name LIKE '%测试%'\n  OR p.phone LIKE '%000%')\n  AND p.phone NOT IN ('13860029testtest', '13800138013')\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.phone, p.userId, p.contractStatus, p.createdAt\nFROM partners p\nWHERE \n  (p.name LIKE '%test%' \n  OR p.phone LIKE '%test%'\n  OR p.name LIKE '%测试%'\n  OR p.phone LIKE '%000%')\n  AND p.phone NOT IN ('13860029testtest', '13800138013')\nORDER BY p.id;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'p.contractstatus' in 'field list'"
+  ]
+}

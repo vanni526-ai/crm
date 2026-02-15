@@ -174,6 +174,10 @@ export const userManagementRouter = router({
         password: z.string().min(6, "密码至少6位"),
         role: z.enum(USER_ROLE_VALUES as [string, ...string[]]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
+        roleCities: z.array(z.object({
+          role: z.string(),
+          cities: z.array(z.string())
+        })).optional(), // 角色-城市关联
       })
     )
     .mutation(async ({ input }) => {
@@ -244,14 +248,38 @@ export const userManagementRouter = router({
       
       // 如果角色包含cityPartner，在partners表创建关联记录
       if (rolesStr.includes('cityPartner')) {
-        const { partners } = await import('../drizzle/schema');
-        await drizzle.insert(partners).values({
+        const { partners, partnerCities, cities } = await import('../drizzle/schema');
+        const [partnerResult] = await drizzle.insert(partners).values({
           userId: newUserId,
           name: input.name,
           phone: input.phone || null,
           profitRatio: '0.30', // 默认30%
           createdBy: 1, // 管理员创建
         } as any);
+        
+        const partnerId = partnerResult.insertId;
+        
+        // 如果指定了城市，创建partnerCities记录
+        if (input.roleCities && input.roleCities.length > 0) {
+          const cityPartnerData = input.roleCities.find(rc => rc.role === 'cityPartner');
+          if (cityPartnerData && cityPartnerData.cities.length > 0) {
+            for (const cityName of cityPartnerData.cities) {
+              // 查找城市ID
+              const [cityRecord] = await drizzle.select().from(cities).where(eq(cities.name, cityName)).limit(1);
+              if (cityRecord) {
+                // 创建partnerCities记录（草稿状态）
+                await drizzle.insert(partnerCities).values({
+                  partnerId: partnerId,
+                  cityId: cityRecord.id,
+                  contractStatus: 'draft',
+                  currentProfitStage: 1,
+                  isInvestmentRecovered: false,
+                  createdBy: 1,
+                } as any);
+              }
+            }
+          }
+        }
       }
 
       return {

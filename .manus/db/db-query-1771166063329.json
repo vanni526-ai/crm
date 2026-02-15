@@ -1,0 +1,16 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM users WHERE (name LIKE '%test%' OR phone LIKE '%test%' OR email LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') AND phone NOT IN ('13860029testtest', '13800138013') AND (email IS NULL OR email != '526test@example.com')) as test_users_count,\n  (SELECT COUNT(*) FROM teachers WHERE (name LIKE '%test%' OR phone LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') AND phone NOT IN ('13860029testtest', '13800138013')) as test_teachers_count,\n  (SELECT COUNT(*) FROM partners WHERE (name LIKE '%test%' OR phone LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') AND phone NOT IN ('13860029testtest', '13800138013')) as test_partners_count,\n  (SELECT COUNT(*) FROM orders WHERE customerName LIKE '%test%' OR deliveryTeacher LIKE '%test%' OR customerName LIKE '%测试%' OR deliveryTeacher LIKE '%测试%') as test_orders_count;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  (SELECT COUNT(*) FROM users WHERE (name LIKE '%test%' OR phone LIKE '%test%' OR email LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') AND phone NOT IN ('13860029testtest', '13800138013') AND (email IS NULL OR email != '526test@example.com')) as test_users_count,\n  (SELECT COUNT(*) FROM teachers WHERE (name LIKE '%test%' OR phone LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') AND phone NOT IN ('13860029testtest', '13800138013')) as test_teachers_count,\n  (SELECT COUNT(*) FROM partners WHERE (name LIKE '%test%' OR phone LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') AND phone NOT IN ('13860029testtest', '13800138013')) as test_partners_count,\n  (SELECT COUNT(*) FROM orders WHERE customerName LIKE '%test%' OR deliveryTeacher LIKE '%test%' OR customerName LIKE '%测试%' OR deliveryTeacher LIKE '%测试%') as test_orders_count;",
+  "rows": [
+    {
+      "test_users_count": "25",
+      "test_teachers_count": "0",
+      "test_partners_count": "13",
+      "test_orders_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "test_users_count\ttest_teachers_count\ttest_partners_count\ttest_orders_count\n25\t0\t13\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1534
+}

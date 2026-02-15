@@ -1,0 +1,9 @@
+{
+  "query": "SELECT o.id, o.customerName, o.deliveryTeacher, o.paymentAmount, o.createdAt\nFROM orders o\nWHERE \n  (o.customerName LIKE '%test%' \n  OR o.deliveryTeacher LIKE '%test%'\n  OR o.customerName LIKE '%测试%'\n  OR o.deliveryTeacher LIKE '%测试%')\nORDER BY o.createdAt DESC\nLIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT o.id, o.customerName, o.deliveryTeacher, o.paymentAmount, o.createdAt\nFROM orders o\nWHERE \n  (o.customerName LIKE '%test%' \n  OR o.deliveryTeacher LIKE '%test%'\n  OR o.customerName LIKE '%测试%'\n  OR o.deliveryTeacher LIKE '%测试%')\nORDER BY o.createdAt DESC\nLIMIT 50;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1559
+}

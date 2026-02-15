@@ -1,0 +1,101 @@
+{
+  "query": "SELECT p.id, p.name, p.phone, p.userId, p.createdAt\nFROM partners p\nWHERE \n  (p.name LIKE '%test%' \n  OR p.phone LIKE '%test%'\n  OR p.name LIKE '%测试%'\n  OR p.phone LIKE '%000%')\n  AND p.phone NOT IN ('13860029testtest', '13800138013')\nORDER BY p.createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.phone, p.userId, p.createdAt\nFROM partners p\nWHERE \n  (p.name LIKE '%test%' \n  OR p.phone LIKE '%test%'\n  OR p.name LIKE '%测试%'\n  OR p.phone LIKE '%000%')\n  AND p.phone NOT IN ('13860029testtest', '13800138013')\nORDER BY p.createdAt DESC;",
+  "rows": [
+    {
+      "id": "90006",
+      "name": "test",
+      "phone": "13381928825",
+      "userId": "13860029",
+      "createdAt": "2026-02-13 02:42:47"
+    },
+    {
+      "id": "28",
+      "name": "朱利闻",
+      "phone": "13800000013",
+      "userId": "15372558",
+      "createdAt": "2026-02-10 09:39:27"
+    },
+    {
+      "id": "27",
+      "name": "瀛姬直营",
+      "phone": "13800000012",
+      "userId": "15372557",
+      "createdAt": "2026-02-10 09:39:25"
+    },
+    {
+      "id": "26",
+      "name": "周建虎",
+      "phone": "13800000011",
+      "userId": "15372556",
+      "createdAt": "2026-02-10 09:39:24"
+    },
+    {
+      "id": "24",
+      "name": "赵浩然",
+      "phone": "13800000009",
+      "userId": "15372554",
+      "createdAt": "2026-02-10 09:39:20"
+    },
+    {
+      "id": "23",
+      "name": "曹心茹",
+      "phone": "13800000008",
+      "userId": "15372553",
+      "createdAt": "2026-02-10 09:39:19"
+    },
+    {
+      "id": "22",
+      "name": "康红祥",
+      "phone": "13800000007",
+      "userId": "15372552",
+      "createdAt": "2026-02-10 09:39:18"
+    },
+    {
+      "id": "21",
+      "name": "李一涵",
+      "phone": "13800000006",
+      "userId": "15372551",
+      "createdAt": "2026-02-10 09:39:16"
+    },
+    {
+      "id": "20",
+      "name": "王开霖",
+      "phone": "13800000005",
+      "userId": "15372550",
+      "createdAt": "2026-02-10 09:39:15"
+    },
+    {
+      "id": "19",
+      "name": "孙志俊",
+      "phone": "13800000004",
+      "userId": "15372549",
+      "createdAt": "2026-02-10 09:39:13"
+    },
+    {
+      "id": "18",
+      "name": "张雪婷",
+      "phone": "13800000003",
+      "userId": "15372548",
+      "createdAt": "2026-02-10 09:39:11"
+    },
+    {
+      "id": "17",
+      "name": "重庆加盟商",
+      "phone": "13800000002",
+      "userId": "15372547",
+      "createdAt": "2026-02-10 09:39:09"
+    },
+    {
+      "id": "16",
+      "name": "苏州加盟商",
+      "phone": "13800138000",
+      "userId": "15372545",
+      "createdAt": "2026-02-10 09:39:08"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tuserId\tcreatedAt\n90006\ttest\t13381928825\t13860029\t2026-02-13 02:42:47\n28\t朱利闻\t13800000013\t15372558\t2026-02-10 09:39:27\n27\t瀛姬直营\t13800000012\t15372557\t2026-02-10 09:39:25\n26\t周建虎\t13800000011\t15372556\t2026-02-10 09:39:24\n24\t赵浩然\t13800000009\t15372554\t2026-02-10 09:39:20\n23\t曹心茹\t13800000008\t15372553\t2026-02-10 09:39:19\n22\t康红祥\t13800000007\t15372552\t2026-02-10 09:39:18\n21\t李一涵\t13800000006\t15372551\t2026-02-10 09:39:16\n20\t王开霖\t13800000005\t15372550\t2026-02-10 09:39:15\n19\t孙志俊\t13800000004\t15372549\t2026-02-10 09:39:13\n18\t张雪婷\t13800000003\t15372548\t2026-02-10 09:39:11\n17\t重庆加盟商\t13800000002\t15372547\t2026-02-10 09:39:09\n16\t苏州加盟商\t13800138000\t15372545\t2026-02-10 09:39:08\n",
+  "stderr": "",
+  "execution_time_ms": 1559
+}

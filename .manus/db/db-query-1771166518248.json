@@ -1,0 +1,13 @@
+{
+  "query": "START TRANSACTION;\n\n-- 先删除user_role_cities关联数据\nDELETE FROM user_role_cities\nWHERE userId IN (\n  SELECT id FROM users\n  WHERE \n    (name LIKE '%test%' \n    OR phone LIKE '%test%'\n    OR email LIKE '%test%'\n    OR name LIKE '%测试%'\n    OR phone LIKE '%000%')\n    AND phone NOT IN ('13860029testtest', '13800138013')\n    AND (email IS NULL OR email != '526test@example.com')\n);\n\n-- 删除users表测试数据\nDELETE FROM users\nWHERE \n  (name LIKE '%test%' \n  OR phone LIKE '%test%'\n  OR email LIKE '%test%'\n  OR name LIKE '%测试%'\n  OR phone LIKE '%000%')\n  AND phone NOT IN ('13860029testtest', '13800138013')\n  AND (email IS NULL OR email != '526test@example.com');\n\n-- 验证结果\nSELECT COUNT(*) as deleted_count FROM users WHERE id = 0;\n\nCOMMIT;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute START TRANSACTION;\n\n-- 先删除user_role_cities关联数据\nDELETE FROM user_role_cities\nWHERE userId IN (\n  SELECT id FROM users\n  WHERE \n    (name LIKE '%test%' \n    OR phone LIKE '%test%'\n    OR email LIKE '%test%'\n    OR name LIKE '%测试%'\n    OR phone LIKE '%000%')\n    AND phone NOT IN ('13860029testtest', '13800138013')\n    AND (email IS NULL OR email != '526test@example.com')\n);\n\n-- 删除users表测试数据\nDELETE FROM users\nWHERE \n  (name LIKE '%test%' \n  OR phone LIKE '%test%'\n  OR email LIKE '%test%'\n  OR name LIKE '%测试%'\n  OR phone LIKE '%000%')\n  AND phone NOT IN ('13860029testtest', '13800138013')\n  AND (email IS NULL OR email != '526test@example.com');\n\n-- 验证结果\nSELECT COUNT(*) as deleted_count FROM users WHERE id = 0;\n\nCOMMIT;",
+  "rows": [
+    {
+      "deleted_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "deleted_count\n0\n",
+  "stderr": "",
+  "execution_time_ms": 2440
+}

@@ -166,6 +166,8 @@ export default function UserManagementContent() {
   const [editRoles, setEditRoles] = useState<string[]>(["user"]);
   
   // 城市选择状态（每个角色独立的城市列表）
+  const [createTeacherCities, setCreateTeacherCities] = useState<string[]>([]);
+  const [createPartnerCities, setCreatePartnerCities] = useState<string[]>([]);
   const [editTeacherCities, setEditTeacherCities] = useState<string[]>([]);
   const [editPartnerCities, setEditPartnerCities] = useState<string[]>([]);
 
@@ -181,6 +183,8 @@ export default function UserManagementContent() {
       toast.success("用户创建成功");
       setIsCreateDialogOpen(false);
       setCreateRoles(["user"]);
+      setCreateTeacherCities([]);
+      setCreatePartnerCities([]);
       refetch();
     },
     onError: (error) => {
@@ -260,7 +264,28 @@ export default function UserManagementContent() {
 
   const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // 验证角色对应的城市是否已选择
+    if (createRoles.includes('teacher') && createTeacherCities.length === 0) {
+      toast.error('请为“老师”角色选择至少一个城市');
+      return;
+    }
+    if (createRoles.includes('cityPartner') && createPartnerCities.length === 0) {
+      toast.error('请为“城市合伙人”角色选择至少一个城市');
+      return;
+    }
+    
     const formData = new FormData(e.currentTarget);
+    
+    // 构建角色-城市关联数据
+    const roleCities: Array<{ role: string; cities: string[] }> = [];
+    if (createRoles.includes('teacher')) {
+      roleCities.push({ role: 'teacher', cities: createTeacherCities });
+    }
+    if (createRoles.includes('cityPartner')) {
+      roleCities.push({ role: 'cityPartner', cities: createPartnerCities });
+    }
+    
     createMutation.mutate({
       name: formData.get("name") as string,
       password: formData.get("password") as string,
@@ -269,6 +294,7 @@ export default function UserManagementContent() {
       phone: (formData.get("phone") as string) || undefined,
       role: createRoles[0] as any, // 主角色（兼容旧接口）
       roles: createRoles.join(","), // 多角色
+      roleCities, // 角色-城市关联
     });
   };
 
@@ -520,12 +546,65 @@ export default function UserManagementContent() {
                   />
                 </div>
               </div>
+              
+              {/* 老师角色的城市选择 */}
+              {createRoles.includes('teacher') && (
+                <div>
+                  <Label>老师所在城市 *</Label>
+                  <div className="mt-2 p-3 border rounded-md space-y-2">
+                    {cities?.map((city) => (
+                      <label key={city.name} className="flex items-center space-x-2 cursor-pointer">
+                        <Checkbox
+                          checked={createTeacherCities.includes(city.name)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setCreateTeacherCities([...createTeacherCities, city.name]);
+                            } else {
+                              setCreateTeacherCities(createTeacherCities.filter(c => c !== city.name));
+                            }
+                          }}
+                        />
+                        <span className="text-sm">{city.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* 城市合伙人角色的城市选择 */}
+              {createRoles.includes('cityPartner') && (
+                <div>
+                  <Label>合伙人管理城市 *</Label>
+                  <div className="mt-2 p-3 border rounded-md space-y-2">
+                    {cities?.map((city) => (
+                      <label key={city.name} className="flex items-center space-x-2 cursor-pointer">
+                        <Checkbox
+                          checked={createPartnerCities.includes(city.name)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setCreatePartnerCities([...createPartnerCities, city.name]);
+                            } else {
+                              setCreatePartnerCities(createPartnerCities.filter(c => c !== city.name));
+                            }
+                          }}
+                        />
+                        <span className="text-sm">{city.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <DialogFooter className="mt-6">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsCreateDialogOpen(false)}
+                onClick={() => {
+                  setIsCreateDialogOpen(false);
+                  setCreateRoles(["user"]);
+                  setCreateTeacherCities([]);
+                  setCreatePartnerCities([]);
+                }}
               >
                 取消
               </Button>

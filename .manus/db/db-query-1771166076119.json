@@ -1,0 +1,210 @@
+{
+  "query": "SELECT id, name, phone, email, roles, createdAt\nFROM users\nWHERE \n  (name LIKE '%test%' \n  OR phone LIKE '%test%'\n  OR email LIKE '%test%'\n  OR name LIKE '%测试%'\n  OR phone LIKE '%000%')\n  AND phone NOT IN ('13860029testtest', '13800138013')\n  AND (email IS NULL OR email != '526test@example.com')\nORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, email, roles, createdAt\nFROM users\nWHERE \n  (name LIKE '%test%' \n  OR phone LIKE '%test%'\n  OR email LIKE '%test%'\n  OR name LIKE '%测试%'\n  OR phone LIKE '%000%')\n  AND phone NOT IN ('13860029testtest', '13800138013')\n  AND (email IS NULL OR email != '526test@example.com')\nORDER BY createdAt DESC;",
+  "rows": [
+    {
+      "id": "16027707",
+      "name": "测试更新老师属性_1770966845422",
+      "phone": "13800138892",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:14:14"
+    },
+    {
+      "id": "16027706",
+      "name": "测试老师无属性_1770966845422",
+      "phone": "13800138891",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:14:12"
+    },
+    {
+      "id": "16027705",
+      "name": "测试老师属性Switch_1770966845422",
+      "phone": "13800138890",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:14:11"
+    },
+    {
+      "id": "16027704",
+      "name": "测试老师属性M_1770966845422",
+      "phone": "13800138889",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:14:09"
+    },
+    {
+      "id": "16027703",
+      "name": "测试老师属性S_1770966845422",
+      "phone": "13800138888",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:14:07"
+    },
+    {
+      "id": "16027699",
+      "name": "测试更新老师属性",
+      "phone": "13800138892",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:12:50"
+    },
+    {
+      "id": "16027698",
+      "name": "测试老师无属性",
+      "phone": "13800138891",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:12:49"
+    },
+    {
+      "id": "16027697",
+      "name": "测试老师属性Switch",
+      "phone": "13800138890",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:12:47"
+    },
+    {
+      "id": "16027696",
+      "name": "测试老师属性M",
+      "phone": "13800138889",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:12:45"
+    },
+    {
+      "id": "16027695",
+      "name": "测试老师属性S",
+      "phone": "13800138888",
+      "email": "NULL",
+      "roles": "user,teacher",
+      "createdAt": "2026-02-13 07:12:44"
+    },
+    {
+      "id": "15903794",
+      "name": "李一涵",
+      "phone": "13800000014",
+      "email": "NULL",
+      "roles": "user",
+      "createdAt": "2026-02-11 12:33:26"
+    },
+    {
+      "id": "15372558",
+      "name": "朱利闻",
+      "phone": "13800000013",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:26"
+    },
+    {
+      "id": "15372557",
+      "name": "瀛姬直营",
+      "phone": "13800000012",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:25"
+    },
+    {
+      "id": "15372556",
+      "name": "周建虎",
+      "phone": "13800000011",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:23"
+    },
+    {
+      "id": "15372554",
+      "name": "赵浩然",
+      "phone": "13800000009",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:20"
+    },
+    {
+      "id": "15372553",
+      "name": "曹心茹",
+      "phone": "13800000008",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:19"
+    },
+    {
+      "id": "15372552",
+      "name": "康红祥",
+      "phone": "13800000007",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:17"
+    },
+    {
+      "id": "15372551",
+      "name": "李一涵",
+      "phone": "13800000006",
+      "email": "NULL",
+      "roles": "cityPartner,user",
+      "createdAt": "2026-02-10 09:39:16"
+    },
+    {
+      "id": "15372550",
+      "name": "王开霖",
+      "phone": "13800000005",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:14"
+    },
+    {
+      "id": "15372549",
+      "name": "孙志俊",
+      "phone": "13800000004",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:13"
+    },
+    {
+      "id": "15372548",
+      "name": "张雪婷",
+      "phone": "13800000003",
+      "email": "NULL",
+      "roles": "cityPartner",
+      "createdAt": "2026-02-10 09:39:10"
+    },
+    {
+      "id": "15372547",
+      "name": "重庆加盟商",
+      "phone": "13800000002",
+      "email": "NULL",
+      "roles": "user",
+      "createdAt": "2026-02-10 09:39:09"
+    },
+    {
+      "id": "15372545",
+      "name": "苏州加盟商",
+      "phone": "13800138000",
+      "email": "NULL",
+      "roles": "user",
+      "createdAt": "2026-02-10 09:39:07"
+    },
+    {
+      "id": "15362142",
+      "name": "水仙",
+      "phone": "15000808880",
+      "email": "NULL",
+      "roles": "teacher",
+      "createdAt": "2026-02-08 08:46:32"
+    },
+    {
+      "id": "13860029",
+      "name": "test",
+      "phone": "13381928825",
+      "email": "test@example.com",
+      "roles": "user,sales,admin,cityPartner",
+      "createdAt": "2026-02-02 08:37:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\temail\troles\tcreatedAt\n16027707\t测试更新老师属性_1770966845422\t13800138892\tNULL\tuser,teacher\t2026-02-13 07:14:14\n16027706\t测试老师无属性_1770966845422\t13800138891\tNULL\tuser,teacher\t2026-02-13 07:14:12\n16027705\t测试老师属性Switch_1770966845422\t13800138890\tNULL\tuser,teacher\t2026-02-13 07:14:11\n16027704\t测试老师属性M_1770966845422\t13800138889\tNULL\tuser,teacher\t2026-02-13 07:14:09\n16027703\t测试老师属性S_1770966845422\t13800138888\tNULL\tuser,teacher\t2026-02-13 07:14:07\n16027699\t测试更新老师属性\t13800138892\tNULL\tuser,teacher\t2026-02-13 07:12:50\n16027698\t测试老师无属性\t13800138891\tNULL\tuser,teacher\t2026-02-13 07:12:49\n16027697\t测试老师属性Switch\t13800138890\tNULL\tuser,teacher\t2026-02-13 07:12:47\n16027696\t测试老师属性M\t13800138889\tNULL\tuser,teacher\t2026-02-13 07:12:45\n16027695\t测试老师属性S\t13800138888\tNULL\tuser,teacher\t2026-02-13 07:12:44\n15903794\t李一涵\t13800000014\tNULL\tuser\t2026-02-11 12:33:26\n15372558\t朱利闻\t13800000013\tNULL\tcityPartner\t2026-02-10 09:39:26\n15372557\t瀛姬直营\t13800000012\tNULL\tcityPartner\t2026-02-10 09:39:25\n15372556\t周建虎\t13800000011\tNULL\tcityPartner\t2026-02-10 09:39:23\n15372554\t赵浩然\t13800000009\tNULL\tcityPartner\t2026-02-10 09:39:20\n15372553\t曹心茹\t13800000008\tNULL\tcityPartner\t2026-02-10 09:39:19\n15372552\t康红祥\t13800000007\tNULL\tcityPartner\t2026-02-10 09:39:17\n15372551\t李一涵\t13800000006\tNULL\tcityPartner,user\t2026-02-10 09:39:16\n15372550\t王开霖\t13800000005\tNULL\tcityPartner\t2026-02-10 09:39:14\n15372549\t孙志俊\t13800000004\tNULL\tcityPartner\t2026-02-10 09:39:13\n15372548\t张雪婷\t13800000003\tNULL\tcityPartner\t2026-02-10 09:39:10\n15372547\t重庆加盟商\t13800000002\tNULL\tuser\t2026-02-10 09:39:09\n15372545\t苏州加盟商\t13800138000\tNULL\tuser\t2026-02-10 09:39:07\n15362142\t水仙\t15000808880\tNULL\tteacher\t2026-02-08 08:46:32\n13860029\ttest\t13381928825\ttest@example.com\tuser,sales,admin,cityPartner\t2026-02-02 08:37:38\n",
+  "stderr": "",
+  "execution_time_ms": 1574
+}

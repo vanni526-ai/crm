@@ -1,0 +1,9 @@
+{
+  "query": "SELECT t.id, t.name, t.phone, t.email, t.createdAt\nFROM teachers t\nWHERE \n  (t.name LIKE '%test%' \n  OR t.phone LIKE '%test%'\n  OR t.email LIKE '%test%'\n  OR t.name LIKE '%测试%'\n  OR t.phone LIKE '%000%')\n  AND t.phone NOT IN ('13860029testtest', '13800138013')\n  AND (t.email IS NULL OR t.email != '526test@example.com')\nORDER BY t.createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT t.id, t.name, t.phone, t.email, t.createdAt\nFROM teachers t\nWHERE \n  (t.name LIKE '%test%' \n  OR t.phone LIKE '%test%'\n  OR t.email LIKE '%test%'\n  OR t.name LIKE '%测试%'\n  OR t.phone LIKE '%000%')\n  AND t.phone NOT IN ('13860029testtest', '13800138013')\n  AND (t.email IS NULL OR t.email != '526test@example.com')\nORDER BY t.createdAt DESC;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1556
+}

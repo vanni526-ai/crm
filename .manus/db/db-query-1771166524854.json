@@ -1,0 +1,14 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM users WHERE name LIKE '%test%' OR phone LIKE '%test%' OR email LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') as remaining_test_users,\n  (SELECT COUNT(*) FROM users WHERE phone IN ('13860029testtest', '13800138013') OR email = '526test@example.com') as preserved_test_users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  (SELECT COUNT(*) FROM users WHERE name LIKE '%test%' OR phone LIKE '%test%' OR email LIKE '%test%' OR name LIKE '%测试%' OR phone LIKE '%000%') as remaining_test_users,\n  (SELECT COUNT(*) FROM users WHERE phone IN ('13860029testtest', '13800138013') OR email = '526test@example.com') as preserved_test_users;",
+  "rows": [
+    {
+      "remaining_test_users": "0",
+      "preserved_test_users": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "remaining_test_users\tpreserved_test_users\n0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1634
+}
