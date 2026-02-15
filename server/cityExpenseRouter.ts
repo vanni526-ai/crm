@@ -61,7 +61,9 @@ export const cityExpenseRouter = router({
         }
         
         // 添加城市过滤条件
-        conditions.push(sql`${cityMonthlyExpenses.cityId} IN (${managedCityIds.join(',')})`);
+        if (managedCityIds.length > 0) {
+          conditions.push(sql`${cityMonthlyExpenses.cityId} IN (${sql.raw(managedCityIds.join(','))})`);
+        }
       }
       
       if (input?.cityId) {

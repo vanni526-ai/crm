@@ -3257,4 +3257,12 @@
 - [x] 修改cityExpense.list API添加从 orders表统计订单数量和销售额(API已存在此功能)
 - [x] 确保返回数据包含orderCount和salesAmount字段
 - [x] 测试验证统计功能正确性(5个测试全部通过)
-- [ ] 保存检查点并更新API文档
+- [x] 保存检查点并更新API文档
+
+
+### 142. 修复cityExpense.list API权限过滤逻辑(基于cityId)
+- [x] 修改权限过滤逻辑,基于partner_cities表查询合伙人管理的城市ID列表
+- [x] 使用cityId过滤city_monthly_expenses表数据
+- [x] 修复SQL语法错误(IN语句)
+- [x] 测试验证修复后的权限过滤功能(7个测试全部通过)
+- [ ] 保存检查点并通知前端App开发
