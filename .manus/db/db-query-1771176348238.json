@@ -1,0 +1,16 @@
+{
+  "query": "\n-- 更新contractStatus为active\nUPDATE partner_cities \nSET contractStatus = 'active'\nWHERE partnerId = 30002;\n\n-- 验证更新结果\nSELECT \n  pc.partnerId,\n  c.name as cityName,\n  pc.contractStatus,\n  CASE \n    WHEN pc.contractStatus = 'active' THEN 'MATCH'\n    ELSE 'NOT_MATCH'\n  END as status_check\nFROM partner_cities pc\nJOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId = 30002;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 更新contractStatus为active\nUPDATE partner_cities \nSET contractStatus = 'active'\nWHERE partnerId = 30002;\n\n-- 验证更新结果\nSELECT \n  pc.partnerId,\n  c.name as cityName,\n  pc.contractStatus,\n  CASE \n    WHEN pc.contractStatus = 'active' THEN 'MATCH'\n    ELSE 'NOT_MATCH'\n  END as status_check\nFROM partner_cities pc\nJOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId = 30002;\n",
+  "rows": [
+    {
+      "partnerId": "30002",
+      "cityName": "杭州",
+      "contractStatus": "active",
+      "status_check": "MATCH"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerId\tcityName\tcontractStatus\tstatus_check\n30002\t杭州\tactive\tMATCH\n",
+  "stderr": "",
+  "execution_time_ms": 1744
+}

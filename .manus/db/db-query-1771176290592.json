@@ -1,0 +1,38 @@
+{
+  "query": "\n-- 查询user信息\nSELECT 'USER' as type, u.id, u.name, u.phone, u.roles\nFROM users u\nWHERE u.phone = '15321700153'\n\nUNION ALL\n\n-- 查询partner信息\nSELECT 'PARTNER' as type, p.id, p.name, p.phone, NULL as roles\nFROM partners p\nWHERE p.phone = '15321700153'\n\nUNION ALL\n\n-- 查询user_role_cities信息\nSELECT 'USER_ROLE_CITIES' as type, urc.id, urc.role, NULL as phone, urc.cities as roles\nFROM user_role_cities urc\nJOIN users u ON urc.userId = u.id\nWHERE u.phone = '15321700153'\n\nUNION ALL\n\n-- 查询partner_cities信息\nSELECT 'PARTNER_CITIES' as type, pc.id, c.name as city, pc.contractStatus as phone, NULL as roles\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '15321700153';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询user信息\nSELECT 'USER' as type, u.id, u.name, u.phone, u.roles\nFROM users u\nWHERE u.phone = '15321700153'\n\nUNION ALL\n\n-- 查询partner信息\nSELECT 'PARTNER' as type, p.id, p.name, p.phone, NULL as roles\nFROM partners p\nWHERE p.phone = '15321700153'\n\nUNION ALL\n\n-- 查询user_role_cities信息\nSELECT 'USER_ROLE_CITIES' as type, urc.id, urc.role, NULL as phone, urc.cities as roles\nFROM user_role_cities urc\nJOIN users u ON urc.userId = u.id\nWHERE u.phone = '15321700153'\n\nUNION ALL\n\n-- 查询partner_cities信息\nSELECT 'PARTNER_CITIES' as type, pc.id, c.name as city, pc.contractStatus as phone, NULL as roles\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '15321700153';\n",
+  "rows": [
+    {
+      "type": "USER",
+      "id": "16800523",
+      "name": "陈治霖",
+      "phone": "15321700153",
+      "roles": "user,cityPartner"
+    },
+    {
+      "type": "PARTNER_CITIES",
+      "id": "120004",
+      "name": "杭州",
+      "phone": "draft",
+      "roles": "NULL"
+    },
+    {
+      "type": "PARTNER",
+      "id": "120001",
+      "name": "陈治霖",
+      "phone": "15321700153",
+      "roles": "NULL"
+    },
+    {
+      "type": "USER_ROLE_CITIES",
+      "id": "90003",
+      "name": "cityPartner",
+      "phone": "NULL",
+      "roles": "[\"杭州\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "type\tid\tname\tphone\troles\nUSER\t16800523\t陈治霖\t15321700153\tuser,cityPartner\nPARTNER_CITIES\t120004\t杭州\tdraft\tNULL\nPARTNER\t120001\t陈治霖\t15321700153\tNULL\nUSER_ROLE_CITIES\t90003\tcityPartner\tNULL\t[\"杭州\"]\n",
+  "stderr": "",
+  "execution_time_ms": 1516
+}

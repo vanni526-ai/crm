@@ -1,0 +1,130 @@
+{
+  "query": "\n-- 查看partner_cities中的cityId\nSELECT 'PARTNER_CITIES' as source, pc.cityId, pc.partnerId, pc.contractStatus\nFROM partner_cities pc\nWHERE pc.partnerId = 30002\n\nUNION ALL\n\n-- 查看cities表中的所有记录\nSELECT 'CITIES' as source, c.id as cityId, c.name as partnerId, NULL as contractStatus\nFROM cities c\nORDER BY source, cityId;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查看partner_cities中的cityId\nSELECT 'PARTNER_CITIES' as source, pc.cityId, pc.partnerId, pc.contractStatus\nFROM partner_cities pc\nWHERE pc.partnerId = 30002\n\nUNION ALL\n\n-- 查看cities表中的所有记录\nSELECT 'CITIES' as source, c.id as cityId, c.name as partnerId, NULL as contractStatus\nFROM cities c\nORDER BY source, cityId;\n",
+  "rows": [
+    {
+      "source": "CITIES",
+      "cityId": "1",
+      "partnerId": "上海",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "2",
+      "partnerId": "苏州",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "3",
+      "partnerId": "重庆",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "4",
+      "partnerId": "天津",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "5",
+      "partnerId": "济南",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "6",
+      "partnerId": "武汉",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "7",
+      "partnerId": "郑州",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "8",
+      "partnerId": "太原",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "9",
+      "partnerId": "石家庄",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "10",
+      "partnerId": "大连",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "11",
+      "partnerId": "东莞",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "12",
+      "partnerId": "南京",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "13",
+      "partnerId": "福州",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "14",
+      "partnerId": "泉州",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "15",
+      "partnerId": "无锡",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "16",
+      "partnerId": "深圳",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "17",
+      "partnerId": "宁波",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "90003",
+      "partnerId": "杭州",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "CITIES",
+      "cityId": "90004",
+      "partnerId": "长沙",
+      "contractStatus": "NULL"
+    },
+    {
+      "source": "PARTNER_CITIES",
+      "cityId": "90003",
+      "partnerId": "30002",
+      "contractStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "source\tcityId\tpartnerId\tcontractStatus\nCITIES\t1\t上海\tNULL\nCITIES\t2\t苏州\tNULL\nCITIES\t3\t重庆\tNULL\nCITIES\t4\t天津\tNULL\nCITIES\t5\t济南\tNULL\nCITIES\t6\t武汉\tNULL\nCITIES\t7\t郑州\tNULL\nCITIES\t8\t太原\tNULL\nCITIES\t9\t石家庄\tNULL\nCITIES\t10\t大连\tNULL\nCITIES\t11\t东莞\tNULL\nCITIES\t12\t南京\tNULL\nCITIES\t13\t福州\tNULL\nCITIES\t14\t泉州\tNULL\nCITIES\t15\t无锡\tNULL\nCITIES\t16\t深圳\tNULL\nCITIES\t17\t宁波\tNULL\nCITIES\t90003\t杭州\tNULL\nCITIES\t90004\t长沙\tNULL\nPARTNER_CITIES\t90003\t30002\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1567
+}

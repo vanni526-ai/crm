@@ -896,6 +896,7 @@ export const partnerManagementRouter = router({
             eq(partnerCities.partnerId, partner.id),
             eq(partnerCities.contractStatus, 'active')
           ));
+
         
         // 统计所有城市的数据
         let totalOrderCount = 0;

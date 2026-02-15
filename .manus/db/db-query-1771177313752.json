@@ -1,0 +1,45 @@
+{
+  "query": "\n-- 查询重庆合伙人在partners表中的记录\nSELECT 'PARTNERS_TABLE' as source, id, name, phone FROM partners WHERE name LIKE '%重庆%';\n\n-- 查询重庆合伙人在users表中的记录\nSELECT 'USERS_TABLE' as source, id, name, phone FROM users WHERE name LIKE '%重庆%' OR roles LIKE '%cityPartner%';\n\n-- 查询重庆合伙人的partner_cities记录\nSELECT 'PARTNER_CITIES' as source, pc.partnerId, p.name as partnerName, c.name as cityName, pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.name LIKE '%重庆%';\n\n-- 查询重庆合伙人的user_role_cities记录\nSELECT 'USER_ROLE_CITIES' as source, urc.userId, u.name as userName, urc.role, urc.cities\nFROM user_role_cities urc\nLEFT JOIN users u ON urc.userId = u.id\nWHERE u.name LIKE '%重庆%' OR urc.cities LIKE '%重庆%';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询重庆合伙人在partners表中的记录\nSELECT 'PARTNERS_TABLE' as source, id, name, phone FROM partners WHERE name LIKE '%重庆%';\n\n-- 查询重庆合伙人在users表中的记录\nSELECT 'USERS_TABLE' as source, id, name, phone FROM users WHERE name LIKE '%重庆%' OR roles LIKE '%cityPartner%';\n\n-- 查询重庆合伙人的partner_cities记录\nSELECT 'PARTNER_CITIES' as source, pc.partnerId, p.name as partnerName, c.name as cityName, pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.name LIKE '%重庆%';\n\n-- 查询重庆合伙人的user_role_cities记录\nSELECT 'USER_ROLE_CITIES' as source, urc.userId, u.name as userName, urc.role, urc.cities\nFROM user_role_cities urc\nLEFT JOIN users u ON urc.userId = u.id\nWHERE u.name LIKE '%重庆%' OR urc.cities LIKE '%重庆%';\n",
+  "rows": [
+    {
+      "source": "PARTNERS_TABLE",
+      "id": "17",
+      "name": "重庆加盟商",
+      "phone": "13800000002"
+    },
+    {
+      "source": "source",
+      "id": "id",
+      "name": "name",
+      "phone": "phone"
+    },
+    {
+      "source": "USERS_TABLE",
+      "id": "15372555",
+      "name": "冯玉智",
+      "phone": "18321298886"
+    },
+    {
+      "source": "USERS_TABLE",
+      "id": "16800186",
+      "name": "test",
+      "phone": "13381928825"
+    },
+    {
+      "source": "USERS_TABLE",
+      "id": "16800523",
+      "name": "陈治霖",
+      "phone": "15321700153"
+    }
+  ],
+  "messages": [
+    "source\tuserId\tuserName\trole\tcities",
+    "USER_ROLE_CITIES\t13860030\tadmin\tsales\t[\"重庆\",\"天津\"]",
+    "USER_ROLE_CITIES\t16800186\ttest\tcityPartner\t[\"重庆\"]",
+    "USER_ROLE_CITIES\t16800186\ttest\tteacher\t[\"重庆\",\"东莞\"]"
+  ],
+  "stdout": "source\tid\tname\tphone\nPARTNERS_TABLE\t17\t重庆加盟商\t13800000002\nsource\tid\tname\tphone\nUSERS_TABLE\t15372555\t冯玉智\t18321298886\nUSERS_TABLE\t16800186\ttest\t13381928825\nUSERS_TABLE\t16800523\t陈治霖\t15321700153\nsource\tuserId\tuserName\trole\tcities\nUSER_ROLE_CITIES\t13860030\tadmin\tsales\t[\"重庆\",\"天津\"]\nUSER_ROLE_CITIES\t16800186\ttest\tcityPartner\t[\"重庆\"]\nUSER_ROLE_CITIES\t16800186\ttest\tteacher\t[\"重庆\",\"东莞\"]\n",
+  "stderr": "",
+  "execution_time_ms": 2209
+}

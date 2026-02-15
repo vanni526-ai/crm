@@ -271,7 +271,7 @@ export const userManagementRouter = router({
                 await drizzle.insert(partnerCities).values({
                   partnerId: partnerId,
                   cityId: cityRecord.id,
-                  contractStatus: 'draft',
+                  contractStatus: 'active',  // 修复：用户管理编辑城市时直接设置为active
                   currentProfitStage: 1,
                   isInvestmentRecovered: false,
                   createdBy: 1,
@@ -461,14 +461,14 @@ export const userManagementRouter = router({
                   
                   // 如果不存在，创建partnerCities记录（草稿状态）
                   if (!existingPartnerCity) {
-                    await drizzle.insert(partnerCities).values({
-                      partnerId: partnerId,
-                      cityId: cityRecord.id,
-                      contractStatus: 'draft',
-                      currentProfitStage: 1,
-                      isInvestmentRecovered: false,
-                      createdBy: 1,
-                    } as any);
+                await drizzle.insert(partnerCities).values({
+                  partnerId: partnerId,
+                  cityId: cityRecord.id,
+                  contractStatus: 'active',  // 修复：用户管理编辑城市时直接设置为active
+                  currentProfitStage: 1,
+                  isInvestmentRecovered: false,
+                  createdBy: 1,
+                } as any);
                   }
                 }
               }
@@ -536,7 +536,7 @@ export const userManagementRouter = router({
                 await drizzle.insert(partnerCities).values({
                   partnerId: partnerId,
                   cityId: cityId,
-                  contractStatus: 'draft',
+                  contractStatus: 'active',  // 修复：用户管理编辑城市时直接设置为active
                   currentProfitStage: 1,
                   isInvestmentRecovered: false,
                   createdBy: 1,

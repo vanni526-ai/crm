@@ -1,0 +1,13 @@
+{
+  "query": "\n-- 先查询杭州的城市ID\nSELECT id FROM cities WHERE name = '杭州';\n\n-- 为陈治霖(partnerId=30002)添加杭州城市关联\nINSERT INTO partner_cities (partnerId, cityId, contractStatus, currentProfitStage, isInvestmentRecovered, createdBy)\nVALUES (30002, (SELECT id FROM cities WHERE name = '杭州'), 'draft', 1, 0, 1);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 先查询杭州的城市ID\nSELECT id FROM cities WHERE name = '杭州';\n\n-- 为陈治霖(partnerId=30002)添加杭州城市关联\nINSERT INTO partner_cities (partnerId, cityId, contractStatus, currentProfitStage, isInvestmentRecovered, createdBy)\nVALUES (30002, (SELECT id FROM cities WHERE name = '杭州'), 'draft', 1, 0, 1);\n",
+  "rows": [
+    {
+      "id": "90003"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n90003\n",
+  "stderr": "",
+  "execution_time_ms": 1730
+}

@@ -1,0 +1,19 @@
+{
+  "query": "\nSELECT \n  pc.id,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  LENGTH(pc.contractStatus) as status_length,\n  HEX(pc.contractStatus) as status_hex\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '15321700153';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  pc.id,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  LENGTH(pc.contractStatus) as status_length,\n  HEX(pc.contractStatus) as status_hex\nFROM partner_cities pc\nJOIN partners p ON pc.partnerId = p.id\nJOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '15321700153';\n",
+  "rows": [
+    {
+      "id": "120004",
+      "partnerId": "120001",
+      "cityId": "90003",
+      "cityName": "杭州",
+      "contractStatus": "draft",
+      "status_length": "5",
+      "status_hex": "6472616674"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpartnerId\tcityId\tcityName\tcontractStatus\tstatus_length\tstatus_hex\n120004\t120001\t90003\t杭州\tdraft\t5\t6472616674\n",
+  "stderr": "",
+  "execution_time_ms": 1529
+}

@@ -1,0 +1,46 @@
+{
+  "query": "\n-- 查看partnerId=17的完整信息\nSELECT id, name, phone, createdAt FROM partners WHERE id = 17;\n\n-- 查看是否有用户关联到partnerId=17\nSELECT u.id, u.name, u.phone, u.roles\nFROM users u\nWHERE u.id IN (\n  SELECT DISTINCT userId FROM user_role_cities WHERE role = 'cityPartner'\n)\nORDER BY u.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查看partnerId=17的完整信息\nSELECT id, name, phone, createdAt FROM partners WHERE id = 17;\n\n-- 查看是否有用户关联到partnerId=17\nSELECT u.id, u.name, u.phone, u.roles\nFROM users u\nWHERE u.id IN (\n  SELECT DISTINCT userId FROM user_role_cities WHERE role = 'cityPartner'\n)\nORDER BY u.id;\n",
+  "rows": [
+    {
+      "id": "17",
+      "name": "重庆加盟商",
+      "phone": "13800000002",
+      "createdAt": "2026-02-10 09:39:09"
+    },
+    {
+      "id": "id",
+      "name": "name",
+      "phone": "phone",
+      "createdAt": "roles"
+    },
+    {
+      "id": "13860030",
+      "name": "admin",
+      "phone": "99999999999",
+      "createdAt": "admin,user"
+    },
+    {
+      "id": "15372555",
+      "name": "冯玉智",
+      "phone": "18321298886",
+      "createdAt": "cityPartner,user"
+    },
+    {
+      "id": "16800186",
+      "name": "test",
+      "phone": "13381928825",
+      "createdAt": "user,admin,sales,teacher,cityPartner"
+    },
+    {
+      "id": "16800523",
+      "name": "陈治霖",
+      "phone": "15321700153",
+      "createdAt": "user,cityPartner"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tcreatedAt\n17\t重庆加盟商\t13800000002\t2026-02-10 09:39:09\nid\tname\tphone\troles\n13860030\tadmin\t99999999999\tadmin,user\n15372555\t冯玉智\t18321298886\tcityPartner,user\n16800186\ttest\t13381928825\tuser,admin,sales,teacher,cityPartner\n16800523\t陈治霖\t15321700153\tuser,cityPartner\n",
+  "stderr": "",
+  "execution_time_ms": 1734
+}

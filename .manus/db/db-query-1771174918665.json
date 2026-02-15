@@ -1,0 +1,17 @@
+{
+  "query": "\nSELECT id, partnerId, cityId, contractStatus, \n       CASE \n         WHEN contractStatus = 'active' THEN 'YES_ACTIVE'\n         WHEN contractStatus = 'draft' THEN 'YES_DRAFT'\n         ELSE CONCAT('OTHER:', contractStatus)\n       END as status_check\nFROM partner_cities \nWHERE partnerId = 30002;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT id, partnerId, cityId, contractStatus, \n       CASE \n         WHEN contractStatus = 'active' THEN 'YES_ACTIVE'\n         WHEN contractStatus = 'draft' THEN 'YES_DRAFT'\n         ELSE CONCAT('OTHER:', contractStatus)\n       END as status_check\nFROM partner_cities \nWHERE partnerId = 30002;\n",
+  "rows": [
+    {
+      "id": "120005",
+      "partnerId": "30002",
+      "cityId": "90003",
+      "contractStatus": "active",
+      "status_check": "YES_ACTIVE"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpartnerId\tcityId\tcontractStatus\tstatus_check\n120005\t30002\t90003\tactive\tYES_ACTIVE\n",
+  "stderr": "",
+  "execution_time_ms": 1527
+}

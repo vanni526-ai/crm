@@ -1,0 +1,8 @@
+{
+  "query": "\n-- 查询user_role_cities数据\nSELECT urc.*, c.name as cityName\nFROM user_role_cities urc\nLEFT JOIN cities c ON urc.cityId = c.id\nWHERE urc.userId = 526;\n\n-- 查询partner_cities数据  \nSELECT pc.*, c.name as cityName\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId = 30002;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询user_role_cities数据\nSELECT urc.*, c.name as cityName\nFROM user_role_cities urc\nLEFT JOIN cities c ON urc.cityId = c.id\nWHERE urc.userId = 526;\n\n-- 查询partner_cities数据  \nSELECT pc.*, c.name as cityName\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId = 30002;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 3: Unknown column 'urc.cityid' in 'on clause'"
+  ]
+}

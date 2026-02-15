@@ -1,0 +1,17 @@
+{
+  "query": "\n-- 删除错误的partnerId=30002记录\nDELETE FROM partner_cities WHERE partnerId = 30002;\n\n-- 更新正确的partnerId=120001记录的contractStatus为active\nUPDATE partner_cities \nSET contractStatus = 'active'\nWHERE partnerId = 120001;\n\n-- 验证修复结果\nSELECT pc.partnerId, p.name, p.phone, c.name as cityName, pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '15321700153';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 删除错误的partnerId=30002记录\nDELETE FROM partner_cities WHERE partnerId = 30002;\n\n-- 更新正确的partnerId=120001记录的contractStatus为active\nUPDATE partner_cities \nSET contractStatus = 'active'\nWHERE partnerId = 120001;\n\n-- 验证修复结果\nSELECT pc.partnerId, p.name, p.phone, c.name as cityName, pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '15321700153';\n",
+  "rows": [
+    {
+      "partnerId": "120001",
+      "name": "陈治霖",
+      "phone": "15321700153",
+      "cityName": "杭州",
+      "contractStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerId\tname\tphone\tcityName\tcontractStatus\n120001\t陈治霖\t15321700153\t杭州\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 2004
+}

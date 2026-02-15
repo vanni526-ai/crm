@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT \n  pc.id,\n  pc.partnerId,\n  pc.cityId,\n  pc.contractStatus,\n  c.id as city_id,\n  c.name as cityName\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId = 30002 AND pc.contractStatus = 'active';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  pc.id,\n  pc.partnerId,\n  pc.cityId,\n  pc.contractStatus,\n  c.id as city_id,\n  c.name as cityName\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId = 30002 AND pc.contractStatus = 'active';\n",
+  "rows": [
+    {
+      "id": "120005",
+      "partnerId": "30002",
+      "cityId": "90003",
+      "contractStatus": "active",
+      "city_id": "90003",
+      "cityName": "杭州"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpartnerId\tcityId\tcontractStatus\tcity_id\tcityName\n120005\t30002\t90003\tactive\t90003\t杭州\n",
+  "stderr": "",
+  "execution_time_ms": 1545
+}

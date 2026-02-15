@@ -1,0 +1,17 @@
+{
+  "query": "\nSELECT \n  u.id as userId,\n  u.name,\n  u.phone,\n  p.id as partnerId,\n  p.name as partnerName\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.phone = '15321700153';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  u.id as userId,\n  u.name,\n  u.phone,\n  p.id as partnerId,\n  p.name as partnerName\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.phone = '15321700153';\n",
+  "rows": [
+    {
+      "userId": "16800523",
+      "name": "陈治霖",
+      "phone": "15321700153",
+      "partnerId": "120001",
+      "partnerName": "陈治霖"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tname\tphone\tpartnerId\tpartnerName\n16800523\t陈治霖\t15321700153\t120001\t陈治霖\n",
+  "stderr": "",
+  "execution_time_ms": 1564
+}
