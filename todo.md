@@ -3265,4 +3265,10 @@
 - [x] 使用cityId过滤city_monthly_expenses表数据
 - [x] 修复SQL语法错误(IN语句)
 - [x] 测试验证修复后的权限过滤功能(7个测试全部通过)
+- [x] 保存检查点并通知前端App开发
+
+
+### 143. 修复cityExpense.list API参数验证schema问题
+- [x] 移除input schema外层的.optional()或添加.default({})
+- [x] 测试验证修复后的API调用(23个测试全部通过)
 - [ ] 保存检查点并通知前端App开发
