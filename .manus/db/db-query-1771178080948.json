@@ -1,0 +1,18 @@
+{
+  "query": "\n-- 1. 创建合伙人记录\nINSERT INTO partners (userId, name, phone, profitRatio, createdBy, isActive)\nVALUES (16800186, 'test', '16800186', '0.30', 1, 1);\n\n-- 2. 获取刚创建的partnerId\nSET @newPartnerId = LAST_INSERT_ID();\n\n-- 3. 创建partner_cities记录（关联重庆城市）\nINSERT INTO partner_cities (partnerId, cityId, contractStatus, currentProfitStage, isInvestmentRecovered, createdBy)\nVALUES (@newPartnerId, 3, 'active', 1, 0, 1);\n\n-- 4. 验证创建结果\nSELECT \n  p.id as partnerId,\n  p.name as partnerName,\n  p.userId,\n  u.name as userName,\n  c.name as cityName,\n  pc.contractStatus\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.userId = 16800186;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 1. 创建合伙人记录\nINSERT INTO partners (userId, name, phone, profitRatio, createdBy, isActive)\nVALUES (16800186, 'test', '16800186', '0.30', 1, 1);\n\n-- 2. 获取刚创建的partnerId\nSET @newPartnerId = LAST_INSERT_ID();\n\n-- 3. 创建partner_cities记录（关联重庆城市）\nINSERT INTO partner_cities (partnerId, cityId, contractStatus, currentProfitStage, isInvestmentRecovered, createdBy)\nVALUES (@newPartnerId, 3, 'active', 1, 0, 1);\n\n-- 4. 验证创建结果\nSELECT \n  p.id as partnerId,\n  p.name as partnerName,\n  p.userId,\n  u.name as userName,\n  c.name as cityName,\n  pc.contractStatus\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.userId = 16800186;\n",
+  "rows": [
+    {
+      "partnerId": "120003",
+      "partnerName": "test",
+      "userId": "16800186",
+      "userName": "test",
+      "cityName": "重庆",
+      "contractStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerId\tpartnerName\tuserId\tuserName\tcityName\tcontractStatus\n120003\ttest\t16800186\ttest\t重庆\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 2177
+}

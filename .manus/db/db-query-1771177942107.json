@@ -1,0 +1,41 @@
+{
+  "query": "\n-- 查询partners表中的重庆加盟商\nSELECT * FROM partners WHERE id = 17;\n\n-- 查询是否有关联的用户\nSELECT u.* FROM users u\nJOIN partners p ON p.userId = u.id\nWHERE p.id = 17;\n\n-- 查询所有合伙人及其关联用户\nSELECT \n  p.id as partnerId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive as userActive\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nWHERE p.name LIKE '%重庆%'\nORDER BY p.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询partners表中的重庆加盟商\nSELECT * FROM partners WHERE id = 17;\n\n-- 查询是否有关联的用户\nSELECT u.* FROM users u\nJOIN partners p ON p.userId = u.id\nWHERE p.id = 17;\n\n-- 查询所有合伙人及其关联用户\nSELECT \n  p.id as partnerId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive as userActive\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nWHERE p.name LIKE '%重庆%'\nORDER BY p.id;\n",
+  "rows": [
+    {
+      "id": "17",
+      "userId": "15372547",
+      "name": "重庆加盟商",
+      "phone": "13800000002",
+      "profitRatio": "0.30",
+      "profitRule": "NULL",
+      "brandFee": "0.00",
+      "techServiceFee": "0.00",
+      "deferredPaymentTotal": "0.00",
+      "deferredPaymentRule": "NULL",
+      "contractStartDate": "NULL",
+      "contractEndDate": "NULL",
+      "contractHistory": "NULL",
+      "accountName": "NULL",
+      "bankName": "NULL",
+      "accountNumber": "NULL",
+      "isActive": "0",
+      "notes": "NULL",
+      "createdBy": "1",
+      "createdAt": "2026-02-10 09:39:09",
+      "updatedAt": "2026-02-13 04:03:47",
+      "idCardNumber": "NULL",
+      "idCardFrontUrl": "NULL",
+      "idCardBackUrl": "NULL",
+      "expenseCoverage": "{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}",
+      "profitPaymentDay": "10"
+    }
+  ],
+  "messages": [
+    "partnerId\tpartnerName\tpartnerPhone\tuserId\tuserName\tuserPhone\tuserActive",
+    "17\t重庆加盟商\t13800000002\t15372547\tNULL\tNULL\tNULL"
+  ],
+  "stdout": "id\tuserId\tname\tphone\tprofitRatio\tprofitRule\tbrandFee\ttechServiceFee\tdeferredPaymentTotal\tdeferredPaymentRule\tcontractStartDate\tcontractEndDate\tcontractHistory\taccountName\tbankName\taccountNumber\tisActive\tnotes\tcreatedBy\tcreatedAt\tupdatedAt\tidCardNumber\tidCardFrontUrl\tidCardBackUrl\texpenseCoverage\tprofitPaymentDay\n17\t15372547\t重庆加盟商\t13800000002\t0.30\tNULL\t0.00\t0.00\t0.00\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\tNULL\t0\tNULL\t1\t2026-02-10 09:39:09\t2026-02-13 04:03:47\tNULL\tNULL\tNULL\t{\"cleaningFee\": false, \"consumablesFee\": false, \"deferredPayment\": false, \"expressFee\": false, \"otherFee\": false, \"phoneFee\": false, \"promotionFee\": false, \"propertyFee\": true, \"rentFee\": true, \"teacherFee\": true, \"transportFee\": true, \"utilityFee\": true}\t10\npartnerId\tpartnerName\tpartnerPhone\tuserId\tuserName\tuserPhone\tuserActive\n17\t重庆加盟商\t13800000002\t15372547\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 2026
+}

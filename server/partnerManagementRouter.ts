@@ -395,6 +395,10 @@ export const partnerManagementRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
+      // 先删除所有partner_cities记录
+      await db.delete(partnerCities).where(eq(partnerCities.partnerId, input.id));
+      
+      // 再设置partners为不激活
       await db
         .update(partners)
         .set({ isActive: false })
@@ -875,10 +879,11 @@ export const partnerManagementRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
-      // 获取所有合伙人
+      // 获取所有激活的合伙人（过滤已删除的）
       const allPartners = await db
         .select()
         .from(partners)
+        .where(eq(partners.isActive, true))
         .orderBy(desc(partners.createdAt));
       
       // 为每个合伙人统计数据

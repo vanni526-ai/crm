@@ -3356,4 +3356,27 @@
 - [x] 修复userManagementRouter的update接口,将contractStatus从'draft'改为'active'
 - [x] 测试完整的数据同步流程(3个测试用例全部通过)
 - [x] 移除调试日志
+- [x] 保存检查点
+
+### 137. 清理重庆加盟商脏数据并将重庆城市关联到test用户
+- [x] 删除重庆加盟商（partnerId=17）的脏数据
+- [x] 为test用户（userId=16800186）创建合伙人记录
+- [x] 关联重庆城市到新的合伙人记录（contractStatus='active'）
+- [x] 验证用户管理和合伙人管理页面显示正确
+- [ ] 保存检查点
+
+### 138. 完善用户管理和合伙人管理的数据同步逻辑
+- [x] 修复用户删除逻辑，自动清理partners和partner_cities数据
+- [x] 修复取消cityPartner角色逻辑，自动清理partner_cities数据
+- [x] 修复合伙人删除逻辑，自动清理partner_cities数据
+- [x] 修复用户名/手机号修改逻辑，自动同步到partners表
+- [x] 创建测试用例验证完整的同步逻辑(5个测试全部通过)
+- [ ] 保存检查点
+
+### 139. 修复合伙人管理页面的查询逻辑，确保正确过滤已删除的合伙人
+- [x] 检查getPartnerStats接口的查询逻辑
+- [x] 确保只显示isActive=true的合伙人
+- [x] 确保只显示contractStatus='active'的partner_cities记录(已存在)
+- [x] 确保过滤掉已删除的用户账号(通过isActive过滤)
+- [x] 创建测试用例验证过滤逻辑(4个测试全部通过)
 - [ ] 保存检查点

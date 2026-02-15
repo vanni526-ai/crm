@@ -427,8 +427,11 @@ export const userManagementRouter = router({
         const [partnerRecords] = await drizzle.select().from(partners).where(eq(partners.userId, id)).limit(1);
         
         if (hadCityPartnerRole && !hasCityPartnerRole) {
-          // 移除合伙人角色：设置为不激活
+          // 移除合伙人角色：删除partner_cities记录，设置partners为不激活
           if (partnerRecords) {
+            // 先删除所有partner_cities记录
+            await drizzle.delete(partnerCities).where(eq(partnerCities.partnerId, partnerRecords.id));
+            // 再设置partners为不激活
             await drizzle.update(partners).set({ isActive: false } as any).where(eq(partners.userId, id));
           }
         } else if (!hadCityPartnerRole && hasCityPartnerRole) {
@@ -492,11 +495,11 @@ export const userManagementRouter = router({
                 // 查找城市ID
                 const [cityRecord] = await drizzle.select().from(cities).where(eq(cities.name, cityName)).limit(1);
                 if (cityRecord) {
-                  // 创建partnerCities记录（草稿状态）
+                  // 创建partnerCities记录
                   await drizzle.insert(partnerCities).values({
                     partnerId: partnerId,
                     cityId: cityRecord.id,
-                    contractStatus: 'draft',
+                    contractStatus: 'active',  // 修复：用户管理编辑城市时直接设置为active
                     currentProfitStage: 1,
                     isInvestmentRecovered: false,
                     createdBy: 1,
@@ -506,11 +509,14 @@ export const userManagementRouter = router({
             }
           }
         } else if (hasCityPartnerRole && partnerRecords) {
-          // 已经是合伙人，更新基础信息
-          await drizzle.update(partners).set({ 
-            name: updateData.name || partnerRecords.name,
-            phone: updateData.phone || partnerRecords.phone,
-          } as any).where(eq(partners.userId, id));
+          // 已经是合伙人，同步更新基础信息（用户名、手机号）
+          const partnerUpdateData: any = {};
+          if (updateData.name) partnerUpdateData.name = updateData.name;
+          if (updateData.phone) partnerUpdateData.phone = updateData.phone;
+          
+          if (Object.keys(partnerUpdateData).length > 0) {
+            await drizzle.update(partners).set(partnerUpdateData).where(eq(partners.userId, id));
+          }
           
           // 如果更新了城市列表，同步更新partnerCities
           if (roleCities && roleCities.cityPartner) {
@@ -751,6 +757,19 @@ export const userManagementRouter = router({
         });
       }
 
+      // 导入schema
+      const { partners, partnerCities } = await import('../drizzle/schema');
+      
+      // 查找关联的合伙人记录
+      const [partnerRecord] = await drizzle.select().from(partners).where(eq(partners.userId, input.id)).limit(1);
+      
+      // 如果存在合伙人记录，先删除partner_cities，再删除partners
+      if (partnerRecord) {
+        await drizzle.delete(partnerCities).where(eq(partnerCities.partnerId, partnerRecord.id));
+        await drizzle.delete(partners).where(eq(partners.userId, input.id));
+      }
+      
+      // 删除用户
       await drizzle.delete(users).where(eq(users.id, input.id));
 
       return {
