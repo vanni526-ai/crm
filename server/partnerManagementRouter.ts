@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders, users } from "../drizzle/schema";
+import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders, users, cityMonthlyExpenses } from "../drizzle/schema";
 import { eq, and, desc, sql, inArray, not } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { uploadAndParseContract } from "./contractParser";
@@ -1477,5 +1477,79 @@ export const partnerManagementRouter = router({
         .where(eq(partnerCities.id, partnerCityId));
       
       return { success: true };
+    }),
+
+  /**
+   * 从city_monthly_expenses表查询合伙人分红数据
+   * 用于前端App显示合伙人在各城市的分红金额
+   */
+  getCityMonthlyProfits: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number().optional(),
+      startDate: z.string().optional(), // YYYY-MM format
+      endDate: z.string().optional(),   // YYYY-MM format
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      // 1. 获取该合伙人关联的所有城市ID
+      const partnerCityRecords = await db
+        .select({ cityId: partnerCities.cityId })
+        .from(partnerCities)
+        .where(eq(partnerCities.partnerId, input.partnerId));
+      
+      if (partnerCityRecords.length === 0) {
+        return {
+          records: [],
+          totalAmount: "0.00",
+          count: 0,
+        };
+      }
+      
+      const partnerCityIds = partnerCityRecords.map(r => r.cityId);
+      
+      // 2. 构建查询条件
+      const conditions = [inArray(cityMonthlyExpenses.cityId, partnerCityIds)];
+      
+      // 如果指定了cityId，只查询该城市
+      if (input.cityId) {
+        conditions.push(eq(cityMonthlyExpenses.cityId, input.cityId));
+      }
+      
+      // 如果指定了时间范围
+      if (input.startDate) {
+        conditions.push(sql`${cityMonthlyExpenses.month} >= ${input.startDate}`);
+      }
+      if (input.endDate) {
+        conditions.push(sql`${cityMonthlyExpenses.month} <= ${input.endDate}`);
+      }
+      
+      // 3. 查询city_monthly_expenses表
+      const records = await db
+        .select({
+          id: cityMonthlyExpenses.id,
+          cityId: cityMonthlyExpenses.cityId,
+          cityName: cityMonthlyExpenses.cityName,
+          month: cityMonthlyExpenses.month,
+          partnerShare: cityMonthlyExpenses.partnerShare,
+          totalExpense: cityMonthlyExpenses.totalExpense,
+          createdAt: cityMonthlyExpenses.createdAt,
+        })
+        .from(cityMonthlyExpenses)
+        .where(and(...conditions))
+        .orderBy(desc(cityMonthlyExpenses.month));
+      
+      // 4. 计算总金额
+      const totalAmount = records.reduce((sum, record) => {
+        return sum + Number(record.partnerShare || 0);
+      }, 0);
+      
+      return {
+        records,
+        totalAmount: totalAmount.toFixed(2),
+        count: records.length,
+      };
     }),
 });

@@ -3227,4 +3227,12 @@
 - [x] 支持按partnerId、cityId、时间范围筛选分红记录
 - [x] 返回分红记录列表和总金额
 - [x] 测试API功能(6个测试全部通过)
+- [x] 保存检查点并提供API文档
+
+### 138. 创建从city_monthly_expenses表查询合伙人分红的API
+- [x] 在partnerManagementRouter.ts中添加getCityMonthlyProfits API
+- [x] 支持按partnerId、cityId、时间范围筛选
+- [x] 返回每个城市每个月的partnerShare（合伙人分红）
+- [x] 计算总分红金额
+- [x] 测试API功能(7个测试全部通过,福州￥1539.48,泉州￥1890.00)
 - [ ] 保存检查点并提供API文档
