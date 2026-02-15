@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders, users, cityMonthlyExpenses } from "../drizzle/schema";
+import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders, users, cityMonthlyExpenses, userRoleCities } from "../drizzle/schema";
 import { eq, and, desc, sql, inArray, not } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { uploadAndParseContract } from "./contractParser";
@@ -176,14 +176,56 @@ export const partnerManagementRouter = router({
       
       // 如果提供了cityIds，则关联城市
       if (input.cityIds && input.cityIds.length > 0) {
+        // 1. 关联城市到partner_cities表
         await db.insert(partnerCities).values(
           input.cityIds.map(cityId => ({
             partnerId,
             cityId,
             expenseCoverage: {}, // 初始化空的费用承担配置
-            createdBy: ctx.user.id, // 添加创建人ID
+            createdBy: ctx.user.id, // 添加创建人 ID
           } as any))
         );
+
+        // 2. 同步城市信息到user_role_cities表
+        // 首先获取城市名称
+        const cityNames = await db
+          .select({ name: cities.name })
+          .from(cities)
+          .where(inArray(cities.id, input.cityIds));
+        
+        const cityNamesArray = cityNames.map(c => c.name);
+
+        // 检查是否已存在cityPartner角色的城市关联
+        const existingRoleCity = await db
+          .select()
+          .from(userRoleCities)
+          .where(
+            and(
+              eq(userRoleCities.userId, userId),
+              eq(userRoleCities.role, "cityPartner" as any)
+            )
+          )
+          .limit(1);
+
+        if (existingRoleCity.length > 0) {
+          // 更新现有记录
+          await db
+            .update(userRoleCities)
+            .set({ cities: JSON.stringify(cityNamesArray) })
+            .where(
+              and(
+                eq(userRoleCities.userId, userId),
+                eq(userRoleCities.role, "cityPartner" as any)
+              )
+            );
+        } else {
+          // 创建新记录
+          await db.insert(userRoleCities).values({
+            userId,
+            role: "cityPartner" as any,
+            cities: JSON.stringify(cityNamesArray),
+          } as any);
+        }
       }
       
       return { 
