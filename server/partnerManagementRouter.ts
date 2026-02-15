@@ -528,6 +528,77 @@ export const partnerManagementRouter = router({
     }),
 
   /**
+   * 根据城市查询合伙人的分红记录（用于前端App）
+   */
+  getProfitRecordsByCity: protectedProcedure
+    .input(z.object({
+      partnerId: z.number(),
+      cityId: z.number().optional(),
+      status: z.enum(["pending", "completed", "failed"]).optional(),
+      startDate: z.string().optional(),
+      endDate: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      
+      // 查询分红记录，通过expenseId关联partner_expenses获取cityId
+      const query = db
+        .select({
+          id: partnerProfitRecords.id,
+          partnerId: partnerProfitRecords.partnerId,
+          expenseId: partnerProfitRecords.expenseId,
+          amount: partnerProfitRecords.amount,
+          transferDate: partnerProfitRecords.transferDate,
+          transferMethod: partnerProfitRecords.transferMethod,
+          transactionNo: partnerProfitRecords.transactionNo,
+          status: partnerProfitRecords.status,
+          notes: partnerProfitRecords.notes,
+          recordedBy: partnerProfitRecords.recordedBy,
+          createdAt: partnerProfitRecords.createdAt,
+          updatedAt: partnerProfitRecords.updatedAt,
+          cityId: partnerExpenses.cityId,
+          cityName: cities.name,
+        })
+        .from(partnerProfitRecords)
+        .leftJoin(partnerExpenses, eq(partnerProfitRecords.expenseId, partnerExpenses.id))
+        .leftJoin(cities, eq(partnerExpenses.cityId, cities.id));
+      
+      const conditions = [eq(partnerProfitRecords.partnerId, input.partnerId)];
+      
+      if (input.cityId) {
+        conditions.push(eq(partnerExpenses.cityId, input.cityId));
+      }
+      
+      if (input.status) {
+        conditions.push(eq(partnerProfitRecords.status, input.status));
+      }
+      
+      if (input.startDate) {
+        conditions.push(sql`${partnerProfitRecords.transferDate} >= ${input.startDate}`);
+      }
+      
+      if (input.endDate) {
+        conditions.push(sql`${partnerProfitRecords.transferDate} <= ${input.endDate}`);
+      }
+      
+      const records = await query
+        .where(and(...conditions))
+        .orderBy(desc(partnerProfitRecords.transferDate));
+      
+      // 计算总金额
+      const totalAmount = records.reduce((sum, record) => {
+        return sum + Number(record.amount || 0);
+      }, 0);
+      
+      return {
+        records,
+        totalAmount: totalAmount.toFixed(2),
+        count: records.length,
+      };
+    }),
+
+  /**
    * 创建分红流水记录
    */
   createProfitRecord: protectedProcedure
