@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, username, phone, roles FROM users WHERE id = 15362126;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, username, phone, roles FROM users WHERE id = 15362126;",
+  "rows": [
+    {
+      "id": "15362126",
+      "name": "水水",
+      "username": "NULL",
+      "phone": "18817847691",
+      "roles": "teacher,普通用户,老师,上海"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tusername\tphone\troles\n15362126\t水水\tNULL\t18817847691\tteacher,普通用户,老师,上海\n",
+  "stderr": "",
+  "execution_time_ms": 2141
+}
