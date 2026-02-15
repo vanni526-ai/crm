@@ -510,7 +510,7 @@ export default function UserManagementContent() {
 
       {/* 创建用户对话框 */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>创建新用户</DialogTitle>
           </DialogHeader>
