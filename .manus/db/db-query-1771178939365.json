@@ -1,0 +1,20 @@
+{
+  "query": "\n-- 查询这2个用户的完整信息\nSELECT \n  id as userId,\n  name as userName,\n  phone as userPhone,\n  email,\n  roles,\n  role,\n  isActive,\n  createdAt\nFROM users\nWHERE id IN (13860029, 16800186)\nORDER BY createdAt;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询这2个用户的完整信息\nSELECT \n  id as userId,\n  name as userName,\n  phone as userPhone,\n  email,\n  roles,\n  role,\n  isActive,\n  createdAt\nFROM users\nWHERE id IN (13860029, 16800186)\nORDER BY createdAt;\n",
+  "rows": [
+    {
+      "userId": "16800186",
+      "userName": "test",
+      "userPhone": "13381928825",
+      "email": "NULL",
+      "roles": "user,admin,sales,teacher,cityPartner",
+      "role": "user",
+      "isActive": "1",
+      "createdAt": "2026-02-15 15:16:51"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tuserName\tuserPhone\temail\troles\trole\tisActive\tcreatedAt\n16800186\ttest\t13381928825\tNULL\tuser,admin,sales,teacher,cityPartner\tuser\t1\t2026-02-15 15:16:51\n",
+  "stderr": "",
+  "execution_time_ms": 1572
+}

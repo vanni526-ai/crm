@@ -1,0 +1,36 @@
+{
+  "query": "\n-- 查询所有重庆城市的合伙人记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive,\n  pc.id as partnerCityId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone\nFROM partners p\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON c.id = pc.cityId\nLEFT JOIN users u ON u.id = p.userId\nWHERE c.name = '重庆' OR p.name LIKE '%重庆%' OR p.name LIKE '%test%'\nORDER BY p.createdAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询所有重庆城市的合伙人记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive,\n  pc.id as partnerCityId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone\nFROM partners p\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON c.id = pc.cityId\nLEFT JOIN users u ON u.id = p.userId\nWHERE c.name = '重庆' OR p.name LIKE '%重庆%' OR p.name LIKE '%test%'\nORDER BY p.createdAt DESC;\n",
+  "rows": [
+    {
+      "partnerId": "120003",
+      "userId": "16800186",
+      "partnerName": "test",
+      "partnerPhone": "16800186",
+      "partnerIsActive": "1",
+      "partnerCityId": "120008",
+      "cityId": "3",
+      "cityName": "重庆",
+      "contractStatus": "active",
+      "userName": "test",
+      "userPhone": "13381928825"
+    },
+    {
+      "partnerId": "90006",
+      "userId": "NULL",
+      "partnerName": "test",
+      "partnerPhone": "13381928825",
+      "partnerIsActive": "1",
+      "partnerCityId": "60008",
+      "cityId": "3",
+      "cityName": "重庆",
+      "contractStatus": "active",
+      "userName": "NULL",
+      "userPhone": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerId\tuserId\tpartnerName\tpartnerPhone\tpartnerIsActive\tpartnerCityId\tcityId\tcityName\tcontractStatus\tuserId\tuserName\tuserPhone\n120003\t16800186\ttest\t16800186\t1\t120008\t3\t重庆\tactive\t16800186\ttest\t13381928825\n90006\t13860029\ttest\t13381928825\t1\t60008\t3\t重庆\tactive\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1540
+}

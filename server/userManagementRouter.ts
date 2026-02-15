@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb, setUserRoleCities, getUserRoleCities } from "./db";
-import { users, teachers } from "../drizzle/schema";
+import { users, teachers, partners, partnerCities, cities } from "../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import { hashPassword } from "./passwordUtils";
 import { USER_ROLE_VALUES } from "../shared/roles";
@@ -716,6 +716,12 @@ export const userManagementRouter = router({
         .update(users)
         .set({ isActive: input.isActive })
         .where(eq(users.id, input.id));
+
+      // 同步到partners表
+      const [partnerRecord] = await drizzle.select().from(partners).where(eq(partners.userId, input.id)).limit(1);
+      if (partnerRecord) {
+        await drizzle.update(partners).set({ isActive: input.isActive } as any).where(eq(partners.userId, input.id));
+      }
 
       return {
         success: true,

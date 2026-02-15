@@ -1,0 +1,44 @@
+{
+  "query": "\n-- 专门查询重庆城市的所有合伙人记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive,\n  p.createdAt as partnerCreatedAt,\n  pc.id as partnerCityId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  pc.createdAt as partnerCityCreatedAt,\n  u.id as actualUserId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive as userIsActive\nFROM partner_cities pc\nLEFT JOIN partners p ON p.id = pc.partnerId\nLEFT JOIN cities c ON c.id = pc.cityId\nLEFT JOIN users u ON u.id = p.userId\nWHERE c.name = '重庆'\nORDER BY pc.createdAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 专门查询重庆城市的所有合伙人记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive,\n  p.createdAt as partnerCreatedAt,\n  pc.id as partnerCityId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  pc.createdAt as partnerCityCreatedAt,\n  u.id as actualUserId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive as userIsActive\nFROM partner_cities pc\nLEFT JOIN partners p ON p.id = pc.partnerId\nLEFT JOIN cities c ON c.id = pc.cityId\nLEFT JOIN users u ON u.id = p.userId\nWHERE c.name = '重庆'\nORDER BY pc.createdAt DESC;\n",
+  "rows": [
+    {
+      "partnerId": "120003",
+      "userId": "16800186",
+      "partnerName": "test",
+      "partnerPhone": "16800186",
+      "partnerIsActive": "1",
+      "partnerCreatedAt": "2026-02-15 17:54:40",
+      "partnerCityId": "120008",
+      "cityId": "3",
+      "cityName": "重庆",
+      "contractStatus": "active",
+      "partnerCityCreatedAt": "2026-02-15 17:54:40",
+      "actualUserId": "16800186",
+      "userName": "test",
+      "userPhone": "13381928825",
+      "userIsActive": "1"
+    },
+    {
+      "partnerId": "90006",
+      "userId": "13860029",
+      "partnerName": "test",
+      "partnerPhone": "13381928825",
+      "partnerIsActive": "1",
+      "partnerCreatedAt": "2026-02-13 02:42:47",
+      "partnerCityId": "60008",
+      "cityId": "3",
+      "cityName": "重庆",
+      "contractStatus": "active",
+      "partnerCityCreatedAt": "2026-02-13 05:21:44",
+      "actualUserId": "NULL",
+      "userName": "NULL",
+      "userPhone": "NULL",
+      "userIsActive": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerId\tuserId\tpartnerName\tpartnerPhone\tpartnerIsActive\tpartnerCreatedAt\tpartnerCityId\tcityId\tcityName\tcontractStatus\tpartnerCityCreatedAt\tactualUserId\tuserName\tuserPhone\tuserIsActive\n120003\t16800186\ttest\t16800186\t1\t2026-02-15 17:54:40\t120008\t3\t重庆\tactive\t2026-02-15 17:54:40\t16800186\ttest\t13381928825\t1\n90006\t13860029\ttest\t13381928825\t1\t2026-02-13 02:42:47\t60008\t3\t重庆\tactive\t2026-02-13 05:21:44\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1571
+}

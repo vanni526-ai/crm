@@ -3363,7 +3363,7 @@
 - [x] 为test用户（userId=16800186）创建合伙人记录
 - [x] 关联重庆城市到新的合伙人记录（contractStatus='active'）
 - [x] 验证用户管理和合伙人管理页面显示正确
-- [ ] 保存检查点
+- [x] 保存检查点
 
 ### 138. 完善用户管理和合伙人管理的数据同步逻辑
 - [x] 修复用户删除逻辑，自动清理partners和partner_cities数据
@@ -3371,7 +3371,7 @@
 - [x] 修复合伙人删除逻辑，自动清理partner_cities数据
 - [x] 修复用户名/手机号修改逻辑，自动同步到partners表
 - [x] 创建测试用例验证完整的同步逻辑(5个测试全部通过)
-- [ ] 保存检查点
+- [x] 保存检查点
 
 ### 139. 修复合伙人管理页面的查询逻辑，确保正确过滤已删除的合伙人
 - [x] 检查getPartnerStats接口的查询逻辑
@@ -3379,4 +3379,17 @@
 - [x] 确保只显示contractStatus='active'的partner_cities记录(已存在)
 - [x] 确保过滤掉已删除的用户账号(通过isActive过滤)
 - [x] 创建测试用例验证过滤逻辑(4个测试全部通过)
+- [x] 保存检查点
+
+### 140. 修复合伙人管理中重复显示的问题并全面审查双向数据同步逻辑
+- [x] 诊断重庆-test重复显示的根本原因（孤儿记录：userId不存在但partners记录仍然存在）
+- [x] 修复重复记录问题（删除partnerId=90006的孤儿记录）
+- [x] 全面审查双向同步逻辑：
+  - [x] 新增：用户管理添加cityPartner角色 → 自动创建partners和partner_cities记录(已存在)
+  - [x] 修改：用户管理修改用户名/手机号/城市 → 自动同步到partners和partner_cities表(已存在)
+  - [x] 启用/禁用：用户管理启用/禁用用户 → 自动同步到partners.isActive(已修复)
+  - [x] 软删除：用户管理删除用户/取消角色 → 自动设置partners.isActive=false并删除partner_cities(已存在)
+  - [x] 硬删除：用户管理删除用户 → 级联删除partners和partner_cities(已存在)
+- [x] 创建数据同步规则文档(docs/data-sync-rules.md)
+- [x] 创建集成测试(部分测试通过,需要修复)
 - [ ] 保存检查点

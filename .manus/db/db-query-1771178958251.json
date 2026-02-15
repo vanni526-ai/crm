@@ -1,0 +1,17 @@
+{
+  "query": "\n-- 删除partnerId=90006的partner_cities记录\nDELETE FROM partner_cities WHERE partnerId = 90006;\n\n-- 删除partnerId=90006的partners记录\nDELETE FROM partners WHERE id = 90006;\n\n-- 验证删除结果\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  pc.id as partnerCityId,\n  c.name as cityName\nFROM partners p\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON c.id = pc.cityId\nWHERE c.name = '重庆' OR p.name LIKE '%test%'\nORDER BY p.createdAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 删除partnerId=90006的partner_cities记录\nDELETE FROM partner_cities WHERE partnerId = 90006;\n\n-- 删除partnerId=90006的partners记录\nDELETE FROM partners WHERE id = 90006;\n\n-- 验证删除结果\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  pc.id as partnerCityId,\n  c.name as cityName\nFROM partners p\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON c.id = pc.cityId\nWHERE c.name = '重庆' OR p.name LIKE '%test%'\nORDER BY p.createdAt DESC;\n",
+  "rows": [
+    {
+      "partnerId": "120003",
+      "userId": "16800186",
+      "partnerName": "test",
+      "partnerCityId": "120008",
+      "cityName": "重庆"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerId\tuserId\tpartnerName\tpartnerCityId\tcityName\n120003\t16800186\ttest\t120008\t重庆\n",
+  "stderr": "",
+  "execution_time_ms": 1983
+}
