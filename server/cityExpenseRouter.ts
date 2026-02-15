@@ -18,11 +18,51 @@ export const cityExpenseRouter = router({
       startMonth: z.string().optional(),
       endMonth: z.string().optional(),
     }).optional())
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
       const conditions = [];
+      
+      // 权限过滤：城市合伙人只能查看自己管理的城市账单
+      const userRoles = ctx.user.roles ? ctx.user.roles.split(',') : [];
+      const isCityPartner = userRoles.includes('cityPartner');
+      const isAdminOrFinance = userRoles.includes('admin') || userRoles.includes('finance');
+      
+      if (isCityPartner && !isAdminOrFinance) {
+        // 获取该合伙人管理的城市列表
+        const partnerRecord = await db
+          .select({ id: partners.id })
+          .from(partners)
+          .where(eq(partners.userId, ctx.user.id))
+          .limit(1);
+        
+        if (partnerRecord.length === 0) {
+          // 如果没有找到合伙人记录，返回空数组
+          return [];
+        }
+        
+        const partnerId = partnerRecord[0].id;
+        
+        // 获取该合伙人管理的城市ID列表
+        const partnerCitiesRecords = await db
+          .select({ cityId: partnerCities.cityId })
+          .from(partnerCities)
+          .where(and(
+            eq(partnerCities.partnerId, partnerId),
+            eq(partnerCities.contractStatus, 'active')
+          ));
+        
+        const managedCityIds = partnerCitiesRecords.map(pc => pc.cityId);
+        
+        if (managedCityIds.length === 0) {
+          // 如果没有管理任何城市，返回空数组
+          return [];
+        }
+        
+        // 添加城市过滤条件
+        conditions.push(sql`${cityMonthlyExpenses.cityId} IN (${managedCityIds.join(',')})`);
+      }
       
       if (input?.cityId) {
         conditions.push(eq(cityMonthlyExpenses.cityId, input.cityId));
