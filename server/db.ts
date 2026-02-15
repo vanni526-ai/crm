@@ -156,7 +156,25 @@ export async function getUserByOpenId(openId: string) {
 export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(users).orderBy(desc(users.createdAt));
+  
+  // 获取所有用户
+  const allUsers = await db.select().from(users).orderBy(desc(users.createdAt));
+  
+  // 对于每个用户,如果有teacher角色,关联teachers表获取城市信息
+  const usersWithCity = await Promise.all(
+    allUsers.map(async (user) => {
+      // 检查roles字段是否包含teacher
+      if (user.roles && user.roles.includes('teacher')) {
+        const teacher = await db.select().from(teachers).where(eq(teachers.userId, user.id)).limit(1);
+        if (teacher.length > 0) {
+          return { ...user, city: teacher[0].city };
+        }
+      }
+      return { ...user, city: null };
+    })
+  );
+  
+  return usersWithCity;
 }
 
 export async function updateUserRole(userId: number, role: UserRole) {

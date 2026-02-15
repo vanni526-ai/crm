@@ -195,6 +195,7 @@ export default function Users() {
                     <TableHead>邮箱</TableHead>
                     <TableHead>登录方式</TableHead>
                     <TableHead>角色</TableHead>
+                    <TableHead>城市</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>最后登录</TableHead>
                     <TableHead className="text-right">操作</TableHead>
@@ -203,7 +204,7 @@ export default function Users() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={8} className="text-center py-8">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -221,6 +222,7 @@ export default function Users() {
                         <TableCell>{user.email || "-"}</TableCell>
                         <TableCell>{user.loginMethod || "-"}</TableCell>
                         <TableCell>{getRoleBadge(user.role)}</TableCell>
+                        <TableCell>{(user as any).city || "-"}</TableCell>
                         <TableCell>{getStatusBadge(user.isActive)}</TableCell>
                         <TableCell>
                           {user.lastSignedIn

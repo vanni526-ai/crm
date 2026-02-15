@@ -1,0 +1,33 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_teachers,\n  COUNT(city) as teachers_with_city,\n  COUNT(*) - COUNT(city) as teachers_without_city\nFROM teachers;\n\nSELECT city, COUNT(*) as count\nFROM teachers\nWHERE city IS NOT NULL AND city != ''\nGROUP BY city\nORDER BY count DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  COUNT(*) as total_teachers,\n  COUNT(city) as teachers_with_city,\n  COUNT(*) - COUNT(city) as teachers_without_city\nFROM teachers;\n\nSELECT city, COUNT(*) as count\nFROM teachers\nWHERE city IS NOT NULL AND city != ''\nGROUP BY city\nORDER BY count DESC;\n",
+  "rows": [
+    {
+      "total_teachers": "128",
+      "teachers_with_city": "128",
+      "teachers_without_city": "0"
+    }
+  ],
+  "messages": [
+    "city\tcount",
+    "上海\t60",
+    "武汉\t12",
+    "天津\t10",
+    "南京\t6",
+    "大连\t6",
+    "深圳\t6",
+    "石家庄\t6",
+    "无锡\t4",
+    "郑州\t4",
+    "济南\t2",
+    "长沙\t2",
+    "宁波\t2",
+    "福州\t2",
+    "东莞\t2",
+    "泉州\t2",
+    "太原\t2"
+  ],
+  "stdout": "total_teachers\tteachers_with_city\tteachers_without_city\n128\t128\t0\ncity\tcount\n上海\t60\n武汉\t12\n天津\t10\n南京\t6\n大连\t6\n深圳\t6\n石家庄\t6\n无锡\t4\n郑州\t4\n济南\t2\n长沙\t2\n宁波\t2\n福州\t2\n东莞\t2\n泉州\t2\n太原\t2\n",
+  "stderr": "",
+  "execution_time_ms": 1772
+}

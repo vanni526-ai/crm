@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_teachers,\n  COUNT(cityId) as teachers_with_city,\n  COUNT(*) - COUNT(cityId) as teachers_without_city\nFROM teachers;\n\nSELECT cityId, COUNT(*) as count\nFROM teachers\nGROUP BY cityId\nORDER BY count DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  COUNT(*) as total_teachers,\n  COUNT(cityId) as teachers_with_city,\n  COUNT(*) - COUNT(cityId) as teachers_without_city\nFROM teachers;\n\nSELECT cityId, COUNT(*) as count\nFROM teachers\nGROUP BY cityId\nORDER BY count DESC;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'cityid' in ''"
+  ]
+}
