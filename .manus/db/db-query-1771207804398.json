@@ -1,0 +1,16 @@
+{
+  "query": "\nUPDATE partner_cities pc\nJOIN partners p ON p.id = pc.partnerId\nJOIN users u ON u.id = p.userId\nSET pc.contractStatus = 'active',\n    pc.currentProfitStage = 1,\n    pc.isInvestmentRecovered = false\nWHERE u.name LIKE '%许博睿%';\n\n-- 验证更新\nSELECT \n  u.name as userName,\n  p.name as partnerName,\n  c.name as cityName,\n  pc.contractStatus\nFROM partner_cities pc\nJOIN partners p ON p.id = pc.partnerId\nJOIN users u ON u.id = p.userId\nJOIN cities c ON c.id = pc.cityId\nWHERE u.name LIKE '%许博睿%';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nUPDATE partner_cities pc\nJOIN partners p ON p.id = pc.partnerId\nJOIN users u ON u.id = p.userId\nSET pc.contractStatus = 'active',\n    pc.currentProfitStage = 1,\n    pc.isInvestmentRecovered = false\nWHERE u.name LIKE '%许博睿%';\n\n-- 验证更新\nSELECT \n  u.name as userName,\n  p.name as partnerName,\n  c.name as cityName,\n  pc.contractStatus\nFROM partner_cities pc\nJOIN partners p ON p.id = pc.partnerId\nJOIN users u ON u.id = p.userId\nJOIN cities c ON c.id = pc.cityId\nWHERE u.name LIKE '%许博睿%';\n",
+  "rows": [
+    {
+      "userName": "许博睿",
+      "partnerName": "许博睿",
+      "cityName": "长沙",
+      "contractStatus": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "userName\tpartnerName\tcityName\tcontractStatus\n许博睿\t许博睿\t长沙\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1808
+}

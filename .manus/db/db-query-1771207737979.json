@@ -1,0 +1,25 @@
+{
+  "query": "\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.roles as userRoles,\n  u.isActive as userIsActive,\n  p.id as partnerId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive,\n  pc.id as partnerCityId,\n  pc.cityId,\n  pc.contractStatus,\n  c.name as cityName\nFROM users u\nLEFT JOIN partners p ON p.userId = u.id\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON c.id = pc.cityId\nWHERE u.name LIKE '%许博睿%' OR p.name LIKE '%许博睿%'\nORDER BY u.id DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.roles as userRoles,\n  u.isActive as userIsActive,\n  p.id as partnerId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive,\n  pc.id as partnerCityId,\n  pc.cityId,\n  pc.contractStatus,\n  c.name as cityName\nFROM users u\nLEFT JOIN partners p ON p.userId = u.id\nLEFT JOIN partner_cities pc ON pc.partnerId = p.id\nLEFT JOIN cities c ON c.id = pc.cityId\nWHERE u.name LIKE '%许博睿%' OR p.name LIKE '%许博睿%'\nORDER BY u.id DESC;\n",
+  "rows": [
+    {
+      "userId": "17370026",
+      "userName": "许博睿",
+      "userPhone": "13161932601",
+      "userRoles": "user,cityPartner",
+      "userIsActive": "1",
+      "partnerId": "150001",
+      "partnerName": "许博睿",
+      "partnerPhone": "13161932601",
+      "partnerIsActive": "1",
+      "partnerCityId": "150001",
+      "cityId": "90004",
+      "contractStatus": "draft",
+      "cityName": "长沙"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tuserName\tuserPhone\tuserRoles\tuserIsActive\tpartnerId\tpartnerName\tpartnerPhone\tpartnerIsActive\tpartnerCityId\tcityId\tcontractStatus\tcityName\n17370026\t许博睿\t13161932601\tuser,cityPartner\t1\t150001\t许博睿\t13161932601\t1\t150001\t90004\tdraft\t长沙\n",
+  "stderr": "",
+  "execution_time_ms": 1519
+}

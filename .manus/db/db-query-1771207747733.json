@@ -1,0 +1,16 @@
+{
+  "query": "\nSELECT u.id, u.name, u.phone, p.id as partnerId\nFROM users u\nLEFT JOIN partners p ON p.userId = u.id\nWHERE u.name LIKE '%许博睿%'\nLIMIT 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT u.id, u.name, u.phone, p.id as partnerId\nFROM users u\nLEFT JOIN partners p ON p.userId = u.id\nWHERE u.name LIKE '%许博睿%'\nLIMIT 1;\n",
+  "rows": [
+    {
+      "id": "17370026",
+      "name": "许博睿",
+      "phone": "13161932601",
+      "partnerId": "150001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tpartnerId\n17370026\t许博睿\t13161932601\t150001\n",
+  "stderr": "",
+  "execution_time_ms": 1545
+}

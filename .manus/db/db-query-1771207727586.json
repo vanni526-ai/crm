@@ -1,0 +1,18 @@
+{
+  "query": "\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.roles as userRoles,\n  p.id as partnerId,\n  p.name as partnerName\nFROM users u\nLEFT JOIN partners p ON p.userId = u.id\nWHERE u.name LIKE '%许博睿%' OR u.phone LIKE '%17370026%' OR p.name LIKE '%许博睿%' OR p.phone LIKE '%17370026%'\nORDER BY u.id DESC\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.roles as userRoles,\n  p.id as partnerId,\n  p.name as partnerName\nFROM users u\nLEFT JOIN partners p ON p.userId = u.id\nWHERE u.name LIKE '%许博睿%' OR u.phone LIKE '%17370026%' OR p.name LIKE '%许博睿%' OR p.phone LIKE '%17370026%'\nORDER BY u.id DESC\nLIMIT 10;\n",
+  "rows": [
+    {
+      "userId": "17370026",
+      "userName": "许博睿",
+      "userPhone": "13161932601",
+      "userRoles": "user,cityPartner",
+      "partnerId": "150001",
+      "partnerName": "许博睿"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tuserName\tuserPhone\tuserRoles\tpartnerId\tpartnerName\n17370026\t许博睿\t13161932601\tuser,cityPartner\t150001\t许博睿\n",
+  "stderr": "",
+  "execution_time_ms": 1531
+}

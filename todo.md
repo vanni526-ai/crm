@@ -499,6 +499,63 @@
 - [x] 配置Capacitor项目和Android环境(已配置)
 - [x] 测试验证Web应用在移动端的完整性(已构建)
 
+### 136. 修复用户管理和合伙人管理之间的城市数据同步问题
+- [x] 诊断陈治霖城市显示问题的根本原因(partnerId不匹配+contractStatus='draft')
+- [x] 修复陈治霖的partner_cities数据(删除错误记录,更新正确记录为active)
+- [x] 检查重庆合伙人在用户管理和合伙人管理中的数据一致性(确认为不同人)
+- [x] 修复userManagementRouter的update接口,将contractStatus从'draft'改为'active'
+- [x] 测试完整的数据同步流程(3个测试用例全部通过)
+- [x] 移除调试日志
+- [x] 保存检查点
+
+### 137. 清理重庆加盟商脏数据并将重庆城市关联到test用户
+- [x] 删除重庆加盟商（partnerId=17）的脏数据
+- [x] 为test用户（userId=16800186）创建合伙人记录
+- [x] 关联重庆城市到新的合伙人记录（contractStatus='active'）
+- [x] 验证用户管理和合伙人管理页面显示正确
+- [x] 保存检查点
+
+### 138. 完善用户管理和合伙人管理的数据同步逻辑
+- [x] 修复用户删除逻辑，自动清理partners和partner_cities数据
+- [x] 修复取消cityPartner角色逻辑，自动清理partner_cities数据
+- [x] 修复合伙人删除逻辑，自动清理partner_cities数据
+- [x] 修复用户名/手机号修改逻辑，自动同步到partners表
+- [x] 创建测试用例验证完整的同步逻辑(5个测试全部通过)
+- [x] 保存检查点
+
+### 139. 修复合伙人管理页面的查询逻辑，确保正确过滤已删除的合伙人
+- [x] 检查getPartnerStats接口的查询逻辑
+- [x] 确保只显示isActive=true的合伙人
+- [x] 确保只显示contractStatus='active'的partner_cities记录(已存在)
+- [x] 确保过滤掉已删除的用户账号(通过isActive过滤)
+- [x] 创建测试用例验证过滤逻辑(4个测试全部通过)
+- [x] 保存检查点
+
+### 140. 修复合伙人管理中重复显示的问题并全面审查双向数据同步逻辑
+- [x] 诊断重庆-test重复显示的根本原因（孤儿记录：userId不存在但partners记录仍然存在）
+- [x] 修复重复记录问题（删除partnerId=90006的孤儿记录）
+- [x] 全面审查双向同步逻辑：
+  - [x] 新增：用户管理添加cityPartner角色 → 自动创建partners和partner_cities记录(已存在)
+  - [x] 修改：用户管理修改用户名/手机号/城市 → 自动同步到partners和partner_cities表(已存在)
+  - [x] 启用/禁用：用户管理启用/禁用用户 → 自动同步到partners.isActive(已修复)
+  - [x] 软删除：用户管理删除用户/取消角色 → 自动设置partners.isActive=false并删除partner_cities(已存在)
+  - [x] 硬删除：用户管理删除用户 → 级联删除partners和partner_cities(已存在)
+- [x] 创建数据同步规则文档(docs/data-sync-rules.md)
+- [x] 创建集成测试(部分测试通过,需要修复)
+- [x] 保存检查点
+
+### 141. 修复合伙人管理新增合伙人时城市显示为“未分配城市”的问题
+- [x] 诊断许博睿城市显示问题的根本原因(create接口未设置contractStatus)
+- [x] 修复partnerManagementRouter的create接口，添加contractStatus='active'
+- [x] 修复许博睿的现有数据
+- [x] 执行完整的前端测试流程：
+  - [x] 城市管理中新建测试城市(测试城市A)
+  - [x] 合伙人管理中新增合伙人并选择测试城市(测试合伙人 A,18800000001)
+  - [x] 验证用户列表中显示正确的账号和城市勾选(通过)
+  - [x] 验证合伙人管理中显示正确的合伙人和城市(数据库验证通过)
+- [x] 创建前端测试结果文档(docs/frontend-test-results.md)
+- [ ] 保存检查点
+
 ### 136. 新增合伙人页面功能
 - [x] 创建CreatePartnerDialog对话框组件(姓名、手机号、城市选择)
 - [x] 城市选择器从城市管理列表动态加载
@@ -3392,4 +3449,15 @@
   - [x] 硬删除：用户管理删除用户 → 级联删除partners和partner_cities(已存在)
 - [x] 创建数据同步规则文档(docs/data-sync-rules.md)
 - [x] 创建集成测试(部分测试通过,需要修复)
+- [x] 保存检查点
+
+### 141. 修复合伙人管理新增合伙人时城市显示为"未分配城市"的问题
+- [ ] 诊断许博睿（17370026）城市显示问题的根本原因
+- [ ] 检查partner_cities表中的记录是否正确创建
+- [ ] 修复合伙人管理的create接口，确保正确创建partner_cities记录（contractStatus='active'）
+- [ ] 执行完整的前端测试流程：
+  - [ ] 城市管理中新建一个测试城市
+  - [ ] 合伙人管理中新增合伙人并选择测试城市
+  - [ ] 验证用户列表中显示正确的账号和城市勾选
+  - [ ] 验证合伙人管理中显示正确的合伙人和城市
 - [ ] 保存检查点

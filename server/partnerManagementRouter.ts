@@ -181,6 +181,9 @@ export const partnerManagementRouter = router({
           input.cityIds.map(cityId => ({
             partnerId,
             cityId,
+            contractStatus: 'active', // 设置为active状态
+            currentProfitStage: 1, // 默认第1阶段
+            isInvestmentRecovered: false, // 默认未回本
             expenseCoverage: {}, // 初始化空的费用承担配置
             createdBy: ctx.user.id, // 添加创建人 ID
           } as any))

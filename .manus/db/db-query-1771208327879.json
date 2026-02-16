@@ -1,0 +1,19 @@
+{
+  "query": "\nSELECT \n  pc.id as partnerCityId,\n  p.id as partnerId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  c.name as cityName,\n  pc.contractStatus,\n  pc.createdAt\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '18800000001'\nORDER BY pc.createdAt DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  pc.id as partnerCityId,\n  p.id as partnerId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  c.name as cityName,\n  pc.contractStatus,\n  pc.createdAt\nFROM partner_cities pc\nLEFT JOIN partners p ON pc.partnerId = p.id\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.phone = '18800000001'\nORDER BY pc.createdAt DESC;\n",
+  "rows": [
+    {
+      "partnerCityId": "150003",
+      "partnerId": "150003",
+      "partnerName": "测试合伙人A",
+      "partnerPhone": "18800000001",
+      "cityName": "测试城市A",
+      "contractStatus": "active",
+      "createdAt": "2026-02-16 02:14:50"
+    }
+  ],
+  "messages": [],
+  "stdout": "partnerCityId\tpartnerId\tpartnerName\tpartnerPhone\tcityName\tcontractStatus\tcreatedAt\n150003\t150003\t测试合伙人A\t18800000001\t测试城市A\tactive\t2026-02-16 02:14:50\n",
+  "stderr": "",
+  "execution_time_ms": 1603
+}
