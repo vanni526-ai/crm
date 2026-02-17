@@ -32,23 +32,32 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Configure CORS
+  // Configure CORS with wildcard support for *.manus.computer domains
   app.use(cors({
-    origin: [
-      // 课程预约App前端域名
-      'https://8081-iw7ezl9uw107lltdk8rzb-9b5da5a1.sg1.manus.computer',
-      'https://9000-iw7ezl9uw107lltdk8rzb-9b5da5a1.sg1.manus.computer',
-      // 其他前端域名
-      'https://8081-i1381rqve5c61pysqmyzt-9b5da5a1.sg1.manus.computer',
-      'https://8081-itemyehshjz3gv4est472-ce4de64b.sg1.manus.computer',
-      'https://8081-iv9oi1inydtghwvjvmhw2-80474770.sg1.manus.computer',
-      // 本地开发
-      'http://localhost:8081',
-      'http://localhost:3000',
-      'http://localhost:9000',
-      // Expo Go应用
-      'app://*',
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      // Allow all *.manus.computer domains
+      if (origin.match(/^https?:\/\/.*\.manus\.computer$/)) {
+        return callback(null, true);
+      }
+      
+      // Allow localhost for development
+      if (origin.match(/^https?:\/\/localhost(:\d+)?$/)) {
+        return callback(null, true);
+      }
+      
+      // Allow Expo Go app
+      if (origin.startsWith('app://')) {
+        return callback(null, true);
+      }
+      
+      // Reject other origins
+      callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'authorization', 'X-Auth-Token', 'x-auth-token'],

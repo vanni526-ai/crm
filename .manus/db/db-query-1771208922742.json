@@ -1,0 +1,27 @@
+{
+  "query": "\n-- 1. 检查cities表中是否还存在西双版纳城市\nSELECT id, name FROM cities WHERE name LIKE '%西双版纳%';\n\n-- 2. 检查partner_cities表中是否还有引用西双版纳城市ID的记录\nSELECT \n  pc.id as partnerCityId,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.cityId IN (SELECT id FROM cities WHERE name LIKE '%西双版纳%')\n   OR (c.id IS NULL AND pc.cityId IS NOT NULL);\n\n-- 3. 检查所有partner_cities表中cityId为NULL或引用不存在的城市的孤儿记录\nSELECT \n  pc.id as partnerCityId,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  CASE \n    WHEN c.id IS NULL THEN '孤儿记录:城市不存在'\n    ELSE '正常记录'\n  END as recordStatus\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.id IS NULL;\n\n-- 4. 检查所有partners表中userId为NULL或引用不存在的用户的孤儿记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  u.name as userName,\n  CASE \n    WHEN u.id IS NULL THEN '孤儿记录:用户不存在'\n    ELSE '正常记录'\n  END as recordStatus\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nWHERE u.id IS NULL;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 1. 检查cities表中是否还存在西双版纳城市\nSELECT id, name FROM cities WHERE name LIKE '%西双版纳%';\n\n-- 2. 检查partner_cities表中是否还有引用西双版纳城市ID的记录\nSELECT \n  pc.id as partnerCityId,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.cityId IN (SELECT id FROM cities WHERE name LIKE '%西双版纳%')\n   OR (c.id IS NULL AND pc.cityId IS NOT NULL);\n\n-- 3. 检查所有partner_cities表中cityId为NULL或引用不存在的城市的孤儿记录\nSELECT \n  pc.id as partnerCityId,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus,\n  CASE \n    WHEN c.id IS NULL THEN '孤儿记录:城市不存在'\n    ELSE '正常记录'\n  END as recordStatus\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.id IS NULL;\n\n-- 4. 检查所有partners表中userId为NULL或引用不存在的用户的孤儿记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  u.name as userName,\n  CASE \n    WHEN u.id IS NULL THEN '孤儿记录:用户不存在'\n    ELSE '正常记录'\n  END as recordStatus\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nWHERE u.id IS NULL;\n",
+  "rows": [
+    {
+      "id": "120001",
+      "name": "西双版纳"
+    }
+  ],
+  "messages": [
+    "partnerId\tuserId\tpartnerName\tpartnerPhone\tuserName\trecordStatus",
+    "16\t15372545\t苏州加盟商\t13800138000\tNULL\t孤儿记录:用户不存在",
+    "18\t15372548\t张雪婷\t13800000003\tNULL\t孤儿记录:用户不存在",
+    "19\t15372549\t孙志俊\t13800000004\tNULL\t孤儿记录:用户不存在",
+    "20\t15372550\t王开霖\t13800000005\tNULL\t孤儿记录:用户不存在",
+    "21\t15372551\t李一涵\t13800000006\tNULL\t孤儿记录:用户不存在",
+    "22\t15372552\t康红祥\t13800000007\tNULL\t孤儿记录:用户不存在",
+    "23\t15372553\t曹心茹\t13800000008\tNULL\t孤儿记录:用户不存在",
+    "24\t15372554\t赵浩然\t13800000009\tNULL\t孤儿记录:用户不存在",
+    "26\t15372556\t周建虎\t13800000011\tNULL\t孤儿记录:用户不存在",
+    "27\t15372557\t瀛姬直营\t13800000012\tNULL\t孤儿记录:用户不存在",
+    "28\t15372558\t朱利闻\t13800000013\tNULL\t孤儿记录:用户不存在"
+  ],
+  "stdout": "id\tname\n120001\t西双版纳\npartnerId\tuserId\tpartnerName\tpartnerPhone\tuserName\trecordStatus\n16\t15372545\t苏州加盟商\t13800138000\tNULL\t孤儿记录:用户不存在\n18\t15372548\t张雪婷\t13800000003\tNULL\t孤儿记录:用户不存在\n19\t15372549\t孙志俊\t13800000004\tNULL\t孤儿记录:用户不存在\n20\t15372550\t王开霖\t13800000005\tNULL\t孤儿记录:用户不存在\n21\t15372551\t李一涵\t13800000006\tNULL\t孤儿记录:用户不存在\n22\t15372552\t康红祥\t13800000007\tNULL\t孤儿记录:用户不存在\n23\t15372553\t曹心茹\t13800000008\tNULL\t孤儿记录:用户不存在\n24\t15372554\t赵浩然\t13800000009\tNULL\t孤儿记录:用户不存在\n26\t15372556\t周建虎\t13800000011\tNULL\t孤儿记录:用户不存在\n27\t15372557\t瀛姬直营\t13800000012\tNULL\t孤儿记录:用户不存在\n28\t15372558\t朱利闻\t13800000013\tNULL\t孤儿记录:用户不存在\n",
+  "stderr": "",
+  "execution_time_ms": 2202
+}

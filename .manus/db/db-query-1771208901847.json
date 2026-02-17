@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 1. 查询雨欣 林的用户信息\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive as userIsActive\nFROM users u\nWHERE u.phone = '13200003';\n\n-- 2. 查询雨欣 林的partners记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive\nFROM partners p\nWHERE p.userId IN (SELECT id FROM users WHERE phone = '13200003');\n\n-- 3. 查询雨欣 林的partner_cities记录\nSELECT \n  pc.id as partnerCityId,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId IN (\n  SELECT p.id FROM partners p\n  WHERE p.userId IN (SELECT id FROM users WHERE phone = '13200003')\n);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 1. 查询雨欣 林的用户信息\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive as userIsActive\nFROM users u\nWHERE u.phone = '13200003';\n\n-- 2. 查询雨欣 林的partners记录\nSELECT \n  p.id as partnerId,\n  p.userId,\n  p.name as partnerName,\n  p.phone as partnerPhone,\n  p.isActive as partnerIsActive\nFROM partners p\nWHERE p.userId IN (SELECT id FROM users WHERE phone = '13200003');\n\n-- 3. 查询雨欣 林的partner_cities记录\nSELECT \n  pc.id as partnerCityId,\n  pc.partnerId,\n  pc.cityId,\n  c.name as cityName,\n  pc.contractStatus\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE pc.partnerId IN (\n  SELECT p.id FROM partners p\n  WHERE p.userId IN (SELECT id FROM users WHERE phone = '13200003')\n);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1970
+}

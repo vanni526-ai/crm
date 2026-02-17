@@ -1,0 +1,8 @@
+{
+  "query": "\n-- 查询这些疑似脏数据账号的详细信息\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive,\n  u.createdAt,\n  GROUP_CONCAT(DISTINCT r.name) as roles\nFROM users u\nLEFT JOIN user_roles ur ON u.id = ur.userId\nLEFT JOIN roles r ON ur.roleId = r.id\nWHERE u.id IN (16028537, 16028538, 16028539, 16028540, 16028541, 16028542, 16028543, 16028544)\nGROUP BY u.id\nORDER BY u.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询这些疑似脏数据账号的详细信息\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive,\n  u.createdAt,\n  GROUP_CONCAT(DISTINCT r.name) as roles\nFROM users u\nLEFT JOIN user_roles ur ON u.id = ur.userId\nLEFT JOIN roles r ON ur.roleId = r.id\nWHERE u.id IN (16028537, 16028538, 16028539, 16028540, 16028541, 16028542, 16028543, 16028544)\nGROUP BY u.id\nORDER BY u.id;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1146 (42S02) at line 3: Table 'jtcsa4dgw9wmnzinvrevwf.user_roles' doesn't exist"
+  ]
+}

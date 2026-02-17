@@ -1,0 +1,66 @@
+{
+  "query": "\n-- 查询这些疑似脏数据账号的详细信息\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive,\n  u.createdAt\nFROM users u\nWHERE u.id IN (16028537, 16028538, 16028539, 16028540, 16028541, 16028542, 16028543, 16028544)\nORDER BY u.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询这些疑似脏数据账号的详细信息\nSELECT \n  u.id as userId,\n  u.name as userName,\n  u.phone as userPhone,\n  u.isActive,\n  u.createdAt\nFROM users u\nWHERE u.id IN (16028537, 16028538, 16028539, 16028540, 16028541, 16028542, 16028543, 16028544)\nORDER BY u.id;\n",
+  "rows": [
+    {
+      "userId": "16028537",
+      "userName": "电话号码",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:52"
+    },
+    {
+      "userId": "16028538",
+      "userName": "活跃状态",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:53"
+    },
+    {
+      "userId": "16028539",
+      "userName": "老师属性",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:53"
+    },
+    {
+      "userId": "16028540",
+      "userName": "受众客户类型",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:53"
+    },
+    {
+      "userId": "16028541",
+      "userName": "地区",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:53"
+    },
+    {
+      "userId": "16028542",
+      "userName": "合同到期时间",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:53"
+    },
+    {
+      "userId": "16028543",
+      "userName": "入职时间",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:53"
+    },
+    {
+      "userId": "16028544",
+      "userName": "备注",
+      "userPhone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-13 09:56:53"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tuserName\tuserPhone\tisActive\tcreatedAt\n16028537\t电话号码\tNULL\t1\t2026-02-13 09:56:52\n16028538\t活跃状态\tNULL\t1\t2026-02-13 09:56:53\n16028539\t老师属性\tNULL\t1\t2026-02-13 09:56:53\n16028540\t受众客户类型\tNULL\t1\t2026-02-13 09:56:53\n16028541\t地区\tNULL\t1\t2026-02-13 09:56:53\n16028542\t合同到期时间\tNULL\t1\t2026-02-13 09:56:53\n16028543\t入职时间\tNULL\t1\t2026-02-13 09:56:53\n16028544\t备注\tNULL\t1\t2026-02-13 09:56:53\n",
+  "stderr": "",
+  "execution_time_ms": 1642
+}

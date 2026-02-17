@@ -1,0 +1,25 @@
+{
+  "query": "\n-- 1. 查询测试城市A的ID\nSELECT id FROM cities WHERE name = '测试城市A';\n\n-- 2. 查询测试合伙人A的userId和partnerId\nSELECT u.id as userId, p.id as partnerId \nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.phone = '18800000001';\n\n-- 3. 删除测试合伙人A的partner_cities记录\nDELETE FROM partner_cities \nWHERE partnerId IN (\n  SELECT p.id FROM partners p\n  JOIN users u ON p.userId = u.id\n  WHERE u.phone = '18800000001'\n);\n\n-- 4. 删除测试合伙人A的partners记录\nDELETE FROM partners \nWHERE userId IN (\n  SELECT id FROM users WHERE phone = '18800000001'\n);\n\n-- 5. 删除测试合伙人A的user_role_cities记录\nDELETE FROM user_role_cities \nWHERE userId IN (\n  SELECT id FROM users WHERE phone = '18800000001'\n);\n\n-- 6. 删除测试合伙人A的users记录\nDELETE FROM users WHERE phone = '18800000001';\n\n-- 7. 删除测试城市A的cities记录\nDELETE FROM cities WHERE name = '测试城市A';\n\n-- 8. 验证删除结果\nSELECT '测试数据已删除' as result;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 1. 查询测试城市A的ID\nSELECT id FROM cities WHERE name = '测试城市A';\n\n-- 2. 查询测试合伙人A的userId和partnerId\nSELECT u.id as userId, p.id as partnerId \nFROM users u\nLEFT JOIN partners p ON u.id = p.userId\nWHERE u.phone = '18800000001';\n\n-- 3. 删除测试合伙人A的partner_cities记录\nDELETE FROM partner_cities \nWHERE partnerId IN (\n  SELECT p.id FROM partners p\n  JOIN users u ON p.userId = u.id\n  WHERE u.phone = '18800000001'\n);\n\n-- 4. 删除测试合伙人A的partners记录\nDELETE FROM partners \nWHERE userId IN (\n  SELECT id FROM users WHERE phone = '18800000001'\n);\n\n-- 5. 删除测试合伙人A的user_role_cities记录\nDELETE FROM user_role_cities \nWHERE userId IN (\n  SELECT id FROM users WHERE phone = '18800000001'\n);\n\n-- 6. 删除测试合伙人A的users记录\nDELETE FROM users WHERE phone = '18800000001';\n\n-- 7. 删除测试城市A的cities记录\nDELETE FROM cities WHERE name = '测试城市A';\n\n-- 8. 验证删除结果\nSELECT '测试数据已删除' as result;\n",
+  "rows": [
+    {
+      "id": "120002"
+    },
+    {
+      "id": "userId\tpartnerId"
+    },
+    {
+      "id": "17370118\t150003"
+    },
+    {
+      "id": "result"
+    },
+    {
+      "id": "测试数据已删除"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\n120002\nuserId\tpartnerId\n17370118\t150003\nresult\n测试数据已删除\n",
+  "stderr": "",
+  "execution_time_ms": 3308
+}
