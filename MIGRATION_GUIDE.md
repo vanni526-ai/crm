@@ -202,42 +202,49 @@ npx cap open android
 
 **API Base URL配置（重要！）**：
 
+**架构说明**：前端App和后端API运行在**不同的沙盒环境**中，必须通过**公网URL**进行通信。
+
 如果配置了Nginx反向代理，前端App应该使用**80端口**：
 
 ```typescript
-// 开发环境
-const API_BASE_URL = 'http://localhost:80';
+// ✅ 正确：跨沙盒访问，使用完整的公网URL
+const API_BASE_URL = 'https://80-irlkkknuolzcky4z8bb9y-38095cbd.sg1.manus.computer';
 
-// 生产环境（Manus沙盒）
-const API_BASE_URL = 'https://80-{sandbox-id}.manus.computer';
+// ❌ 错误：不能使用localhost（只能在同一沙盒内使用）
+const API_BASE_URL = 'http://localhost:80';
 ```
 
 如果**没有**配置Nginx，则使用后端实际端口：
 
 ```typescript
-// 开发环境
-const API_BASE_URL = 'http://localhost:3000';
+// ✅ 正确：跨沙盒访问，使用完整的公网URL
+const API_BASE_URL = 'https://3000-irlkkknuolzcky4z8bb9y-38095cbd.sg1.manus.computer';
 
-// 生产环境（Manus沙盒）
-const API_BASE_URL = 'https://3000-{sandbox-id}.manus.computer';
+// ❌ 错误：不能使用localhost
+const API_BASE_URL = 'http://localhost:3000';
 ```
+
+**关键点**：
+- ❌ 不能使用 `localhost`（只能在同一沙盒内使用）
+- ✅ 必须使用完整的公网URL（跨沙盒访问）
+- ✅ 推荐使用80端口（固定端口，后端端口变化时无需更新前端配置）
 
 **快速集成示例**：
 
 ```typescript
 import { CRMApiClient } from './crm-api-sdk';
 
-// 初始化客户端（使用Nginx反向代理）
+// 初始化客户端（跨沙盒访问，使用完整的公网URL）
 const client = new CRMApiClient({
-  baseURL: process.env.NODE_ENV === 'production'
-    ? 'https://80-irlkkknuolzcky4z8bb9y-38095cbd.sg1.manus.computer'
-    : 'http://localhost:80',
+  baseURL: 'https://80-irlkkknuolzcky4z8bb9y-38095cbd.sg1.manus.computer',
   token: localStorage.getItem('auth_token')
 });
 
 // 调用API
 const users = await client.users.list();
 ```
+
+**详细配置指南**：`docs/frontend-app-api-config-guide.md`
 
 ---
 

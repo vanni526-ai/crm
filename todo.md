@@ -3502,3 +3502,12 @@
 - [x] 允许所有*.manus.computer域名访问
 - [x] 测试验证CORS配置生效（5个测试全部通过）
 - [x] 更新迁移指南文档
+
+### 148. 修正Nginx配置问题 - 跨沙盒访问
+- [x] 诊断问题：Nginx在后端沙盒，前端App在另一个沙盒
+- [x] 确认Nginx服务状态（正常运行）
+- [x] 确认80端口已暴露到公网（https://80-irlkkknuolzcky4z8bb9y-38095cbd.sg1.manus.computer）
+- [x] 创建前端App跨沙盒API配置指南（docs/frontend-app-api-config-guide.md）
+- [x] 更新迁移指南，明确说明不能使用localhost
+- [x] 测试公网80端口访问（成功）
+- [x] 保存检查点
