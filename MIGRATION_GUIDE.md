@@ -88,7 +88,41 @@ pnpm dev
 
 服务器会自动启动在3000端口（如果3000端口被占用，会自动切换到其他可用端口）。
 
-### 步骤6：验证迁移结果
+### 步骤6：配置Nginx反向代理（推荐）
+
+**为什么需要Nginx？**
+
+后端使用动态端口检测机制，端口可能会变化（3000ₒ3001ₒ3002）。使用Nginx反向代理后，前端始终访问固定的80端口，无需关心后端实际端口。
+
+```bash
+# 1. 安装Nginx
+sudo apt-get update
+sudo apt-get install -y nginx
+
+# 2. 启用项目配置
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo ln -sf /home/ubuntu/course_crm/nginx.conf /etc/nginx/sites-enabled/course_crm
+
+# 3. 测试配置
+sudo nginx -t
+
+# 4. 启动Nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+# 5. 验证配置
+curl http://localhost:80/health
+```
+
+**配置说明**：
+- 前端访问：`http://localhost:80` 或 `https://80-{sandbox-id}.manus.computer`
+- Nginx代理到：`http://localhost:3000`（后端实际端口）
+- 支持WebSocket（Vite HMR热更新）
+- 支持大文件上传（50MB）
+
+详细配置请参考：`docs/nginx-reverse-proxy-guide.md`
+
+### 步骤7：验证迁移结果
 
 1. **访问Web应用**：打开浏览器访问开发服务器URL
 2. **检查登录功能**：使用Manus OAuth登录
@@ -166,15 +200,39 @@ npx cap open android
 
 **SDK位置**：`docs/crm-api-sdk.md`
 
+**API Base URL配置（重要！）**：
+
+如果配置了Nginx反向代理，前端App应该使用**80端口**：
+
+```typescript
+// 开发环境
+const API_BASE_URL = 'http://localhost:80';
+
+// 生产环境（Manus沙盒）
+const API_BASE_URL = 'https://80-{sandbox-id}.manus.computer';
+```
+
+如果**没有**配置Nginx，则使用后端实际端口：
+
+```typescript
+// 开发环境
+const API_BASE_URL = 'http://localhost:3000';
+
+// 生产环境（Manus沙盒）
+const API_BASE_URL = 'https://3000-{sandbox-id}.manus.computer';
+```
+
 **快速集成示例**：
 
 ```typescript
 import { CRMApiClient } from './crm-api-sdk';
 
-// 初始化客户端
+// 初始化客户端（使用Nginx反向代理）
 const client = new CRMApiClient({
-  baseURL: 'https://your-backend-url.manus.space',
-  token: 'your-auth-token'
+  baseURL: process.env.NODE_ENV === 'production'
+    ? 'https://80-irlkkknuolzcky4z8bb9y-38095cbd.sg1.manus.computer'
+    : 'http://localhost:80',
+  token: localStorage.getItem('auth_token')
 });
 
 // 调用API
@@ -187,7 +245,17 @@ const users = await client.users.list();
 
 ### Q1：端口冲突怎么办？
 
-**A**：开发服务器会自动检测端口占用，如果3000端口被占用，会自动切换到3001、3002等可用端口。前端App的API客户端SDK会自动检测当前端口，无需手动修改配置。
+**A**：推荐使用Nginx反向代理解决端口问题：
+
+1. **使用Nginx反向代理（推荐）**：
+   - 前端始终访问80端口
+   - 后端可以在任意端口运行（3000、3001等）
+   - 配置方法见上文“步骤6：配置Nginx反向代理”
+
+2. **不使用Nginx（不推荐）**：
+   - 开发服务器会自动检测端口占用
+   - 如果3000端口被占用，会自动切换到3001、3002等
+   - 前端App需要手动更新API地址中的端口号
 
 ### Q2：数据库连接失败怎么办？
 
