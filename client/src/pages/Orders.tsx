@@ -397,19 +397,28 @@ export default function Orders() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      pending: "outline",
-      paid: "default",
-      completed: "secondary",
-      cancelled: "destructive",
-      refunded: "destructive",
-    };
     const labels: Record<string, string> = {
       pending: "待支付",
       paid: "已支付",
+      has_balance: "有尾款",
       completed: "已完成",
       cancelled: "已取消",
       refunded: "已退款",
+    };
+    
+    // 特殊样式处理
+    if (status === "has_balance") {
+      return <Badge className="bg-red-600 text-white hover:bg-red-700">{labels[status]}</Badge>;
+    }
+    if (status === "paid") {
+      return <Badge className="bg-blue-600 text-white hover:bg-blue-700">{labels[status]}</Badge>;
+    }
+    
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      pending: "outline",
+      completed: "secondary",
+      cancelled: "destructive",
+      refunded: "destructive",
     };
     return <Badge variant={variants[status] || "default"}>{labels[status] || status}</Badge>;
   };
@@ -803,6 +812,7 @@ export default function Orders() {
                     <SelectItem value="all">全部状态</SelectItem>
                     <SelectItem value="pending">待支付</SelectItem>
                     <SelectItem value="paid">已支付</SelectItem>
+                    <SelectItem value="has_balance">有尾款</SelectItem>
                     <SelectItem value="completed">已完成</SelectItem>
                     <SelectItem value="cancelled">已取消</SelectItem>
                     <SelectItem value="refunded">已退款</SelectItem>
@@ -1518,6 +1528,7 @@ export default function Orders() {
                   <SelectContent>
                     <SelectItem value="pending">待支付</SelectItem>
                     <SelectItem value="paid">已支付</SelectItem>
+                    <SelectItem value="has_balance">有尾款</SelectItem>
                     <SelectItem value="completed">已完成</SelectItem>
                     <SelectItem value="cancelled">已取消</SelectItem>
                     <SelectItem value="refunded">已退款</SelectItem>

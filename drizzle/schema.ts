@@ -108,7 +108,7 @@ export const orders = mysqlTable("orders", {
   classDate: date("classDate"), // 上课日期
   classTime: varchar("classTime", { length: 50 }), // 上课时间(支持时间范围如"14:00-16:00")
   
-  status: mysqlEnum("status", ["pending", "paid", "completed", "cancelled", "refunded"]).default("pending").notNull(),
+  status: mysqlEnum("status", ["pending", "paid", "has_balance", "completed", "cancelled", "refunded"]).default("pending").notNull(),
   deliveryStatus: mysqlEnum("deliveryStatus", ["pending", "accepted", "delivered"]).default("pending").notNull(), // 交付状态：待接单/已接单/已交付
   acceptedAt: timestamp("acceptedAt"), // 接单时间
   acceptedBy: int("acceptedBy"), // 接单老师ID(关联users表)

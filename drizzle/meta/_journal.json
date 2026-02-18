@@ -267,6 +267,13 @@
       "when": 1770979663565,
       "tag": "0037_rare_sway",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1771421419891,
+      "tag": "0038_demonic_secret_warriors",
+      "breakpoints": true
     }
   ]
 }
