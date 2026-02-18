@@ -294,6 +294,36 @@ export async function updateUserRoles(userId: number, roles: string[]) {
     // 用户之前没有cityPartner角色,现在有了,启用partners表记录
     await db.update(partners).set({ isActive: true }).where(eq(partners.userId, userId));
   }
+  
+  // 如果去掉了teacher角色,同步禁用teachers表中的对应记录
+  const hadTeacher = oldRoles.includes("teacher");
+  const hasTeacher = roles.includes("teacher");
+  
+  if (hadTeacher && !hasTeacher) {
+    // 用户之前有teacher角色,现在没有了,禁用teachers表记录
+    await db.update(teachers).set({ isActive: false }).where(eq(teachers.userId, userId));
+  } else if (!hadTeacher && hasTeacher) {
+    // 用户之前没有teacher角色,现在有了,启用teachers表记录（如果不存在则创建）
+    const existingTeacher = await db.select().from(teachers).where(eq(teachers.userId, userId)).limit(1);
+    if (existingTeacher.length > 0) {
+      // 已存在记录,启用
+      await db.update(teachers).set({ isActive: true }).where(eq(teachers.userId, userId));
+    } else {
+      // 不存在记录,创建新记录
+      const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+      if (user.length > 0) {
+        const teacherData: any = {
+          userId: userId,
+          name: user[0].name,
+          isActive: true,
+        };
+        if (user[0].phone) {
+          teacherData.phone = user[0].phone;
+        }
+        await db.insert(teachers).values(teacherData);
+      }
+    }
+  }
 }
 
 export async function updateUserStatus(userId: number, isActive: boolean) {
