@@ -3683,3 +3683,19 @@
 - [x] 恢复为直接显示deliveryRoom字段（不拼接城市）
 - [x] 测试验证（项目状态正常，TypeScript编译无错误）
 - [x] 保存检查点
+
+### 170. 优化Gmail批量导入订单功能，添加字段数据标准化和验证逻辑
+- [x] 检查当前Gmail导入逻辑和LLM解析实现
+- [x] 分析问题案例（ORD1770738915351702：“长风1101”应该是“上海1101”）
+- [x] 设计教室名称映射规则（区域名→城市名）
+- [x] 创建classroomMappingRules.ts模块，包含：
+  - [x] 上海教室映射规则（长风+房间号→上海+房间号）
+  - [x] 其他城市教室映射规则（城市名→标准教室名）
+  - [x] standardizeClassroom函数（支持正则匹配和捕获组替换）
+  - [x] generateClassroomMappingPrompt函数（生成LLM prompt提示）
+- [x] 更新gmailOrderParser.ts：
+  - [x] 导入classroomMappingRules模块
+  - [x] 在LLM prompt中添加教室映射规则
+  - [x] 在解析后添加教室名称标准化逻b辑
+- [x] 编写测试用例（23个测试全部通过）
+- [x] 保存检查点

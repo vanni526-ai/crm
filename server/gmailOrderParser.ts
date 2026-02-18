@@ -1,5 +1,6 @@
 import { invokeLLM } from "./_core/llm";
 import { getAllGmailImportConfigs, isTeacherName } from "./db";
+import { standardizeClassroom, generateClassroomMappingPrompt } from "./classroomMappingRules";
 
 /**
  * 解析后的订单信息
@@ -51,6 +52,9 @@ export async function parseGmailOrderContent(
   configHints.push(`默认老师费用比例: ${defaultFees.teacherFeeRate * 100}%, 默认车费: ¥${defaultFees.transportFeeDefault}`);
   
   const configPrompt = configHints.length > 0 ? `\n\n参考配置规则（用于提高解析准确率）:\n${configHints.join('\n')}` : '';
+  
+  // 添加教室映射规则到prompt
+  const classroomMappingPrompt = generateClassroomMappingPrompt();
 
   const prompt = `你是一个专业的订单信息提取助手。请从以下微信群聊天记录中提取所有订单信息。${configPrompt}
 
@@ -111,6 +115,7 @@ ${emailContent}
    * "长风北岸1101" → 城市填写"上海"
    * "腾讯会议" → 城市填写"互联网课"(线上课程)
    * 其他教室根据文本中的城市信息填写
+${classroomMappingPrompt}
 9. 教室 - 教室信息(如"无锡教室"、"济南教室")
 10. 支付金额 - 总支付金额(定金+尾款)
 11. 课程金额 - 课程总价
@@ -481,12 +486,27 @@ ${emailContent}
       
       const extractedFees = extractFees(orderText, order.course);
       
+      // 标准化教室名称
+      let standardizedCity = order.city;
+      let standardizedClassroom = order.classroom;
+      
+      if (order.classroom) {
+        const standardized = standardizeClassroom(order.classroom, order.city);
+        if (standardized) {
+          standardizedCity = standardized.city;
+          standardizedClassroom = standardized.classroom;
+          console.log(`[教室标准化] "${order.classroom}" → "${standardizedClassroom}" (城市: ${standardizedCity})`);
+        }
+      }
+      
       orders.push({
         ...order,
         salesperson: correctCommonErrors(order.salesperson),
         deviceWechat: correctCommonErrors(order.deviceWechat),
         customerName,
         teacher: correctCommonErrors(order.teacher),
+        city: standardizedCity,
+        classroom: standardizedClassroom,
         // 如果LLM返回的费用为0,使用正则提取的费用
         teacherFee: order.teacherFee > 0 ? order.teacherFee : extractedFees.teacherFee,
         carFee: order.carFee > 0 ? order.carFee : extractedFees.carFee,

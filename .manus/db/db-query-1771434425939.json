@@ -1,0 +1,105 @@
+{
+  "query": "SELECT cityName, name as classroomName, address \nFROM classrooms \nWHERE isActive = true \nORDER BY cityName, name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT cityName, name as classroomName, address \nFROM classrooms \nWHERE isActive = true \nORDER BY cityName, name;",
+  "rows": [
+    {
+      "cityName": "上海",
+      "classroomName": "上海1101",
+      "address": "上海普陀区中江路106号北岸长风i幢1101室"
+    },
+    {
+      "cityName": "上海",
+      "classroomName": "上海404",
+      "address": "上海普陀区中江路106号北岸长风i幢404室"
+    },
+    {
+      "cityName": "上海",
+      "classroomName": "上海捷运大厦16d",
+      "address": "上海市长宁区天山路600弄2号楼新虹桥捷运大厦16D"
+    },
+    {
+      "cityName": "东莞",
+      "classroomName": "东莞2410",
+      "address": "广东省东莞市南城区东莞大道430号汇海大厦2栋办公2410室"
+    },
+    {
+      "cityName": "南京",
+      "classroomName": "南京1609",
+      "address": "江苏省南京市鼓楼区中央路323号利奥大厦1609室"
+    },
+    {
+      "cityName": "大连",
+      "classroomName": "大连1520",
+      "address": "辽宁大连中山区致富街31号新世界名泷1520室"
+    },
+    {
+      "cityName": "天津",
+      "classroomName": "天津1501",
+      "address": "天津市南开区融创中心(西区)2幢N2-1-1501"
+    },
+    {
+      "cityName": "太原",
+      "classroomName": "太原2301",
+      "address": "山西太原市小店区亲海国际B座2301室"
+    },
+    {
+      "cityName": "宁波",
+      "classroomName": "宁波1103",
+      "address": "宁波市鄞州区首南街道天达巷253号宁波国贸B座1103室"
+    },
+    {
+      "cityName": "无锡",
+      "classroomName": "无锡2021",
+      "address": "江苏省无锡市滨湖区新庙路5号嘉业财富中心8-2021"
+    },
+    {
+      "cityName": "武汉",
+      "classroomName": "武汉1921",
+      "address": "湖北武汉江汉区唐家墩路5号菱角湖万达广场A栋A3单元19层21室"
+    },
+    {
+      "cityName": "泉州",
+      "classroomName": "泉州1618",
+      "address": "福建省泉州市丰泽区东海泰禾广场12号楼1618室"
+    },
+    {
+      "cityName": "济南",
+      "classroomName": "济南815",
+      "address": "山东济南市历下区山左路888号绿地国金中心A2-815室（桔子酒店楼上）"
+    },
+    {
+      "cityName": "深圳",
+      "classroomName": "深圳1309",
+      "address": "广东省深圳市福田区红花路99号长平商务大厦1309室"
+    },
+    {
+      "cityName": "石家庄",
+      "classroomName": "石家庄2034",
+      "address": "河北石家庄市桥西区塔坛国际商贸城11号2034室"
+    },
+    {
+      "cityName": "福州",
+      "classroomName": "福州1121",
+      "address": "福建省福州市817路茶亭国际写字楼11层21单元"
+    },
+    {
+      "cityName": "苏州",
+      "classroomName": "苏州1406",
+      "address": "江苏省苏州市吴中区郭巷街道环湖路1688号YANGO SOHO公寓1406室"
+    },
+    {
+      "cityName": "郑州",
+      "classroomName": "郑州2445",
+      "address": "河南省郑州市二七区大学南路8号万达广场12号楼B座24层2445号"
+    },
+    {
+      "cityName": "重庆",
+      "classroomName": "重庆1907",
+      "address": "重庆市九龙坡区4栋17-15中迪广场1907"
+    }
+  ],
+  "messages": [],
+  "stdout": "cityName\tclassroomName\taddress\n上海\t上海1101\t上海普陀区中江路106号北岸长风i幢1101室\n上海\t上海404\t上海普陀区中江路106号北岸长风i幢404室\n上海\t上海捷运大厦16d\t上海市长宁区天山路600弄2号楼新虹桥捷运大厦16D\n东莞\t东莞2410\t广东省东莞市南城区东莞大道430号汇海大厦2栋办公2410室\n南京\t南京1609\t江苏省南京市鼓楼区中央路323号利奥大厦1609室\n大连\t大连1520\t辽宁大连中山区致富街31号新世界名泷1520室\n天津\t天津1501\t天津市南开区融创中心(西区)2幢N2-1-1501\n太原\t太原2301\t山西太原市小店区亲海国际B座2301室\n宁波\t宁波1103\t宁波市鄞州区首南街道天达巷253号宁波国贸B座1103室\n无锡\t无锡2021\t江苏省无锡市滨湖区新庙路5号嘉业财富中心8-2021\n武汉\t武汉1921\t湖北武汉江汉区唐家墩路5号菱角湖万达广场A栋A3单元19层21室\n泉州\t泉州1618\t福建省泉州市丰泽区东海泰禾广场12号楼1618室\n济南\t济南815\t山东济南市历下区山左路888号绿地国金中心A2-815室（桔子酒店楼上）\n深圳\t深圳1309\t广东省深圳市福田区红花路99号长平商务大厦1309室\n石家庄\t石家庄2034\t河北石家庄市桥西区塔坛国际商贸城11号2034室\n福州\t福州1121\t福建省福州市817路茶亭国际写字楼11层21单元\n苏州\t苏州1406\t江苏省苏州市吴中区郭巷街道环湖路1688号YANGO SOHO公寓1406室\n郑州\t郑州2445\t河南省郑州市二七区大学南路8号万达广场12号楼B座24层2445号\n重庆\t重庆1907\t重庆市九龙坡区4栋17-15中迪广场1907\n",
+  "stderr": "",
+  "execution_time_ms": 1503
+}
