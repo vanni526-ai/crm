@@ -281,6 +281,13 @@
       "when": 1771422311435,
       "tag": "0039_greedy_champions",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1771423232255,
+      "tag": "0040_burly_zaran",
+      "breakpoints": true
     }
   ]
 }

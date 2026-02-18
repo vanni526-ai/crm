@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, name, phone, createdAt FROM teachers WHERE name LIKE '%皮皮%' ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, createdAt FROM teachers WHERE name LIKE '%皮皮%' ORDER BY id;",
+  "rows": [
+    {
+      "id": "570102",
+      "name": "皮皮",
+      "phone": "",
+      "createdAt": "2026-02-13 10:34:56"
+    },
+    {
+      "id": "570166",
+      "name": "皮皮",
+      "phone": "",
+      "createdAt": "2026-02-13 10:36:17"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tcreatedAt\n570102\t皮皮\t\t2026-02-13 10:34:56\n570166\t皮皮\t\t2026-02-13 10:36:17\n",
+  "stderr": "",
+  "execution_time_ms": 1521
+}

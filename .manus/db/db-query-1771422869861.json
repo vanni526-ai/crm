@@ -1,0 +1,262 @@
+{
+  "query": "SELECT name, COUNT(*) as count FROM teachers GROUP BY name HAVING COUNT(*) > 1 ORDER BY count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT name, COUNT(*) as count FROM teachers GROUP BY name HAVING COUNT(*) > 1 ORDER BY count DESC;",
+  "rows": [
+    {
+      "name": "小钰",
+      "count": "4"
+    },
+    {
+      "name": "烨",
+      "count": "2"
+    },
+    {
+      "name": "晚晚",
+      "count": "2"
+    },
+    {
+      "name": "巳月",
+      "count": "2"
+    },
+    {
+      "name": "黑桃",
+      "count": "2"
+    },
+    {
+      "name": "小小",
+      "count": "2"
+    },
+    {
+      "name": "小凡",
+      "count": "2"
+    },
+    {
+      "name": "Nemo",
+      "count": "2"
+    },
+    {
+      "name": "Nancy",
+      "count": "2"
+    },
+    {
+      "name": "七七",
+      "count": "2"
+    },
+    {
+      "name": "韦德",
+      "count": "2"
+    },
+    {
+      "name": "兔子",
+      "count": "2"
+    },
+    {
+      "name": "苏苏",
+      "count": "2"
+    },
+    {
+      "name": "十字蛇",
+      "count": "2"
+    },
+    {
+      "name": "小夜",
+      "count": "2"
+    },
+    {
+      "name": "小米",
+      "count": "2"
+    },
+    {
+      "name": "米朵",
+      "count": "2"
+    },
+    {
+      "name": "星斗",
+      "count": "2"
+    },
+    {
+      "name": "声声",
+      "count": "2"
+    },
+    {
+      "name": "欣欣",
+      "count": "2"
+    },
+    {
+      "name": "宥香",
+      "count": "2"
+    },
+    {
+      "name": "玥玥",
+      "count": "2"
+    },
+    {
+      "name": "温言",
+      "count": "2"
+    },
+    {
+      "name": "依一",
+      "count": "2"
+    },
+    {
+      "name": "蜜咕咕",
+      "count": "2"
+    },
+    {
+      "name": "铴铴",
+      "count": "2"
+    },
+    {
+      "name": "佳佳",
+      "count": "2"
+    },
+    {
+      "name": "小羊",
+      "count": "2"
+    },
+    {
+      "name": "水水",
+      "count": "2"
+    },
+    {
+      "name": "淼淼",
+      "count": "2"
+    },
+    {
+      "name": "紫野",
+      "count": "2"
+    },
+    {
+      "name": "小梨",
+      "count": "2"
+    },
+    {
+      "name": "Luna",
+      "count": "2"
+    },
+    {
+      "name": "唐泽",
+      "count": "2"
+    },
+    {
+      "name": "絮絮",
+      "count": "2"
+    },
+    {
+      "name": "无浪",
+      "count": "2"
+    },
+    {
+      "name": "Sherry",
+      "count": "2"
+    },
+    {
+      "name": "瑶瑶",
+      "count": "2"
+    },
+    {
+      "name": "橘子",
+      "count": "2"
+    },
+    {
+      "name": "璐璐",
+      "count": "2"
+    },
+    {
+      "name": "九淑",
+      "count": "2"
+    },
+    {
+      "name": "YY",
+      "count": "2"
+    },
+    {
+      "name": "River",
+      "count": "2"
+    },
+    {
+      "name": "枝",
+      "count": "2"
+    },
+    {
+      "name": "昭昭",
+      "count": "2"
+    },
+    {
+      "name": "姜一",
+      "count": "2"
+    },
+    {
+      "name": "米妮",
+      "count": "2"
+    },
+    {
+      "name": "鱼鱼",
+      "count": "2"
+    },
+    {
+      "name": "酥酥",
+      "count": "2"
+    },
+    {
+      "name": "兮灵",
+      "count": "2"
+    },
+    {
+      "name": "黛茜",
+      "count": "2"
+    },
+    {
+      "name": "甜儿",
+      "count": "2"
+    },
+    {
+      "name": "大崎",
+      "count": "2"
+    },
+    {
+      "name": "圆圆",
+      "count": "2"
+    },
+    {
+      "name": "皮皮",
+      "count": "2"
+    },
+    {
+      "name": "雨凝",
+      "count": "2"
+    },
+    {
+      "name": "安雅",
+      "count": "2"
+    },
+    {
+      "name": "奚敏",
+      "count": "2"
+    },
+    {
+      "name": "井盖",
+      "count": "2"
+    },
+    {
+      "name": "云云",
+      "count": "2"
+    },
+    {
+      "name": "爱丽丝",
+      "count": "2"
+    },
+    {
+      "name": "琴酒",
+      "count": "2"
+    },
+    {
+      "name": "汐梨",
+      "count": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tcount\n小钰\t4\n烨\t2\n晚晚\t2\n巳月\t2\n黑桃\t2\n小小\t2\n小凡\t2\nNemo\t2\nNancy\t2\n七七\t2\n韦德\t2\n兔子\t2\n苏苏\t2\n十字蛇\t2\n小夜\t2\n小米\t2\n米朵\t2\n星斗\t2\n声声\t2\n欣欣\t2\n宥香\t2\n玥玥\t2\n温言\t2\n依一\t2\n蜜咕咕\t2\n铴铴\t2\n佳佳\t2\n小羊\t2\n水水\t2\n淼淼\t2\n紫野\t2\n小梨\t2\nLuna\t2\n唐泽\t2\n絮絮\t2\n无浪\t2\nSherry\t2\n瑶瑶\t2\n橘子\t2\n璐璐\t2\n九淑\t2\nYY\t2\nRiver\t2\n枝\t2\n昭昭\t2\n姜一\t2\n米妮\t2\n鱼鱼\t2\n酥酥\t2\n兮灵\t2\n黛茜\t2\n甜儿\t2\n大崎\t2\n圆圆\t2\n皮皮\t2\n雨凝\t2\n安雅\t2\n奚敏\t2\n井盖\t2\n云云\t2\n爱丽丝\t2\n琴酒\t2\n汐梨\t2\n",
+  "stderr": "",
+  "execution_time_ms": 1529
+}

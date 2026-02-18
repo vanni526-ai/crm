@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users\nADD COLUMN avatarUrl VARCHAR(500),\nADD COLUMN aliases TEXT,\nADD COLUMN teacherAttribute ENUM('S', 'M', 'Switch'),\nADD COLUMN customerType VARCHAR(200),\nADD COLUMN category VARCHAR(50),\nADD COLUMN hourlyRate DECIMAL(10, 2),\nADD COLUMN bankAccount VARCHAR(100),\nADD COLUMN bankName VARCHAR(100),\nADD COLUMN contractEndDate DATE,\nADD COLUMN joinDate DATE,\nADD COLUMN teacherStatus VARCHAR(20) DEFAULT '活跃',\nADD COLUMN teacherNotes TEXT,\nADD COLUMN wechat VARCHAR(100);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE users\nADD COLUMN avatarUrl VARCHAR(500),\nADD COLUMN aliases TEXT,\nADD COLUMN teacherAttribute ENUM('S', 'M', 'Switch'),\nADD COLUMN customerType VARCHAR(200),\nADD COLUMN category VARCHAR(50),\nADD COLUMN hourlyRate DECIMAL(10, 2),\nADD COLUMN bankAccount VARCHAR(100),\nADD COLUMN bankName VARCHAR(100),\nADD COLUMN contractEndDate DATE,\nADD COLUMN joinDate DATE,\nADD COLUMN teacherStatus VARCHAR(20) DEFAULT '活跃',\nADD COLUMN teacherNotes TEXT,\nADD COLUMN wechat VARCHAR(100);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 6569
+}
