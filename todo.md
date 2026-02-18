@@ -3699,3 +3699,23 @@
   - [x] 在解析后添加教室名称标准化逻b辑
 - [x] 编写测试用例（23个测试全部通过）
 - [x] 保存检查点
+
+### 171. 实现历史订单数据清洗功能，自动扫描并修复不符合标准的教室名称
+- [x] 设计数据清洗方案：
+  - [x] 扫描所有历史订单的deliveryRoom字段
+  - [x] 使用classroomMappingRules.ts中的standardizeClassroom函数进行标准化
+  - [x] 记录清洗前后的数据变化
+  - [x] 提供预览和确认机制
+- [x] 实现后端API接口：
+  - [x] 创建dataCleaningRouter模块
+  - [x] scanOrders接口：返回需要清洗的订单列表
+  - [x] cleanOrders接口：执行批量数据清洗
+  - [x] previewClean接口：预览单个订单的清洗结果
+  - [x] 注册到主路由（trpc.dataCleaning.*）
+- [x] 实现前端管理页面：
+  - [x] 创建DataCleaning.tsx页面
+  - [x] 显示需要清洗的订单列表（清洗前→清洗后对比）
+  - [x] 提供“清洗选中”和“一键清洗全部”按钮
+  - [x] 添加到路由（/data-cleaning）
+- [x] 测试验证（4个测试用例全部通过）
+- [x] 保存检查点
