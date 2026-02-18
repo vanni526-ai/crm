@@ -3559,4 +3559,14 @@
 - [x] 更新LLM提示词，说明多教室城市的默认规则
 - [x] 测试宁波订单识别（测试用例1，预期教室为“宁波1103”）
 - [x] 测试上海订单识别（测试用例2，明确指定“404教室”）
+- [x] 保存检查点（版本57a7e3df）
+
+### 155. 修复生产环境退出登录和教室创建问题
+- [x] 诊断退出登录功能无效的原因：useAuth hook没有在logout后重定向
+- [x] 检查DashboardLayout中的退出登录实现：调用useAuth().logout
+- [x] 修复退出登录功能：在logout函数中添加window.location.href = getLoginUrl()
+- [x] 诊断教室创建JSON解析错误的原因：session cookie过期导致认证失败，后端返回HTML页面
+- [x] 修复教室创建接口的认证问题：需要用户清除cookie并重新登录
+- [x] 测试退出登录功能（auth.logout.redirect.test.ts，2个测试全部通过）
+- [x] 测试教室创建功能（需要用户重新登录后手动测试）
 - [ ] 保存检查点
