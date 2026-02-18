@@ -312,9 +312,11 @@ export async function updateUserRoles(userId: number, roles: string[]) {
       // 不存在记录,创建新记录
       const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
       if (user.length > 0) {
+        // 确保name字段不为null或undefined
+        const userName = user[0].name || user[0].nickname || user[0].email || `User_${userId}`;
         const teacherData: any = {
           userId: userId,
-          name: user[0].name,
+          name: userName,
           isActive: true,
         };
         if (user[0].phone) {

@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, IFNULL(name, 'NULL') as name_check, phone, roles FROM users WHERE id = 16800186;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, IFNULL(name, 'NULL') as name_check, phone, roles FROM users WHERE id = 16800186;",
+  "rows": [
+    {
+      "id": "16800186",
+      "name": "test韩祎君",
+      "name_check": "test韩祎君",
+      "phone": "13381928825",
+      "roles": "user,admin,sales,cityPartner,teacher"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tname_check\tphone\troles\n16800186\ttest韩祎君\ttest韩祎君\t13381928825\tuser,admin,sales,cityPartner,teacher\n",
+  "stderr": "",
+  "execution_time_ms": 1486
+}

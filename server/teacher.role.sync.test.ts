@@ -116,4 +116,36 @@ describe("Teacher Role Synchronization", () => {
 
     expect(teacherRecords[0].isActive).toBe(false);
   });
+
+  it("should handle user with null name by using fallback", async () => {
+    // 创建一个name为null的用户
+    const result = await db.insert(users).values({
+      name: null as any,
+      nickname: "测试花名",
+      phone: "13900139000",
+      roles: "user",
+      role: "user",
+      isActive: true,
+    });
+    const nullNameUserId = result[0].insertId;
+
+    try {
+      // 添加teacher角色
+      await updateUserRoles(nullNameUserId, ["teacher"]);
+
+      // 验证teachers表中创建了记录，使用nickname作为名字
+      const teacherRecords = await db
+        .select()
+        .from(teachers)
+        .where(eq(teachers.userId, nullNameUserId));
+
+      expect(teacherRecords.length).toBe(1);
+      expect(teacherRecords[0].name).toBe("测试花名");
+      expect(teacherRecords[0].isActive).toBe(true);
+    } finally {
+      // 清理测试数据
+      await db.delete(teachers).where(eq(teachers.userId, nullNameUserId));
+      await db.delete(users).where(eq(users.id, nullNameUserId));
+    }
+  });
 });

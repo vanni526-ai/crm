@@ -3642,3 +3642,9 @@
   - [x] 支持多角色同时管理
 - [x] 测试双向同步功能（5个测试用例全部通过）
 - [x] 保存检查点
+
+### 164. 修复老师角色双向同步功能中创建teachers记录时缺少name字段的错误
+- [x] 诊断错误原因：insert into teachers时name字段使用default值导致NOT NULL约束失败
+- [x] 修复updateUserRoles函数中创建teachers记录的逻辑，确保name字段正确传递
+- [x] 测试修复效果
+- [x] 保存检查点
