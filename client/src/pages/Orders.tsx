@@ -193,7 +193,7 @@ export default function Orders() {
   const [learnReason, setLearnReason] = useState("");
   const [batchChannelOrderNoOpen, setBatchChannelOrderNoOpen] = useState(false);
   const [batchChannelOrderNo, setBatchChannelOrderNo] = useState("");
-  const [calculatePartnerFeeOpen, setCalculatePartnerFeeOpen] = useState(false);
+
   const [isCalculating, setIsCalculating] = useState(false);
   const [batchChannelAction, setBatchChannelAction] = useState<"fill" | "clear">("fill");
   const [classDateFilter, setClassDateFilter] = useState<"all" | "today" | "thisWeek" | "thisMonth" | "thisYear">("all");
@@ -725,9 +725,9 @@ export default function Orders() {
               <Upload className="mr-2 h-4 w-4" />
               智能登记
             </Button>
-            <Button variant="outline" onClick={() => setCalculatePartnerFeeOpen(true)}>
+            <Button variant="outline" onClick={() => window.location.href = '/data-cleaning'}>
               <Wrench className="mr-2 h-4 w-4" />
-              计算合伙人费
+              数据清洗
             </Button>
 
             <Button onClick={() => setCreateOpen(true)}>
@@ -776,20 +776,7 @@ export default function Orders() {
                   >
                     批量修正渠道订单号
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      if (selectedOrderIds.length === 0) {
-                        toast.error("请至少选择一个订单");
-                        return;
-                      }
-                      setCalculatePartnerFeeOpen(true);
-                    }}
-                  >
-                    <Wrench className="mr-1 h-3 w-3" />
-                    批量计算合伙人费
-                  </Button>
+
                   <Button 
                     variant="destructive" 
                     size="sm"
@@ -2293,65 +2280,7 @@ export default function Orders() {
           </DialogContent>
         </Dialog>
 
-        {/* 计算合伙人费对话框 */}
-        <Dialog open={calculatePartnerFeeOpen} onOpenChange={setCalculatePartnerFeeOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>批量计算合伙人费用</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="bg-blue-50 p-4 rounded-md border border-blue-200">
-                <p className="text-sm text-blue-900 mb-2">
-                  📊 此操作将根据城市管理中配置的合伙人费比例，重新计算{selectedOrderIds.length > 0 ? `选中的 ${selectedOrderIds.length} 个订单` : '所有订单'}的合伙人费用。
-                </p>
-                <p className="text-sm text-blue-900">
-                  计算公式：<strong>合伙人费 = (课程金额 - 老师费用 - 车费) × 合伙人费比例</strong>
-                </p>
-              </div>
-              <div className="bg-amber-50 p-3 rounded-md border border-amber-200">
-                <p className="text-sm text-amber-800">
-                  ⚠️ 注意：此操作将更新{selectedOrderIds.length > 0 ? `选中的 ${selectedOrderIds.length} 个订单` : '所有订单'}的合伙人费用，请确认城市配置中的比例是否正确。
-                </p>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button 
-                variant="outline" 
-                onClick={() => setCalculatePartnerFeeOpen(false)}
-                disabled={isCalculating}
-              >
-                取消
-              </Button>
-              <Button 
-                onClick={async () => {
-                  setIsCalculating(true);
-                  try {
-                    // 计算选中的订单的合伙人费
-                    const result = await utils.client.orders.batchCalculatePartnerFee.mutate({ orderIds: selectedOrderIds });
-                    
-                    utils.orders.list.invalidate();
-                    toast.success(
-                      `计算完成！共处理 ${result.totalOrders} 个订单，更新 ${result.updatedCount} 个，未变化 ${result.unchangedCount} 个`,
-                      {
-                        description: result.errorCount > 0 ? `${result.errorCount} 个订单处理失败` : undefined,
-                        duration: 5000,
-                      }
-                    );
-                    setCalculatePartnerFeeOpen(false);
-                    setSelectedOrderIds([]); // 清空选中的订单
-                  } catch (error: any) {
-                    toast.error(error.message || "计算失败，请重试");
-                  } finally {
-                    setIsCalculating(false);
-                  }
-                }}
-                disabled={isCalculating}
-              >
-                {isCalculating ? "计算中..." : "开始计算"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+
       </div>
     </DashboardLayout>
   );
