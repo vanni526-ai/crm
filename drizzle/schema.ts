@@ -98,6 +98,7 @@ export const orders = mysqlTable("orders", {
   utilityFee: decimal("utilityFee", { precision: 10, scale: 2 }).default("0.00"), // 水电费用
   otherFee: decimal("otherFee", { precision: 10, scale: 2 }).default("0.00"), // 其他费用
   finalAmount: decimal("finalAmount", { precision: 10, scale: 2 }).default("0.00"), // 金串到账金额
+  balanceAmount: decimal("balanceAmount", { precision: 10, scale: 2 }).default("0.00"), // 尾款金额
   
   // 交付信息
   deliveryCity: varchar("deliveryCity", { length: 50 }), // 交付城市

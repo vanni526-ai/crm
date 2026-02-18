@@ -274,6 +274,13 @@
       "when": 1771421419891,
       "tag": "0038_demonic_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "5",
+      "when": 1771422311435,
+      "tag": "0039_greedy_champions",
+      "breakpoints": true
     }
   ]
 }

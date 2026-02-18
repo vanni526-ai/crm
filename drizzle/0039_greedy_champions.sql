@@ -1,0 +1,1 @@
+ALTER TABLE `orders` ADD `balanceAmount` decimal(10,2) DEFAULT '0.00';

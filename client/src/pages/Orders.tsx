@@ -38,6 +38,7 @@ const orderSchema = z.object({
   otherFee: z.string().optional(),
   partnerFee: z.string().optional(),
   finalAmount: z.string().optional(),
+  balanceAmount: z.string().optional(),
   deliveryCity: z.string().optional(),
   deliveryRoom: z.string().optional(),
   deliveryTeacher: z.string().optional(),
@@ -230,6 +231,7 @@ export default function Orders() {
       otherFee: data.otherFee,
       partnerFee: data.partnerFee,
       finalAmount: data.finalAmount,
+      balanceAmount: data.balanceAmount,
       deliveryCity: data.deliveryCity,
       deliveryRoom: data.deliveryRoom,
       deliveryTeacher: data.deliveryTeacher,
@@ -268,6 +270,7 @@ export default function Orders() {
         otherFee: data.otherFee,
         partnerFee: data.partnerFee,
         finalAmount: data.finalAmount,
+        balanceAmount: data.balanceAmount,
         deliveryCity: data.deliveryCity,
         deliveryRoom: data.deliveryRoom,
         deliveryTeacher: data.deliveryTeacher,
@@ -303,6 +306,7 @@ export default function Orders() {
     setValue("otherFee", order.otherFee ?? "");
     setValue("partnerFee", order.partnerFee ?? "");
     setValue("finalAmount", order.finalAmount ?? "");
+    setValue("balanceAmount", (order as any).balanceAmount ?? "");
     setValue("deliveryCity", order.deliveryCity || "");
     setValue("deliveryRoom", order.deliveryRoom || "");
     setValue("deliveryTeacher", order.deliveryTeacher || "");
@@ -968,6 +972,7 @@ export default function Orders() {
                         <TableHead>其他费用</TableHead>
                         <TableHead>合伙人费</TableHead>
                         <TableHead>金串到账金额</TableHead>
+                        <TableHead>尾款金额</TableHead>
                         <TableHead>支付日期</TableHead>
                         <TableHead>支付时间</TableHead>
                         <TableHead>交付城市</TableHead>
@@ -1038,6 +1043,7 @@ export default function Orders() {
                           </TableCell>
                           <TableCell>¥{order.partnerFee || "0.00"}</TableCell>
                           <TableCell>¥{order.finalAmount || "0.00"}</TableCell>
+                          <TableCell>¥{(order as any).balanceAmount || "0.00"}</TableCell>
                           <TableCell>{order.paymentDate ? (typeof order.paymentDate === 'string' ? order.paymentDate : formatDateBJ(order.paymentDate)) : "-"}</TableCell>
                           <TableCell>{order.paymentTime || "-"}</TableCell>
                           <TableCell>{order.deliveryCity || "-"}</TableCell>
@@ -1335,6 +1341,10 @@ export default function Orders() {
                     <div>
                       <p className="text-sm text-muted-foreground">金串到账金额</p>
                       <p className="font-medium">¥{selectedOrder.finalAmount || "0.00"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">尾款金额</p>
+                      <p className="font-medium">¥{(selectedOrder as any).balanceAmount || "0.00"}</p>
                     </div>
                   </div>
                 </div>
@@ -1849,6 +1859,16 @@ export default function Orders() {
                         placeholder="请输入金串到账金额"
                       />
                     </div>
+                    <div>
+                      <Label htmlFor="balanceAmount">尾款金额</Label>
+                      <Input
+                        id="balanceAmount"
+                        type="number"
+                        step="0.01"
+                        {...register("balanceAmount")}
+                        placeholder="请输入尾款金额"
+                      />
+                    </div>
                     <div className="col-span-2">
                       <Label htmlFor="notes">备注</Label>
                       <Input id="notes" {...register("notes")} placeholder="请输入备注信息" />
@@ -2080,6 +2100,16 @@ export default function Orders() {
                         step="0.01"
                         {...register("finalAmount")}
                         placeholder="请输入金串到账金额"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-balanceAmount">尾款金额</Label>
+                      <Input
+                        id="edit-balanceAmount"
+                        type="number"
+                        step="0.01"
+                        {...register("balanceAmount")}
+                        placeholder="请输入尾款金额"
                       />
                     </div>
                     <div className="col-span-2">
