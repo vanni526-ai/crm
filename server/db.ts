@@ -326,6 +326,38 @@ export async function updateUserRoles(userId: number, roles: string[]) {
       }
     }
   }
+  
+  // 如果去掉了sales角色,同步禁用salespersons表中的对应记录
+  const hadSales = oldRoles.includes("sales");
+  const hasSales = roles.includes("sales");
+  
+  if (hadSales && !hasSales) {
+    // 用户之前有sales角色,现在没有了,禁用salespersons表记录
+    await db.update(salespersons).set({ isActive: false }).where(eq(salespersons.userId, userId));
+  } else if (!hadSales && hasSales) {
+    // 用户之前没有sales角色,现在有了,启用salespersons表记录（如果不存在则创建）
+    const existingSales = await db.select().from(salespersons).where(eq(salespersons.userId, userId)).limit(1);
+    if (existingSales.length > 0) {
+      // 已存在记录,启用
+      await db.update(salespersons).set({ isActive: true }).where(eq(salespersons.userId, userId));
+    } else {
+      // 不存在记录,创建新记录
+      const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+      if (user.length > 0) {
+        // 确保name字段不为null或undefined
+        const userName = user[0].name || user[0].nickname || user[0].email || `User_${userId}`;
+        const salesData: any = {
+          userId: userId,
+          name: userName,
+          isActive: true,
+        };
+        if (user[0].phone) {
+          salesData.phone = user[0].phone;
+        }
+        await db.insert(salespersons).values(salesData);
+      }
+    }
+  }
 }
 
 export async function updateUserStatus(userId: number, isActive: boolean) {
