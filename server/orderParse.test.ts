@@ -118,4 +118,29 @@ describe("订单智能解析API测试", () => {
     console.log("输入文本:", orderText);
     console.log("预期结果:", expected);
   });
+
+  it("测试用例6: 自动填充城市默认教室（天津示例）", async () => {
+    const orderText = `山竹 2.18 19:00-21:00 乳首+问罪  yy上 （天津） 列斯卡农 报销老师100打车费   3500全款已付 给老师700 支付宝加微信付款 4200003031202602168006870732`;
+    
+    const expected = {
+      salesperson: "山竹",
+      customerName: "列斯卡农",
+      classDate: "2026-02-18",
+      classTime: "19:00-21:00",
+      course: "乳首+问罪",
+      teacher: "yy",
+      city: "天津",
+      classroom: "天津1501", // 天津只有一个教室，应该自动填充
+      paymentAmount: 3500,
+      teacherFee: 700,
+      carFee: 100,
+      channelOrderNo: "4200003031202602168006870732",
+      paymentMethod: "微信" // 自动识别
+    };
+    
+    console.log("测试用例6: 自动填充城市默认教室");
+    console.log("输入文本:", orderText);
+    console.log("预期结果:", expected);
+    console.log("注：天津只有一个教室'天津1501'，系统应该自动填充教室字段");
+  });
 });

@@ -29,6 +29,13 @@ export const orderParseRouter = router({
           db.getAllCities(),
         ]);
 
+        // 获取所有城市的教室信息（用于教室自动填充）
+        const cityClassroomsMap = new Map<string, string[]>();
+        for (const city of cities) {
+          const classrooms = await db.getClassroomsByCityId(city.id);
+          cityClassroomsMap.set(city.name, classrooms.map(c => c.name));
+        }
+
         // 构建销售人员和老师名单
         const salespeopleNames = salespeople.map(s => s.name).join("、");
         const teacherNames = teachers.map(t => t.name).join("、");
@@ -77,7 +84,9 @@ ${text}
      * "捕运大厦16D" → "上海"
      * "腾讯会议" → "互联网课"
 
-8. **教室** - 教室信息（如"无锡教室"、"济南教室"）
+8. **教室** - 教室信息（如"无锡教室"、"济南教室")
+   - **自动填充规则**：如果订单文本中没有明确提到教室，但城市只有一个教室时，自动填充该城市的默认教室
+   - 例如：天津只有一个教室"天津1501"，如果订单中只提到"天津"而没有提到教室，则自动填充"天津1501"
 
 9. **支付金额** - 总支付金额（定金+尾款）
 
@@ -194,6 +203,14 @@ ${text}
         }
 
         const parsedOrder = JSON.parse(content);
+
+        // 后处理：教室自动填充
+        if (parsedOrder.city && (!parsedOrder.classroom || parsedOrder.classroom === "")) {
+          const classrooms = cityClassroomsMap.get(parsedOrder.city);
+          if (classrooms && classrooms.length === 1) {
+            parsedOrder.classroom = classrooms[0];
+          }
+        }
 
         // 后处理：自动识别支付渠道
         if (parsedOrder.channelOrderNo && !parsedOrder.paymentMethod) {
