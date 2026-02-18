@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO classrooms (cityId, cityName, name, address, isActive, sortOrder, notes) \nVALUES (1, '上海', '测试教室999', '上海市长宁区天山路600弄2号楼新红16D', 1, 0, '测试备注');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute INSERT INTO classrooms (cityId, cityName, name, address, isActive, sortOrder, notes) \nVALUES (1, '上海', '测试教室999', '上海市长宁区天山路600弄2号楼新红16D', 1, 0, '测试备注');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1510
+}

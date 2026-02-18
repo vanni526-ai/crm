@@ -194,22 +194,23 @@ export async function parseTransferNotes(text: string) {
    - 特别注意:"好好"、"ivy"都是销售人员名,不是副词或其他词性
    - **请直接返回识别到的名字**(例如识别到"山竹",就返回"山竹";识别到"妖渊",就返回"妖渊")
 2. **老师名识别**: 系统中的老师有: ${teacherNamesList}。老师名可能带有"老师"后缀或"上"后缀。
-3. **客户名识别规则** - 客户名**不能**是以下任何一种:
+3. **课程名识别** - 常见课程名称包括:
+   - 基础类:基础局、女王局、2v2、基础女王局、基础女王
+   - 专项课程:乳首、问罪、臣服、反转、sp课、tk课、木乃伊、埃及艳后、情趣变装课、丝袜课、裸足丝袜、女m课、疯三、淼淼课
+   - 组合课程:基础局+乳首、基础局+问罪、乳首+问罪、基础局+裸足丝袜
+   - 特殊类型:理论课、线上理论课、面销、活动、充值、补课、退款
+   - **重要:以上课程名称不能被识别为销售人或客户名**
+4. **客户名识别规则** - 客户名**不能**是以下任何一种:
    - 老师名(${teacherNamesList})
-   - 城市名(北京、上海、天津、武汉、重庆、成都、郑州、济南、南京、苏州、无锡、东莞、福州、泉州、太原、石家庄等)
-   - 课程名或业务类型(2v2、基础局、女王局、丝袜课、裸足丝袜、问罪、臣服、反转、sp课、埃及艳后、活动、充值、面销等)
+   - 城市名(北京、上海、天津、武汉、重庆、成都、郑州、济南、南京、苏州、无锡、东莞、福州、泉州、太原、石家庄、大连等)
+   - 课程名(见上述课程名识别列表)
    - 包含“单”、“上”、“教室”等后缀的词
    - 包含“报销”、“车费”、“辛苦费”、“收款”等费用或交易相关词
-   - **特别注意:对于面销/充值类订单,如果文本中没有明确的客户名称,则customerName应该留空,不要把“充值”、“面销”等词误识别为客户名**
-4. **地点识别**: 地点通常是城市名,可能带括号,例如"(北京)"、"上海"、"武汉单"。
-5. **课程识别**: 
-   - 课程名通常包含"局"、"课"等后缀
-   - **"面销"是一种课程类型**,不是费用记录
-   - 其他课程包括:2v2、基础局、女王局、丝袜课、裸足丝袜、问罪、臣服、反转、sp课、埃及艳后等
-6. **费用记录过滤**: 以下类型的文本**不应该**创建订单,应该跳过:
-   - **纯费用支付记录**:只包含"报销“、“车费“、“辛苦费“、“提成“等词,且没有课程名和上课时间
-   - **注意**:如果包含"面销“作为课程名,并有收款金额,则应该创建订单
-7. **特殊场景识别**:
+   - **特别注意:对于面销/充值类订单,如果文本中没有明确的客户名称,则customerName应该留空,不要把"充值"、"面销"等词误识别为客户名**
+5. **地点识别**: 地点通常是城市名,可能带括号,例如"(北京)"、"上海"、"武汉单"。
+6. **课程识别补充**: 课程名通常包含"局”、"课"等后缀,如果包含"面销"作为课程名并有收款金额,则应该创建订单。
+7. **费用记录过滤**: 纯费用支付记录(只包含"报销"、"车费"、"辛苦费"、"提成"等词,且没有课程名和上课时间)不应该创建订单。
+8. **特殊场景识别**:
    - **退款**: 课程名包含"退款“或"退费“,金额应为负数(paymentAmount和courseAmount都为负数)
    - **补课**: 课程名包含"补课“或"补计时“,正常处理
    - **存课**: 课程名包含"存“字(如"存一节裸足丝袜课“),正常处理,在notes中标注"存课“
@@ -257,7 +258,7 @@ export async function parseTransferNotes(text: string) {
 
 请将以下转账备注解析为JSON数组,每个对象包含以下字段:
 - salesperson: 销售人员名字(花名),必须从系统销售人员列表(${salespersonNames})中匹配,如果找不到匹配的销售人员则留空
-- classDate: 上课日期(格式: 2024-MM-DD 或 2025-MM-DD,根据当前时间判断年份)
+- classDate: 上课日期(格式: YYYY-MM-DD,根据当前时间判断年份。当前年份是${new Date().getFullYear()}年,如果月份小于当前月份则判定为下一年)
 - classTime: 上课时间(格式: HH:MM-HH:MM)
 - deliveryCourse: 课程名称
 - deliveryTeacher: 老师名字(包含"老师"后缀如果有)
@@ -337,14 +338,35 @@ ${lines.join('\n')}
     const orders = parsed.orders || [];
     
     // 将别名/真实姓名转换为花名(或真实姓名),并提取结构化备注信息
-    orders.forEach((order: any) => {
+    const { getClassroomsByCityName } = await import("./db");
+    
+    for (const order of orders) {
       if (order.salesperson && salespersonMapping.has(order.salesperson)) {
         // 优先使用花名显示
         order.salesperson = salespersonMapping.get(order.salesperson);
       }
       
       // 智能纠错功能
-      order = smartCorrection(order);
+      Object.assign(order, smartCorrection(order));
+      
+      // 教室自动填充逻辑：如果城市只有一个教室且订单未指定教室，则自动填充
+      if (order.deliveryCity && !order.deliveryRoom) {
+        try {
+          const classrooms = await getClassroomsByCityName(order.deliveryCity);
+          if (classrooms.length === 1) {
+            // 单教室城市，自动填充教室
+            order.deliveryRoom = classrooms[0].name;
+            console.log(`[智能登记] 自动填充教室: ${order.deliveryCity} -> ${order.deliveryRoom}`);
+          } else if (classrooms.length > 1) {
+            // 多教室城市，默认填充第一个教室（按sortOrder排序）
+            order.deliveryRoom = classrooms[0].name;
+            console.log(`[智能登记] 多教室城市默认填充第一个教室: ${order.deliveryCity} -> ${order.deliveryRoom}`);
+          }
+        } catch (error) {
+          // 如果查询教室失败，忽略错误，不影响解析结果
+          console.warn(`[智能登记] 查询教室失败: ${order.deliveryCity}`, error);
+        }
+      }
       
       // 提取结构化备注信息
       if (order.notes) {
@@ -356,7 +378,7 @@ ${lines.join('\n')}
         order.paymentStatus = extracted.paymentStatus || null;
         order.specialNotes = extracted.specialNotes || null;
       }
-    });
+    }
     
     return orders;
   } catch (error: any) {
