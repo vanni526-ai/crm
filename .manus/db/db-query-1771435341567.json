@@ -1,0 +1,258 @@
+{
+  "query": "SELECT name, aliases FROM teachers WHERE isActive = true;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT name, aliases FROM teachers WHERE isActive = true;",
+  "rows": [
+    {
+      "name": "安雅",
+      "aliases": "NULL"
+    },
+    {
+      "name": "烨",
+      "aliases": "NULL"
+    },
+    {
+      "name": "圆圆",
+      "aliases": "NULL"
+    },
+    {
+      "name": "小钰",
+      "aliases": "NULL"
+    },
+    {
+      "name": "玥玥",
+      "aliases": "NULL"
+    },
+    {
+      "name": "唐泽",
+      "aliases": "NULL"
+    },
+    {
+      "name": "Nemo",
+      "aliases": "NULL"
+    },
+    {
+      "name": "淼淼",
+      "aliases": "NULL"
+    },
+    {
+      "name": "璐璐",
+      "aliases": "NULL"
+    },
+    {
+      "name": "水水",
+      "aliases": "NULL"
+    },
+    {
+      "name": "米妮",
+      "aliases": "NULL"
+    },
+    {
+      "name": "姜一",
+      "aliases": "NULL"
+    },
+    {
+      "name": "枝",
+      "aliases": "NULL"
+    },
+    {
+      "name": "韦德",
+      "aliases": "NULL"
+    },
+    {
+      "name": "黑桃",
+      "aliases": "NULL"
+    },
+    {
+      "name": "井盖",
+      "aliases": "NULL"
+    },
+    {
+      "name": "紫野",
+      "aliases": "NULL"
+    },
+    {
+      "name": "无浪",
+      "aliases": "NULL"
+    },
+    {
+      "name": "温言",
+      "aliases": "NULL"
+    },
+    {
+      "name": "巳月",
+      "aliases": "NULL"
+    },
+    {
+      "name": "小梨",
+      "aliases": "NULL"
+    },
+    {
+      "name": "River",
+      "aliases": "NULL"
+    },
+    {
+      "name": "米朵",
+      "aliases": "NULL"
+    },
+    {
+      "name": "七七",
+      "aliases": "NULL"
+    },
+    {
+      "name": "瑶瑶",
+      "aliases": "NULL"
+    },
+    {
+      "name": "九淑",
+      "aliases": "NULL"
+    },
+    {
+      "name": "晚晚",
+      "aliases": "NULL"
+    },
+    {
+      "name": "大崎",
+      "aliases": "NULL"
+    },
+    {
+      "name": "黛茜",
+      "aliases": "NULL"
+    },
+    {
+      "name": "星斗",
+      "aliases": "NULL"
+    },
+    {
+      "name": "佳佳",
+      "aliases": "NULL"
+    },
+    {
+      "name": "昭昭",
+      "aliases": "NULL"
+    },
+    {
+      "name": "蜜咕咕",
+      "aliases": "NULL"
+    },
+    {
+      "name": "小小",
+      "aliases": "NULL"
+    },
+    {
+      "name": "琴酒",
+      "aliases": "NULL"
+    },
+    {
+      "name": "鱼鱼",
+      "aliases": "NULL"
+    },
+    {
+      "name": "宥香",
+      "aliases": "NULL"
+    },
+    {
+      "name": "依一",
+      "aliases": "NULL"
+    },
+    {
+      "name": "云云",
+      "aliases": "NULL"
+    },
+    {
+      "name": "兮灵",
+      "aliases": "NULL"
+    },
+    {
+      "name": "絮絮",
+      "aliases": "NULL"
+    },
+    {
+      "name": "雨凝",
+      "aliases": "NULL"
+    },
+    {
+      "name": "酥酥",
+      "aliases": "NULL"
+    },
+    {
+      "name": "甜儿",
+      "aliases": "NULL"
+    },
+    {
+      "name": "小米",
+      "aliases": "NULL"
+    },
+    {
+      "name": "奚敏",
+      "aliases": "NULL"
+    },
+    {
+      "name": "皮皮",
+      "aliases": "NULL"
+    },
+    {
+      "name": "铴铴",
+      "aliases": "NULL"
+    },
+    {
+      "name": "声声",
+      "aliases": "NULL"
+    },
+    {
+      "name": "YY",
+      "aliases": "NULL"
+    },
+    {
+      "name": "Nancy",
+      "aliases": "NULL"
+    },
+    {
+      "name": "爱丽丝",
+      "aliases": "NULL"
+    },
+    {
+      "name": "小凡",
+      "aliases": "NULL"
+    },
+    {
+      "name": "苏苏",
+      "aliases": "NULL"
+    },
+    {
+      "name": "Sherry",
+      "aliases": "NULL"
+    },
+    {
+      "name": "小夜",
+      "aliases": "NULL"
+    },
+    {
+      "name": "兔子",
+      "aliases": "NULL"
+    },
+    {
+      "name": "十字蛇",
+      "aliases": "NULL"
+    },
+    {
+      "name": "欣欣",
+      "aliases": "NULL"
+    },
+    {
+      "name": "汐梨",
+      "aliases": "NULL"
+    },
+    {
+      "name": "小羊",
+      "aliases": "NULL"
+    },
+    {
+      "name": "Luna",
+      "aliases": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\taliases\n安雅\tNULL\n烨\tNULL\n圆圆\tNULL\n小钰\tNULL\n玥玥\tNULL\n唐泽\tNULL\nNemo\tNULL\n淼淼\tNULL\n璐璐\tNULL\n水水\tNULL\n米妮\tNULL\n姜一\tNULL\n枝\tNULL\n韦德\tNULL\n黑桃\tNULL\n井盖\tNULL\n紫野\tNULL\n无浪\tNULL\n温言\tNULL\n巳月\tNULL\n小梨\tNULL\nRiver\tNULL\n米朵\tNULL\n七七\tNULL\n瑶瑶\tNULL\n九淑\tNULL\n晚晚\tNULL\n大崎\tNULL\n黛茜\tNULL\n星斗\tNULL\n佳佳\tNULL\n昭昭\tNULL\n蜜咕咕\tNULL\n小小\tNULL\n琴酒\tNULL\n鱼鱼\tNULL\n宥香\tNULL\n依一\tNULL\n云云\tNULL\n兮灵\tNULL\n絮絮\tNULL\n雨凝\tNULL\n酥酥\tNULL\n甜儿\tNULL\n小米\tNULL\n奚敏\tNULL\n皮皮\tNULL\n铴铴\tNULL\n声声\tNULL\nYY\tNULL\nNancy\tNULL\n爱丽丝\tNULL\n小凡\tNULL\n苏苏\tNULL\nSherry\tNULL\n小夜\tNULL\n兔子\tNULL\n十字蛇\tNULL\n欣欣\tNULL\n汐梨\tNULL\n小羊\tNULL\nLuna\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1516
+}

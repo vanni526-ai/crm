@@ -1,0 +1,73 @@
+{
+  "query": "SELECT name FROM cities;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT name FROM cities;",
+  "rows": [
+    {
+      "name": "上海"
+    },
+    {
+      "name": "东莞"
+    },
+    {
+      "name": "南京"
+    },
+    {
+      "name": "大连"
+    },
+    {
+      "name": "天津"
+    },
+    {
+      "name": "太原"
+    },
+    {
+      "name": "宁波"
+    },
+    {
+      "name": "无锡"
+    },
+    {
+      "name": "杭州"
+    },
+    {
+      "name": "武汉"
+    },
+    {
+      "name": "泉州"
+    },
+    {
+      "name": "测试城市"
+    },
+    {
+      "name": "济南"
+    },
+    {
+      "name": "深圳"
+    },
+    {
+      "name": "石家庄"
+    },
+    {
+      "name": "福州"
+    },
+    {
+      "name": "苏州"
+    },
+    {
+      "name": "西双版纳"
+    },
+    {
+      "name": "郑州"
+    },
+    {
+      "name": "重庆"
+    },
+    {
+      "name": "长沙"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\n上海\n东莞\n南京\n大连\n天津\n太原\n宁波\n无锡\n杭州\n武汉\n泉州\n测试城市\n济南\n深圳\n石家庄\n福州\n苏州\n西双版纳\n郑州\n重庆\n长沙\n",
+  "stderr": "",
+  "execution_time_ms": 1525
+}

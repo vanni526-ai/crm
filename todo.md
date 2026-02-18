@@ -3719,3 +3719,22 @@
   - [x] 添加到路由（/data-cleaning）
 - [x] 测试验证（4个测试用例全部通过）
 - [x] 保存检查点
+### 172. 扩展Gmail导入LLM智能识别和数据清洗功能，增加老师名称统一和城市名称规范化
+- [x] 创建老师名称标准化规则模块（teacherMappingRules.ts）
+  - [x] 查询数据库获取所有老师的标准名称和别名
+  - [x] 实现standardizeTeacherName函数（支持别名映射）
+- [x] 创建城市名称标准化规则模块（cityMappingRules.ts）
+  - [x] 查询数据库获取所有城市的标准名称
+  - [x] 实现standardizeCityName函数（支持别名映射）
+- [x] 扩展Gmail导入的LLM智能识别：
+  - [x] 导入teacherMappingRules和cityMappingRules模块
+  - [x] 在LLM解析后添加老师名称标准化
+  - [x] 在LLM解析后添加城市名称标准化
+- [x] 扩展数据清洗功能：
+  - [x] 更新scanOrders接口，扫描老师和城市字段
+  - [x] 更新cleanOrders接口，清洗老师和城市字段
+- [x] 更新DataCleaning.tsx页面，显示老师和城市字段的清洗结果
+  - [x] 添加表格列：原始老师、标准老师
+  - [x] 添加表格列：原始城市、标准城市
+- [x] 测试验证（9个测试用例全部通过）
+- [x] 保存检查点

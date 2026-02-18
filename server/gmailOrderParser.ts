@@ -1,6 +1,8 @@
 import { invokeLLM } from "./_core/llm";
 import { getAllGmailImportConfigs, isTeacherName } from "./db";
 import { standardizeClassroom, generateClassroomMappingPrompt } from "./classroomMappingRules";
+import { standardizeTeacherName, generateTeacherMappingPrompt } from "./teacherMappingRules";
+import { standardizeCityName, generateCityMappingPrompt } from "./cityMappingRules";
 
 /**
  * 解析后的订单信息
@@ -55,8 +57,20 @@ export async function parseGmailOrderContent(
   
   // 添加教室映射规则到prompt
   const classroomMappingPrompt = generateClassroomMappingPrompt();
+  
+  // 添加老师映射规则到prompt
+  const teacherMappingPrompt = await generateTeacherMappingPrompt();
+  
+  // 添加城市映射规则到prompt
+  const cityMappingPrompt = await generateCityMappingPrompt();
 
   const prompt = `你是一个专业的订单信息提取助手。请从以下微信群聊天记录中提取所有订单信息。${configPrompt}
+
+${classroomMappingPrompt}
+
+${teacherMappingPrompt}
+
+${cityMappingPrompt}
 
 ⁉️ 订单边界识别规则（非常重要）：
 - 每条订单是一个独立的消息，从发送人+时间戳开始，到下一个发送人之前结束
@@ -499,12 +513,31 @@ ${classroomMappingPrompt}
         }
       }
       
+      // 标准化老师名称
+      let standardizedTeacher = order.teacher;
+      if (order.teacher) {
+        const standardized = await standardizeTeacherName(order.teacher);
+        if (standardized) {
+          standardizedTeacher = standardized;
+          console.log(`[老师标准化] "${order.teacher}" → "${standardizedTeacher}"`);
+        }
+      }
+      
+      // 标准化城市名称
+      if (standardizedCity) {
+        const cityStandardized = await standardizeCityName(standardizedCity);
+        if (cityStandardized) {
+          standardizedCity = cityStandardized;
+          console.log(`[城市标准化] "${order.city}" → "${standardizedCity}"`);
+        }
+      }
+      
       orders.push({
         ...order,
         salesperson: correctCommonErrors(order.salesperson),
         deviceWechat: correctCommonErrors(order.deviceWechat),
         customerName,
-        teacher: correctCommonErrors(order.teacher),
+        teacher: standardizedTeacher,
         city: standardizedCity,
         classroom: standardizedClassroom,
         // 如果LLM返回的费用为0,使用正则提取的费用

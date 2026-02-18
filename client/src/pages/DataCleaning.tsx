@@ -93,7 +93,7 @@ export default function DataCleaning() {
       <div>
         <h1 className="text-3xl font-bold">数据清洗</h1>
         <p className="text-muted-foreground mt-2">
-          扫描并修复历史订单中不符合标准的教室名称
+          扫描并修复历史订单中不符合标准的教室、老师和城市名称
         </p>
       </div>
 
@@ -171,9 +171,11 @@ export default function DataCleaning() {
                     <TableHead>上课日期</TableHead>
                     <TableHead>原始城市</TableHead>
                     <TableHead>原始教室</TableHead>
+                    <TableHead>原始老师</TableHead>
                     <TableHead className="text-center">→</TableHead>
                     <TableHead>标准城市</TableHead>
                     <TableHead>标准教室</TableHead>
+                    <TableHead>标准老师</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -202,19 +204,27 @@ export default function DataCleaning() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="secondary">{order.originalRoom}</Badge>
+                        <Badge variant="secondary">{order.originalRoom || "-"}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{order.originalTeacher || "-"}</Badge>
                       </TableCell>
                       <TableCell className="text-center">
                         <AlertCircle className="w-4 h-4 text-orange-500 mx-auto" />
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="bg-green-50">
-                          {order.standardizedCity}
+                          {order.standardizedCity || "-"}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="bg-green-50">
-                          {order.standardizedRoom}
+                          {order.standardizedRoom || "-"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="bg-green-50">
+                          {order.standardizedTeacher || "-"}
                         </Badge>
                       </TableCell>
                     </TableRow>
