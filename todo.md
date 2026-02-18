@@ -3511,3 +3511,24 @@
 - [x] 更新迁移指南，明确说明不能使用localhost
 - [x] 测试公网80端口访问（成功）
 - [x] 保存检查点
+
+### 149. 整理订单API接口文档
+- [x] 查找订单相关的后端代码和路由
+- [x] 整理订单查询接口文档（list/getById/getFiltered）
+- [x] 整理新增订单接口文档（create/batchCreate）
+- [x] 整理订单更新接口文档（update/updateStatus/updateDeliveryStatus）
+- [x] 整理订单删除接口文档（delete/deleteByChannelOrderNo）
+- [x] 整理订单统计接口文档（getByDateRange/exportExcel）
+- [x] 整理批量操作接口（batchCalculatePartnerFee）
+- [x] 创建完整的API接口文档（10个章节，含认证、数据模型、错误码说明）
+- [x] 交付文档给用户
+
+### 150. 实现订单智能解析功能（前端App集成）
+- [x] 实现订单智能解析API接口（orderParse.parseOrderText）
+- [x] 集成销售人员、老师、城市管理数据
+- [x] 实现业务规则（合伙人费用、理论课费用、作废订单处理）
+- [x] 实现支付渠道自动识别（支付宝28位、微信28-32位）
+- [x] 原始文本自动保存到备注字段
+- [x] 测试API接口功能（5个测试用例全部通过）
+- [x] 编写前端App集成文档（含接口说明、代码示例、测试用例）
+- [ ] 保存检查点
