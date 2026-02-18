@@ -967,7 +967,7 @@ export default function Orders() {
                         <TableHead>上课日期</TableHead>
                         <TableHead>上课时间</TableHead>
                         <TableHead>备注</TableHead>
-                        <TableHead>状态</TableHead>
+                        <TableHead>支付状态</TableHead>
                         <TableHead>交付状态</TableHead>
                         <TableHead>创建时间</TableHead>
                         <TableHead className="text-right">操作</TableHead>
