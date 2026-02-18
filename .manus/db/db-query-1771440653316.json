@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users ADD COLUMN isMember BOOLEAN DEFAULT FALSE NOT NULL;\nALTER TABLE users ADD COLUMN membershipOrderId INT;\nALTER TABLE users ADD COLUMN membershipActivatedAt TIMESTAMP;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE users ADD COLUMN isMember BOOLEAN DEFAULT FALSE NOT NULL;\nALTER TABLE users ADD COLUMN membershipOrderId INT;\nALTER TABLE users ADD COLUMN membershipActivatedAt TIMESTAMP;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3768
+}

@@ -27,6 +27,7 @@ import { partnerManagementRouter } from "./partnerManagementRouter";
 import { cityExpenseRouter } from "./cityExpenseRouter";
 import { orderParseRouter } from "./orderParseRouter";
 import { dataCleaningRouter } from "./dataCleaningRouter";
+import { membershipRouter } from "./membershipRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -101,6 +102,7 @@ export const appRouter = router({
   cityExpense: cityExpenseRouter,
   orderParse: orderParseRouter,
   dataCleaning: dataCleaningRouter,
+  membership: membershipRouter,
 
   // 数据质量检查
   dataQuality: router({

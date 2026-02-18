@@ -3790,3 +3790,14 @@
 - [x] 测试验证修复效果
 - [x] 保存检查点
 
+
+### 176. 实现会员系统后端功能
+- [x] 更新数据库schema，在users表添加会员相关字段（isMember, membershipOrderId, membershipActivatedAt）
+- [x] 在orders表添加orderType字段区分订单类型
+- [x] 实现users.getMembershipStatus接口（查询会员状态）
+- [x] 实现orders.createMembership接口（创建会员订单）
+- [x] 实现users.activateMembership接口（激活会员）
+- [x] 编写单元测试验证所有接口功能
+- [x] 测试错误处理和边界情况
+- [x] 保存检查点
+

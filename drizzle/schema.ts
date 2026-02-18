@@ -17,6 +17,11 @@ export const users = mysqlTable("users", {
   roles: varchar("roles", { length: 255 }).default("user").notNull(), // 新多角色字段，逗号分隔，如 "admin,teacher"
   isActive: boolean("isActive").default(true).notNull(),
   
+  // 会员相关字段
+  isMember: boolean("isMember").default(false).notNull(), // 是否是会员
+  membershipOrderId: int("membershipOrderId"), // 会员订单ID（关联订单表）
+  membershipActivatedAt: timestamp("membershipActivatedAt"), // 会员激活时间
+  
   // 老师特有字段(从teachers表迁移)
   avatarUrl: varchar("avatarUrl", { length: 500 }), // 头像URL(S3存储)
   aliases: text("aliases"), // 别名列表(JSON数组)
@@ -125,6 +130,7 @@ export const orders = mysqlTable("orders", {
   classDate: date("classDate"), // 上课日期
   classTime: varchar("classTime", { length: 50 }), // 上课时间(支持时间范围如"14:00-16:00")
   
+  orderType: varchar("orderType", { length: 20 }).default("course").notNull(), // 订单类型: course(课程订单), membership(会员订单)
   status: mysqlEnum("status", ["pending", "paid", "has_balance", "completed", "cancelled", "refunded"]).default("pending").notNull(),
   deliveryStatus: mysqlEnum("deliveryStatus", ["pending", "accepted", "delivered"]).default("pending").notNull(), // 交付状态：待接单/已接单/已交付
   acceptedAt: timestamp("acceptedAt"), // 接单时间
