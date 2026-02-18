@@ -76,6 +76,26 @@ export const dataCleaningRouter = router({
             standardizedRoom = classroomStandardized.classroom;
           }
         }
+      } else if (order.deliveryCity && !order.deliveryRoom) {
+        // 智能填充教室：如果有城市但没有教室，且该城市只有一个教室，标记为需要清洗
+        try {
+          const cityClassrooms = await database
+            .select({ name: classrooms.name })
+            .from(classrooms)
+            .where(
+              and(
+                eq(classrooms.cityName, order.deliveryCity),
+                eq(classrooms.isActive, true)
+              )
+            );
+          
+          if (cityClassrooms.length === 1) {
+            needsCleaning = true;
+            standardizedRoom = cityClassrooms[0].name;
+          }
+        } catch (classroomError) {
+          console.error(`[扫描] 订单${order.id}查询教室失败:`, classroomError);
+        }
       }
 
       // 2. 标准化老师名称
@@ -143,8 +163,11 @@ export const dataCleaningRouter = router({
       let failCount = 0;
       const errors: Array<{ orderId: number; error: string }> = [];
 
+      console.log(`[数据清洗] 开始清洗${orderIds.length}个订单...`);
+      
       for (const orderId of orderIds) {
         try {
+          console.log(`[数据清洗] 处理订单ID: ${orderId}`);
           // 查询订单
           const [order] = await database
             .select({
@@ -246,21 +269,28 @@ export const dataCleaningRouter = router({
           );
         } catch (error) {
           failCount++;
+          const errorMsg = error instanceof Error ? error.message : "未知错误";
           errors.push({
             orderId,
-            error: error instanceof Error ? error.message : "未知错误",
+            error: errorMsg,
           });
           console.error(`[数据清洗] 订单${orderId}清洗失败:`, error);
+          console.error(`[数据清洗] 错误堆栈:`, error instanceof Error ? error.stack : "N/A");
         }
       }
+      
+      console.log(`[数据清洗] 清洗完成: 成功${successCount}个，失败${failCount}个`);
 
-      return {
+      const result = {
         success: true,
         successCount,
         failCount,
         errors,
         message: `成功清洗${successCount}个订单${failCount > 0 ? `，失败${failCount}个` : ""}`,
       };
+      
+      console.log(`[数据清洗] 返回结果:`, JSON.stringify(result, null, 2));
+      return result;
     }),
 
   /**

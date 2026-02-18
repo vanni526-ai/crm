@@ -39,7 +39,9 @@ export default function DataCleaning() {
       refetchScan();
     },
     onError: (error) => {
-      alert(`数据清洗失败: ${error.message}`);
+      console.error("[API Mutation Error]", error);
+      const errorMessage = error.message || "未知错误";
+      alert(`数据清洗失败: ${errorMessage}`);
     },
   });
 
