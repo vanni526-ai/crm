@@ -1,7 +1,7 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
-import { orders } from "../drizzle/schema";
+import { orders, classrooms } from "../drizzle/schema";
 import { eq, isNotNull, ne } from "drizzle-orm";
 import { standardizeClassroom } from "./classroomMappingRules";
 import { standardizeTeacherName } from "./teacherMappingRules";
@@ -185,6 +185,17 @@ export const dataCleaningRouter = router({
                 updateData.deliveryCity = classroomStandardized.city;
                 updateData.deliveryRoom = classroomStandardized.classroom;
               }
+            }
+          } else if (order.deliveryCity && !order.deliveryRoom) {
+            // 智能填充教室：如果有城市但没有教室，且该城市只有一个教室，自动填充
+            const cityClassrooms = await database
+              .select({ name: classrooms.name })
+              .from(classrooms)
+              .where(eq(classrooms.cityName, order.deliveryCity));
+            
+            if (cityClassrooms.length === 1) {
+              updateData.deliveryRoom = cityClassrooms[0].name;
+              console.log(`[智能填充] 订单${orderId} 城市${order.deliveryCity}只有一个教室，自动填充: ${cityClassrooms[0].name}`);
             }
           }
 
