@@ -3618,14 +3618,16 @@
 - [x] 测试尾款金额的自动识别
 - [x] 保存检查点（版枬7a97515c）
 
-### 162. 清理teachers表重复数据，重构为以users表为准
+### 162. 实现老师管理与用户管理的双向同步（参照合伙人模式）
 - [x] 检查数据库中teachers表和users表的数据（teachers有28条，users有70位老师）
-- [x] 分析teachers表的特有字段：avatarUrl, aliases, teacherAttribute, customerType, category, city, hourlyRate, bankAccount, bankName, contractEndDate, joinDate
-- [x] 扩展users表schema添加avatarUrl、aliases等字段（已通过ALTER TABLE添加）
+- [x] 分析teachers表的特有字段
+- [x] 扩展users表schema添加老师特有字段（已通过ALTER TABLE添加）
 - [x] 分析teachers表与users表的数据差异（65条重复+2条不存在）
 - [x] 标记teachers表中的重复记录为isActive=false（成功更新64条）
-- [ ] 更新后端接口（从teachers表改为users表筛选）
+- [x] 保存阶段性检查点（版本fc0f16bf）
+- [x] 添加teachers表的userId关联字段（已存在）
+- [x] 创建数据同步脚本建立teachers与users的关联（通过SQL UPDATE完成）
+- [ ] 更新后端接口实现双向同步逻辑
 - [ ] 更新前端老师管理页面
-- [ ] 更新订单解析逻辑（getAllTeachersForParser）
 - [ ] 测试验证
 - [ ] 保存检查点

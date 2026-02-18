@@ -939,17 +939,16 @@ export async function getAllTeachers() {
   const db = await getDb();
   if (!db) return [];
   const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/JopHWzeEmqAYxCyT.png";
+   // 从u users表读取角色包含teacher的用户
   const results = await db.select({
-    id: teachers.id,
-    name: teachers.name,
-    nickname: teachers.nickname,
-    phone: teachers.phone,
-    customerType: teachers.customerType,
-    notes: teachers.notes,
-    city: teachers.city,
-    isActive: teachers.isActive,
-    avatarUrl: teachers.avatarUrl,
-  }).from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
+    id: users.id,
+    name: users.name,
+    nickname: users.nickname,
+    phone: users.phone,
+    customerType: users.customerType,
+    isActive: sql<number>`1`, // users表没有isActive字段，默认为1
+    avatarUrl: users.avatarUrl,
+  }).from(users).where(like(users.roles, '%teacher%')).orderBy(desc(users.createdAt));
   
   // 如果avatarUrl为null,使用统一默认头像
   return results.map(teacher => ({

@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE teachers ADD COLUMN userId INT AFTER id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE teachers ADD COLUMN userId INT AFTER id;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1060 (42S21) at line 1: Duplicate column name 'userId'"
+  ]
+}
