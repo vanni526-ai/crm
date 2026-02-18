@@ -3648,3 +3648,10 @@
 - [x] 修复updateUserRoles函数中创建teachers记录的逻辑，确保name字段正确传递
 - [x] 测试修复效果
 - [x] 保存检查点
+
+### 165. 修复老师列表页面teacherAttribute字段不显示的问题
+- [x] 检查老师列表前端页面代码（Teachers.tsx）
+- [x] 检查后端getAllTeachers API是否返回teacherAttribute字段
+- [x] 修复显示问题
+- [x] 测试验证
+- [x] 保存检查点

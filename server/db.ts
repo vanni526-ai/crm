@@ -980,6 +980,7 @@ export async function getAllTeachers() {
     customerType: users.customerType,
     isActive: sql<number>`1`, // users表没有isActive字段，默认为1
     avatarUrl: users.avatarUrl,
+    teacherAttribute: users.teacherAttribute,
   }).from(users).where(like(users.roles, '%teacher%')).orderBy(desc(users.createdAt));
   
   // 如果avatarUrl为null,使用统一默认头像
