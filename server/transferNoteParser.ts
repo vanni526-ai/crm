@@ -36,7 +36,7 @@ function smartCorrection(order: any): any {
   }
   
   // 2. 金额格式纠错 - 全角数字转半角
-  const amountFields = ['paymentAmount', 'courseAmount', 'teacherFee', 'transportFee', 'otherFee', 'partnerFee'];
+  const amountFields = ['paymentAmount', 'courseAmount', 'balanceAmount', 'teacherFee', 'transportFee', 'otherFee', 'partnerFee'];
   amountFields.forEach(field => {
     if (order[field] && typeof order[field] === 'string') {
       // 全角数字转半角
@@ -265,7 +265,8 @@ export async function parseTransferNotes(text: string) {
 - customerName: 客户名字(必须严格遵守上述客户名识别规则,如果无法确定客户名则留空)
 - paymentAmount: 支付金额(只提取数字,不包含"已付"、"未付"等文字)
 - paymentMethod: 支付方式(如"支付宝收款"、"富掌柜收款"、"现金"、"微信",如果没有明确提及则留空)
-- courseAmount: 课程总金额(如果有"未付"金额,计算总额)
+- courseAmount: 课程总金额(如果有"未付"或"尾款"金额,计算总额)
+- balanceAmount: 尾款金额(从"尾款 XXX"、"未付 XXX"、"剩余 XXX"、"差 XXX"中提取数字。**重要:尾款金额是指客户还未支付的部分课程金额,不包括已支付的部分**。如果文本中明确提到尾款或未付金额,则提取该数字;如果没有则留空)
 - channelOrderNo: 渠道订单号/交易单号(从"交易单号XXXXX"中提取数字,例如:4200002912202512208697791196,如果没有则留空)
 - teacherFee: 老师费用(从"给老师XXX"中提取数字,**不包括车费**,如果没有则留空)
 - transportFee: 车费(从"报销老师XXX车费"、"报销XXX车费"、"老师打车XXX"、"车费XXX"中提取数字。**重要:车费和老师费用必须严格区分!如果文本中明确提到"车费"二字,则该金额属于transportFee而不是teacherFee**,如果没有则留空)

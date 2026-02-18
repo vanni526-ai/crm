@@ -95,7 +95,7 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
       // 比较原始解析结果和用户修改后的值,记录修正数据
       const fieldsToCheck = [
         'salesperson', 'customerName', 'deliveryCourse', 'deliveryTeacher',
-        'classDate', 'classTime', 'paymentAmount', 'courseAmount',
+        'classDate', 'classTime', 'paymentAmount', 'courseAmount', 'balanceAmount',
         'deliveryCity', 'deliveryRoom', 'paymentMethod', 'channelOrderNo',
         'teacherFee', 'transportFee', 'otherFee', 'partnerFee',
         'trafficSource', 'accountBalance', 'paymentCity', 'paymentDate',
@@ -278,6 +278,14 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                             <Input
                               value={editingData.courseAmount || ""}
                               onChange={(e) => updateEditingField("courseAmount", e.target.value)}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">尾款金额</Label>
+                            <Input
+                              value={(editingData as any).balanceAmount || ""}
+                              onChange={(e) => updateEditingField("balanceAmount", e.target.value)}
                               className="h-8 text-sm"
                             />
                           </div>
@@ -567,6 +575,9 @@ export function SmartRegisterDialog({ open, onOpenChange, onSuccess }: SmartRegi
                           )}
                           {item.courseAmount && (
                             <div><span className="text-muted-foreground">课程金额:</span> ¥{item.courseAmount}</div>
+                          )}
+                          {(item as any).balanceAmount && (
+                            <div><span className="text-muted-foreground">尾款金额:</span> ¥{(item as any).balanceAmount}</div>
                           )}
                           {item.jinchuanAmount && (
                             <div><span className="text-muted-foreground">金串到账金额:</span> ¥{item.jinchuanAmount}</div>
