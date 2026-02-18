@@ -1047,7 +1047,7 @@ export default function Orders() {
                           <TableCell>{order.paymentDate ? (typeof order.paymentDate === 'string' ? order.paymentDate : formatDateBJ(order.paymentDate)) : "-"}</TableCell>
                           <TableCell>{order.paymentTime || "-"}</TableCell>
                           <TableCell>{order.deliveryCity || "-"}</TableCell>
-                          <TableCell>{order.deliveryRoom ? `${order.deliveryCity || ""}${order.deliveryRoom}` : "-"}</TableCell>
+                          <TableCell>{order.deliveryRoom || "-"}</TableCell>
                           <TableCell>{order.deliveryTeacher || "-"}</TableCell>
                           <TableCell className="max-w-[150px] truncate">{order.deliveryCourse || "-"}</TableCell>
                           <TableCell>{order.classDate ? (typeof order.classDate === 'string' ? order.classDate : formatDateBJ(order.classDate)) : "-"}</TableCell>
@@ -1358,7 +1358,7 @@ export default function Orders() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">交付教室</p>
-                      <p className="font-medium">{selectedOrder.deliveryRoom ? `${selectedOrder.deliveryCity || ""}${selectedOrder.deliveryRoom}` : "-"}</p>
+                      <p className="font-medium">{selectedOrder.deliveryRoom || "-"}</p>
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">交付老师</p>
