@@ -144,10 +144,10 @@ const cityClassroomRules: ClassroomMappingRule[] = [
   },
   // 天津
   {
-    pattern: /^天津(教室)?$/,
+    pattern: /^天津(1501|教室|场|上)?$|^\(天津\)$/,
     standardCity: "天津",
-    standardClassroom: "天津教室",
-    description: "天津教室映射"
+    standardClassroom: "天津1501",
+    description: "天津教室映射（天津/天津教室/天津1501/天津场/天津上/(天津) → 天津1501）"
   }
 ];
 

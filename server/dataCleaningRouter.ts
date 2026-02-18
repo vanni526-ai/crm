@@ -76,7 +76,7 @@ export const dataCleaningRouter = router({
             standardizedRoom = classroomStandardized.classroom;
           }
         }
-      } else if (order.deliveryCity && !order.deliveryRoom) {
+      } else if (order.deliveryCity && (!order.deliveryRoom || order.deliveryRoom.trim() === "")) {
         // 智能填充教室：如果有城市但没有教室，且该城市只有一个教室，标记为需要清洗
         try {
           const cityClassrooms = await database
@@ -209,7 +209,7 @@ export const dataCleaningRouter = router({
                 updateData.deliveryRoom = classroomStandardized.classroom;
               }
             }
-          } else if (order.deliveryCity && !order.deliveryRoom) {
+          } else if (order.deliveryCity && (!order.deliveryRoom || order.deliveryRoom.trim() === "")) {
             // 智能填充教室：如果有城市但没有教室，且该城市只有一个教室，自动填充
             try {
               const cityClassrooms = await database

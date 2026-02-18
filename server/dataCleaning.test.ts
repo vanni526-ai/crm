@@ -145,4 +145,27 @@ describe("数据清洗功能测试", () => {
     const test2 = standardizeClassroom("未知教室", undefined);
     expect(test2).toBeNull();
   });
+
+  it("应该将所有天津教室变体标准化为天津1501", () => {
+    const testCases = [
+      { input: "天津教室", expected: "天津1501" },
+      { input: "天津1501", expected: "天津1501" },
+      { input: "(天津)", expected: "天津1501" },
+      { input: "天津场", expected: "天津1501" },
+      { input: "天津上", expected: "天津1501" },
+      { input: "天津", expected: "天津1501" },
+    ];
+
+    for (const testCase of testCases) {
+      const result = standardizeClassroom(testCase.input, "天津");
+      expect(result).toBeDefined();
+      expect(result?.classroom).toBe(testCase.expected);
+      expect(result?.city).toBe("天津");
+    }
+  });
+
+  it("应该不匹配垃圾数据", () => {
+    const result = standardizeClassroom("ゴミ箱", "天津");
+    expect(result).toBeNull();
+  });
 });
