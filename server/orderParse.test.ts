@@ -13,6 +13,7 @@ describe("订单智能解析API测试", () => {
       course: "基础局+裸足丝袜课",
       teacher: "酥酥",
       city: "宁波",
+      classroom: "宁波1103", // 宁波只有1个教室，自动填充
       paymentAmount: 3000,
       downPayment: 1200,
       finalPayment: 1800,

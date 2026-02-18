@@ -207,7 +207,8 @@ ${text}
         // 后处理：教室自动填充
         if (parsedOrder.city && (!parsedOrder.classroom || parsedOrder.classroom === "")) {
           const classrooms = cityClassroomsMap.get(parsedOrder.city);
-          if (classrooms && classrooms.length === 1) {
+          if (classrooms && classrooms.length > 0) {
+            // 如果订单文本中没有明确指定教室，默认填充第一个教室
             parsedOrder.classroom = classrooms[0];
           }
         }
