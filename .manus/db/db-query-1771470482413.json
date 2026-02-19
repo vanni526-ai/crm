@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE systemAccounts \nADD COLUMN isMember BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否是会员',\nADD COLUMN membershipOrderId INT NULL COMMENT '会员订单ID',\nADD COLUMN membershipActivatedAt TIMESTAMP NULL COMMENT '会员激活时间';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE systemAccounts \nADD COLUMN isMember BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否是会员',\nADD COLUMN membershipOrderId INT NULL COMMENT '会员订单ID',\nADD COLUMN membershipActivatedAt TIMESTAMP NULL COMMENT '会员激活时间';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2865
+}

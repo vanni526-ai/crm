@@ -339,6 +339,7 @@ export default function AccountManagement() {
                     <TableHead>用户名</TableHead>
                     <TableHead>邮箱</TableHead>
                     <TableHead>角色</TableHead>
+                    <TableHead>会员状态</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
@@ -350,6 +351,18 @@ export default function AccountManagement() {
                       <TableCell>{account.email || "-"}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{account.identity}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {account.isMember ? (
+                          <Badge variant="default" className="gap-1 bg-amber-500 hover:bg-amber-600">
+                            <CheckCircle className="h-3 w-3" />
+                            会员
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="gap-1">
+                            非会员
+                          </Badge>
+                        )}
                       </TableCell>
                       <TableCell>
                         {account.isActive ? (
@@ -524,6 +537,30 @@ export default function AccountManagement() {
                 <Label>备注</Label>
                 <Input name="notes" defaultValue={selectedAccount.notes || ""} placeholder="输入备注" />
               </div>
+              
+              {/* 会员信息展示 */}
+              {selectedAccount.isMember && (
+                <div className="border-t pt-4 space-y-2">
+                  <Label className="text-sm font-semibold">会员信息</Label>
+                  <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-md p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-amber-600" />
+                      <span className="text-sm font-medium text-amber-900 dark:text-amber-100">已开通会员</span>
+                    </div>
+                    {selectedAccount.membershipActivatedAt && (
+                      <div className="text-xs text-amber-700 dark:text-amber-300">
+                        激活时间: {new Date(selectedAccount.membershipActivatedAt).toLocaleString('zh-CN')}
+                      </div>
+                    )}
+                    {selectedAccount.membershipOrderId && (
+                      <div className="text-xs text-amber-700 dark:text-amber-300">
+                        订单ID: {selectedAccount.membershipOrderId}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
               <div className="flex gap-2 justify-end">
                 <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
                   取消

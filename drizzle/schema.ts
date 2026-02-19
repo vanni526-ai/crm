@@ -922,6 +922,12 @@ export const systemAccounts = mysqlTable("systemAccounts", {
   relatedId: int("relatedId"), // 关联ID(客户ID/老师ID/销售人员ID等)
   relatedName: varchar("relatedName", { length: 100 }), // 关联名称(客户名/老师名/销售名等)
   isActive: boolean("isActive").default(true).notNull(), // 是否激活
+  
+  // 会员相关字段
+  isMember: boolean("isMember").default(false).notNull(), // 是否是会员
+  membershipOrderId: int("membershipOrderId"), // 会员订单ID
+  membershipActivatedAt: timestamp("membershipActivatedAt"), // 会员激活时间
+  
   lastLoginAt: timestamp("lastLoginAt"), // 最后登录时间
   createdAt: timestamp("createdAt").defaultNow().notNull(), // 创建时间
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(), // 更新时间
