@@ -13,7 +13,7 @@ import { reconciliationRouter } from "./reconciliationRouter";
 import { customerRouter } from "./customerRouter";
 import { financeRouter } from "./financeRouter";
 import { cityRouter } from "./cityRouter";
-import { accountRouter } from "./accountRouter";
+
 import { permissionRouter } from "./permissionRouter";
 import { authRouter } from "./authRouter";
 import { userManagementRouter } from "./userManagementRouter";
@@ -83,7 +83,7 @@ export const appRouter = router({
   customers: customerRouter,
   finance: financeRouter,
   city: cityRouter,
-  accounts: accountRouter,
+
   permissions: permissionRouter,
   auth: authRouter,
   userManagement: userManagementRouter,

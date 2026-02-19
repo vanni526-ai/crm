@@ -3829,3 +3829,15 @@
 - [x] 测试验证会员状态显示
 - [x] 保存检查点
 
+
+### 180. 删除账号管理模块并添加admin角色登录限制
+- [x] 删除前端AccountManagement.tsx页面文件
+- [x] 今App.tsx中删除/accounts路由
+- [x] 从DashboardLayout.tsx导航栏中删除“账号管理”入口
+- [x] 删除后端accountRouter.ts文件
+- [x] 从routers.ts中删除accountRouter的导入和注册
+- [x] 添加admin角色登录限制（在auth中间件检查用户角色）
+- [x] 清理systemAccounts表相关的导入和引用
+- [x] 测试验证admin角色登录和非admin角色被拒绝
+- [x] 保存检查点
+

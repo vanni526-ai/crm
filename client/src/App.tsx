@@ -29,7 +29,7 @@ import CityPartnerConfig from "./pages/CityPartnerConfig";
 import Cities from "./pages/Cities";
 import ReconciliationMatch from "./pages/ReconciliationMatch";
 import ReconciliationReport from "./pages/ReconciliationReport";
-import AccountManagement from "./pages/AccountManagement";
+
 import LocalLogin from "./pages/LocalLogin";
 
 import CustomerManagement from "./pages/CustomerManagement";
@@ -71,7 +71,7 @@ function Router() {
       <Route path={"/cities"} component={Cities} />
       <Route path={"/reconciliation-match"} component={ReconciliationMatch} />
       <Route path={"/reconciliation-report"} component={ReconciliationReport} />
-      <Route path={"/accounts"} component={AccountManagement} />
+
       <Route path={"/login"} component={LocalLogin} />
 
       <Route path={"/courses"} component={Courses} />
