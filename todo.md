@@ -3876,9 +3876,8 @@
 - [x] 测试解决方案并为App团队编写文档
 - [x] 保存检查点
 
-### 179. 重新生成sdk/api-client.ts（基于当前CRM的appRouter）
-- [x] 分析当前appRouter结构和所有可用端点
-- [x] 生成新SDK并正确映射所有端点（包括membership）
-- [x] 测试新SDK的membership和orders端点
-- [x] 更新文档和集成指南
-- [x] 保存检查点
+### 179. 为App团队提供tRPC React Query hooks集成指南（方案3）
+- [x] 创建React Native的tRPC客户端集成指南
+- [x] 提供会员和订单API的示例代码
+- [x] 文档化设置步骤和依赖项
+- [x] 交付完整的集成指南给用户
