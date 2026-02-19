@@ -18,9 +18,11 @@ export const users = mysqlTable("users", {
   isActive: boolean("isActive").default(true).notNull(),
   
   // 会员相关字段
-  isMember: boolean("isMember").default(false).notNull(), // 是否是会员
+  membershipStatus: mysqlEnum("membershipStatus", ["pending", "active", "expired"]).default("pending").notNull(), // 会员状态: pending(待激活), active(已激活), expired(已过期)
+  isMember: boolean("isMember").default(false).notNull(), // 是否是会员(兼容旧字段)
   membershipOrderId: int("membershipOrderId"), // 会员订单ID（关联订单表）
   membershipActivatedAt: timestamp("membershipActivatedAt"), // 会员激活时间
+  membershipExpiresAt: timestamp("membershipExpiresAt"), // 会员到期时间
   
   // 老师特有字段(从teachers表迁移)
   avatarUrl: varchar("avatarUrl", { length: 500 }), // 头像URL(S3存储)
@@ -924,9 +926,11 @@ export const systemAccounts = mysqlTable("systemAccounts", {
   isActive: boolean("isActive").default(true).notNull(), // 是否激活
   
   // 会员相关字段
-  isMember: boolean("isMember").default(false).notNull(), // 是否是会员
+  membershipStatus: mysqlEnum("membershipStatus", ["pending", "active", "expired"]).default("pending").notNull(), // 会员状态
+  isMember: boolean("isMember").default(false).notNull(), // 是否是会员(兼容旧字段)
   membershipOrderId: int("membershipOrderId"), // 会员订单ID
   membershipActivatedAt: timestamp("membershipActivatedAt"), // 会员激活时间
+  membershipExpiresAt: timestamp("membershipExpiresAt"), // 会员到期时间
   
   lastLoginAt: timestamp("lastLoginAt"), // 最后登录时间
   createdAt: timestamp("createdAt").defaultNow().notNull(), // 创建时间
@@ -1140,3 +1144,16 @@ export const cityMonthlyExpenses = mysqlTable("city_monthly_expenses", {
 
 export type CityMonthlyExpense = typeof cityMonthlyExpenses.$inferSelect;
 export type InsertCityMonthlyExpense = typeof cityMonthlyExpenses.$inferInsert;
+
+// 会员配置表
+export const membershipConfig = mysqlTable("membershipConfig", {
+  id: int("id").primaryKey().autoincrement(),
+  configKey: varchar("configKey", { length: 50 }).notNull().unique(), // 配置键名，如 "validity_days"
+  configValue: varchar("configValue", { length: 255 }).notNull(), // 配置值
+  description: varchar("description", { length: 255 }), // 配置说明
+  isActive: boolean("isActive").default(true).notNull(), // 是否启用
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type MembershipConfig = typeof membershipConfig.$inferSelect;
+export type InsertMembershipConfig = typeof membershipConfig.$inferInsert;

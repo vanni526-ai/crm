@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, publicProcedure, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "./db";
-import { users, orders } from "../drizzle/schema";
+import { users, orders, membershipConfig } from "../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import { generateOrderNo } from "./orderNoGenerator";
 
@@ -29,9 +29,11 @@ export const membershipRouter = router({
       // 查询当前用户的会员状态
       const [user] = await db
         .select({
+          membershipStatus: users.membershipStatus,
           isMember: users.isMember,
           membershipOrderId: users.membershipOrderId,
           membershipActivatedAt: users.membershipActivatedAt,
+          membershipExpiresAt: users.membershipExpiresAt,
         })
         .from(users)
         .where(eq(users.id, ctx.user.id))
@@ -44,9 +46,25 @@ export const membershipRouter = router({
         });
       }
 
+      // 检查会员是否过期
+      let currentStatus = user.membershipStatus;
+      if (currentStatus === "active" && user.membershipExpiresAt) {
+        const now = new Date();
+        if (now > user.membershipExpiresAt) {
+          // 会员已过期，更新状态
+          currentStatus = "expired";
+          await db
+            .update(users)
+            .set({ membershipStatus: "expired", isMember: false })
+            .where(eq(users.id, ctx.user.id));
+        }
+      }
+
       return {
-        isMember: user.isMember,
+        membershipStatus: currentStatus,
+        isMember: currentStatus === "active",
         membershipActivatedAt: user.membershipActivatedAt?.toISOString(),
+        membershipExpiresAt: user.membershipExpiresAt?.toISOString(),
         membershipOrderId: user.membershipOrderId || undefined,
       };
     } catch (error) {
@@ -85,16 +103,23 @@ export const membershipRouter = router({
 
         // 检查用户是否已是会员
         const [existingUser] = await db
-          .select({ isMember: users.isMember })
+          .select({ 
+            membershipStatus: users.membershipStatus,
+            membershipExpiresAt: users.membershipExpiresAt 
+          })
           .from(users)
           .where(eq(users.id, ctx.user.id))
           .limit(1);
 
-        if (existingUser?.isMember) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "您已经是会员，无需重复购买",
-          });
+        if (existingUser?.membershipStatus === "active") {
+          // 检查是否真的过期
+          const now = new Date();
+          if (!existingUser.membershipExpiresAt || now <= existingUser.membershipExpiresAt) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "您已经是会员，无需重复购买",
+            });
+          }
         }
 
         // 生成订单号
@@ -162,16 +187,23 @@ export const membershipRouter = router({
 
         // 检查用户是否已是会员
         const [existingUser] = await db
-          .select({ isMember: users.isMember })
+          .select({ 
+            membershipStatus: users.membershipStatus,
+            membershipExpiresAt: users.membershipExpiresAt 
+          })
           .from(users)
           .where(eq(users.id, ctx.user.id))
           .limit(1);
 
-        if (existingUser?.isMember) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "您已经是会员",
-          });
+        if (existingUser?.membershipStatus === "active") {
+          // 检查是否真的过期
+          const now = new Date();
+          if (!existingUser.membershipExpiresAt || now <= existingUser.membershipExpiresAt) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "您已经是会员",
+            });
+          }
         }
 
         // 根据订单号查询订单
@@ -212,13 +244,30 @@ export const membershipRouter = router({
           });
         }
 
+        // 获取会员有效期配置
+        const [config] = await db
+          .select({ configValue: membershipConfig.configValue })
+          .from(membershipConfig)
+          .where(and(
+            eq(membershipConfig.configKey, "validity_days"),
+            eq(membershipConfig.isActive, true)
+          ))
+          .limit(1);
+
+        const validityDays = config ? parseInt(config.configValue) : 365; // 默认365天
+        const activatedAt = new Date();
+        const expiresAt = new Date(activatedAt);
+        expiresAt.setDate(expiresAt.getDate() + validityDays);
+
         // 更新用户会员状态
         await db
           .update(users)
           .set({
+            membershipStatus: "active",
             isMember: true,
             membershipOrderId: order.id,
-            membershipActivatedAt: new Date(),
+            membershipActivatedAt: activatedAt,
+            membershipExpiresAt: expiresAt,
             updatedAt: new Date(),
           })
           .where(eq(users.id, ctx.user.id));

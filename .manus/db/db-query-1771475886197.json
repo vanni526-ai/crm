@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS membershipConfig (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  configKey VARCHAR(50) NOT NULL UNIQUE,\n  configValue VARCHAR(255) NOT NULL,\n  description VARCHAR(255),\n  isActive BOOLEAN NOT NULL DEFAULT TRUE,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);\n\nINSERT INTO membershipConfig (configKey, configValue, description) \nVALUES ('validity_days', '365', '会员有效期天数（默认365天=1年）')\nON DUPLICATE KEY UPDATE configValue=VALUES(configValue);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE IF NOT EXISTS membershipConfig (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  configKey VARCHAR(50) NOT NULL UNIQUE,\n  configValue VARCHAR(255) NOT NULL,\n  description VARCHAR(255),\n  isActive BOOLEAN NOT NULL DEFAULT TRUE,\n  createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);\n\nINSERT INTO membershipConfig (configKey, configValue, description) \nVALUES ('validity_days', '365', '会员有效期天数（默认365天=1年）')\nON DUPLICATE KEY UPDATE configValue=VALUES(configValue);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1985
+}

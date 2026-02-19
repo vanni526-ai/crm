@@ -1,0 +1,19 @@
+{
+  "query": "SELECT orderNo, customerName, deliveryCourse, paymentAmount, orderType, status, createdAt \nFROM orders \nWHERE deliveryCourse LIKE '%会员费%' OR deliveryCourse LIKE '%会员%' OR orderType = 'membership'\nORDER BY createdAt DESC \nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT orderNo, customerName, deliveryCourse, paymentAmount, orderType, status, createdAt \nFROM orders \nWHERE deliveryCourse LIKE '%会员费%' OR deliveryCourse LIKE '%会员%' OR orderType = 'membership'\nORDER BY createdAt DESC \nLIMIT 20;",
+  "rows": [
+    {
+      "orderNo": "ORD1768031619266906",
+      "customerName": "井中光",
+      "deliveryCourse": "jojo会员门槛",
+      "paymentAmount": "68.00",
+      "orderType": "course",
+      "status": "paid",
+      "createdAt": "2026-01-10 07:53:39"
+    }
+  ],
+  "messages": [],
+  "stdout": "orderNo\tcustomerName\tdeliveryCourse\tpaymentAmount\torderType\tstatus\tcreatedAt\nORD1768031619266906\t井中光\tjojo会员门槛\t68.00\tcourse\tpaid\t2026-01-10 07:53:39\n",
+  "stderr": "",
+  "execution_time_ms": 1530
+}
