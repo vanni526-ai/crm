@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE customers \nADD COLUMN membershipStatus ENUM('pending', 'active', 'expired') DEFAULT 'pending' NOT NULL COMMENT '会员状态',\nADD COLUMN membershipOrderId INT COMMENT '会员订单ID',\nADD COLUMN membershipActivatedAt TIMESTAMP NULL COMMENT '会员激活时间',\nADD COLUMN membershipExpiresAt TIMESTAMP NULL COMMENT '会员到期时间';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nALTER TABLE customers \nADD COLUMN membershipStatus ENUM('pending', 'active', 'expired') DEFAULT 'pending' NOT NULL COMMENT '会员状态',\nADD COLUMN membershipOrderId INT COMMENT '会员订单ID',\nADD COLUMN membershipActivatedAt TIMESTAMP NULL COMMENT '会员激活时间',\nADD COLUMN membershipExpiresAt TIMESTAMP NULL COMMENT '会员到期时间';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2862
+}

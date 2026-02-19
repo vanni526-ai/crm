@@ -3820,3 +3820,12 @@
 - [x] 编写单元测试验证会员状态流转和有效期计算
 - [x] 保存检查点
 
+
+### 179. 在客户管理页面添加会员状态和有效期显示功能
+- [x] 检查customers表是否有会员相关字段
+- [x] 如果没有，在customers表添加会员字段（membershipStatus, membershipActivatedAt, membershipExpiresAt）
+- [x] 在客户管理页面表格添加“会员状态”列
+- [x] 在客户详情/编辑对话框显示会员信息
+- [x] 测试验证会员状态显示
+- [x] 保存检查点
+

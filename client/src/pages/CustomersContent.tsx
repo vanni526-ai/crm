@@ -489,6 +489,7 @@ export default function CustomersContent() {
                     <TableHead className="cursor-pointer" onClick={() => handleSort('lastOrderDate')}>
                       最后消费{getSortIcon('lastOrderDate')}
                     </TableHead>
+                    <TableHead>会员状态</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -560,6 +561,28 @@ export default function CustomersContent() {
                           {customer.lastOrderDate ? formatDateBJ(customer.lastOrderDate) : "-"}
                         </TableCell>
                         <TableCell>
+                          {customer.membershipStatus === 'active' ? (
+                            <div className="flex flex-col gap-1">
+                              <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
+                                ✨ 会员
+                              </Badge>
+                              {customer.membershipExpiresAt && (
+                                <span className="text-xs text-muted-foreground">
+                                  到期: {formatDateBJ(customer.membershipExpiresAt)}
+                                </span>
+                              )}
+                            </div>
+                          ) : customer.membershipStatus === 'expired' ? (
+                            <Badge variant="outline" className="text-gray-500">
+                              已过期
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary">
+                              待激活
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
                           <div className="flex space-x-2">
                             <Button
                               variant="ghost"
@@ -584,7 +607,7 @@ export default function CustomersContent() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                         {searchTerm ? "未找到匹配的客户" : "暂无客户数据"}
                       </TableCell>
                     </TableRow>
@@ -762,6 +785,63 @@ function CustomerDetailDialog({
                 <p className="text-sm text-muted-foreground">备注</p>
                 <p className="font-medium">{customer.notes || "-"}</p>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* 会员信息 */}
+          <Card className="glass-card border-yellow-200 bg-yellow-50/50">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                ✨ 会员信息
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">会员状态</p>
+                <div className="mt-1">
+                  {customer.membershipStatus === 'active' ? (
+                    <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
+                      ✨ 已激活
+                    </Badge>
+                  ) : customer.membershipStatus === 'expired' ? (
+                    <Badge variant="outline" className="text-gray-500">
+                      已过期
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary">
+                      待激活
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              {customer.membershipStatus === 'active' && (
+                <>
+                  <div>
+                    <p className="text-sm text-muted-foreground">激活时间</p>
+                    <p className="font-medium">
+                      {customer.membershipActivatedAt ? formatDateBJ(customer.membershipActivatedAt) : "-"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">到期时间</p>
+                    <p className="font-medium text-orange-600">
+                      {customer.membershipExpiresAt ? formatDateBJ(customer.membershipExpiresAt) : "-"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">会员订单ID</p>
+                    <p className="font-medium">{customer.membershipOrderId || "-"}</p>
+                  </div>
+                </>
+              )}
+              {customer.membershipStatus === 'expired' && customer.membershipExpiresAt && (
+                <div>
+                  <p className="text-sm text-muted-foreground">过期时间</p>
+                  <p className="font-medium text-gray-500">
+                    {formatDateBJ(customer.membershipExpiresAt)}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 

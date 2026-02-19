@@ -78,6 +78,13 @@ export const customers = mysqlTable("customers", {
   tags: text("tags"), // 客户标签(JSON数组存储)
   notes: text("notes"),
   createdBy: int("createdBy").notNull(), // 创建人(销售)
+  
+  // 会员相关字段
+  membershipStatus: mysqlEnum("membershipStatus", ["pending", "active", "expired"]).default("pending").notNull(), // 会员状态
+  membershipOrderId: int("membershipOrderId"), // 会员订单ID
+  membershipActivatedAt: timestamp("membershipActivatedAt"), // 会员激活时间
+  membershipExpiresAt: timestamp("membershipExpiresAt"), // 会员到期时间
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
