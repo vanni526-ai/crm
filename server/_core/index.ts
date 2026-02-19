@@ -32,7 +32,7 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Configure CORS with wildcard support for *.manus.computer domains
+  // Configure CORS with wildcard support for Manus domains
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl requests)
@@ -45,8 +45,33 @@ async function startServer() {
         return callback(null, true);
       }
       
+      // Allow all *.manus-asia.computer domains
+      if (origin.match(/^https?:\/\/.*\.manus-asia\.computer$/)) {
+        return callback(null, true);
+      }
+      
+      // Allow all *.manuspre.computer domains (preview environment)
+      if (origin.match(/^https?:\/\/.*\.manuspre\.computer$/)) {
+        return callback(null, true);
+      }
+      
+      // Allow all *.manuscomputer.ai domains
+      if (origin.match(/^https?:\/\/.*\.manuscomputer\.ai$/)) {
+        return callback(null, true);
+      }
+      
+      // Allow all *.manusvm.computer domains
+      if (origin.match(/^https?:\/\/.*\.manusvm\.computer$/)) {
+        return callback(null, true);
+      }
+      
       // Allow localhost for development
       if (origin.match(/^https?:\/\/localhost(:\d+)?$/)) {
+        return callback(null, true);
+      }
+      
+      // Allow 127.0.0.1 for development
+      if (origin.match(/^https?:\/\/127\.0\.0\.1(:\d+)?$/)) {
         return callback(null, true);
       }
       
@@ -54,6 +79,15 @@ async function startServer() {
       if (origin.startsWith('app://')) {
         return callback(null, true);
       }
+      
+      // Allow custom origins from environment variable
+      const customOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+      if (customOrigins.some(allowed => origin === allowed || origin.endsWith(allowed))) {
+        return callback(null, true);
+      }
+      
+      // Log rejected origin for debugging
+      console.warn(`[CORS] Rejected origin: ${origin}`);
       
       // Reject other origins
       callback(new Error('Not allowed by CORS'));

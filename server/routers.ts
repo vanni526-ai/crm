@@ -28,6 +28,7 @@ import { cityExpenseRouter } from "./cityExpenseRouter";
 import { orderParseRouter } from "./orderParseRouter";
 import { dataCleaningRouter } from "./dataCleaningRouter";
 import { membershipRouter } from "./membershipRouter";
+import { apiDiscoveryRouter } from "./apiDiscoveryRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -79,6 +80,7 @@ const teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
 
 export const appRouter = router({
   system: systemRouter,
+  discovery: apiDiscoveryRouter,
   salespersons: salespersonRouter,
   customers: customerRouter,
   finance: financeRouter,
