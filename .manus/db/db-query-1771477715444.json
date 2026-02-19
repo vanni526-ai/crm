@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, name, membershipStatus, membershipActivatedAt, membershipExpiresAt FROM customers LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, membershipStatus, membershipActivatedAt, membershipExpiresAt FROM customers LIMIT 10;",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "晓曦东晨",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300002",
+      "name": "JoeGong",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300003",
+      "name": "涛涛",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300004",
+      "name": "Augustin.W",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300005",
+      "name": "王天蔚",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300006",
+      "name": "从不服输",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300007",
+      "name": "万芍",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300008",
+      "name": "望山",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300009",
+      "name": "stefan Icke 斯特凡, 艾克",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    },
+    {
+      "id": "300010",
+      "name": "Ethanys",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tmembershipStatus\tmembershipActivatedAt\tmembershipExpiresAt\n300001\t晓曦东晨\tpending\tNULL\tNULL\n300002\tJoeGong\tpending\tNULL\tNULL\n300003\t涛涛\tpending\tNULL\tNULL\n300004\tAugustin.W\tpending\tNULL\tNULL\n300005\t王天蔚\tpending\tNULL\tNULL\n300006\t从不服输\tpending\tNULL\tNULL\n300007\t万芍\tpending\tNULL\tNULL\n300008\t望山\tpending\tNULL\tNULL\n300009\tstefan Icke 斯特凡, 艾克\tpending\tNULL\tNULL\n300010\tEthanys\tpending\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1626
+}

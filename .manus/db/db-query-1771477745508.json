@@ -1,0 +1,80 @@
+{
+  "query": "SELECT u.id as user_id, u.name as user_name, u.membershipStatus, c.id as customer_id, c.name as customer_name \nFROM users u \nLEFT JOIN customers c ON LOWER(u.name) = LOWER(c.name) \nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id as user_id, u.name as user_name, u.membershipStatus, c.id as customer_id, c.name as customer_name \nFROM users u \nLEFT JOIN customers c ON LOWER(u.name) = LOWER(c.name) \nLIMIT 10;",
+  "rows": [
+    {
+      "user_id": "13860030",
+      "user_name": "admin",
+      "membershipStatus": "pending",
+      "customer_id": "660001",
+      "customer_name": "admin"
+    },
+    {
+      "user_id": "1",
+      "user_name": "顗杰 韩",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "1470017",
+      "user_name": "韩一杰",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "1680001",
+      "user_name": "系统管理员",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "1770004",
+      "user_name": "碳 咪",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "11040019",
+      "user_name": "yi han",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "13200003",
+      "user_name": "雨欣 林",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "14790104",
+      "user_name": "13880017383",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "14790105",
+      "user_name": "13880019690",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    },
+    {
+      "user_id": "14790106",
+      "user_name": "13880045415",
+      "membershipStatus": "pending",
+      "customer_id": "NULL",
+      "customer_name": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tuser_name\tmembershipStatus\tcustomer_id\tcustomer_name\n13860030\tadmin\tpending\t660001\tadmin\n1\t顗杰 韩\tpending\tNULL\tNULL\n1470017\t韩一杰\tpending\tNULL\tNULL\n1680001\t系统管理员\tpending\tNULL\tNULL\n1770004\t碳 咪\tpending\tNULL\tNULL\n11040019\tyi han\tpending\tNULL\tNULL\n13200003\t雨欣 林\tpending\tNULL\tNULL\n14790104\t13880017383\tpending\tNULL\tNULL\n14790105\t13880019690\tpending\tNULL\tNULL\n14790106\t13880045415\tpending\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1548
+}

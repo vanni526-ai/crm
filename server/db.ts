@@ -424,6 +424,18 @@ export async function getAllCustomers() {
         accountBalance = latestOrder[0]?.accountBalance || "0.00";
       }
       
+      // 查询对应的users表中的会员信息
+      const userInfo = await db
+        .select({
+          membershipStatus: users.membershipStatus,
+          membershipActivatedAt: users.membershipActivatedAt,
+          membershipExpiresAt: users.membershipExpiresAt,
+          membershipOrderId: users.membershipOrderId,
+        })
+        .from(users)
+        .where(sql`LOWER(${users.name}) = LOWER(${customer.name})`)
+        .limit(1);
+      
       return {
         ...customer,
         totalSpent: customerOrders[0]?.totalAmount || "0.00",
@@ -431,6 +443,11 @@ export async function getAllCustomers() {
         firstOrderDate: customerOrders[0]?.firstOrderDate || null,
         accountBalance,
         classCount: customerOrders[0]?.orderCount || 0,
+        // 添加会员信息
+        membershipStatus: userInfo[0]?.membershipStatus || 'pending',
+        membershipActivatedAt: userInfo[0]?.membershipActivatedAt || null,
+        membershipExpiresAt: userInfo[0]?.membershipExpiresAt || null,
+        membershipOrderId: userInfo[0]?.membershipOrderId || null,
       };
     })
   );
