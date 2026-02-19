@@ -146,6 +146,13 @@ export default function CustomersContent() {
     formState: { errors },
   } = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
+    defaultValues: {
+      name: "",
+      wechat: "",
+      phone: "",
+      trafficSource: "",
+      notes: "",
+    },
   });
 
   const onCreateSubmit = (data: CustomerFormData) => {
