@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, name, isActive, createdAt FROM cities WHERE name IN ('测试城市', '西双版纳') ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, isActive, createdAt FROM cities WHERE name IN ('测试城市', '西双版纳') ORDER BY name;",
+  "rows": [
+    {
+      "id": "90009",
+      "name": "测试城市",
+      "isActive": "1",
+      "createdAt": "2026-02-15 18:12:46"
+    },
+    {
+      "id": "120001",
+      "name": "西双版纳",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:05:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\tcreatedAt\n90009\t测试城市\t1\t2026-02-15 18:12:46\n120001\t西双版纳\t1\t2026-02-16 02:05:24\n",
+  "stderr": "",
+  "execution_time_ms": 1568
+}

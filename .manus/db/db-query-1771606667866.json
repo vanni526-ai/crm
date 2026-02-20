@@ -1,0 +1,28 @@
+{
+  "query": "SELECT * FROM cities WHERE name IN ('测试城市', '西双版纳');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT * FROM cities WHERE name IN ('测试城市', '西双版纳');",
+  "rows": [
+    {
+      "id": "90009",
+      "name": "测试城市",
+      "areaCode": "NULL",
+      "isActive": "1",
+      "sortOrder": "0",
+      "createdAt": "2026-02-15 18:12:46",
+      "updatedAt": "2026-02-15 18:12:46"
+    },
+    {
+      "id": "120001",
+      "name": "西双版纳",
+      "areaCode": "",
+      "isActive": "1",
+      "sortOrder": "0",
+      "createdAt": "2026-02-16 02:05:24",
+      "updatedAt": "2026-02-16 02:05:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tareaCode\tisActive\tsortOrder\tcreatedAt\tupdatedAt\n90009\t测试城市\tNULL\t1\t0\t2026-02-15 18:12:46\t2026-02-15 18:12:46\n120001\t西双版纳\t\t1\t0\t2026-02-16 02:05:24\t2026-02-16 02:05:24\n",
+  "stderr": "",
+  "execution_time_ms": 1498
+}
