@@ -344,7 +344,9 @@ export const userManagementRouter = router({
         }
         
         // 验证：老师/合伙人必须选择城市
-        if (roleCities) {
+        // 检查roleCities是否为空对象或undefined
+        const hasRoleCities = roleCities && Object.keys(roleCities).length > 0;
+        if (hasRoleCities) {
           for (const role of rolesArray) {
             if (role === 'teacher' || role === 'cityPartner') {
               const cities = roleCities[role];
@@ -379,7 +381,9 @@ export const userManagementRouter = router({
       await drizzle.update(users).set(setData).where(eq(users.id, id));
 
       // 保存角色-城市关联
-      if (roleCities) {
+      // 检查roleCities是否为空对象或undefined
+      const hasRoleCities = roleCities && Object.keys(roleCities).length > 0;
+      if (hasRoleCities) {
         for (const [role, cities] of Object.entries(roleCities)) {
           if (role === 'teacher' || role === 'cityPartner') {
             await setUserRoleCities(id, role as 'teacher' | 'cityPartner', cities as string[]);
