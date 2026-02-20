@@ -169,7 +169,7 @@ export const userManagementRouter = router({
       z.object({
         name: z.string().min(1, "用户名不能为空"),
         nickname: z.string().optional(),
-        email: z.string().email("邮箱格式不正确").optional(),
+        email: z.union([z.string().email("邮箱格式不正确"), z.literal("")]).optional(),
         phone: z.string().optional(),
         password: z.string().min(6, "密码至少6位"),
         role: z.enum(USER_ROLE_VALUES as [string, ...string[]]).optional(),
@@ -295,7 +295,7 @@ export const userManagementRouter = router({
         id: z.number(),
         name: z.string().min(1, "用户名不能为空").optional(),
         nickname: z.string().optional(),
-        email: z.string().email("邮箱格式不正确").optional(),
+        email: z.union([z.string().email("邮箱格式不正确"), z.literal("")]).optional(),
         phone: z.string().optional(),
         role: z.enum(USER_ROLE_VALUES as [string, ...string[]]).optional(),
         roles: z.string().optional(), // 多角色，逗号分隔
