@@ -17,13 +17,8 @@ const requireUser = t.middleware(async opts => {
     throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
   }
 
-  // CRM系统只允许admin角色登录
-  if (ctx.user.role !== 'admin') {
-    throw new TRPCError({ 
-      code: "FORBIDDEN", 
-      message: "只有管理员可以访问CRM系统" 
-    });
-  }
+  // 允许所有已登录用户访问CRM系统
+  // 具体的功能权限由各个路由的procedure类型控制(adminProcedure, salesOrAdminProcedure等)
 
   return next({
     ctx: {
