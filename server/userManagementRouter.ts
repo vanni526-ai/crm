@@ -344,12 +344,12 @@ export const userManagementRouter = router({
         }
         
         // 验证：老师/合伙人必须选择城市
-        // 检查roleCities是否为空对象或undefined
+        // 只验证在roleCities中实际传递了的角色
         const hasRoleCities = roleCities && Object.keys(roleCities).length > 0;
         if (hasRoleCities) {
-          for (const role of rolesArray) {
+          // 遍历roleCities中的每个角色，检查是否有城市
+          for (const [role, cities] of Object.entries(roleCities)) {
             if (role === 'teacher' || role === 'cityPartner') {
-              const cities = roleCities[role];
               if (!cities || cities.length === 0) {
                 throw new TRPCError({
                   code: "BAD_REQUEST",
@@ -358,10 +358,14 @@ export const userManagementRouter = router({
               }
             }
           }
-        } else {
-          // 如果没有传roleCities，但有teacher或cityPartner角色，需要检查数据库中是否已有城市
-          for (const role of rolesArray) {
-            if (role === 'teacher' || role === 'cityPartner') {
+        }
+        
+        // 对于选中了teacher或cityPartner角色但没有在roleCities中传递的情况，
+        // 检查数据库中是否已有城市配置
+        for (const role of rolesArray) {
+          if (role === 'teacher' || role === 'cityPartner') {
+            // 如果roleCities中没有这个角色的数据，检查数据库
+            if (!hasRoleCities || !roleCities[role]) {
               const existingCities = await getUserRoleCities(id);
               const roleCity = existingCities.find((rc: any) => rc.role === role);
               if (!roleCity || !roleCity.cities || JSON.parse(roleCity.cities).length === 0) {
