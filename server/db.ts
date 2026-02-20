@@ -4498,6 +4498,7 @@ export async function getAllCities() {
       })
       .from(cities)
       .leftJoin(partnerCities, eq(cities.id, partnerCities.cityId))
+      .where(eq(cities.isActive, true))  // 只返回激活状态的城市
       .orderBy(asc(cities.sortOrder), asc(cities.name));
     
     // 去重:当一个城市有多条partner_cities记录时,leftJoin会返回多行
