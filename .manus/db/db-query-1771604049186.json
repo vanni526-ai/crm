@@ -1,0 +1,17 @@
+{
+  "query": "\n-- 查询杭州在cities表中的ID\nSELECT id, name FROM cities WHERE name = '杭州';\n\n-- 查询partner_cities表中杭州的cityId\nSELECT pc.id, pc.cityId, c.name as cityName, pc.profitRatioStage1Partner\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '杭州';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询杭州在cities表中的ID\nSELECT id, name FROM cities WHERE name = '杭州';\n\n-- 查询partner_cities表中杭州的cityId\nSELECT pc.id, pc.cityId, c.name as cityName, pc.profitRatioStage1Partner\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '杭州';\n",
+  "rows": [
+    {
+      "id": "90003",
+      "name": "杭州"
+    }
+  ],
+  "messages": [
+    "id\tcityId\tcityName\tprofitRatioStage1Partner",
+    "120004\t90003\t杭州\t30.00"
+  ],
+  "stdout": "id\tname\n90003\t杭州\nid\tcityId\tcityName\tprofitRatioStage1Partner\n120004\t90003\t杭州\t30.00\n",
+  "stderr": "",
+  "execution_time_ms": 1730
+}

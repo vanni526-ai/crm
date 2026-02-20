@@ -1,0 +1,21 @@
+{
+  "query": "\n-- 查询杭州的详细合伙人合同信息\nSELECT \n  pc.id,\n  pc.cityId,\n  c.name as cityName,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '杭州';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询杭州的详细合伙人合同信息\nSELECT \n  pc.id,\n  pc.cityId,\n  c.name as cityName,\n  pc.currentProfitStage,\n  pc.isInvestmentRecovered,\n  pc.profitRatioStage1Partner,\n  pc.profitRatioStage2APartner,\n  pc.profitRatioStage2BPartner,\n  pc.profitRatioStage3Partner\nFROM partner_cities pc\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE c.name = '杭州';\n",
+  "rows": [
+    {
+      "id": "120004",
+      "cityId": "90003",
+      "cityName": "杭州",
+      "currentProfitStage": "1",
+      "isInvestmentRecovered": "0",
+      "profitRatioStage1Partner": "30.00",
+      "profitRatioStage2APartner": "30.00",
+      "profitRatioStage2BPartner": "20.00",
+      "profitRatioStage3Partner": "20.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcityId\tcityName\tcurrentProfitStage\tisInvestmentRecovered\tprofitRatioStage1Partner\tprofitRatioStage2APartner\tprofitRatioStage2BPartner\tprofitRatioStage3Partner\n120004\t90003\t杭州\t1\t0\t30.00\t30.00\t20.00\t20.00\n",
+  "stderr": "",
+  "execution_time_ms": 1502
+}

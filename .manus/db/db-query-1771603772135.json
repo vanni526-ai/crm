@@ -1,0 +1,22 @@
+{
+  "query": "\n-- 查询杭州城市的数据\nSELECT * FROM cities WHERE name = '杭州';\n\n-- 查询杭州的合伙人费配置\nSELECT * FROM cityPartnerConfig WHERE city = '杭州';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询杭州城市的数据\nSELECT * FROM cities WHERE name = '杭州';\n\n-- 查询杭州的合伙人费配置\nSELECT * FROM cityPartnerConfig WHERE city = '杭州';\n",
+  "rows": [
+    {
+      "id": "90003",
+      "name": "杭州",
+      "areaCode": "",
+      "isActive": "1",
+      "sortOrder": "0",
+      "createdAt": "2026-02-15 16:19:04",
+      "updatedAt": "2026-02-15 16:19:04"
+    }
+  ],
+  "messages": [
+    "id\tcity\tpartnerFeeRate\tdescription\tisActive\tupdatedBy\tupdatedAt\tcreatedAt\tareaCode",
+    "360004\t杭州\tNULL\t\t1\t11040019\t2026-02-15 16:17:09\t2026-02-15 16:17:09\t"
+  ],
+  "stdout": "id\tname\tareaCode\tisActive\tsortOrder\tcreatedAt\tupdatedAt\n90003\t杭州\t\t1\t0\t2026-02-15 16:19:04\t2026-02-15 16:19:04\nid\tcity\tpartnerFeeRate\tdescription\tisActive\tupdatedBy\tupdatedAt\tcreatedAt\tareaCode\n360004\t杭州\tNULL\t\t1\t11040019\t2026-02-15 16:17:09\t2026-02-15 16:17:09\t\n",
+  "stderr": "",
+  "execution_time_ms": 1692
+}

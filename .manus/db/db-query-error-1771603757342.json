@@ -1,0 +1,10 @@
+{
+  "query": "\n-- 查询杭州城市的数据\nSELECT * FROM cities WHERE name = '杭州';\n\n-- 查询杭州的合伙人配置\nSELECT * FROM partner_contracts WHERE cityId IN (SELECT id FROM cities WHERE name = '杭州');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询杭州城市的数据\nSELECT * FROM cities WHERE name = '杭州';\n\n-- 查询杭州的合伙人配置\nSELECT * FROM partner_contracts WHERE cityId IN (SELECT id FROM cities WHERE name = '杭州');\n",
+  "returncode": 1,
+  "logs": [
+    "id\tname\tareaCode\tisActive\tsortOrder\tcreatedAt\tupdatedAt",
+    "90003\t杭州\t\t1\t0\t2026-02-15 16:19:04\t2026-02-15 16:19:04",
+    "ERROR 1146 (42S02) at line 6: Table 'jtcsa4dgw9wmnzinvrevwf.partner_contracts' doesn't exist"
+  ]
+}

@@ -3295,15 +3295,64 @@ export async function getAllCitiesWithStats(options?: {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
 
-  // 获取所有城市配置
-  const cities = await db
-    .select()
+  // 获取所有城市配置，并关联partner_cities表获取合伙人分红比例
+  const cityConfigs = await db
+    .select({
+      id: cityPartnerConfig.id,
+      city: cityPartnerConfig.city,
+      areaCode: cityPartnerConfig.areaCode,
+      description: cityPartnerConfig.description,
+      isActive: cityPartnerConfig.isActive,
+      updatedBy: cityPartnerConfig.updatedBy,
+      updatedAt: cityPartnerConfig.updatedAt,
+      createdAt: cityPartnerConfig.createdAt,
+      // 从 partner_cities 表查询合伙人分红比例
+      currentProfitStage: partnerCities.currentProfitStage,
+      isInvestmentRecovered: partnerCities.isInvestmentRecovered,
+      profitRatioStage1Partner: partnerCities.profitRatioStage1Partner,
+      profitRatioStage2APartner: partnerCities.profitRatioStage2APartner,
+      profitRatioStage2BPartner: partnerCities.profitRatioStage2BPartner,
+      profitRatioStage3Partner: partnerCities.profitRatioStage3Partner,
+    })
     .from(cityPartnerConfig)
+    .leftJoin(cities, eq(cityPartnerConfig.city, cities.name))
+    .leftJoin(partnerCities, eq(cities.id, partnerCities.cityId))
     .orderBy(cityPartnerConfig.city);
+  
+  // 计算每个城市的当前合伙人分红比例
+  const citiesWithPartnerFeeRate = cityConfigs.map(city => {
+    let partnerFeeRate: number | null = null;
+    
+    if (city.currentProfitStage !== null) {
+      if (city.currentProfitStage === 1 && city.profitRatioStage1Partner !== null) {
+        partnerFeeRate = parseFloat(String(city.profitRatioStage1Partner));
+      } else if (city.currentProfitStage === 2) {
+        if (city.isInvestmentRecovered && city.profitRatioStage2BPartner !== null) {
+          partnerFeeRate = parseFloat(String(city.profitRatioStage2BPartner));
+        } else if (!city.isInvestmentRecovered && city.profitRatioStage2APartner !== null) {
+          partnerFeeRate = parseFloat(String(city.profitRatioStage2APartner));
+        }
+      } else if (city.currentProfitStage === 3 && city.profitRatioStage3Partner !== null) {
+        partnerFeeRate = parseFloat(String(city.profitRatioStage3Partner));
+      }
+    }
+    
+    return {
+      id: city.id,
+      city: city.city,
+      areaCode: city.areaCode,
+      description: city.description,
+      isActive: city.isActive,
+      updatedBy: city.updatedBy,
+      updatedAt: city.updatedAt,
+      createdAt: city.createdAt,
+      partnerFeeRate,
+    };
+  });
 
   // 为每个城市统计订单数据
   const citiesWithStats = await Promise.all(
-    cities.map(async (city) => {
+    citiesWithPartnerFeeRate.map(async (city) => {
       // 构建查询条件
       const conditions = [
         eq(orders.deliveryCity, city.city),
@@ -4512,17 +4561,21 @@ export async function getAllCities() {
     
     // 计算每个城市的当前合佩人分红比例
     return Array.from(uniqueCities.values()).map(city => {
-      let partnerFeeRate = 0;
-      if (city.currentProfitStage === 1 && city.profitRatioStage1Partner) {
-        partnerFeeRate = parseFloat(city.profitRatioStage1Partner);
-      } else if (city.currentProfitStage === 2) {
-        if (city.isInvestmentRecovered && city.profitRatioStage2BPartner) {
-          partnerFeeRate = parseFloat(city.profitRatioStage2BPartner);
-        } else if (!city.isInvestmentRecovered && city.profitRatioStage2APartner) {
-          partnerFeeRate = parseFloat(city.profitRatioStage2APartner);
+      let partnerFeeRate: number | null = null;
+      
+      // 只有当城市有合伙人合同时才计算分红比例
+      if (city.currentProfitStage !== null) {
+        if (city.currentProfitStage === 1 && city.profitRatioStage1Partner !== null) {
+          partnerFeeRate = parseFloat(String(city.profitRatioStage1Partner));
+        } else if (city.currentProfitStage === 2) {
+          if (city.isInvestmentRecovered && city.profitRatioStage2BPartner !== null) {
+            partnerFeeRate = parseFloat(String(city.profitRatioStage2BPartner));
+          } else if (!city.isInvestmentRecovered && city.profitRatioStage2APartner !== null) {
+            partnerFeeRate = parseFloat(String(city.profitRatioStage2APartner));
+          }
+        } else if (city.currentProfitStage === 3 && city.profitRatioStage3Partner !== null) {
+          partnerFeeRate = parseFloat(String(city.profitRatioStage3Partner));
         }
-      } else if (city.currentProfitStage === 3 && city.profitRatioStage3Partner) {
-        partnerFeeRate = parseFloat(city.profitRatioStage3Partner);
       }
       
       return {

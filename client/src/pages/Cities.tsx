@@ -516,7 +516,7 @@ export default function Cities() {
                 <TableRow key={city.id}>
                   <TableCell className="font-medium">{city.city}</TableCell>
                   <TableCell>{city.areaCode || "-"}</TableCell>
-                  <TableCell>{city.partnerFeeRate}%</TableCell>
+                  <TableCell>{city.partnerFeeRate !== null && city.partnerFeeRate !== undefined ? `${city.partnerFeeRate}%` : "-"}</TableCell>
                   <TableCell className="text-right">{city.orderCount}</TableCell>
                   <TableCell className="text-right">{formatCurrency(city.totalSales)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(city.totalExpense)}</TableCell>
