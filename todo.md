@@ -4050,3 +4050,11 @@
 - [x] 诊断版本 b0db5345 未更新到 52d946a2 的原因(版本号硬编码在version.json中)
 - [x] 更新version.json为最新版本52d946a2
 - [x] 保存新checkpoint
+
+### 139. 修复客户管理页面React受控/非受控组件错误
+- [x] 分析错误原因(input value从undefined变为有值)
+- [x] 定位问题代码(CustomersContent.tsx的筛选输入框)
+- [x] 修复所有输入组件的value属性(将state初始化为空字符串)
+- [x] 更新resetFilters和applyFilters函数
+- [x] 修复所有onChange处理器
+- [x] 测试验证修复效果

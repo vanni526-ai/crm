@@ -135,11 +135,11 @@ export default function CustomersContent() {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showFilters, setShowFilters] = useState(false);
-  const [minSpent, setMinSpent] = useState<number | undefined>();
-  const [maxSpent, setMaxSpent] = useState<number | undefined>();
-  const [minClassCount, setMinClassCount] = useState<number | undefined>();
-  const [maxClassCount, setMaxClassCount] = useState<number | undefined>();
-  const [lastConsumptionDays, setLastConsumptionDays] = useState<number | undefined>();
+  const [minSpent, setMinSpent] = useState<string>("");
+  const [maxSpent, setMaxSpent] = useState<string>("");
+  const [minClassCount, setMinClassCount] = useState<string>("");
+  const [maxClassCount, setMaxClassCount] = useState<string>("");
+  const [lastConsumptionDays, setLastConsumptionDays] = useState<string>("");
   const [trafficSource, setTrafficSource] = useState<string>("");
 
   const {
@@ -215,11 +215,11 @@ export default function CustomersContent() {
 
   const applyFilters = () => {
     setFilterParams({
-      minSpent,
-      maxSpent,
-      minClassCount,
-      maxClassCount,
-      lastConsumptionDays,
+      minSpent: minSpent ? Number(minSpent) : undefined,
+      maxSpent: maxSpent ? Number(maxSpent) : undefined,
+      minClassCount: minClassCount ? Number(minClassCount) : undefined,
+      maxClassCount: maxClassCount ? Number(maxClassCount) : undefined,
+      lastConsumptionDays: lastConsumptionDays ? Number(lastConsumptionDays) : undefined,
       trafficSource: trafficSource || undefined,
       sortBy: sortField || undefined,
       sortOrder: sortOrder,
@@ -227,11 +227,11 @@ export default function CustomersContent() {
   };
 
   const resetFilters = () => {
-    setMinSpent(undefined);
-    setMaxSpent(undefined);
-    setMinClassCount(undefined);
-    setMaxClassCount(undefined);
-    setLastConsumptionDays(undefined);
+    setMinSpent("");
+    setMaxSpent("");
+    setMinClassCount("");
+    setMaxClassCount("");
+    setLastConsumptionDays("");
     setTrafficSource("");
     setSortField(null);
     setFilterParams({});
@@ -396,16 +396,16 @@ export default function CustomersContent() {
                       <Input
                         type="number"
                         placeholder="最小"
-                        value={minSpent || ""}
-                        onChange={(e) => setMinSpent(e.target.value ? Number(e.target.value) : undefined)}
+                        value={minSpent}
+                        onChange={(e) => setMinSpent(e.target.value)}
                         className="w-24"
                       />
                       <span>-</span>
                       <Input
                         type="number"
                         placeholder="最大"
-                        value={maxSpent || ""}
-                        onChange={(e) => setMaxSpent(e.target.value ? Number(e.target.value) : undefined)}
+                        value={maxSpent}
+                        onChange={(e) => setMaxSpent(e.target.value)}
                         className="w-24"
                       />
                     </div>
@@ -417,16 +417,16 @@ export default function CustomersContent() {
                       <Input
                         type="number"
                         placeholder="最小"
-                        value={minClassCount || ""}
-                        onChange={(e) => setMinClassCount(e.target.value ? Number(e.target.value) : undefined)}
+                        value={minClassCount}
+                        onChange={(e) => setMinClassCount(e.target.value)}
                         className="w-24"
                       />
                       <span>-</span>
                       <Input
                         type="number"
                         placeholder="最大"
-                        value={maxClassCount || ""}
-                        onChange={(e) => setMaxClassCount(e.target.value ? Number(e.target.value) : undefined)}
+                        value={maxClassCount}
+                        onChange={(e) => setMaxClassCount(e.target.value)}
                         className="w-24"
                       />
                     </div>
@@ -435,8 +435,8 @@ export default function CustomersContent() {
                   <div className="space-y-2">
                     <Label>最后消费时间</Label>
                     <select
-                      value={lastConsumptionDays || ""}
-                      onChange={(e) => setLastConsumptionDays(e.target.value ? Number(e.target.value) : undefined)}
+                      value={lastConsumptionDays}
+                      onChange={(e) => setLastConsumptionDays(e.target.value)}
                       className="w-full h-10 px-3 rounded-md border border-input bg-background"
                     >
                       <option value="">全部</option>
