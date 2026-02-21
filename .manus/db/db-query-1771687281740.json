@@ -1,0 +1,60 @@
+{
+  "query": "SELECT userId, role, cities FROM user_role_cities LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT userId, role, cities FROM user_role_cities LIMIT 10;",
+  "rows": [
+    {
+      "userId": "13860030",
+      "role": "teacher",
+      "cities": "[\"东莞\"]"
+    },
+    {
+      "userId": "13860030",
+      "role": "sales",
+      "cities": "[\"重庆\",\"天津\"]"
+    },
+    {
+      "userId": "13860030",
+      "role": "cityPartner",
+      "cities": "[\"天津\"]"
+    },
+    {
+      "userId": "15372555",
+      "role": "cityPartner",
+      "cities": "[\"福州\",\"泉州\"]"
+    },
+    {
+      "userId": "15362121",
+      "role": "teacher",
+      "cities": "[1]"
+    },
+    {
+      "userId": "16027576",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "16027577",
+      "role": "teacher",
+      "cities": "[\"上海\",\"北京\"]"
+    },
+    {
+      "userId": "16027578",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "16027579",
+      "role": "teacher",
+      "cities": "[\"北京\"]"
+    },
+    {
+      "userId": "16027580",
+      "role": "teacher",
+      "cities": "[\"深圳\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\trole\tcities\n13860030\tteacher\t[\"东莞\"]\n13860030\tsales\t[\"重庆\",\"天津\"]\n13860030\tcityPartner\t[\"天津\"]\n15372555\tcityPartner\t[\"福州\",\"泉州\"]\n15362121\tteacher\t[1]\n16027576\tteacher\t[\"上海\"]\n16027577\tteacher\t[\"上海\",\"北京\"]\n16027578\tteacher\t[\"上海\"]\n16027579\tteacher\t[\"北京\"]\n16027580\tteacher\t[\"深圳\"]\n",
+  "stderr": "",
+  "execution_time_ms": 1575
+}
