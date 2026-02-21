@@ -1,0 +1,15 @@
+{
+  "query": "\n-- 统计信息\nSELECT \n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%') as total_teachers,\n  (SELECT COUNT(DISTINCT userId) FROM user_role_cities WHERE role = 'teacher') as teachers_with_mapping,\n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%' AND id NOT IN (SELECT userId FROM user_role_cities WHERE role = 'teacher')) as teachers_without_mapping;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 统计信息\nSELECT \n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%') as total_teachers,\n  (SELECT COUNT(DISTINCT userId) FROM user_role_cities WHERE role = 'teacher') as teachers_with_mapping,\n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%' AND id NOT IN (SELECT userId FROM user_role_cities WHERE role = 'teacher')) as teachers_without_mapping;\n",
+  "rows": [
+    {
+      "total_teachers": "70",
+      "teachers_with_mapping": "16",
+      "teachers_without_mapping": "68"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_teachers\tteachers_with_mapping\tteachers_without_mapping\n70\t16\t68\n",
+  "stderr": "",
+  "execution_time_ms": 1588
+}

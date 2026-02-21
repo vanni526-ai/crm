@@ -1,0 +1,82 @@
+{
+  "query": "\n-- 查询所有老师总数\nSELECT COUNT(*) as total_teachers\nFROM users\nWHERE roles LIKE '%teacher%';\n\n-- 查询有城市映射的老师数量\nSELECT COUNT(DISTINCT userId) as teachers_with_cities\nFROM user_role_cities\nWHERE role = 'teacher';\n\n-- 查询所有老师及其城市映射情况\nSELECT \n  u.id,\n  u.name,\n  u.roles,\n  urc.cities,\n  CASE \n    WHEN urc.cities IS NULL THEN '无城市映射'\n    WHEN urc.cities = '[]' THEN '空城市列表'\n    ELSE '有城市映射'\n  END as mapping_status\nFROM users u\nLEFT JOIN user_role_cities urc ON u.id = urc.userId AND urc.role = 'teacher'\nWHERE u.roles LIKE '%teacher%'\nORDER BY mapping_status, u.name\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询所有老师总数\nSELECT COUNT(*) as total_teachers\nFROM users\nWHERE roles LIKE '%teacher%';\n\n-- 查询有城市映射的老师数量\nSELECT COUNT(DISTINCT userId) as teachers_with_cities\nFROM user_role_cities\nWHERE role = 'teacher';\n\n-- 查询所有老师及其城市映射情况\nSELECT \n  u.id,\n  u.name,\n  u.roles,\n  urc.cities,\n  CASE \n    WHEN urc.cities IS NULL THEN '无城市映射'\n    WHEN urc.cities = '[]' THEN '空城市列表'\n    ELSE '有城市映射'\n  END as mapping_status\nFROM users u\nLEFT JOIN user_role_cities urc ON u.id = urc.userId AND urc.role = 'teacher'\nWHERE u.roles LIKE '%teacher%'\nORDER BY mapping_status, u.name\nLIMIT 20;\n",
+  "rows": [
+    {
+      "total_teachers": "70"
+    },
+    {
+      "total_teachers": "teachers_with_cities"
+    },
+    {
+      "total_teachers": "16"
+    },
+    {
+      "total_teachers": "id\tname\troles\tcities\tmapping_status"
+    },
+    {
+      "total_teachers": "15362141\tCC\tteacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028826\tLuna\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028822\tNancy\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362136\tNemo\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362130\tnicy\tteacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028805\tRiver\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362157\tSherry\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028821\tYY\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028806\t七七\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028808\t九淑\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362161\t云云\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362134\t井盖\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028813\t佳佳\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362160\t依一\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362166\t兔子\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362150\t兮灵\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362123\t冷月\tteacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "16028825\t十字蛇\tuser,teacher\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362127\t唐泽\tteacher,user\tNULL\t无城市映射"
+    },
+    {
+      "total_teachers": "15362125\t嘟嘟\tteacher\tNULL\t无城市映射"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_teachers\n70\nteachers_with_cities\n16\nid\tname\troles\tcities\tmapping_status\n15362141\tCC\tteacher\tNULL\t无城市映射\n16028826\tLuna\tuser,teacher\tNULL\t无城市映射\n16028822\tNancy\tuser,teacher\tNULL\t无城市映射\n15362136\tNemo\tteacher,user\tNULL\t无城市映射\n15362130\tnicy\tteacher\tNULL\t无城市映射\n16028805\tRiver\tuser,teacher\tNULL\t无城市映射\n15362157\tSherry\tteacher,user\tNULL\t无城市映射\n16028821\tYY\tuser,teacher\tNULL\t无城市映射\n16028806\t七七\tuser,teacher\tNULL\t无城市映射\n16028808\t九淑\tuser,teacher\tNULL\t无城市映射\n15362161\t云云\tteacher,user\tNULL\t无城市映射\n15362134\t井盖\tteacher,user\tNULL\t无城市映射\n16028813\t佳佳\tuser,teacher\tNULL\t无城市映射\n15362160\t依一\tteacher,user\tNULL\t无城市映射\n15362166\t兔子\tteacher,user\tNULL\t无城市映射\n15362150\t兮灵\tteacher,user\tNULL\t无城市映射\n15362123\t冷月\tteacher\tNULL\t无城市映射\n16028825\t十字蛇\tuser,teacher\tNULL\t无城市映射\n15362127\t唐泽\tteacher,user\tNULL\t无城市映射\n15362125\t嘟嘟\tteacher\tNULL\t无城市映射\n",
+  "stderr": "",
+  "execution_time_ms": 2106
+}

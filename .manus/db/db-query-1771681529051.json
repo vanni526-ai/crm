@@ -1,0 +1,37 @@
+{
+  "query": "\n-- 查看迁移后的统计数据\nSELECT \n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%') as total_teachers,\n  (SELECT COUNT(DISTINCT userId) FROM user_role_cities WHERE role = 'teacher') as teachers_with_mapping,\n  (SELECT COUNT(*) FROM user_role_cities WHERE role = 'teacher') as total_mapping_records;\n\n-- 查看所有老师的城市映射（前20个）\nSELECT \n  u.id,\n  u.name,\n  urc.cities,\n  JSON_LENGTH(urc.cities) as city_count\nFROM users u\nJOIN user_role_cities urc ON u.id = urc.userId\nWHERE u.roles LIKE '%teacher%' AND urc.role = 'teacher'\nORDER BY u.name\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查看迁移后的统计数据\nSELECT \n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%') as total_teachers,\n  (SELECT COUNT(DISTINCT userId) FROM user_role_cities WHERE role = 'teacher') as teachers_with_mapping,\n  (SELECT COUNT(*) FROM user_role_cities WHERE role = 'teacher') as total_mapping_records;\n\n-- 查看所有老师的城市映射（前20个）\nSELECT \n  u.id,\n  u.name,\n  urc.cities,\n  JSON_LENGTH(urc.cities) as city_count\nFROM users u\nJOIN user_role_cities urc ON u.id = urc.userId\nWHERE u.roles LIKE '%teacher%' AND urc.role = 'teacher'\nORDER BY u.name\nLIMIT 20;\n",
+  "rows": [
+    {
+      "total_teachers": "70",
+      "teachers_with_mapping": "77",
+      "total_mapping_records": "77"
+    }
+  ],
+  "messages": [
+    "id\tname\tcities\tcity_count",
+    "16028826\tLuna\t[6]\t1",
+    "16028822\tNancy\t[4]\t1",
+    "15362136\tNemo\t[1]\t1",
+    "16028805\tRiver\t[1]\t1",
+    "15362157\tSherry\t[12]\t1",
+    "16800186\ttest\t[\"重庆\",\"东莞\"]\t2",
+    "16028821\tYY\t[4]\t1",
+    "16028806\t七七\t[1]\t1",
+    "16028808\t九淑\t[1]\t1",
+    "15362161\t云云\t[15]\t1",
+    "15362134\t井盖\t[1]\t1",
+    "16028813\t佳佳\t[10]\t1",
+    "15362160\t依一\t[15]\t1",
+    "15362166\t兔子\t[6]\t1",
+    "15362150\t兮灵\t[9]\t1",
+    "16028825\t十字蛇\t[6]\t1",
+    "15362127\t唐泽\t[1]\t1",
+    "16028799\t圆圆\t[1]\t1",
+    "15362148\t声声\t[4]\t1",
+    "16028810\t大崎\t[1]\t1"
+  ],
+  "stdout": "total_teachers\tteachers_with_mapping\ttotal_mapping_records\n70\t77\t77\nid\tname\tcities\tcity_count\n16028826\tLuna\t[6]\t1\n16028822\tNancy\t[4]\t1\n15362136\tNemo\t[1]\t1\n16028805\tRiver\t[1]\t1\n15362157\tSherry\t[12]\t1\n16800186\ttest\t[\"重庆\",\"东莞\"]\t2\n16028821\tYY\t[4]\t1\n16028806\t七七\t[1]\t1\n16028808\t九淑\t[1]\t1\n15362161\t云云\t[15]\t1\n15362134\t井盖\t[1]\t1\n16028813\t佳佳\t[10]\t1\n15362160\t依一\t[15]\t1\n15362166\t兔子\t[6]\t1\n15362150\t兮灵\t[9]\t1\n16028825\t十字蛇\t[6]\t1\n15362127\t唐泽\t[1]\t1\n16028799\t圆圆\t[1]\t1\n15362148\t声声\t[4]\t1\n16028810\t大崎\t[1]\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1708
+}

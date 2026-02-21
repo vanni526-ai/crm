@@ -1,0 +1,8 @@
+{
+  "query": "\n-- 检查订单表中是否有老师的城市信息\nSELECT \n  o.teacherName,\n  c.name as city_name,\n  COUNT(*) as order_count\nFROM orders o\nJOIN cities c ON o.cityId = c.id\nWHERE o.teacherName IS NOT NULL AND o.teacherName != ''\nGROUP BY o.teacherName, c.name\nORDER BY o.teacherName, order_count DESC\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 检查订单表中是否有老师的城市信息\nSELECT \n  o.teacherName,\n  c.name as city_name,\n  COUNT(*) as order_count\nFROM orders o\nJOIN cities c ON o.cityId = c.id\nWHERE o.teacherName IS NOT NULL AND o.teacherName != ''\nGROUP BY o.teacherName, c.name\nORDER BY o.teacherName, order_count DESC\nLIMIT 20;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 3: Unknown column 'o.cityid' in 'on clause'"
+  ]
+}

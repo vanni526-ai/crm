@@ -1,0 +1,100 @@
+{
+  "query": "\n-- 查看没有城市映射的老师样例\nSELECT u.id, u.name, u.phone, u.roles\nFROM users u\nWHERE u.roles LIKE '%teacher%'\n  AND u.id NOT IN (SELECT userId FROM user_role_cities WHERE role = 'teacher')\nLIMIT 15;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查看没有城市映射的老师样例\nSELECT u.id, u.name, u.phone, u.roles\nFROM users u\nWHERE u.roles LIKE '%teacher%'\n  AND u.id NOT IN (SELECT userId FROM user_role_cities WHERE role = 'teacher')\nLIMIT 15;\n",
+  "rows": [
+    {
+      "id": "15362122",
+      "name": "姜一",
+      "phone": "13936258496",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362123",
+      "name": "冷月",
+      "phone": "18054121058",
+      "roles": "teacher"
+    },
+    {
+      "id": "15362124",
+      "name": "黑桃",
+      "phone": "15888248980",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362125",
+      "name": "嘟嘟",
+      "phone": "18267846167",
+      "roles": "teacher"
+    },
+    {
+      "id": "15362126",
+      "name": "水水",
+      "phone": "18817847691",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362127",
+      "name": "唐泽",
+      "phone": "19935377186",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362128",
+      "name": "无浪",
+      "phone": "13633805089",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362129",
+      "name": "米妮",
+      "phone": "13046640252",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362130",
+      "name": "nicy",
+      "phone": "17321368758",
+      "roles": "teacher"
+    },
+    {
+      "id": "15362131",
+      "name": "小梨",
+      "phone": "17611021650",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362132",
+      "name": "韦德",
+      "phone": "13816823753",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362133",
+      "name": "枝",
+      "phone": "19872019665",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362134",
+      "name": "井盖",
+      "phone": "18221235091",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362135",
+      "name": "温言",
+      "phone": "15121178931",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362136",
+      "name": "Nemo",
+      "phone": "17743515520",
+      "roles": "teacher,user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\troles\n15362122\t姜一\t13936258496\tteacher,user\n15362123\t冷月\t18054121058\tteacher\n15362124\t黑桃\t15888248980\tteacher,user\n15362125\t嘟嘟\t18267846167\tteacher\n15362126\t水水\t18817847691\tteacher,user\n15362127\t唐泽\t19935377186\tteacher,user\n15362128\t无浪\t13633805089\tteacher,user\n15362129\t米妮\t13046640252\tteacher,user\n15362130\tnicy\t17321368758\tteacher\n15362131\t小梨\t17611021650\tteacher,user\n15362132\t韦德\t13816823753\tteacher,user\n15362133\t枝\t19872019665\tteacher,user\n15362134\t井盖\t18221235091\tteacher,user\n15362135\t温言\t15121178931\tteacher,user\n15362136\tNemo\t17743515520\tteacher,user\n",
+  "stderr": "",
+  "execution_time_ms": 1513
+}

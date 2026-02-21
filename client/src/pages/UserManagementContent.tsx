@@ -349,12 +349,22 @@ export default function UserManagementContent() {
     // 从user_role_cities表加载每个角色的城市列表
     try {
       const roleCitiesData = await trpcUtils.userManagement.getRoleCities.fetch({ userId: user.id });
+      const allCities = await trpcUtils.analytics.getAllCities.fetch();
+      
+      // 创建城市ID到城市名称的映射
+      const cityIdToNameMap: Record<number, string> = {};
+      allCities.forEach((city: any) => {
+        cityIdToNameMap[city.id] = city.name;
+      });
+      
       const roleCitiesMap: Record<string, string[]> = {};
       roleCitiesData.forEach((rc: any) => {
         try {
           // cities字段是JSON字符串，需要解析为数组
           const citiesArray = JSON.parse(rc.cities || '[]');
-          roleCitiesMap[rc.role] = citiesArray;
+          // 将城市ID转换为城市名称
+          const cityNames = citiesArray.map((cityId: number) => cityIdToNameMap[cityId]).filter(Boolean);
+          roleCitiesMap[rc.role] = cityNames;
         } catch (e) {
           console.error('Failed to parse cities for role:', rc.role, e);
           roleCitiesMap[rc.role] = [];

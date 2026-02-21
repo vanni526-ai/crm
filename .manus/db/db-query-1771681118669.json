@@ -1,0 +1,160 @@
+{
+  "query": "\n-- 从订单表中统计老师在哪些城市授课\nSELECT \n  o.deliveryTeacher as teacher_name,\n  o.deliveryCity as city_name,\n  COUNT(*) as order_count\nFROM orders o\nWHERE o.deliveryTeacher IS NOT NULL \n  AND o.deliveryTeacher != ''\n  AND o.deliveryCity IS NOT NULL\n  AND o.deliveryCity != ''\nGROUP BY o.deliveryTeacher, o.deliveryCity\nORDER BY o.deliveryTeacher, order_count DESC\nLIMIT 30;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 从订单表中统计老师在哪些城市授课\nSELECT \n  o.deliveryTeacher as teacher_name,\n  o.deliveryCity as city_name,\n  COUNT(*) as order_count\nFROM orders o\nWHERE o.deliveryTeacher IS NOT NULL \n  AND o.deliveryTeacher != ''\n  AND o.deliveryCity IS NOT NULL\n  AND o.deliveryCity != ''\nGROUP BY o.deliveryTeacher, o.deliveryCity\nORDER BY o.deliveryTeacher, order_count DESC\nLIMIT 30;\n",
+  "rows": [
+    {
+      "teacher_name": "grace",
+      "city_name": "上海",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "JOJO",
+      "city_name": "上海",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "miya",
+      "city_name": "互联网课",
+      "order_count": "2"
+    },
+    {
+      "teacher_name": "mr.24",
+      "city_name": "天津",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "Nancy",
+      "city_name": "北京",
+      "order_count": "3"
+    },
+    {
+      "teacher_name": "rothbart",
+      "city_name": "苏州",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "windy",
+      "city_name": "宁波",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "YY",
+      "city_name": "天津",
+      "order_count": "32"
+    },
+    {
+      "teacher_name": "YY",
+      "city_name": "互联网课",
+      "order_count": "3"
+    },
+    {
+      "teacher_name": "YY",
+      "city_name": "济南",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "yy鸿",
+      "city_name": "天津",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "九淑",
+      "city_name": "上海",
+      "order_count": "2"
+    },
+    {
+      "teacher_name": "云云",
+      "city_name": "无锡",
+      "order_count": "5"
+    },
+    {
+      "teacher_name": "兔子",
+      "city_name": "深圳",
+      "order_count": "18"
+    },
+    {
+      "teacher_name": "兮敏",
+      "city_name": "郑州",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "兮灵",
+      "city_name": "石家庄",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "剑来",
+      "city_name": "重庆",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "十一",
+      "city_name": "上海",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "十字蛇",
+      "city_name": "武汉",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "上海",
+      "order_count": "9"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "太原",
+      "order_count": "5"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "山西运城",
+      "order_count": "2"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "成都",
+      "order_count": "2"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "河南南阳",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "安徽",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "合肥",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "淮安",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "唐泽",
+      "city_name": "互联网课",
+      "order_count": "1"
+    },
+    {
+      "teacher_name": "唐泽上",
+      "city_name": "上海",
+      "order_count": "2"
+    },
+    {
+      "teacher_name": "唐泽上",
+      "city_name": "互联网课",
+      "order_count": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "teacher_name\tcity_name\torder_count\ngrace\t上海\t1\nJOJO\t上海\t1\nmiya\t互联网课\t2\nmr.24\t天津\t1\nNancy\t北京\t3\nrothbart\t苏州\t1\nwindy\t宁波\t1\nYY\t天津\t32\nYY\t互联网课\t3\nYY\t济南\t1\nyy鸿\t天津\t1\n九淑\t上海\t2\n云云\t无锡\t5\n兔子\t深圳\t18\n兮敏\t郑州\t1\n兮灵\t石家庄\t1\n剑来\t重庆\t1\n十一\t上海\t1\n十字蛇\t武汉\t1\n唐泽\t上海\t9\n唐泽\t太原\t5\n唐泽\t山西运城\t2\n唐泽\t成都\t2\n唐泽\t河南南阳\t1\n唐泽\t安徽\t1\n唐泽\t合肥\t1\n唐泽\t淮安\t1\n唐泽\t互联网课\t1\n唐泽上\t上海\t2\n唐泽上\t互联网课\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1614
+}
