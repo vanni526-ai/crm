@@ -352,18 +352,27 @@ export default function UserManagementContent() {
       const allCities = await trpcUtils.analytics.getAllCities.fetch();
       
       // 创建城市ID到城市名称的映射
-      const cityIdToNameMap: Record<number, string> = {};
+      const cityIdToNameMap: Record<string, string> = {}; // 使用string类型的key
       allCities.forEach((city: any) => {
-        cityIdToNameMap[city.id] = city.name;
+        cityIdToNameMap[String(city.id)] = city.name; // 将ID转换为string
       });
+      
+      console.log('City ID to Name Map:', cityIdToNameMap);
+      console.log('Role Cities Data:', roleCitiesData);
       
       const roleCitiesMap: Record<string, string[]> = {};
       roleCitiesData.forEach((rc: any) => {
         try {
           // cities字段是JSON字符串，需要解析为数组
           const citiesArray = JSON.parse(rc.cities || '[]');
-          // 将城市ID转换为城市名称
-          const cityNames = citiesArray.map((cityId: number) => cityIdToNameMap[cityId]).filter(Boolean);
+          console.log(`Role ${rc.role} cities array:`, citiesArray);
+          // 将城市ID转换为城市名称，支持数字和字符串ID
+          const cityNames = citiesArray.map((cityId: any) => {
+            const cityName = cityIdToNameMap[String(cityId)];
+            console.log(`Converting city ID ${cityId} to name: ${cityName}`);
+            return cityName;
+          }).filter(Boolean);
+          console.log(`Role ${rc.role} city names:`, cityNames);
           roleCitiesMap[rc.role] = cityNames;
         } catch (e) {
           console.error('Failed to parse cities for role:', rc.role, e);
