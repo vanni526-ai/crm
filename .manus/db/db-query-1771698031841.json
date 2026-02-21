@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, wechatId, deletedAt FROM customers WHERE deletedAt IS NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, wechatId, deletedAt FROM customers WHERE deletedAt IS NULL LIMIT 5;",
+  "rows": [
+    {
+      "id": "300001",
+      "name": "晓曦东晨",
+      "wechatId": "NULL",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "300002",
+      "name": "JoeGong",
+      "wechatId": "NULL",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "300003",
+      "name": "涛涛",
+      "wechatId": "NULL",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "300004",
+      "name": "Augustin.W",
+      "wechatId": "NULL",
+      "deletedAt": "NULL"
+    },
+    {
+      "id": "300005",
+      "name": "王天蔚",
+      "wechatId": "NULL",
+      "deletedAt": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\twechatId\tdeletedAt\n300001\t晓曦东晨\tNULL\tNULL\n300002\tJoeGong\tNULL\tNULL\n300003\t涛涛\tNULL\tNULL\n300004\tAugustin.W\tNULL\tNULL\n300005\t王天蔚\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1627
+}

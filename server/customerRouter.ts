@@ -150,4 +150,22 @@ export const customerRouter = router({
       const progress = progressTracker.getProgress(input.taskId);
       return progress;
     }),
+
+  // 删除客户
+  delete: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db.deleteCustomer(input.id);
+      return { success: true };
+    }),
+
+  // 批量删除客户
+  batchDelete: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()) }))
+    .mutation(async ({ input }) => {
+      for (const id of input.ids) {
+        await db.deleteCustomer(id);
+      }
+      return { success: true, count: input.ids.length };
+    }),
 });

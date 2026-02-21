@@ -386,73 +386,26 @@ export async function getAllCustomers() {
   const db = await getDb();
   if (!db) return [];
   
-  // 获取所有客户及其统计信息
-  const customersData = await db.select().from(customers).orderBy(desc(customers.createdAt));
+  // 只获取基本客户信息，不查询统计数据（避免N+1查询问题）
+  const customersData = await db
+    .select()
+    .from(customers)
+    .where(isNull(customers.deletedAt))
+    .orderBy(desc(customers.createdAt));
   
-  // 为每个客户计算累计消费和最后消费时间
-  const customersWithStats = await Promise.all(
-    customersData.map(async (customer) => {
-      const customerOrders = await db
-        .select({
-          totalAmount: sql<string>`SUM(${orders.paymentAmount})`,
-          lastOrderDate: sql<Date>`MAX(${orders.createdAt})`,
-          firstOrderDate: sql<Date>`MIN(${orders.createdAt})`,
-          orderCount: sql<number>`COUNT(*)`,
-        })
-        .from(orders)
-        .where(sql`LOWER(${orders.customerName}) = LOWER(${customer.name})`);
-      
-      // 优先从账户流水表获取最新的账户余额
-      const latestTransaction = await db
-        .select({ balanceAfter: accountTransactions.balanceAfter })
-        .from(accountTransactions)
-        .where(eq(accountTransactions.customerId, customer.id))
-        .orderBy(desc(accountTransactions.createdAt))
-        .limit(1);
-      
-      // 如果没有流水记录,从订单表获取最新的账户余额
-      let accountBalance = "0.00";
-      if (latestTransaction[0]?.balanceAfter) {
-        accountBalance = latestTransaction[0].balanceAfter;
-      } else {
-        const latestOrder = await db
-          .select({ accountBalance: orders.accountBalance })
-          .from(orders)
-          .where(sql`LOWER(${orders.customerName}) = LOWER(${customer.name})`)
-          .orderBy(desc(orders.createdAt))
-          .limit(1);
-        accountBalance = latestOrder[0]?.accountBalance || "0.00";
-      }
-      
-      // 查询对应的users表中的会员信息
-      const userInfo = await db
-        .select({
-          membershipStatus: users.membershipStatus,
-          membershipActivatedAt: users.membershipActivatedAt,
-          membershipExpiresAt: users.membershipExpiresAt,
-          membershipOrderId: users.membershipOrderId,
-        })
-        .from(users)
-        .where(sql`LOWER(${users.name}) = LOWER(${customer.name})`)
-        .limit(1);
-      
-      return {
-        ...customer,
-        totalSpent: customerOrders[0]?.totalAmount || "0.00",
-        lastOrderDate: customerOrders[0]?.lastOrderDate || null,
-        firstOrderDate: customerOrders[0]?.firstOrderDate || null,
-        accountBalance,
-        classCount: customerOrders[0]?.orderCount || 0,
-        // 添加会员信息
-        membershipStatus: userInfo[0]?.membershipStatus || 'pending',
-        membershipActivatedAt: userInfo[0]?.membershipActivatedAt || null,
-        membershipExpiresAt: userInfo[0]?.membershipExpiresAt || null,
-        membershipOrderId: userInfo[0]?.membershipOrderId || null,
-      };
-    })
-  );
-  
-  return customersWithStats;
+  // 返回基本客户数据，添加默认值
+  return customersData.map(customer => ({
+    ...customer,
+    totalSpent: "0.00",
+    lastOrderDate: null,
+    firstOrderDate: null,
+    accountBalance: customer.accountBalance || "0.00",
+    classCount: 0,
+    membershipStatus: customer.membershipStatus || 'pending',
+    membershipActivatedAt: customer.membershipActivatedAt || null,
+    membershipExpiresAt: customer.membershipExpiresAt || null,
+    membershipOrderId: customer.membershipOrderId || null,
+  }));
 }
 
 export async function searchCustomers(keyword: string) {
@@ -545,7 +498,11 @@ export async function getOrCreateCustomerForUser(user: {
 export async function deleteCustomer(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.delete(customers).where(eq(customers.id, id));
+  // 软删除：设置deletedAt字段而不是真正删除记录
+  await db
+    .update(customers)
+    .set({ deletedAt: new Date() })
+    .where(eq(customers.id, id));
 }
 
 // ========== 订单管理 ==========

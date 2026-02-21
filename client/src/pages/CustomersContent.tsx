@@ -52,22 +52,26 @@ export default function CustomersContent() {
     },
     isPending: false,
   };
-  const deleteCustomer = {
-    mutate: (data: any) => {
+  const deleteCustomer = trpc.customers.delete.useMutation({
+    onSuccess: () => {
       utils.customers.list.invalidate();
       toast.success("客户删除成功");
     },
-    isPending: false,
-  };
+    onError: (error) => {
+      toast.error(`删除失败: ${error.message}`);
+    },
+  });
 
-  const batchDeleteCustomers = {
-    mutate: (data: any) => {
+  const batchDeleteCustomers = trpc.customers.batchDelete.useMutation({
+    onSuccess: (result) => {
       utils.customers.list.invalidate();
-      toast.success(`批量删除成功，共删除 ${data.count} 个客户`);
+      toast.success(`批量删除成功，共删除 ${result.count} 个客户`);
       setSelectedCustomerIds([]);
     },
-    isPending: false,
-  };
+    onError: (error) => {
+      toast.error(`批量删除失败: ${error.message}`);
+    },
+  });
 
   // const importFromOrders = trpc.customers.importFromOrders.useMutation({...});
   const importFromOrders = { mutate: (data: any) => {}, isPending: false };

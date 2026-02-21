@@ -316,6 +316,13 @@
       "when": 1771476993200,
       "tag": "0044_rainy_thena",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "5",
+      "when": 1771697810465,
+      "tag": "0045_moaning_firebird",
+      "breakpoints": true
     }
   ]
 }

@@ -87,6 +87,7 @@ export const customers = mysqlTable("customers", {
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  deletedAt: timestamp("deletedAt"), // 软删除时间戳
 }, (table) => ({
   userIdx: index("user_idx").on(table.userId),
   wechatIdx: index("wechat_idx").on(table.wechatId),

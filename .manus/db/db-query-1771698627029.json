@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, deletedAt FROM customers WHERE deletedAt IS NOT NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, deletedAt FROM customers WHERE deletedAt IS NOT NULL LIMIT 5;",
+  "rows": [
+    {
+      "id": "690001",
+      "name": "16662441510",
+      "deletedAt": "2026-02-21 18:28:42"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tdeletedAt\n690001\t16662441510\t2026-02-21 18:28:42\n",
+  "stderr": "",
+  "execution_time_ms": 1491
+}
