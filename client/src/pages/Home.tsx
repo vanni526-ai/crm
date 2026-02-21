@@ -4,9 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, ShoppingCart, Users, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
 import { formatDateBJ, startOfMonthBJ, todayBJ } from "@/lib/timezone";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { data: user } = trpc.auth.me.useQuery();
+  const [version, setVersion] = useState<string>("");
+  
+  useEffect(() => {
+    fetch('/version.json')
+      .then(res => res.json())
+      .then(data => setVersion(data.version))
+      .catch(() => setVersion('unknown'));
+  }, []);
   
   // 获取本月数据统计
   const startDate = startOfMonthBJ();
@@ -21,7 +30,14 @@ export default function Home() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">课程交付CRM系统</h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold">课程交付CRM系统</h1>
+            {version && (
+              <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                当前版本：{version}
+              </span>
+            )}
+          </div>
           <p className="text-muted-foreground mt-2">
             欢迎回来, {user?.name || user?.nickname || '用户'}
           </p>
