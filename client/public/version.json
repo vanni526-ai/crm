@@ -1,11 +1,6 @@
 {
-<<<<<<< Updated upstream
-  "version": "4c949e8",
-  "buildTime": "2026-02-22T14:37:45.711Z",
-=======
-  "version": "9c3305f-dirty",
-  "buildTime": "2026-02-22T08:52:36.763Z",
->>>>>>> Stashed changes
+  "version": "159d11a",
+  "buildTime": "2026-02-22T15:09:04.716Z",
   "branch": "main",
   "isDirty": false
 }
