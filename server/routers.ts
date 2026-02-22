@@ -832,13 +832,12 @@ export const appRouter = router({
         await db.updateOrder(id, processedData);
         return { success: true };
       }),
-    
-    delete: salesOrAdminProcedure
+        delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input, ctx }) => {
         try {
-          console.log('[Orders] 删除请求: id=', input.id, 'user=', ctx.user.name);
-          await db.deleteOrder(input.id);
+          console.log('[Production Test] orders.delete mutation 执行了', { id: input.id, user: ctx.user?.name });
+          console.log('[Mutation] orders.delete', { id: input.id, user: ctx.user });         await db.deleteOrder(input.id);
           console.log('[Orders] 删除成功: id=', input.id);
           return { success: true };
         } catch (error) {
@@ -1523,8 +1522,9 @@ export const appRouter = router({
     
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.deleteSchedule(input.id);
+      .mutation(async ({ input, ctx }) => {
+        console.log('[Production Test] customers.delete mutation 执行了', { id: input.id, user: ctx.user?.name });
+        await db.deleteCustomer(input.id);
         return { success: true };
       }),
     
