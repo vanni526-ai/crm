@@ -80,6 +80,16 @@ async function startServer() {
         return callback(null, true);
       }
       
+      // Allow production domain crm.bdsm.com.cn
+      if (origin === 'https://crm.bdsm.com.cn' || origin === 'http://crm.bdsm.com.cn') {
+        return callback(null, true);
+      }
+      
+      // Allow all *.bdsm.com.cn subdomains
+      if (origin.match(/^https?:\/\/.*\.bdsm\.com\.cn$/)) {
+        return callback(null, true);
+      }
+      
       // Allow custom origins from environment variable
       const customOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
       if (customOrigins.some(allowed => origin === allowed || origin.endsWith(allowed))) {
