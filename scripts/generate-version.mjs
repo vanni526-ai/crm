@@ -8,6 +8,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 try {
+  // 检查是否有未提交的更改，如果有则自动提交
+  const gitStatus = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
+  if (gitStatus.length > 0) {
+    console.log('⚠️  Detected uncommitted changes, auto-committing...');
+    execSync('git add -A', { encoding: 'utf-8' });
+    execSync('git commit -m "Auto-commit before version generation" --no-verify', { encoding: 'utf-8' });
+    console.log('✅ Changes committed successfully');
+  }
+  
   // 获取Git commit hash（短版本）
   const gitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
   
@@ -17,9 +26,13 @@ try {
   // 获取Git分支名
   const gitBranch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim();
   
-  // 检查是否有未提交的更改
-  const gitStatus = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
-  const isDirty = gitStatus.length > 0;
+  // 再次检查是否有未提交的更改（理论上应该为空）
+  const gitStatusAfter = execSync('git status --porcelain', { encoding: 'utf-8' }).trim();
+  const isDirty = gitStatusAfter.length > 0;
+  
+  if (isDirty) {
+    console.warn('⚠️  Warning: Still have uncommitted changes after auto-commit');
+  }
   
   const versionData = {
     version: gitHash + (isDirty ? '-dirty' : ''),
