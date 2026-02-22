@@ -4058,3 +4058,27 @@
 - [x] 更新resetFilters和applyFilters函数
 - [x] 修复所有onChange处理器
 - [x] 测试验证修复效果
+
+### 140. 修复订单删除和客户删除功能的500错误
+- [ ] 分析错误日志(500 Internal Server Error, 返回HTML而不是JSON)
+- [ ] 检查orders.batchDelete API实现
+- [ ] 检查customers.delete API实现
+- [ ] 修复后端删除逻辑的错误
+- [ ] 测试单个订单删除
+- [ ] 测试批量订单删除
+- [ ] 测试客户删除
+- [ ] 验证删除后数据正确更新
+
+
+### 140. 诊断订单删除和客户删除功能的500错误
+- [x] 分析错误日志(生产环境返回500错误和HTML而不是JSON)
+- [x] 检查orders.batchDelete和customers.delete API实现(代码正确)
+- [x] 创建测试验证删除功能(客户删除和订单批量删除测试全部通过)
+- [x] 确认问题根源:生产环境部署的代码版本过旧,需要重新发布最新checkpoint
+
+
+### 141. 修复版本发布后version.json未更新的问题
+- [x] 检查version.json文件内容(当前显示52d946a2)
+- [x] 更新version.json为最新版本916a4a27
+- [x] 保存checkpoint
+- [x] 指导用户重新发布最新版本
