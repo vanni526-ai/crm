@@ -308,8 +308,10 @@ export const userManagementRouter = router({
         roleCities: z.record(z.string(), z.array(z.string())).optional(), // 角色-城市关联，如 { "teacher": ["深圳"], "cityPartner": ["天津"] }
       })
     )
-    .mutation(async ({ input }) => {
-      const drizzle = await getDb();
+    .mutation(async ({ input, ctx }) => {
+      try {
+        console.log('[UserManagement] 更新请求: userId=', input.id, 'data=', JSON.stringify(input), 'operator=', ctx.user.name);
+        const drizzle = await getDb();
       if (!drizzle) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -579,10 +581,18 @@ export const userManagementRouter = router({
         }
       }
 
+      console.log('[UserManagement] 更新成功: userId=', input.id);
       return {
         success: true,
         message: "用户信息更新成功",
       };
+      } catch (error) {
+        console.error('[UserManagement] 更新失败: userId=', input.id, 'error=', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error instanceof Error ? error.message : '更新用户信息失败',
+        });
+      }
     }),
 
   // 更新用户角色（多角色）
@@ -717,8 +727,10 @@ export const userManagementRouter = router({
         isActive: z.boolean(),
       })
     )
-    .mutation(async ({ input }) => {
-      const drizzle = await getDb();
+    .mutation(async ({ input, ctx }) => {
+      try {
+        console.log('[UserManagement] 切换状态请求: userId=', input.id, 'isActive=', input.isActive, 'operator=', ctx.user.name);
+        const drizzle = await getDb();
       if (!drizzle) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -737,13 +749,21 @@ export const userManagementRouter = router({
         await drizzle.update(partners).set({ isActive: input.isActive } as any).where(eq(partners.userId, input.id));
       }
 
+      console.log('[UserManagement] 切换状态成功: userId=', input.id);
       return {
         success: true,
         message: input.isActive ? "账号已启用" : "账号已禁用",
       };
+      } catch (error) {
+        console.error('[UserManagement] 切换状态失败: userId=', input.id, 'error=', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error instanceof Error ? error.message : '切换用户状态失败',
+        });
+      }
     }),
 
-  // 获取用户的角色-城市关联
+  // 重置密码获取用户的角色-城市关联
   getRoleCities: adminProcedure
     .input(z.object({ userId: z.number() }))
     .query(async ({ input }) => {
@@ -754,8 +774,10 @@ export const userManagementRouter = router({
   // 删除用户
   delete: adminProcedure
     .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      const drizzle = await getDb();
+    .mutation(async ({ input, ctx }) => {
+      try {
+        console.log('[UserManagement] 删除请求: userId=', input.id, 'operator=', ctx.user.name);
+        const drizzle = await getDb();
       if (!drizzle) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -792,9 +814,17 @@ export const userManagementRouter = router({
       // 删除用户
       await drizzle.delete(users).where(eq(users.id, input.id));
 
+      console.log('[UserManagement] 删除成功: userId=', input.id);
       return {
         success: true,
         message: "用户删除成功",
       };
+      } catch (error) {
+        console.error('[UserManagement] 删除失败: userId=', input.id, 'error=', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error instanceof Error ? error.message : '删除用户失败',
+        });
+      }
     }),
 });
