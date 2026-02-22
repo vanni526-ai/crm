@@ -113,6 +113,21 @@ async function startServer() {
       createContext,
     })
   );
+  
+  // Global error handler - must be after all routes
+  app.use((err: any, req: any, res: any, next: any) => {
+    console.error('[Express Error]', err);
+    
+    // Ensure we always return JSON
+    if (!res.headersSent) {
+      res.status(err.status || 500).json({
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: err.message || 'Internal server error',
+        },
+      });
+    }
+  });
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
