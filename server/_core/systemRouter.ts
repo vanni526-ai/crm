@@ -2,6 +2,8 @@ import { z } from "zod";
 import { notifyOwner } from "./notification";
 import { adminProcedure, publicProcedure, router } from "./trpc";
 import * as db from "../db";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 export const systemRouter = router({
   health: publicProcedure
@@ -13,6 +15,28 @@ export const systemRouter = router({
     .query(() => ({
       ok: true,
     })),
+
+  version: publicProcedure
+    .query(() => {
+      try {
+        // 读取构建时生成的version.json
+        const versionPath = join(process.cwd(), 'client/public/version.json');
+        const versionContent = readFileSync(versionPath, 'utf-8');
+        const versionData = JSON.parse(versionContent);
+        return {
+          ...versionData,
+          serverTime: new Date().toISOString(),
+        };
+      } catch (error) {
+        return {
+          version: 'unknown',
+          buildTime: 'unknown',
+          branch: 'unknown',
+          isDirty: false,
+          serverTime: new Date().toISOString(),
+        };
+      }
+    }),
 
   notifyOwner: adminProcedure
     .input(

@@ -4,18 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, ShoppingCart, Users, TrendingUp } from "lucide-react";
 import { Link } from "wouter";
 import { formatDateBJ, startOfMonthBJ, todayBJ } from "@/lib/timezone";
-import { useEffect, useState } from "react";
+
 
 export default function Home() {
   const { data: user } = trpc.auth.me.useQuery();
-  const [version, setVersion] = useState<string>("");
   
-  useEffect(() => {
-    fetch('/version.json')
-      .then(res => res.json())
-      .then(data => setVersion(data.version))
-      .catch(() => setVersion('unknown'));
-  }, []);
+  // 从后端API获取版本信息
+  const { data: versionInfo } = trpc.system.version.useQuery();
   
   // 获取本月数据统计
   const startDate = startOfMonthBJ();
@@ -32,10 +27,17 @@ export default function Home() {
         <div>
           <div className="flex items-center gap-4">
             <h1 className="text-3xl font-bold">课程交付CRM系统</h1>
-            {version && (
-              <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                当前版本：{version}
-              </span>
+            {versionInfo && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                  当前版本：{versionInfo.version}
+                </span>
+                {versionInfo.isDirty && (
+                  <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded">
+                    未提交更改
+                  </span>
+                )}
+              </div>
             )}
           </div>
           <p className="text-muted-foreground mt-2">
