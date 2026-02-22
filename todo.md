@@ -4310,6 +4310,9 @@
 - [x] 分析日志发现CORS错误："Not allowed by CORS"
 - [x] 检查后端CORS配置
 - [x] 修复CORS配置：添加crm.bdsm.com.cn到白名单
-- [ ] 保存检查点并重新发布
->>>>>>> Stashed changes
+- [x] 保存检查点(d2d1af01)
+- [x] 添加OPTIONS预检请求处理
+- [ ] 保存最终检查点
+- [ ] 发布到生产环境
+- [ ] 验证删除功能正常工作changes
 - [ ] 验证删除功能正常工作

@@ -108,6 +108,9 @@ async function startServer() {
     exposedHeaders: ['Authorization', 'authorization', 'X-Auth-Token', 'x-auth-token'],
   }));
   
+  // Handle OPTIONS preflight requests for all routes
+  app.options('*', cors());
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
