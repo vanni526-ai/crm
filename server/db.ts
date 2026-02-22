@@ -745,7 +745,13 @@ export async function updateOrderNo(id: number, orderNo: string) {
 export async function deleteOrder(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.delete(orders).where(eq(orders.id, id));
+  
+  try {
+    await db.delete(orders).where(eq(orders.id, id));
+  } catch (error) {
+    console.error('[DB] deleteOrder failed:', { id, error });
+    throw new Error(`Failed to delete order ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 /**
@@ -1918,8 +1924,13 @@ export async function batchDeleteOrders(ids: number[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  for (const id of ids) {
-    await db.delete(orders).where(eq(orders.id, id));
+  try {
+    for (const id of ids) {
+      await db.delete(orders).where(eq(orders.id, id));
+    }
+  } catch (error) {
+    console.error('[DB] batchDeleteOrders failed:', { ids, error });
+    throw new Error(`Failed to batch delete orders: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 

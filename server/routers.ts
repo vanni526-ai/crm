@@ -835,16 +835,36 @@ export const appRouter = router({
     
     delete: salesOrAdminProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        await db.deleteOrder(input.id);
-        return { success: true };
+      .mutation(async ({ input, ctx }) => {
+        try {
+          console.log('[Orders] 删除请求: id=', input.id, 'user=', ctx.user.name);
+          await db.deleteOrder(input.id);
+          console.log('[Orders] 删除成功: id=', input.id);
+          return { success: true };
+        } catch (error) {
+          console.error('[Orders] 删除失败: id=', input.id, 'error=', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : '删除订单失败',
+          });
+        }
       }),
     
     batchDelete: salesOrAdminProcedure
       .input(z.object({ ids: z.array(z.number()) }))
-      .mutation(async ({ input }) => {
-        await db.batchDeleteOrders(input.ids);
-        return { success: true, count: input.ids.length };
+      .mutation(async ({ input, ctx }) => {
+        try {
+          console.log('[Orders] 批量删除请求: ids=', input.ids, 'user=', ctx.user.name);
+          await db.batchDeleteOrders(input.ids);
+          console.log('[Orders] 批量删除成功: count=', input.ids.length);
+          return { success: true, count: input.ids.length };
+        } catch (error) {
+          console.error('[Orders] 批量删除失败: ids=', input.ids, 'error=', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : '批量删除订单失败',
+          });
+        }
       }),
     
     batchUpdateStatus: salesOrAdminProcedure
