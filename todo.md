@@ -4082,3 +4082,35 @@
 - [x] 更新version.json为最新版本916a4a27
 - [x] 保存checkpoint
 - [x] 指导用户重新发布最新版本
+
+
+### 142. 为App开发团队生成会员费和会员状态API接口文档
+- [x] 分析现有会员相关接口实现(membershipRouter.ts)
+- [x] 查看会员相关的API端点(getMembershipStatus/createMembership/activateMembership)
+- [x] 整理接口地址、认证方式、请求参数
+- [x] 编写完整的API文档(包括5个示例代码、10个FAQ、错误处理)
+- [x] 交付文档给用户
+
+### 143. 诊断生产环境订单和用户管理的500错误
+- [x] 检查orders.delete API实现 - 存在(orders.batchDelete)
+- [x] 检查orders.update API实现 - 存在(第759行)
+- [x] 检查userManagement.update API实现 - 存在(userManagementRouter已注册)
+- [x] 检查customers.delete API实现 - 存在(customerRouter已注册)
+- [x] 确认问题根源:生产环境代码版本不一致或有运行时错误
+- [x] 建议用户重新发布最新checkpoint 62e64af3
+
+
+### 144. 修复用户管理页面编辑用户时合伙人城市下拉框不显示城市列表
+- [ ] 分析城市下拉框不显示的原因
+- [ ] 检查城市列表API调用
+- [ ] 修复城市列表加载逻辑
+- [ ] 测试验证修复效果
+- [ ] 创建checkpoint
+
+### 136. 修复用户管理编辑对话框城市标签不显示的问题
+- [x] 诊断问题根源(代码错误地将城市名称当作ID去查找映射表)
+- [x] 修复城市加载逻辑(直接使用数据库中存储的城市名称数组)
+- [x] 移除不必要的城市ID到名称转换逻辑
+- [x] 清理调试用的console.log语句
+- [x] 测试验证修复效果(城市标签正确显示"福州"和"泉州")
+- [x] 保存检查点

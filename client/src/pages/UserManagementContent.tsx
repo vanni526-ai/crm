@@ -334,7 +334,6 @@ export default function UserManagementContent() {
   const trpcUtils = trpc.useUtils();
 
   const handleEditUser = async (user: any) => {
-    setEditingUser(user);
     const parsedRoles = parseRoles(user.roles || user.role);
     // 确保普通用户角色始终存在
     if (!parsedRoles.includes("user")) {
@@ -349,41 +348,28 @@ export default function UserManagementContent() {
     // 从user_role_cities表加载每个角色的城市列表
     try {
       const roleCitiesData = await trpcUtils.userManagement.getRoleCities.fetch({ userId: user.id });
-      const allCities = await trpcUtils.analytics.getAllCities.fetch();
-      
-      // 创建城市ID到城市名称的映射
-      const cityIdToNameMap: Record<string, string> = {}; // 使用string类型的key
-      allCities.forEach((city: any) => {
-        cityIdToNameMap[String(city.id)] = city.name; // 将ID转换为string
-      });
-      
-      console.log('City ID to Name Map:', cityIdToNameMap);
-      console.log('Role Cities Data:', roleCitiesData);
       
       const roleCitiesMap: Record<string, string[]> = {};
       roleCitiesData.forEach((rc: any) => {
         try {
-          // cities字段是JSON字符串，需要解析为数组
+          // cities字段是JSON字符串，存储的是城市名称数组（不是ID）
           const citiesArray = JSON.parse(rc.cities || '[]');
-          console.log(`Role ${rc.role} cities array:`, citiesArray);
-          // 将城市ID转换为城市名称，支持数字和字符串ID
-          const cityNames = citiesArray.map((cityId: any) => {
-            const cityName = cityIdToNameMap[String(cityId)];
-            console.log(`Converting city ID ${cityId} to name: ${cityName}`);
-            return cityName;
-          }).filter(Boolean);
-          console.log(`Role ${rc.role} city names:`, cityNames);
-          roleCitiesMap[rc.role] = cityNames;
+          // 直接使用城市名称，不需要转换
+          roleCitiesMap[rc.role] = citiesArray;
         } catch (e) {
           console.error('Failed to parse cities for role:', rc.role, e);
           roleCitiesMap[rc.role] = [];
         }
       });
-      
       setEditTeacherCities(roleCitiesMap['teacher'] || []);
       setEditPartnerCities(roleCitiesMap['cityPartner'] || []);
+      
+      // 城市数据加载完成后再打开对话框
+      setEditingUser(user);
     } catch (error) {
       console.error('Failed to load role cities:', error);
+      // 即使加载失败也要打开对话框
+      setEditingUser(user);
     }
   };
 

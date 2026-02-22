@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, userId, role, cities, createdAt FROM user_role_cities WHERE userId = 15372555;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, userId, role, cities, createdAt FROM user_role_cities WHERE userId = 15372555;",
+  "rows": [
+    {
+      "id": "15",
+      "userId": "15372555",
+      "role": "cityPartner",
+      "cities": "[\"福州\",\"泉州\"]",
+      "createdAt": "2026-02-10 10:54:23"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\trole\tcities\tcreatedAt\n15\t15372555\tcityPartner\t[\"福州\",\"泉州\"]\t2026-02-10 10:54:23\n",
+  "stderr": "",
+  "execution_time_ms": 1604
+}
