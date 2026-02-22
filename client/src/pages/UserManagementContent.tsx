@@ -421,7 +421,8 @@ export default function UserManagementContent() {
               <TableHead>邮箱</TableHead>
               <TableHead>手机号</TableHead>
               <TableHead>角色</TableHead>
-              <TableHead>状态</TableHead>
+              <TableHead>会员状态</TableHead>
+              <TableHead>账号状态</TableHead>
               <TableHead>最后登录</TableHead>
               <TableHead className="text-right">操作</TableHead>
             </TableRow>
@@ -429,7 +430,7 @@ export default function UserManagementContent() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center">
+                <TableCell colSpan={10} className="text-center">
                   加载中...
                 </TableCell>
               </TableRow>
@@ -457,6 +458,21 @@ export default function UserManagementContent() {
                           );
                         })}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {(user as any).membershipStatus === 'active' ? (
+                        <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
+                          ✨ 已激活
+                        </Badge>
+                      ) : (user as any).membershipStatus === 'expired' ? (
+                        <Badge variant="outline" className="text-gray-500">
+                          已过期
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground">
+                          待激活
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -504,7 +520,7 @@ export default function UserManagementContent() {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="text-center">
+                <TableCell colSpan={10} className="text-center">
                   暂无用户数据
                 </TableCell>
               </TableRow>

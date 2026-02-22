@@ -102,6 +102,12 @@ export const userManagementRouter = router({
             createdAt: user.createdAt,
             lastSignedIn: user.lastSignedIn,
             roleCities, // 现在格式正确了：Record<string, string[]>
+            // 会员相关字段
+            membershipStatus: user.membershipStatus,
+            isMember: user.isMember,
+            membershipActivatedAt: user.membershipActivatedAt,
+            membershipExpiresAt: user.membershipExpiresAt,
+            membershipOrderId: user.membershipOrderId,
           };
         })
       );

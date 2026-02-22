@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, openId, name, nickname, roles, membershipStatus, isMember, membershipOrderId, membershipActivatedAt, membershipExpiresAt, createdAt, updatedAt FROM users WHERE id = 16800186;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, openId, name, nickname, roles, membershipStatus, isMember, membershipOrderId, membershipActivatedAt, membershipExpiresAt, createdAt, updatedAt FROM users WHERE id = 16800186;",
+  "rows": [
+    {
+      "id": "16800186",
+      "openId": "user_1771168611406_bcdxpp",
+      "name": "test",
+      "nickname": "开发者账号",
+      "roles": "user,admin,sales,cityPartner,teacher",
+      "membershipStatus": "active",
+      "isMember": "1",
+      "membershipOrderId": "2610002",
+      "membershipActivatedAt": "2026-02-22 04:07:31",
+      "membershipExpiresAt": "2027-02-22 04:07:31",
+      "createdAt": "2026-02-15 15:16:51",
+      "updatedAt": "2026-02-22 05:55:27"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\tnickname\troles\tmembershipStatus\tisMember\tmembershipOrderId\tmembershipActivatedAt\tmembershipExpiresAt\tcreatedAt\tupdatedAt\n16800186\tuser_1771168611406_bcdxpp\ttest\t开发者账号\tuser,admin,sales,cityPartner,teacher\tactive\t1\t2610002\t2026-02-22 04:07:31\t2027-02-22 04:07:31\t2026-02-15 15:16:51\t2026-02-22 05:55:27\n",
+  "stderr": "",
+  "execution_time_ms": 1558
+}
