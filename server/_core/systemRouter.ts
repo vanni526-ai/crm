@@ -20,28 +20,45 @@ export const systemRouter = router({
   version: publicProcedure
     .query(() => {
       try {
-        // 动态读取Git版本信息
-        const gitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
-        const isDirty = execSync('git status --porcelain', { encoding: 'utf-8' }).trim().length > 0;
-        const branch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim();
+        // 优先读取package.json的version字段（由generate-version.mjs生成）
+        const packagePath = join(process.cwd(), 'package.json');
+        const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+        const version = packageJson.version;
         
-        const version = isDirty ? `${gitHash}-dirty` : gitHash;
-        
-        return {
-          version,
-          buildTime: new Date().toISOString(),
-          branch,
-          isDirty,
-          serverTime: new Date().toISOString(),
-        };
-      } catch (error) {
-        // 如果Git命令失败，尝试读取version.json作为后备
+        // 尝试读取version.json获取详细信息
         try {
           const versionPath = join(process.cwd(), 'client/public/version.json');
-          const versionContent = readFileSync(versionPath, 'utf-8');
-          const versionData = JSON.parse(versionContent);
+          const versionData = JSON.parse(readFileSync(versionPath, 'utf-8'));
           return {
-            ...versionData,
+            version, // 使用package.json的version
+            buildTime: versionData.buildTime,
+            branch: versionData.branch,
+            isDirty: versionData.isDirty,
+            serverTime: new Date().toISOString(),
+          };
+        } catch {
+          // 如果version.json不存在，只返回package.json的version
+          return {
+            version,
+            buildTime: 'unknown',
+            branch: 'unknown',
+            isDirty: false,
+            serverTime: new Date().toISOString(),
+          };
+        }
+      } catch (error) {
+        // 如果读取package.json失败，尝试动态读取Git信息
+        try {
+          const gitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+          const isDirty = execSync('git status --porcelain', { encoding: 'utf-8' }).trim().length > 0;
+          const branch = execSync('git rev-parse --abbrev-ref HEAD', { encoding: 'utf-8' }).trim();
+          const version = isDirty ? `${gitHash}-dirty` : gitHash;
+          
+          return {
+            version,
+            buildTime: new Date().toISOString(),
+            branch,
+            isDirty,
             serverTime: new Date().toISOString(),
           };
         } catch {

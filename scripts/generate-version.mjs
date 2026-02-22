@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from 'child_process';
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -32,8 +32,15 @@ try {
   const outputPath = join(__dirname, '../client/public/version.json');
   writeFileSync(outputPath, JSON.stringify(versionData, null, 2));
   
+  // 更新package.json的version字段
+  const packagePath = join(__dirname, '../package.json');
+  const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+  packageJson.version = versionData.version;
+  writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
+  
   console.log('✅ Version file generated successfully:');
   console.log(JSON.stringify(versionData, null, 2));
+  console.log(`✅ package.json version updated to: ${versionData.version}`);
 } catch (error) {
   console.error('❌ Failed to generate version file:', error.message);
   
