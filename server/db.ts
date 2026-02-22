@@ -386,14 +386,35 @@ export async function getAllCustomers() {
   const db = await getDb();
   if (!db) return [];
   
-  // 只获取基本客户信息，不查询统计数据（避免N+1查询问题）
+  // LEFT JOIN users表获取会员信息(如果客户关联了userId)
   const customersData = await db
-    .select()
+    .select({
+      // customers表字段
+      id: customers.id,
+      userId: customers.userId,
+      name: customers.name,
+      wechatId: customers.wechatId,
+      phone: customers.phone,
+      trafficSource: customers.trafficSource,
+      accountBalance: customers.accountBalance,
+      tags: customers.tags,
+      notes: customers.notes,
+      createdBy: customers.createdBy,
+      createdAt: customers.createdAt,
+      updatedAt: customers.updatedAt,
+      deletedAt: customers.deletedAt,
+      // users表的会员字段(优先使用users表数据)
+      membershipStatus: users.membershipStatus,
+      membershipOrderId: users.membershipOrderId,
+      membershipActivatedAt: users.membershipActivatedAt,
+      membershipExpiresAt: users.membershipExpiresAt,
+    })
     .from(customers)
+    .leftJoin(users, eq(customers.userId, users.id))
     .where(isNull(customers.deletedAt))
     .orderBy(desc(customers.createdAt));
   
-  // 返回基本客户数据，添加默认值
+  // 返回客户数据，添加默认值
   return customersData.map(customer => ({
     ...customer,
     totalSpent: "0.00",
@@ -401,10 +422,11 @@ export async function getAllCustomers() {
     firstOrderDate: null,
     accountBalance: customer.accountBalance || "0.00",
     classCount: 0,
+    // 如果没有关联users表,会员状态默认为pending
     membershipStatus: customer.membershipStatus || 'pending',
+    membershipOrderId: customer.membershipOrderId || null,
     membershipActivatedAt: customer.membershipActivatedAt || null,
     membershipExpiresAt: customer.membershipExpiresAt || null,
-    membershipOrderId: customer.membershipOrderId || null,
   }));
 }
 

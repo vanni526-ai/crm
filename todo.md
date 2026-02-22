@@ -4312,7 +4312,41 @@
 - [x] 修复CORS配置：添加crm.bdsm.com.cn到白名单
 - [x] 保存检查点(d2d1af01)
 - [x] 添加OPTIONS预检请求处理
-- [ ] 保存最终检查点
+- [x] 保存最终检查点(64294d59)
 - [ ] 发布到生产环境
 - [ ] 验证删除功能正常工作changes
 - [ ] 验证删除功能正常工作
+
+### 145. 用户管理页面优化和会员状态修复
+- [x] 检查"用户账号"tab列表是否有userId列（已有）
+- [x] 检查"业务客户"tab列表是否有customerId列（缺少）
+- [x] 在业务客户列表最前面添加客户ID列
+- [ ] 调查韩顗杰在两个列表中会员状态不一致的原因
+- [ ] 修复会员状态不一致问题
+- [ ] 保存检查点并验证
+
+### 146. 评估并合并users和customers表
+- [ ] 分析users表的使用场景和字段
+- [ ] 分析customers表的使用场景和字段
+- [ ] 查找所有引用users表的代码位置
+- [ ] 查找所有引用customers表的代码位置
+- [ ] 评估合并方案：保留users还是customers
+- [ ] 制定数据迁移计划
+- [ ] 实施合并方案
+- [ ] 更新所有相关代码
+- [ ] 测试验证
+- [ ] 保存检查点
+
+### 147. 移除customers表的会员管理字段,统一使用users表
+- [x] 分析customers表会员字段的使用情况(64处引用)
+- [x] 查找所有引用customers表会员字段的代码
+- [x] 修改schema.ts移除customers表的4个会员字段
+- [x] 修改db.ts中getAllCustomers函数,移除会员字段返回
+- [x] customerRouter.ts无需修改(调用getAllCustomers)
+- [x] 修改db.ts中getAllCustomers,LEFT JOIN users表返回会员信息
+- [x] 前端CustomersContent.tsx无需修改(后端API返回会员字段)
+- [x] 执行数据库迁移(通过SQL直接删除字段)
+- [x] 评估前端接口影响:前端无需修改,API返回数据结构保持不变
+- [x] 生成API文档(docs/API文档-客户管理接口.md)
+- [x] 测试验证所有功能正常(会员字段正常返回)
+- [ ] 保存检查点

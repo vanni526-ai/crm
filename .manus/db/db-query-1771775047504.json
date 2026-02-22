@@ -1,0 +1,46 @@
+{
+  "query": "\n-- 查询韩顗杰在customers表中的数据\nSELECT id, userId, name, membershipStatus, membershipActivatedAt, membershipExpiresAt, membershipOrderId\nFROM customers\nWHERE name LIKE '%韩顗杰%';\n\n-- 查询韩顗杰在users表中的数据\nSELECT id, name, phone, membershipStatus, membershipActivatedAt, membershipExpiresAt, membershipOrderId\nFROM users\nWHERE name LIKE '%韩顗杰%' OR phone LIKE '%17370405%';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询韩顗杰在customers表中的数据\nSELECT id, userId, name, membershipStatus, membershipActivatedAt, membershipExpiresAt, membershipOrderId\nFROM customers\nWHERE name LIKE '%韩顗杰%';\n\n-- 查询韩顗杰在users表中的数据\nSELECT id, name, phone, membershipStatus, membershipActivatedAt, membershipExpiresAt, membershipOrderId\nFROM users\nWHERE name LIKE '%韩顗杰%' OR phone LIKE '%17370405%';\n",
+  "rows": [
+    {
+      "id": "720001",
+      "userId": "17370405",
+      "name": "韩顗杰",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL",
+      "membershipOrderId": "NULL"
+    },
+    {
+      "id": "id",
+      "userId": "name",
+      "name": "phone",
+      "membershipStatus": "membershipStatus",
+      "membershipActivatedAt": "membershipActivatedAt",
+      "membershipExpiresAt": "membershipExpiresAt",
+      "membershipOrderId": "membershipOrderId"
+    },
+    {
+      "id": "1470017",
+      "userId": "韩顗杰",
+      "name": "NULL",
+      "membershipStatus": "pending",
+      "membershipActivatedAt": "NULL",
+      "membershipExpiresAt": "NULL",
+      "membershipOrderId": "NULL"
+    },
+    {
+      "id": "17370405",
+      "userId": "韩顗杰",
+      "name": "18602111141",
+      "membershipStatus": "active",
+      "membershipActivatedAt": "2026-02-22 05:47:07",
+      "membershipExpiresAt": "2027-02-22 05:47:07",
+      "membershipOrderId": "2610003"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\tmembershipStatus\tmembershipActivatedAt\tmembershipExpiresAt\tmembershipOrderId\n720001\t17370405\t韩顗杰\tpending\tNULL\tNULL\tNULL\nid\tname\tphone\tmembershipStatus\tmembershipActivatedAt\tmembershipExpiresAt\tmembershipOrderId\n1470017\t韩顗杰\tNULL\tpending\tNULL\tNULL\tNULL\n17370405\t韩顗杰\t18602111141\tactive\t2026-02-22 05:47:07\t2027-02-22 05:47:07\t2610003\n",
+  "stderr": "",
+  "execution_time_ms": 1803
+}

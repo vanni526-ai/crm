@@ -483,6 +483,7 @@ export default function CustomersContent() {
                         className="cursor-pointer"
                       />
                     </TableHead>
+                    <TableHead>客户ID</TableHead>
                     <TableHead>客户名</TableHead>
                     <TableHead>流量来源</TableHead>
                     <TableHead className="cursor-pointer" onClick={() => handleSort('accountBalance')}>
@@ -507,7 +508,7 @@ export default function CustomersContent() {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8">
+                      <TableCell colSpan={10} className="text-center py-8">
                         加载中...
                       </TableCell>
                     </TableRow>
@@ -527,6 +528,9 @@ export default function CustomersContent() {
                             }}
                             className="cursor-pointer"
                           />
+                        </TableCell>
+                        <TableCell className="font-mono text-sm text-muted-foreground">
+                          {customer.id}
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
