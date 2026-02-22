@@ -836,15 +836,34 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input, ctx }) => {
         try {
-          console.log('[Production Test] orders.delete mutation 执行了', { id: input.id, user: ctx.user?.name });
-          console.log('[Mutation] orders.delete', { id: input.id, user: ctx.user });         await db.deleteOrder(input.id);
-          console.log('[Orders] 删除成功: id=', input.id);
-          return { success: true };
+          console.log('[Production Debug] orders.delete 开始执行', { 
+            id: input.id, 
+            user: ctx.user?.name,
+            timestamp: new Date().toISOString()
+          });
+          
+          // 执行删除
+          await db.deleteOrder(input.id);
+          
+          console.log('[Production Debug] orders.delete 执行成功', { id: input.id });
+          
+          // 返回简单的响应对象
+          const result = { success: true };
+          console.log('[Production Debug] orders.delete 返回值', result);
+          
+          return result;
         } catch (error) {
-          console.error('[Orders] 删除失败: id=', input.id, 'error=', error);
+          console.error('[Production Debug] orders.delete 失败', {
+            id: input.id,
+            errorType: error?.constructor?.name,
+            errorMessage: error instanceof Error ? error.message : String(error),
+            errorStack: error instanceof Error ? error.stack : undefined,
+          });
+          
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error instanceof Error ? error.message : '删除订单失败',
+            cause: error,
           });
         }
       }),

@@ -42,12 +42,22 @@ const trpcClient = trpc.createClient({
     httpBatchLink({
       url: "/api/trpc",
       transformer: superjson,
-      fetch(input, init) {
-        return globalThis.fetch(input, {
+      async fetch(input, init) {
+        const res = await globalThis.fetch(input, {
           ...(init ?? {}),
           credentials: "include",
           signal: init?.signal ?? AbortSignal.timeout(120000), // 120秒超时
         });
+        
+        // 添加响应调试日志
+        const clonedRes = res.clone();
+        const text = await clonedRes.text();
+        console.log('[tRPC Response Raw]', text.substring(0, 500));
+        if (!res.ok) {
+          console.error('[tRPC Response Error]', text);
+        }
+        
+        return res;
       },
       // 增加批处理的最大URL长度限制
       maxURLLength: Infinity,

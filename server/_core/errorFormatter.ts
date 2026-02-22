@@ -14,13 +14,25 @@ export function formatError(opts: {
 }) {
   const { error, type, path, input } = opts;
   
-  // 记录错误日志
+  // 记录详细的错误日志
   console.error(`[tRPC Error] ${type} ${path}:`, {
     code: error.code,
     message: error.message,
     input,
     cause: error.cause,
+    stack: error.stack,
   });
+  
+  // 记录完整的错误对象用于调试
+  console.error('[tRPC Error Full]', JSON.stringify({
+    code: error.code,
+    message: error.message,
+    name: error.name,
+    cause: error.cause instanceof Error ? {
+      message: error.cause.message,
+      stack: error.cause.stack,
+    } : error.cause,
+  }, null, 2));
   
   // 返回格式化的错误响应
   return {
