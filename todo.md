@@ -4525,3 +4525,31 @@
 - [x] 添加cityExpense.getStats接口说明
 - [x] 添加analytics.getDashboardStats接口说明
 - [x] 保存检查点并交付
+
+### 158. 为所有CRM后端接口添加JWT Bearer Token认证支持
+- [ ] 检查现有认证机制实现（context.ts）
+- [ ] 修改context.ts支持Bearer Token（从Authorization header提取JWT）
+- [ ] 测试验证所有接口的Bearer Token支持
+  - [ ] orders.*接口
+  - [ ] notifications.*接口
+  - [ ] membership.*接口
+  - [ ] schedules.*接口
+  - [ ] partnerManagement.*接口
+  - [ ] cityExpense.*接口
+  - [ ] analytics.*接口
+- [ ] 保存检查点并交付
+
+### 158. 为所有CRM后端接口添加JWT Bearer Token认证支持
+- [x] 检查现有认证机制实现（sdk.ts中的authenticateRequest函数）
+- [x] 确认Bearer Token支持已实现（支持Authorization header、URL query params、Session Cookie）
+- [x] 创建测试脚本验证所有接口的Bearer Token支持
+  - [x] account.*接口（成功）
+  - [x] orders.*接口（成功）
+  - [x] notifications.*接口（成功）
+  - [x] membership.*接口（成功）
+  - [x] schedules.*接口（403权限限制，认证成功）
+  - [x] partnerManagement.*接口（403权限限制，认证成功）
+  - [x] cityExpense.*接口（403权限限制，认证成功）
+  - [x] analytics.*接口（成功）
+- [x] 生成Bearer Token使用指南文档
+- [x] 保存检查点并交付
