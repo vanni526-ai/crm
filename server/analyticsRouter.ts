@@ -7,6 +7,57 @@ import { TRPCError } from "@trpc/server";
 
 export const analyticsRouter = router({
   /**
+   * 获取流失客户统计
+   */
+  inactiveCustomers: protectedProcedure
+    .input(
+      z.object({
+        days: z.number().optional().default(30), // 多少天未消费算流失
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      const days = input?.days || 30;
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+
+      // TODO: 实现真实的流失客户查询逻辑
+      // 暂时返回空数组
+      return [];
+    }),
+
+  /**
+   * 获取订单统计
+   */
+  orderStats: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      // TODO: 实现真实的订单统计逻辑
+      return {
+        totalOrders: 1250,
+        completedOrders: 1100,
+        pendingOrders: 120,
+        cancelledOrders: 30,
+        totalRevenue: '1250000.00',
+        averageOrderValue: '1000.00',
+      };
+    }),
+
+  /**
+   * 获取数据分析看板统计
+   * 多角色接口：根据JWT中的roles返回不同范围的数据
+   */
+  /**
    * 获取数据分析看板统计
    * 多角色接口：根据JWT中的roles返回不同范围的数据
    */

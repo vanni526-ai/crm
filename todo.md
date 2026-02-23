@@ -4511,3 +4511,8 @@
   - [x] 添加角色判断（admin/sales/teacher/cityPartner）
 - [x] 运行API健康检查脚本验证
 - [x] 保存检查点并交付
+
+### 156. 修复首页缺失的两个analytics接口
+- [x] 添加analytics.inactiveCustomers接口
+- [x] 添加analytics.orderStats接口
+- [x] 测试验证并保存检查点
