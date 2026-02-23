@@ -28,6 +28,7 @@ export function registerOAuthRoutes(app: Express) {
         return;
       }
 
+      // 1. Upsert user
       await db.upsertUser({
         openId: userInfo.openId,
         name: userInfo.name || null,
@@ -35,6 +36,9 @@ export function registerOAuthRoutes(app: Express) {
         loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
         lastSignedIn: new Date(),
       });
+
+      // 2. Auto-create/link customer record
+      await db.autoLinkCustomerToUser(userInfo.openId);
 
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",

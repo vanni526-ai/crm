@@ -153,6 +153,60 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+/**
+ * 自动为用户创建或关联customer记录
+ * 在用户注册/登录时调用，确保users和customers表实时同步
+ */
+export async function autoLinkCustomerToUser(openId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot auto-link customer: database not available");
+    return;
+  }
+
+  try {
+    // 1. 获取用户信息
+    const user = await getUserByOpenId(openId);
+    if (!user) {
+      console.warn(`[Database] User not found for openId: ${openId}`);
+      return;
+    }
+
+    // 2. 检查是否已有关联的customer
+    const existingCustomer = await getCustomerByUserId(user.id);
+    if (existingCustomer) {
+      console.log(`[Database] Customer already linked for user ${user.id}`);
+      return;
+    }
+
+    // 3. 通过phone查找现有customer并关联
+    if (user.phone) {
+      const customerByPhone = await getCustomerByPhone(user.phone);
+      if (customerByPhone && !customerByPhone.userId) {
+        await db.update(customers)
+          .set({ userId: user.id })
+          .where(eq(customers.id, customerByPhone.id));
+        console.log(`[Database] Linked existing customer ${customerByPhone.id} to user ${user.id} by phone`);
+        return;
+      }
+    }
+
+    // 4. 创建新的customer记录
+    const customerName = user.name || user.nickname || user.phone || `用户${user.id}`;
+    await createCustomer({
+      userId: user.id,
+      name: customerName,
+      phone: user.phone || undefined,
+      trafficSource: "App注册",
+      createdBy: user.id,
+    });
+    console.log(`[Database] Created new customer for user ${user.id}`);
+  } catch (error) {
+    console.error("[Database] Failed to auto-link customer:", error);
+    // 不抛出错误，避免影响用户登录流程
+  }
+}
+
 export async function getAllUsers() {
   const db = await getDb();
   if (!db) return [];
@@ -2179,39 +2233,42 @@ export async function rechargeCustomerAccount(params: {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  // 1. 获取当前余额
-  const [customer] = await db
-    .select()
-    .from(customers)
-    .where(eq(customers.id, params.customerId));
-  
-  if (!customer) {
-    throw new Error("客户不存在");
-  }
-  
-  const balanceBefore = Number(customer.accountBalance);
-  const balanceAfter = balanceBefore + params.amount;
-  
-  // 2. 更新客户余额
-  await db
-    .update(customers)
-    .set({ accountBalance: balanceAfter.toFixed(2) })
-    .where(eq(customers.id, params.customerId));
-  
-  // 3. 记录流水
-  await db.insert(accountTransactions).values({
-    customerId: params.customerId,
-    customerName: customer.name,
-    type: "recharge",
-    amount: params.amount.toFixed(2),
-    balanceBefore: balanceBefore.toFixed(2),
-    balanceAfter: balanceAfter.toFixed(2),
-    notes: params.notes,
-    operatorId: params.operatorId,
-    operatorName: params.operatorName,
+  // 使用事务确保原子性
+  return await db.transaction(async (tx) => {
+    // 1. 获取当前余额
+    const [customer] = await tx
+      .select()
+      .from(customers)
+      .where(eq(customers.id, params.customerId));
+    
+    if (!customer) {
+      throw new Error("客户不存在");
+    }
+    
+    const balanceBefore = Number(customer.accountBalance);
+    const balanceAfter = balanceBefore + params.amount;
+    
+    // 2. 更新客户余额
+    await tx
+      .update(customers)
+      .set({ accountBalance: balanceAfter.toFixed(2) })
+      .where(eq(customers.id, params.customerId));
+    
+    // 3. 记录流水
+    await tx.insert(accountTransactions).values({
+      customerId: params.customerId,
+      customerName: customer.name,
+      type: "recharge",
+      amount: params.amount.toFixed(2),
+      balanceBefore: balanceBefore.toFixed(2),
+      balanceAfter: balanceAfter.toFixed(2),
+      notes: params.notes,
+      operatorId: params.operatorId,
+      operatorName: params.operatorName,
+    });
+    
+    return { balanceBefore, balanceAfter };
   });
-  
-  return { balanceBefore, balanceAfter };
 }
 
 /**
@@ -2228,47 +2285,50 @@ export async function consumeCustomerAccount(params: {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  // 1. 获取当前余额
-  const [customer] = await db
-    .select()
-    .from(customers)
-    .where(eq(customers.id, params.customerId));
-  
-  if (!customer) {
-    throw new Error("客户不存在");
-  }
-  
-  const balanceBefore = Number(customer.accountBalance);
-  
-  // 2. 检查余额是否足够
-  if (balanceBefore < params.amount) {
-    throw new Error(`余额不足,当前余额¥${balanceBefore.toFixed(2)},需要¥${params.amount.toFixed(2)}`);
-  }
-  
-  const balanceAfter = balanceBefore - params.amount;
-  
-  // 3. 更新客户余额
-  await db
-    .update(customers)
-    .set({ accountBalance: balanceAfter.toFixed(2) })
-    .where(eq(customers.id, params.customerId));
-  
-  // 4. 记录流水
-  await db.insert(accountTransactions).values({
-    customerId: params.customerId,
-    customerName: customer.name,
-    type: "consume",
-    amount: (-params.amount).toFixed(2),
-    balanceBefore: balanceBefore.toFixed(2),
-    balanceAfter: balanceAfter.toFixed(2),
-    relatedOrderId: params.orderId,
-    relatedOrderNo: params.orderNo,
-    notes: `订单消费:${params.orderNo}`,
-    operatorId: params.operatorId,
-    operatorName: params.operatorName,
+  // 使用事务确保原子性
+  return await db.transaction(async (tx) => {
+    // 1. 获取当前余额
+    const [customer] = await tx
+      .select()
+      .from(customers)
+      .where(eq(customers.id, params.customerId));
+    
+    if (!customer) {
+      throw new Error("客户不存在");
+    }
+    
+    const balanceBefore = Number(customer.accountBalance);
+    
+    // 2. 检查余额是否足够
+    if (balanceBefore < params.amount) {
+      throw new Error(`余额不足,当前余额￥${balanceBefore.toFixed(2)},需要￥${params.amount.toFixed(2)}`);
+    }
+    
+    const balanceAfter = balanceBefore - params.amount;
+    
+    // 3. 更新客户余额
+    await tx
+      .update(customers)
+      .set({ accountBalance: balanceAfter.toFixed(2) })
+      .where(eq(customers.id, params.customerId));
+    
+    // 4. 记录流水
+    await tx.insert(accountTransactions).values({
+      customerId: params.customerId,
+      customerName: customer.name,
+      type: "consume",
+      amount: (-params.amount).toFixed(2),
+      balanceBefore: balanceBefore.toFixed(2),
+      balanceAfter: balanceAfter.toFixed(2),
+      relatedOrderId: params.orderId,
+      relatedOrderNo: params.orderNo,
+      notes: `订单消费:${params.orderNo}`,
+      operatorId: params.operatorId,
+      operatorName: params.operatorName,
+    });
+    
+    return { balanceBefore, balanceAfter };
   });
-  
-  return { balanceBefore, balanceAfter };
 }
 
 /**
@@ -2285,41 +2345,44 @@ export async function refundCustomerAccount(params: {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  // 1. 获取当前余额
-  const [customer] = await db
-    .select()
-    .from(customers)
-    .where(eq(customers.id, params.customerId));
-  
-  if (!customer) {
-    throw new Error("客户不存在");
-  }
-  
-  const balanceBefore = Number(customer.accountBalance);
-  const balanceAfter = balanceBefore + params.amount;
-  
-  // 2. 更新客户余额
-  await db
-    .update(customers)
-    .set({ accountBalance: balanceAfter.toFixed(2) })
-    .where(eq(customers.id, params.customerId));
-  
-  // 3. 记录流水
-  await db.insert(accountTransactions).values({
-    customerId: params.customerId,
-    customerName: customer.name,
-    type: "refund",
-    amount: params.amount.toFixed(2),
-    balanceBefore: balanceBefore.toFixed(2),
-    balanceAfter: balanceAfter.toFixed(2),
-    relatedOrderId: params.orderId,
-    relatedOrderNo: params.orderNo,
-    notes: `订单退款:${params.orderNo}`,
-    operatorId: params.operatorId,
-    operatorName: params.operatorName,
+  // 使用事务确保原子性
+  return await db.transaction(async (tx) => {
+    // 1. 获取当前余额
+    const [customer] = await tx
+      .select()
+      .from(customers)
+      .where(eq(customers.id, params.customerId));
+    
+    if (!customer) {
+      throw new Error("客户不存在");
+    }
+    
+    const balanceBefore = Number(customer.accountBalance);
+    const balanceAfter = balanceBefore + params.amount;
+    
+    // 2. 更新客户余额
+    await tx
+      .update(customers)
+      .set({ accountBalance: balanceAfter.toFixed(2) })
+      .where(eq(customers.id, params.customerId));
+    
+    // 3. 记录流水
+    await tx.insert(accountTransactions).values({
+      customerId: params.customerId,
+      customerName: customer.name,
+      type: "refund",
+      amount: params.amount.toFixed(2),
+      balanceBefore: balanceBefore.toFixed(2),
+      balanceAfter: balanceAfter.toFixed(2),
+      relatedOrderId: params.orderId,
+      relatedOrderNo: params.orderNo,
+      notes: `订单退款:${params.orderNo}`,
+      operatorId: params.operatorId,
+      operatorName: params.operatorName,
+    });
+    
+    return { balanceBefore, balanceAfter };
   });
-  
-  return { balanceBefore, balanceAfter };
 }
 
 // ============ Smart Register History ============
