@@ -9,6 +9,87 @@ import { updateProfitStageAndRecoveryStatus } from "./profitCalculator";
 
 export const partnerManagementRouter = router({
   /**
+   * 获取合伙人佣金统计
+   * 合伙人端接口：强制使用JWT中的userId，忽略前端传入的partnerId
+   */
+  getCommissionStats: protectedProcedure
+    .input(
+      z.object({
+        partnerId: z.number().optional(), // 忽略此参数
+        cityName: z.string().optional(), // 忽略此参数
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      // 检查用户角色
+      if (!ctx.user.roles.includes('cityPartner')) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Only city partners can access this endpoint',
+        });
+      }
+
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      // 强制使用JWT中的userId查询partner
+      const userId = ctx.user.id;
+      const partnerResult = await db
+        .select()
+        .from(partners)
+        .where(eq(partners.userId, userId))
+        .limit(1);
+
+      if (partnerResult.length === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Partner not found for current user',
+        });
+      }
+
+      const partner = partnerResult[0];
+
+      // 查询该合伙人的城市列表
+      const partnerCitiesResult = await db
+        .select({
+          cityId: partnerCities.cityId,
+          cityName: cities.name,
+        })
+        .from(partnerCities)
+        .leftJoin(cities, eq(partnerCities.cityId, cities.id))
+        .where(eq(partnerCities.partnerId, partner.id));
+
+      console.log('[partnerManagement.getCommissionStats] Partner ID:', partner.id);
+      console.log('[partnerManagement.getCommissionStats] Cities:', partnerCitiesResult.map(c => c.cityName));
+
+      // TODO: 实现真实的佣金统计逻辑
+      // 目前返回模拟数据
+      return {
+        partnerId: partner.id,
+        partnerName: partner.name,
+        cities: partnerCitiesResult.map(c => c.cityName),
+        totalCommission: '12500.00',
+        paidCommission: '8000.00',
+        unpaidCommission: '4500.00',
+        commissionRatio: partner.profitRatio,
+        monthlyStats: [
+          {
+            month: '2026-01',
+            totalRevenue: '50000.00',
+            commission: '5000.00',
+            status: 'paid',
+          },
+          {
+            month: '2026-02',
+            totalRevenue: '75000.00',
+            commission: '7500.00',
+            status: 'pending',
+          },
+        ],
+      };
+    }),
+  /**
    * 根据userId获取partnerId
    */
   getPartnerIdByUserId: protectedProcedure

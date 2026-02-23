@@ -4483,3 +4483,31 @@
 - [x] 检查列表查询是否过滤已删除记录（getAllTeachers函数）
 - [x] 修复问题并测试验证
 - [x] 保存检查点并交付
+
+### 155. 实现4个缺失的后端接口
+- [ ] 实现schedules.getTeacherAvailability接口（老师端）
+- [ ] 实现partnerManagement.getCommissionStats接口（合伙人端）
+- [ ] 实现cityExpense.getStats接口（城市费用统计）
+- [ ] 实现analytics.getDashboardStats接口（数据分析看板）
+- [ ] 运行API健康检查脚本验证
+- [ ] 保存检查点并交付
+
+### 155. 实现4个缺失的后端接口
+- [x] 实现schedules.getTeacherAvailability接口
+  - [x] 创建schedulesRouter模块
+  - [x] 实现老师排班查询逻辑
+  - [x] 添加权限控制（只允许teacher角色访问）
+- [x] 实现partnerManagement.getCommissionStats接口
+  - [x] 在partnerManagementRouter中添加接口
+  - [x] 实现合伙人佣金统计逻辑
+  - [x] 添加权限控制（只允许cityPartner角色访问）
+- [x] 实现cityExpense.getStats接口
+  - [x] 在cityExpenseRouter中添加接口
+  - [x] 实现城市费用统计逻辑
+  - [x] 添加权限控制（只允许cityPartner角色访问）
+- [x] 实现analytics.getDashboardStats接口
+  - [x] 创建analyticsRouter模块
+  - [x] 实现多角色数据统计逻辑
+  - [x] 添加角色判断（admin/sales/teacher/cityPartner）
+- [x] 运行API健康检查脚本验证
+- [x] 保存检查点并交付

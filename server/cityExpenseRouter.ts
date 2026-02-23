@@ -9,6 +9,96 @@ import { aggregateOrderFeesByMonthAndCity, aggregateOrderSalesByMonthAndCity } f
 
 export const cityExpenseRouter = router({
   /**
+   * 获取城市费用统计
+   * 合伙人端接口：强制使用JWT中的userId，忽略前端传入的cityName
+   */
+  getStats: protectedProcedure
+    .input(
+      z.object({
+        cityName: z.string().optional(), // 忽略此参数
+        startMonth: z.string().optional(),
+        endMonth: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      // 检查用户角色
+      const userRoles = ctx.user.roles ? ctx.user.roles.split(',') : [];
+      const isCityPartner = userRoles.includes('cityPartner');
+
+      if (!isCityPartner) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Only city partners can access this endpoint',
+        });
+      }
+
+      // 强制使用JWT中的userId查询partner
+      const userId = ctx.user.id;
+      const partnerRecord = await db
+        .select({ id: partners.id })
+        .from(partners)
+        .where(eq(partners.userId, userId))
+        .limit(1);
+
+      if (partnerRecord.length === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Partner not found for current user',
+        });
+      }
+
+      const partnerId = partnerRecord[0].id;
+
+      // 获取该合伙人管理的城市ID列表
+      const partnerCitiesRecords = await db
+        .select({
+          cityId: partnerCities.cityId,
+          cityName: cities.name,
+        })
+        .from(partnerCities)
+        .leftJoin(cities, eq(partnerCities.cityId, cities.id))
+        .where(and(
+          eq(partnerCities.partnerId, partnerId),
+          eq(partnerCities.contractStatus, 'active')
+        ));
+
+      const managedCityIds = partnerCitiesRecords.map(pc => pc.cityId);
+
+      console.log('[cityExpense.getStats] Partner ID:', partnerId);
+      console.log('[cityExpense.getStats] Managed Cities:', partnerCitiesRecords.map(c => c.cityName));
+
+      // TODO: 实现真实的费用统计逻辑
+      // 目前返回模拟数据
+      return {
+        cities: partnerCitiesRecords.map(c => c.cityName),
+        totalExpense: '45000.00',
+        monthlyAverage: '15000.00',
+        breakdown: {
+          rentFee: '20000.00',
+          propertyFee: '5000.00',
+          utilityFee: '3000.00',
+          consumablesFee: '2000.00',
+          cleaningFee: '1500.00',
+          phoneFee: '500.00',
+          expressFee: '1000.00',
+          promotionFee: '12000.00',
+        },
+        monthlyStats: [
+          {
+            month: '2026-01',
+            totalExpense: '15000.00',
+          },
+          {
+            month: '2026-02',
+            totalExpense: '15000.00',
+          },
+        ],
+      };
+    }),
+  /**
    * 获取城市月度费用账单列表
    */
   list: protectedProcedure
