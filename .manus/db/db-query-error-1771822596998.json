@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, name, phone, teacherStatus, deletedAt, createdAt, updatedAt FROM users WHERE id IN (22771277, 22771270, 22771260);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, teacherStatus, deletedAt, createdAt, updatedAt FROM users WHERE id IN (22771277, 22771270, 22771260);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'deletedat' in 'field list'"
+  ]
+}

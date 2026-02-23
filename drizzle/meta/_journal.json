@@ -330,6 +330,13 @@
       "when": 1771783196926,
       "tag": "0046_brainy_shaman",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "5",
+      "when": 1771822685872,
+      "tag": "0047_odd_earthquake",
+      "breakpoints": true
     }
   ]
 }

@@ -1087,7 +1087,7 @@ export async function getAllTeachers() {
   const db = await getDb();
   if (!db) return [];
   const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/JopHWzeEmqAYxCyT.png";
-   // 从u users表读取角色包含teacher的用户
+   // 从u users表读取角色包含teacher的用户，过滤已删除记录
   const results = await db.select({
     id: users.id,
     name: users.name,
@@ -1097,7 +1097,12 @@ export async function getAllTeachers() {
     isActive: sql<number>`1`, // users表没有isActive字段，默认为1
     avatarUrl: users.avatarUrl,
     teacherAttribute: users.teacherAttribute,
-  }).from(users).where(like(users.roles, '%teacher%')).orderBy(desc(users.createdAt));
+  }).from(users).where(
+    and(
+      like(users.roles, '%teacher%'),
+      isNull(users.deletedAt) // 过滤已删除记录
+    )
+  ).orderBy(desc(users.createdAt));
   
   // 如果avatarUrl为null,使用统一默认头像
   return results.map(teacher => ({
@@ -1132,11 +1137,20 @@ export async function updateTeacher(id: number, data: Partial<InsertTeacher> & {
   await db.update(teachers).set(updateData).where(eq(teachers.id, id));
 }
 
-// 批量删除老师
+// 批量删除老师（软删除users表记录）
 export async function batchDeleteTeachers(ids: number[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.delete(teachers).where(inArray(teachers.id, ids));
+  
+  console.log('[batchDeleteTeachers] 开始删除老师: ids=', ids);
+  
+  // 软删除users表中的老师记录
+  await db
+    .update(users)
+    .set({ deletedAt: new Date() })
+    .where(inArray(users.id, ids));
+  
+  console.log('[batchDeleteTeachers] 删除成功: count=', ids.length);
 }
 
 // 批量更新老师状态

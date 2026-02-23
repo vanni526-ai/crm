@@ -1,0 +1,31 @@
+{
+  "query": "SELECT id, name, phone, roles, deletedAt FROM users WHERE id IN (22771277, 22771270, 22771260);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, roles, deletedAt FROM users WHERE id IN (22771277, 22771270, 22771260);",
+  "rows": [
+    {
+      "id": "22771277",
+      "name": "测试老师",
+      "phone": "NULL",
+      "roles": "teacher",
+      "deletedAt": "2026-02-23 04:59:24"
+    },
+    {
+      "id": "22771270",
+      "name": "测试老师",
+      "phone": "NULL",
+      "roles": "teacher",
+      "deletedAt": "2026-02-23 04:59:24"
+    },
+    {
+      "id": "22771260",
+      "name": "测试老师",
+      "phone": "NULL",
+      "roles": "teacher",
+      "deletedAt": "2026-02-23 04:59:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\troles\tdeletedAt\n22771277\t测试老师\tNULL\tteacher\t2026-02-23 04:59:24\n22771270\t测试老师\tNULL\tteacher\t2026-02-23 04:59:24\n22771260\t测试老师\tNULL\tteacher\t2026-02-23 04:59:24\n",
+  "stderr": "",
+  "execution_time_ms": 1593
+}
