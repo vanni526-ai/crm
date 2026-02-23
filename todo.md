@@ -4349,4 +4349,17 @@
 - [x] 评估前端接口影响:前端无需修改,API返回数据结构保持不变
 - [x] 生成API文档(docs/API文档-客户管理接口.md)
 - [x] 测试验证所有功能正常(会员字段正常返回)
+- [x] 保存检查点(72668726)
+
+### 148. 将业务客户tab移出创建独立的客户管理页面
+- [x] 修改/customer-management页面,移除"业务客户"tab
+- [x] 备份旧的Customers.tsx为Customers_old_backup.tsx
+- [x] 创建新页面/customers,使用CustomersContent组件
+- [x] 在DashboardLayout导航栏中添加"客户管理"菜单项(放在用户管理下方)
+- [x] App.tsx中/customers路由已存在,无需修改
+- [x] 测试两个页面的导航和布局
+  - 用户管理(/customer-management): 只显示用户账号列表,tab已移除
+  - 客户管理(/customers): 显示业务客户列表,布局一致
+  - 导航栏: 客户管理已添加在用户管理下方
+  - 会员状态: 从 users表正常获取并显示
 - [ ] 保存检查点
