@@ -4456,3 +4456,23 @@
   - [x] 通知模块文档
   - [x] 服务发现模块文档
 - [x] 保存检查点并交付
+
+### 153. 完成剩余权限改造（老师端、城市合伙人端、测试用例）
+- [x] 实现老师端接口权限控制
+  - [x] 改造teacherPayments模块（老师收入查询）
+  - [x] 改造orders.list（老师视角，只看自己的课程订单）
+  - [x] 添加老师端数据范围控制
+- [x] 实现城市合伙人端接口权限控制
+  - [x] 改造partnerManagement.getCommissionStats
+  - [x] 改造cityExpense.list
+  - [x] 改造cityExpense.getStats
+  - [x] 改造customers.list（城市范围）
+  - [x] 添加城市绑定关系查询
+- [x] 编写权限测试用例
+  - [x] 测试学员端权限（account、orders）
+  - [x] 测试老师端权限
+  - [x] 测试城市合伙人权限
+  - [x] 测试销售端权限
+  - [x] 测试管理员权限
+  - [x] 测试越权访问拒绝
+- [x] 更新API文档并保存检查点
