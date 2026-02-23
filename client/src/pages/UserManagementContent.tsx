@@ -245,6 +245,7 @@ export default function UserManagementContent() {
     if (searchKeyword) {
       const keyword = searchKeyword.toLowerCase();
       const matchesKeyword = (
+        user.id.toString().includes(keyword) ||
         user.name?.toLowerCase().includes(keyword) ||
         user.nickname?.toLowerCase().includes(keyword) ||
         user.email?.toLowerCase().includes(keyword) ||
