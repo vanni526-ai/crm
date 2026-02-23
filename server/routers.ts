@@ -221,27 +221,81 @@ export const appRouter = router({
         channelOrderNo: z.string().optional(),
       }).optional())
       .query(async ({ ctx, input }) => {
-        // 如果有渠道订单号搜索
+        const { getDataScope } = await import("./permissions");
+        const scope = getDataScope(ctx);
+        
+        // 如果有渠道订单号搜索（仅管理员和财务）
         if (input?.channelOrderNo && input.channelOrderNo.trim() !== '') {
+          if (!scope.isAdmin && !scope.isFinance) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "无权搜索渠道订单号" });
+          }
           return db.searchOrdersByChannelOrderNo(input.channelOrderNo);
         }
         
-        // 如果有支付渠道筛选
+        // 如果有支付渠道筛选（仅管理员和财务）
         if (input?.paymentChannel && input.paymentChannel !== 'all') {
+          if (!scope.isAdmin && !scope.isFinance) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "无权按支付渠道筛选" });
+          }
           return db.getOrdersByPaymentChannel(input.paymentChannel);
         }
         
-        // 销售只能看自己的订单
-        if (ctx.user.role === "sales") {
+        // 根据角色返回不同的订单列表
+        if (scope.isAdmin || scope.isFinance) {
+          // 管理员和财务可以查看所有订单
+          return db.getAllOrders();
+        } else if (scope.isSales) {
+          // 销售只能看自己的订单
           return db.getOrdersBySales(ctx.user.id);
+        } else if (scope.isTeacher) {
+          // 老师查看与自己相关的订单
+          return db.getOrdersByTeacher(ctx.user.id);
+        } else if (scope.isUser) {
+          // 普通用户查看自己创建的订单
+          return db.getOrdersBySales(ctx.user.id);
+        } else {
+          // 其他角色返回空列表
+          return [];
         }
-        return db.getAllOrders();
       }),
     
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return db.getOrderById(input.id);
+      .query(async ({ ctx, input }) => {
+        const { getDataScope, checkResourceOwnership } = await import("./permissions");
+        const scope = getDataScope(ctx);
+        
+        // 查询订单
+        const order = await db.getOrderById(input.id);
+        if (!order) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+        }
+        
+        // 管理员和财务可以查看所有订单
+        if (scope.isAdmin || scope.isFinance) {
+          return order;
+        }
+        
+        // 普通用户和销售只能查看自己创建的订单
+        if (scope.isUser || scope.isSales) {
+          if (order.salesId !== ctx.user.id) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "无权查看此订单" });
+          }
+          return order;
+        }
+        
+        // 老师只能查看与自己相关的订单
+        if (scope.isTeacher) {
+          const user = await db.getUserById(ctx.user.id);
+          const teacherName = user?.name || user?.nickname || '';
+          if (!order.deliveryTeacher || !order.deliveryTeacher.includes(teacherName)) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "无权查看此订单" });
+          }
+          return order;
+        }
+        
+        // 其他角色拒绝访问
+        throw new TRPCError({ code: "FORBIDDEN", message: "无权查看订单" });
       }),
     
     // 更新订单支付状态
@@ -458,6 +512,7 @@ export const appRouter = router({
         customerName: z.string().optional(), // 允许客户名为空
         salespersonId: z.number().optional(), // 销售人员ID(关联salespersons表)
         salesPerson: z.string().optional(),
+        salesId: z.number().optional(), // 销售人员ID(关联users表) - 后端自动填充
         trafficSource: z.string().optional(),
         paymentAmount: z.string(),
         courseAmount: z.string(),

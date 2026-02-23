@@ -4402,3 +4402,57 @@
   - [x] 测试删除关联customer
   - [x] 验证users表更新
 - [x] 保存检查点并交付
+
+### 152. 实施CRM后端接口权限改造
+- [x] 分析现有接口结构和权限机制
+  - [x] 读取所有路由模块
+  - [x] 分析现有认证机制
+  - [x] 梳理需要改造的接口列表
+- [x] 创建权限中间件和基础设施
+  - [x] 创建角色权限中间件
+  - [x] 实现数据范围控制逻辑
+  - [x] 创建可复用的权限校验函数
+- [x] 改造学员端接口(user)
+  - [x] account.getMyTransactions
+  - [x] account.getMyBalance
+  - [x] orders.list
+  - [x] orders.getById
+- [ ] 改造老师端接口(teacher)
+  - [ ] schedules.getTeacherAvailability
+  - [ ] orders.list (老师视角)
+  - [ ] analytics.getDashboardStats (老师视角)
+- [ ] 改造城市合伙人端接口(cityPartner)
+  - [ ] partnerManagement.getCommissionStats
+  - [ ] cityExpense.list
+  - [ ] cityExpense.getStats
+  - [ ] analytics.getCityStats
+  - [ ] customers.list (城市范围)
+- [x] 改造销售端接口(sales)
+  - [x] orders.create (自动关联salesId)
+  - [x] orders.list (销售视角)
+  - [ ] analytics.getDashboardStats (销售视角)
+- [ ] 改造管理员端接口(admin)
+  - [ ] 所有查询接口增加角色校验
+  - [ ] 保持参数兼容性
+- [ ] 编写权限测试用例
+  - [ ] 测试学员端权限
+  - [ ] 测试老师端权限
+  - [ ] 测试城市合伙人权限
+  - [ ] 测试销售端权限
+  - [ ] 测试管理员权限
+  - [ ] 测试越权访问拒绝
+- [x] 生成完整API文档
+  - [x] 认证模块文档
+  - [x] 用户模块文档
+  - [x] 客户模块文档
+  - [x] 城市模块文档
+  - [x] 老师模块文档
+  - [x] 课程模块文档
+  - [x] 预约模块文档
+  - [x] 支付模块文档
+  - [x] 会员模块文档
+  - [x] 合伙人模块文档
+  - [x] 费用账单模块文档
+  - [x] 通知模块文档
+  - [x] 服务发现模块文档
+- [x] 保存检查点并交付

@@ -5247,3 +5247,26 @@ export async function getPartnerExpenses(partnerId: number) {
   
   return result;
 }
+
+/**
+ * 获取老师相关的订单列表
+ * 查询deliveryTeacher字段包含老师名字的订单
+ */
+export async function getOrdersByTeacher(teacherId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // 首先获取老师的名字
+  const user = await getUserById(teacherId);
+  if (!user) return [];
+  
+  const teacherName = user.name || user.nickname || '';
+  if (!teacherName) return [];
+  
+  // 查询deliveryTeacher字段包含老师名字的订单
+  return db
+    .select()
+    .from(orders)
+    .where(sql`${orders.deliveryTeacher} LIKE ${`%${teacherName}%`}`)
+    .orderBy(desc(orders.createdAt));
+}
