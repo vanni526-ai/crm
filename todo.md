@@ -4553,3 +4553,14 @@
   - [x] analytics.*接口（成功）
 - [x] 生成Bearer Token使用指南文档
 - [x] 保存检查点并交付
+
+### 159. 修复APP团队报告的数据库连接和JWT认证问题
+- [x] 诊断TiDB数据库连接错误（CRM后端配置正确，指向TiDB Cloud远程数据库）
+- [x] 检查DATABASE_URL环境变量配置（gateway02.us-east-1.prod.aws.tidbcloud.com:4000）
+- [x] 确认数据库连接问题在代理层而非CRM后端
+- [x] 诊断JWT Token 10001认证错误（代理层使用不同的JWT_SECRET）
+- [x] 检查JWT_SECRET环境变量配置（NLfhjW8BxHuaEbw9k6rNWG）
+- [x] 确认代理层和CRM后端的JWT_SECRET不一致
+- [x] 创建APP代理层JWT配置指南文档
+- [x] 提供JWT_SECRET和Token格式要求给APP团队
+- [x] 保存检查点并交付
