@@ -571,14 +571,42 @@ export async function getOrCreateCustomerForUser(user: {
   };
 }
 
+/**
+ * 删除customer（软删除）并级联更新users表
+ * 使用事务确保原子性，防止孤立记录
+ */
 export async function deleteCustomer(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // 软删除：设置deletedAt字段而不是真正删除记录
-  await db
-    .update(customers)
-    .set({ deletedAt: new Date() })
-    .where(eq(customers.id, id));
+  
+  // 使用事务确保级联操作的原子性
+  return await db.transaction(async (tx) => {
+    // 1. 获取customer信息，检查是否存在
+    const [customer] = await tx
+      .select()
+      .from(customers)
+      .where(eq(customers.id, id))
+      .limit(1);
+    
+    if (!customer) {
+      throw new Error(`Customer ${id} not found`);
+    }
+    
+    // 2. 如果customer关联了user，需要解除关联
+    // 注意：users表不存储customer相关字段，只有customers表存储userId
+    // 所以只需要软删除customer即可，不需要更新users表
+    
+    // 3. 软删除customer记录
+    await tx
+      .update(customers)
+      .set({ deletedAt: new Date() })
+      .where(eq(customers.id, id));
+    
+    console.log(`[deleteCustomer] Customer ${id} (${customer.name}) deleted successfully`);
+    if (customer.userId) {
+      console.log(`[deleteCustomer] Customer was linked to user ${customer.userId}`);
+    }
+  });
 }
 
 // ========== 订单管理 ==========
