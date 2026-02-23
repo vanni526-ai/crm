@@ -4362,4 +4362,11 @@
   - 客户管理(/customers): 显示业务客户列表,布局一致
   - 导航栏: 客户管理已添加在用户管理下方
   - 会员状态: 从 users表正常获取并显示
-- [ ] 保存检查点
+- [x] 保存检查点(fc61448a)
+
+### 149. 修复/customers页面受控组件错误
+- [x] 诊断CustomersContent.tsx中的input元素(checkbox的checked属性)
+- [x] 修复checkbox的checked属性,确保初始值不是undefined(使用customer?.id ?? -1)
+- [x] 测试页面加载和checkbox交互(选中/取消选中)
+- [x] 验证控制台无受控组件警告
+- [x] 保存检查点

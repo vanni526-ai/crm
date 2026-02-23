@@ -518,7 +518,7 @@ export default function CustomersContent() {
                         <TableCell>
                           <input
                             type="checkbox"
-                            checked={selectedCustomerIds.includes(customer.id)}
+                            checked={selectedCustomerIds.includes(customer?.id ?? -1)}
                             onChange={(e) => {
                               if (e.target.checked) {
                                 setSelectedCustomerIds([...selectedCustomerIds, customer.id]);
