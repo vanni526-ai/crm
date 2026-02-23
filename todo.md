@@ -4516,3 +4516,12 @@
 - [x] 添加analytics.inactiveCustomers接口
 - [x] 添加analytics.orderStats接口
 - [x] 测试验证并保存检查点
+
+### 157. 更新CRM系统完整API文档
+- [x] 添加analytics.inactiveCustomers接口说明
+- [x] 添加analytics.orderStats接口说明
+- [x] 添加schedules.getTeacherAvailability接口说明
+- [x] 添加partnerManagement.getCommissionStats接口说明
+- [x] 添加cityExpense.getStats接口说明
+- [x] 添加analytics.getDashboardStats接口说明
+- [x] 保存检查点并交付
