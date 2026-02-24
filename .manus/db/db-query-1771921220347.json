@@ -1,0 +1,210 @@
+{
+  "query": "SELECT id, userId, name, phone, city, category, status, createdAt \nFROM teachers \nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, userId, name, phone, city, category, status, createdAt \nFROM teachers \nLIMIT 20;",
+  "rows": [
+    {
+      "id": "570055",
+      "userId": "15362121",
+      "name": "安雅",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:25"
+    },
+    {
+      "id": "570056",
+      "userId": "16028798",
+      "name": "烨",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:26"
+    },
+    {
+      "id": "570057",
+      "userId": "16028799",
+      "name": "圆圆",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:27"
+    },
+    {
+      "id": "570058",
+      "userId": "16028800",
+      "name": "小钰",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:27"
+    },
+    {
+      "id": "570059",
+      "userId": "16028801",
+      "name": "玥玥",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:28"
+    },
+    {
+      "id": "570060",
+      "userId": "15362127",
+      "name": "唐泽",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:29"
+    },
+    {
+      "id": "570061",
+      "userId": "15362136",
+      "name": "Nemo",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:29"
+    },
+    {
+      "id": "570062",
+      "userId": "15362139",
+      "name": "淼淼",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:30"
+    },
+    {
+      "id": "570063",
+      "userId": "16028802",
+      "name": "璐璐",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:31"
+    },
+    {
+      "id": "570064",
+      "userId": "15362126",
+      "name": "水水",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:31"
+    },
+    {
+      "id": "570065",
+      "userId": "15362129",
+      "name": "米妮",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:32"
+    },
+    {
+      "id": "570066",
+      "userId": "15362122",
+      "name": "姜一",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:33"
+    },
+    {
+      "id": "570067",
+      "userId": "15362133",
+      "name": "枝",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:33"
+    },
+    {
+      "id": "570068",
+      "userId": "15362132",
+      "name": "韦德",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:34"
+    },
+    {
+      "id": "570069",
+      "userId": "15362124",
+      "name": "黑桃",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:35"
+    },
+    {
+      "id": "570070",
+      "userId": "15362134",
+      "name": "井盖",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:35"
+    },
+    {
+      "id": "570071",
+      "userId": "16028804",
+      "name": "紫野",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:36"
+    },
+    {
+      "id": "570072",
+      "userId": "15362128",
+      "name": "无浪",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:37"
+    },
+    {
+      "id": "570073",
+      "userId": "15362135",
+      "name": "温言",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:37"
+    },
+    {
+      "id": "570074",
+      "userId": "15362137",
+      "name": "巳月",
+      "phone": "",
+      "city": "上海",
+      "category": "本部老师",
+      "status": "活跃",
+      "createdAt": "2026-02-13 10:34:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\tphone\tcity\tcategory\tstatus\tcreatedAt\n570055\t15362121\t安雅\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:25\n570056\t16028798\t烨\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:26\n570057\t16028799\t圆圆\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:27\n570058\t16028800\t小钰\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:27\n570059\t16028801\t玥玥\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:28\n570060\t15362127\t唐泽\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:29\n570061\t15362136\tNemo\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:29\n570062\t15362139\t淼淼\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:30\n570063\t16028802\t璐璐\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:31\n570064\t15362126\t水水\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:31\n570065\t15362129\t米妮\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:32\n570066\t15362122\t姜一\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:33\n570067\t15362133\t枝\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:33\n570068\t15362132\t韦德\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:34\n570069\t15362124\t黑桃\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:35\n570070\t15362134\t井盖\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:35\n570071\t16028804\t紫野\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:36\n570072\t15362128\t无浪\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:37\n570073\t15362135\t温言\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:37\n570074\t15362137\t巳月\t\t上海\t本部老师\t活跃\t2026-02-13 10:34:38\n",
+  "stderr": "",
+  "execution_time_ms": 1523
+}

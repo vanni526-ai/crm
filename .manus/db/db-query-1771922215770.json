@@ -1,0 +1,86 @@
+{
+  "query": "SELECT city, areaCode FROM cityPartnerConfig WHERE isActive = 1 ORDER BY city;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT city, areaCode FROM cityPartnerConfig WHERE isActive = 1 ORDER BY city;",
+  "rows": [
+    {
+      "city": "上海",
+      "areaCode": "021"
+    },
+    {
+      "city": "东莞",
+      "areaCode": "769"
+    },
+    {
+      "city": "南京",
+      "areaCode": "025"
+    },
+    {
+      "city": "大连",
+      "areaCode": "411"
+    },
+    {
+      "city": "天津",
+      "areaCode": "022"
+    },
+    {
+      "city": "太原",
+      "areaCode": "351"
+    },
+    {
+      "city": "宁波",
+      "areaCode": "574"
+    },
+    {
+      "city": "无锡",
+      "areaCode": "510"
+    },
+    {
+      "city": "杭州",
+      "areaCode": "571"
+    },
+    {
+      "city": "武汉",
+      "areaCode": "027"
+    },
+    {
+      "city": "泉州",
+      "areaCode": "595"
+    },
+    {
+      "city": "济南",
+      "areaCode": "531"
+    },
+    {
+      "city": "深圳",
+      "areaCode": "755"
+    },
+    {
+      "city": "石家庄",
+      "areaCode": "311"
+    },
+    {
+      "city": "福州",
+      "areaCode": "591"
+    },
+    {
+      "city": "苏州",
+      "areaCode": "512"
+    },
+    {
+      "city": "郑州",
+      "areaCode": "371"
+    },
+    {
+      "city": "重庆",
+      "areaCode": "023"
+    },
+    {
+      "city": "长沙",
+      "areaCode": "731"
+    }
+  ],
+  "messages": [],
+  "stdout": "city\tareaCode\n上海\t021\n东莞\t769\n南京\t025\n大连\t411\n天津\t022\n太原\t351\n宁波\t574\n无锡\t510\n杭州\t571\n武汉\t027\n泉州\t595\n济南\t531\n深圳\t755\n石家庄\t311\n福州\t591\n苏州\t512\n郑州\t371\n重庆\t023\n长沙\t731\n",
+  "stderr": "",
+  "execution_time_ms": 1633
+}

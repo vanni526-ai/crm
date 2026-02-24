@@ -1,0 +1,120 @@
+{
+  "query": "SELECT name, areaCode, isActive \nFROM cities \nWHERE isActive = 1 \nORDER BY name ASC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT name, areaCode, isActive \nFROM cities \nWHERE isActive = 1 \nORDER BY name ASC;",
+  "rows": [
+    {
+      "name": "上海",
+      "areaCode": "021",
+      "isActive": "1"
+    },
+    {
+      "name": "东莞",
+      "areaCode": "769",
+      "isActive": "1"
+    },
+    {
+      "name": "南京",
+      "areaCode": "025",
+      "isActive": "1"
+    },
+    {
+      "name": "大连",
+      "areaCode": "411",
+      "isActive": "1"
+    },
+    {
+      "name": "天津",
+      "areaCode": "022",
+      "isActive": "1"
+    },
+    {
+      "name": "太原",
+      "areaCode": "351",
+      "isActive": "1"
+    },
+    {
+      "name": "宁波",
+      "areaCode": "574",
+      "isActive": "1"
+    },
+    {
+      "name": "无锡",
+      "areaCode": "510",
+      "isActive": "1"
+    },
+    {
+      "name": "杭州",
+      "areaCode": "571",
+      "isActive": "1"
+    },
+    {
+      "name": "武汉",
+      "areaCode": "027",
+      "isActive": "1"
+    },
+    {
+      "name": "泉州",
+      "areaCode": "595",
+      "isActive": "1"
+    },
+    {
+      "name": "测试城市_1771820816337",
+      "areaCode": "NULL",
+      "isActive": "1"
+    },
+    {
+      "name": "测试城市_1771820848293",
+      "areaCode": "NULL",
+      "isActive": "1"
+    },
+    {
+      "name": "测试城市_1771820865389",
+      "areaCode": "NULL",
+      "isActive": "1"
+    },
+    {
+      "name": "济南",
+      "areaCode": "531",
+      "isActive": "1"
+    },
+    {
+      "name": "深圳",
+      "areaCode": "755",
+      "isActive": "1"
+    },
+    {
+      "name": "石家庄",
+      "areaCode": "311",
+      "isActive": "1"
+    },
+    {
+      "name": "福州",
+      "areaCode": "591",
+      "isActive": "1"
+    },
+    {
+      "name": "苏州",
+      "areaCode": "512",
+      "isActive": "1"
+    },
+    {
+      "name": "郑州",
+      "areaCode": "371",
+      "isActive": "1"
+    },
+    {
+      "name": "重庆",
+      "areaCode": "023",
+      "isActive": "1"
+    },
+    {
+      "name": "长沙",
+      "areaCode": "731",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "name\tareaCode\tisActive\n上海\t021\t1\n东莞\t769\t1\n南京\t025\t1\n大连\t411\t1\n天津\t022\t1\n太原\t351\t1\n宁波\t574\t1\n无锡\t510\t1\n杭州\t571\t1\n武汉\t027\t1\n泉州\t595\t1\n测试城市_1771820816337\tNULL\t1\n测试城市_1771820848293\tNULL\t1\n测试城市_1771820865389\tNULL\t1\n济南\t531\t1\n深圳\t755\t1\n石家庄\t311\t1\n福州\t591\t1\n苏州\t512\t1\n郑州\t371\t1\n重庆\t023\t1\n长沙\t731\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1556
+}
