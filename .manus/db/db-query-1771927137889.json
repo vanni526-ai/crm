@@ -1,0 +1,9 @@
+{
+  "query": "\n-- 查询所有老师角色的用户及其城市数据\nSELECT \n  u.id,\n  u.name,\n  u.nickname,\n  u.phone,\n  u.roles,\n  urc.cities\nFROM users u\nLEFT JOIN user_role_cities urc ON u.id = urc.userId AND urc.role = 'teacher'\nWHERE u.roles LIKE '%老师%'\n  AND u.deletedAt IS NULL\nORDER BY u.id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 查询所有老师角色的用户及其城市数据\nSELECT \n  u.id,\n  u.name,\n  u.nickname,\n  u.phone,\n  u.roles,\n  urc.cities\nFROM users u\nLEFT JOIN user_role_cities urc ON u.id = urc.userId AND urc.role = 'teacher'\nWHERE u.roles LIKE '%老师%'\n  AND u.deletedAt IS NULL\nORDER BY u.id;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1494
+}

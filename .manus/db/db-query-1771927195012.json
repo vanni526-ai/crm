@@ -1,0 +1,55 @@
+{
+  "query": "\nSELECT DISTINCT roles FROM users WHERE deletedAt IS NULL LIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT DISTINCT roles FROM users WHERE deletedAt IS NULL LIMIT 20;\n",
+  "rows": [
+    {
+      "roles": "user"
+    },
+    {
+      "roles": "user,admin,sales,cityPartner,teacher"
+    },
+    {
+      "roles": "user,sales,finance"
+    },
+    {
+      "roles": "teacher,user"
+    },
+    {
+      "roles": "user,teacher"
+    },
+    {
+      "roles": "sales"
+    },
+    {
+      "roles": "user,admin"
+    },
+    {
+      "roles": "user,cityPartner,admin,sales"
+    },
+    {
+      "roles": "admin,user"
+    },
+    {
+      "roles": "admin"
+    },
+    {
+      "roles": "user,cityPartner,teacher"
+    },
+    {
+      "roles": "teacher"
+    },
+    {
+      "roles": "cityPartner,user"
+    },
+    {
+      "roles": "user,teacher,cityPartner"
+    },
+    {
+      "roles": "user,cityPartner"
+    }
+  ],
+  "messages": [],
+  "stdout": "roles\nuser\nuser,admin,sales,cityPartner,teacher\nuser,sales,finance\nteacher,user\nuser,teacher\nsales\nuser,admin\nuser,cityPartner,admin,sales\nadmin,user\nadmin\nuser,cityPartner,teacher\nteacher\ncityPartner,user\nuser,teacher,cityPartner\nuser,cityPartner\n",
+  "stderr": "",
+  "execution_time_ms": 1511
+}
