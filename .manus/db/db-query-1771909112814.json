@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE classrooms ADD COLUMN capacity INT NOT NULL DEFAULT 1 COMMENT '教室容量（同时可容纳的课程数）';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute ALTER TABLE classrooms ADD COLUMN capacity INT NOT NULL DEFAULT 1 COMMENT '教室容量（同时可容纳的课程数）';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2012
+}

@@ -31,6 +31,9 @@ import { membershipRouter } from "./membershipRouter";
 import { apiDiscoveryRouter } from "./apiDiscoveryRouter";
 import { schedulesRouter } from "./schedulesRouter";
 import { analyticsRouter } from "./analyticsRouter";
+import { classroomsRouter } from "./classroomsRouter";
+import { teachersRouter } from "./teachersRouter";
+import { bookingRouter } from "./bookingRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -109,6 +112,9 @@ export const appRouter = router({
   membership: membershipRouter,
   schedules: schedulesRouter,
   analytics: analyticsRouter,
+  classrooms: classroomsRouter,
+  teachers: teachersRouter,
+  booking: bookingRouter,
 
   // 数据质量检查
   dataQuality: router({

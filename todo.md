@@ -4598,4 +4598,32 @@
 - [x] 执行批量删除操作（DELETE FROM users WHERE name LIKE '%测试%'）
 - [x] 确认用户编号列已显示id字段
 - [x] 在搜索框中增加针对id的搜索功能
+- [x] 保存检查点并交付
+
+### 164. 生成"申请通知"相关的所有接口文档
+- [x] 查找申请通知相关的所有接口定义（notifications路由）
+- [x] 整理接口参数、返回值和调用示例
+- [x] 生成完整的Markdown接口文档
+- [x] 交付文档
+
+### 165. 实施约课流程综合优化方案
+- [ ] 更新综合优化方案文档（包含优化后的getAvailableTimeSlots）
+- [ ] 创建前端交互流程文档（详细的用户体验流程）
+- [ ] 执行数据库改动：
+  - [ ] 扩展classrooms表（增加capacity字段）
+  - [ ] 新增teacher_unavailability表
+  - [ ] 新增order_items表
+- [ ] 实现classrooms相关接口：
+  - [ ] classrooms.list
+- [ ] 实现teachers相关接口：
+  - [ ] teachers.getAvailable
+- [ ] 实现schedules相关接口：
+  - [ ] schedules.getAvailableTimeSlots（优化版）
+  - [ ] schedules.setUnavailability
+  - [ ] schedules.listUnavailability
+- [ ] 实现booking相关接口：
+  - [ ] booking.getAvailableClassroom
+  - [ ] booking.create（支持多课程）
+- [ ] 编写测试用例验证所有功能
+- [ ] 生成完整的API接口文档供APP团队使用
 - [ ] 保存检查点并交付

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE order_items (\n  id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',\n  orderId INT NOT NULL COMMENT '订单ID',\n  courseId INT NOT NULL COMMENT '课程ID',\n  courseName VARCHAR(100) NOT NULL COMMENT '课程名称（冗余字段，方便查询）',\n  quantity INT NOT NULL DEFAULT 1 COMMENT '数量',\n  duration DECIMAL(4,2) NOT NULL COMMENT '课程时长（小时）',\n  price DECIMAL(10,2) NOT NULL COMMENT '课程单价',\n  subtotal DECIMAL(10,2) NOT NULL COMMENT '小计金额',\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',\n  \n  INDEX idx_order (orderId),\n  INDEX idx_course (courseId),\n  FOREIGN KEY (orderId) REFERENCES orders(id) ON DELETE CASCADE,\n  FOREIGN KEY (courseId) REFERENCES courses(id)\n) COMMENT='订单明细表';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute CREATE TABLE order_items (\n  id INT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',\n  orderId INT NOT NULL COMMENT '订单ID',\n  courseId INT NOT NULL COMMENT '课程ID',\n  courseName VARCHAR(100) NOT NULL COMMENT '课程名称（冗余字段，方便查询）',\n  quantity INT NOT NULL DEFAULT 1 COMMENT '数量',\n  duration DECIMAL(4,2) NOT NULL COMMENT '课程时长（小时）',\n  price DECIMAL(10,2) NOT NULL COMMENT '课程单价',\n  subtotal DECIMAL(10,2) NOT NULL COMMENT '小计金额',\n  createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',\n  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',\n  \n  INDEX idx_order (orderId),\n  INDEX idx_course (courseId),\n  FOREIGN KEY (orderId) REFERENCES orders(id) ON DELETE CASCADE,\n  FOREIGN KEY (courseId) REFERENCES courses(id)\n) COMMENT='订单明细表';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1848
+}

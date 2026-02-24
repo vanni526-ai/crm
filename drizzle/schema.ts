@@ -238,6 +238,7 @@ export const schedules = mysqlTable("schedules", {
   
   // 课程信息
   teacherId: int("teacherId"), // 授课老师ID
+  classroomId: int("classroomId"), // 教室ID(关联classrooms表)
   teacherName: varchar("teacherName", { length: 100 }), // 授课老师名称(手动输入)
   courseType: varchar("courseType", { length: 200 }).notNull(), // 课程类型
   classDate: date("classDate"), // 上课日期
@@ -253,6 +254,7 @@ export const schedules = mysqlTable("schedules", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   teacherIdx: index("teacher_idx").on(table.teacherId),
+  classroomIdx: index("classroom_idx").on(table.classroomId),
   customerIdx: index("schedule_customer_idx").on(table.customerId),
   startTimeIdx: index("start_time_idx").on(table.startTime),
   cityIdx: index("schedule_city_idx").on(table.city),
@@ -1048,6 +1050,7 @@ export const classrooms = mysqlTable("classrooms", {
   address: text("address").notNull(), // 教室详细地址
   isActive: boolean("isActive").default(true).notNull(), // 是否启用
   sortOrder: int("sortOrder").default(0), // 排序顺序
+  capacity: int("capacity").default(1).notNull(), // 教室容量(同时可容纳的课程数)
   notes: text("notes"), // 备注
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -1160,3 +1163,44 @@ export const membershipConfig = mysqlTable("membershipConfig", {
 });
 export type MembershipConfig = typeof membershipConfig.$inferSelect;
 export type InsertMembershipConfig = typeof membershipConfig.$inferInsert;
+
+/**
+ * 老师不接客时段表
+ */
+export const teacherUnavailability = mysqlTable("teacher_unavailability", {
+  id: int("id").autoincrement().primaryKey(),
+  teacherId: int("teacherId").notNull(), // 老师ID
+  startTime: timestamp("startTime").notNull(), // 不接客开始时间
+  endTime: timestamp("endTime").notNull(), // 不接客结束时间
+  reason: varchar("reason", { length: 200 }), // 不接客原因
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  teacherIdx: index("unavail_teacher_idx").on(table.teacherId),
+  timeIdx: index("unavail_time_idx").on(table.startTime, table.endTime),
+}));
+
+export type TeacherUnavailability = typeof teacherUnavailability.$inferSelect;
+export type InsertTeacherUnavailability = typeof teacherUnavailability.$inferInsert;
+
+/**
+ * 订单明细表 - 支持一个订单包含多个课程
+ */
+export const orderItems = mysqlTable("order_items", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("orderId").notNull(), // 订单ID
+  courseId: int("courseId").notNull(), // 课程ID
+  courseName: varchar("courseName", { length: 100 }).notNull(), // 课程名称(冗余字段,方便查询)
+  quantity: int("quantity").default(1).notNull(), // 数量
+  duration: decimal("duration", { precision: 4, scale: 2 }).notNull(), // 课程时长(小时)
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // 课程单价
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(), // 小计金额
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  orderIdx: index("order_item_order_idx").on(table.orderId),
+  courseIdx: index("order_item_course_idx").on(table.courseId),
+}));
+
+export type OrderItem = typeof orderItems.$inferSelect;
+export type InsertOrderItem = typeof orderItems.$inferInsert;
