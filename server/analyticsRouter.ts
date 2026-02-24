@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "./_core/trpc";
-import { getDb } from "./db";
+import { router, protectedProcedure, publicProcedure } from "./_core/trpc";
+import { getDb, getAllCitiesWithStats } from "./db";
 import { orders, users, customers, partners, partnerCities, cities } from "../drizzle/schema";
 import { eq, and, sql, gte, lte, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -172,5 +172,28 @@ export const analyticsRouter = router({
         code: 'FORBIDDEN',
         message: 'Insufficient permissions to access dashboard stats',
       });
+    }),
+
+  /**
+   * 获取所有城市的统计数据
+   */
+  getAllCitiesWithStats: publicProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ input }) => {
+      const options: { startDate?: Date; endDate?: Date } = {};
+      
+      if (input?.startDate) {
+        options.startDate = new Date(input.startDate);
+      }
+      if (input?.endDate) {
+        options.endDate = new Date(input.endDate);
+      }
+
+      return await getAllCitiesWithStats(options);
     }),
 });

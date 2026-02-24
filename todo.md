@@ -4627,3 +4627,9 @@
 - [ ] 编写测试用例验证所有功能
 - [ ] 生成完整的API接口文档供APP团队使用
 - [ ] 保存检查点并交付
+
+
+### 最新Bug修复
+
+- [x] 修复CityOrdersDialog中的toFixed类型错误（value.toFixed is not a function）
+- [x] 修夏analytics.getAllCitiesWithStats接口缺失问题（NOT_FOUND错误）

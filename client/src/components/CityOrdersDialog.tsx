@@ -17,9 +17,11 @@ export function CityOrdersDialog({ cityName, open, onOpenChange }: CityOrdersDia
 
   const cityOrders = orders?.filter((order: any) => order.deliveryCity === cityName) || [];
 
-  const formatCurrency = (value: number | null) => {
-    if (value === null) return "-";
-    return `¥${value.toFixed(2)}`;
+  const formatCurrency = (value: number | string | null | undefined) => {
+    if (value === null || value === undefined) return "-";
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (isNaN(numValue)) return "-";
+    return `¥${numValue.toFixed(2)}`;
   };
 
   const formatDate = (dateStr: string | null) => {
