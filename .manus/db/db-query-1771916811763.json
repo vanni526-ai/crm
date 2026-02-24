@@ -1,0 +1,9 @@
+{
+  "query": "-- 为真实合伙人创建partners记录\n-- 使用默认值：profitRatio=0, profitPaymentDay=25\nINSERT INTO partners (userId, name, phone, profitRatio, profitPaymentDay, isActive, createdAt, updatedAt)\nSELECT \n  u.id as userId,\n  u.name,\n  u.phone,\n  0.00 as profitRatio,\n  25 as profitPaymentDay,\n  1 as isActive,\n  NOW() as createdAt,\n  NOW() as updatedAt\nFROM users u\nWHERE u.id IN (15362146, 15372555, 16028821, 16800186, 16800523, 17370026)\n  AND u.isActive = 1\n  AND NOT EXISTS (\n    SELECT 1 FROM partners p \n    WHERE p.userId = u.id AND p.isActive = 1\n  );",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 为真实合伙人创建partners记录\n-- 使用默认值：profitRatio=0, profitPaymentDay=25\nINSERT INTO partners (userId, name, phone, profitRatio, profitPaymentDay, isActive, createdAt, updatedAt)\nSELECT \n  u.id as userId,\n  u.name,\n  u.phone,\n  0.00 as profitRatio,\n  25 as profitPaymentDay,\n  1 as isActive,\n  NOW() as createdAt,\n  NOW() as updatedAt\nFROM users u\nWHERE u.id IN (15362146, 15372555, 16028821, 16800186, 16800523, 17370026)\n  AND u.isActive = 1\n  AND NOT EXISTS (\n    SELECT 1 FROM partners p \n    WHERE p.userId = u.id AND p.isActive = 1\n  );",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1558
+}

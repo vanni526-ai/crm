@@ -1,0 +1,26 @@
+{
+  "query": "SELECT p.id, p.name, p.phone, p.isActive, p.createdAt, COUNT(pc.id) as city_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId AND pc.contractStatus = 'active'\nWHERE p.isActive = 1\nGROUP BY p.id, p.name, p.phone, p.isActive, p.createdAt\nHAVING city_count = 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.phone, p.isActive, p.createdAt, COUNT(pc.id) as city_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId AND pc.contractStatus = 'active'\nWHERE p.isActive = 1\nGROUP BY p.id, p.name, p.phone, p.isActive, p.createdAt\nHAVING city_count = 0;",
+  "rows": [
+    {
+      "id": "180002",
+      "name": "测试城市合伙人",
+      "phone": "13900139000",
+      "isActive": "1",
+      "createdAt": "2026-02-23 04:27:45",
+      "city_count": "0"
+    },
+    {
+      "id": "180001",
+      "name": "测试城市合伙人",
+      "phone": "13900139000",
+      "isActive": "1",
+      "createdAt": "2026-02-23 04:27:28",
+      "city_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tisActive\tcreatedAt\tcity_count\n180002\t测试城市合伙人\t13900139000\t1\t2026-02-23 04:27:45\t0\n180001\t测试城市合伙人\t13900139000\t1\t2026-02-23 04:27:28\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1520
+}

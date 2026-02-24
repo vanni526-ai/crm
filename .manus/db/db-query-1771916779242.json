@@ -1,0 +1,24 @@
+{
+  "query": "SELECT p.id, p.userId, p.name, p.isActive,\n       COUNT(pc.id) as city_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nWHERE p.isActive = 1\nGROUP BY p.id, p.userId, p.name, p.isActive\nHAVING city_count = 0\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.userId, p.name, p.isActive,\n       COUNT(pc.id) as city_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nWHERE p.isActive = 1\nGROUP BY p.id, p.userId, p.name, p.isActive\nHAVING city_count = 0\nORDER BY p.id;",
+  "rows": [
+    {
+      "id": "180001",
+      "userId": "22771306",
+      "name": "测试城市合伙人",
+      "isActive": "1",
+      "city_count": "0"
+    },
+    {
+      "id": "180002",
+      "userId": "22771313",
+      "name": "测试城市合伙人",
+      "isActive": "1",
+      "city_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\tisActive\tcity_count\n180001\t22771306\t测试城市合伙人\t1\t0\n180002\t22771313\t测试城市合伙人\t1\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1603
+}

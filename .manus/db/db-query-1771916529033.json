@@ -1,0 +1,136 @@
+{
+  "query": "SELECT p.id, p.name, p.isActive, p.createdAt,\n       COUNT(pc.id) as city_count,\n       GROUP_CONCAT(DISTINCT c.name) as cities,\n       GROUP_CONCAT(DISTINCT pc.contractStatus) as contract_statuses\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.isActive = 1\nGROUP BY p.id, p.name, p.isActive, p.createdAt\nHAVING city_count > 0\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.isActive, p.createdAt,\n       COUNT(pc.id) as city_count,\n       GROUP_CONCAT(DISTINCT c.name) as cities,\n       GROUP_CONCAT(DISTINCT pc.contractStatus) as contract_statuses\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.isActive = 1\nGROUP BY p.id, p.name, p.isActive, p.createdAt\nHAVING city_count > 0\nORDER BY p.id;",
+  "rows": [
+    {
+      "id": "25",
+      "name": "冯玉智",
+      "isActive": "1",
+      "createdAt": "2026-02-10 09:39:22",
+      "city_count": "2",
+      "cities": "福州,泉州",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "120001",
+      "name": "陈治霖",
+      "isActive": "1",
+      "createdAt": "2026-02-15 16:27:27",
+      "city_count": "1",
+      "cities": "杭州",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "120003",
+      "name": "test",
+      "isActive": "1",
+      "createdAt": "2026-02-15 17:54:40",
+      "city_count": "1",
+      "cities": "重庆",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150001",
+      "name": "许博睿",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:00:08",
+      "city_count": "1",
+      "cities": "长沙",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150004",
+      "name": "张雪婷",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:40:16",
+      "city_count": "3",
+      "cities": "天津,石家庄,大连",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150005",
+      "name": "王开霖",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:55:02",
+      "city_count": "1",
+      "cities": "武汉",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150006",
+      "name": "李一涵",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:55:24",
+      "city_count": "1",
+      "cities": "郑州",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150007",
+      "name": "康培源",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:55:55",
+      "city_count": "1",
+      "cities": "太原",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150009",
+      "name": "赵浩然",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:56:38",
+      "city_count": "1",
+      "cities": "南京",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150010",
+      "name": "周建虎",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:57:04",
+      "city_count": "1",
+      "cities": "无锡",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150011",
+      "name": "韩顗杰",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:57:49",
+      "city_count": "1",
+      "cities": "深圳",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150012",
+      "name": "朱利闻",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:58:08",
+      "city_count": "1",
+      "cities": "宁波",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "150013",
+      "name": "孙志俊",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:59:07",
+      "city_count": "1",
+      "cities": "济南",
+      "contract_statuses": "active"
+    },
+    {
+      "id": "210001",
+      "name": "曹⼼茹",
+      "isActive": "1",
+      "createdAt": "2026-02-24 06:21:04",
+      "city_count": "1",
+      "cities": "东莞",
+      "contract_statuses": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\tcreatedAt\tcity_count\tcities\tcontract_statuses\n25\t冯玉智\t1\t2026-02-10 09:39:22\t2\t福州,泉州\tactive\n120001\t陈治霖\t1\t2026-02-15 16:27:27\t1\t杭州\tactive\n120003\ttest\t1\t2026-02-15 17:54:40\t1\t重庆\tactive\n150001\t许博睿\t1\t2026-02-16 02:00:08\t1\t长沙\tactive\n150004\t张雪婷\t1\t2026-02-16 02:40:16\t3\t天津,石家庄,大连\tactive\n150005\t王开霖\t1\t2026-02-16 02:55:02\t1\t武汉\tactive\n150006\t李一涵\t1\t2026-02-16 02:55:24\t1\t郑州\tactive\n150007\t康培源\t1\t2026-02-16 02:55:55\t1\t太原\tactive\n150009\t赵浩然\t1\t2026-02-16 02:56:38\t1\t南京\tactive\n150010\t周建虎\t1\t2026-02-16 02:57:04\t1\t无锡\tactive\n150011\t韩顗杰\t1\t2026-02-16 02:57:49\t1\t深圳\tactive\n150012\t朱利闻\t1\t2026-02-16 02:58:08\t1\t宁波\tactive\n150013\t孙志俊\t1\t2026-02-16 02:59:07\t1\t济南\tactive\n210001\t曹⼼茹\t1\t2026-02-24 06:21:04\t1\t东莞\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1513
+}

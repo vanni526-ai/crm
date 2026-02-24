@@ -4656,3 +4656,20 @@
 ### 客户管理页面接口修复
 
 - [x] 修复客户管理页面调用不存在的analytics.getAllCities接口
+
+
+### 合伙人管理数据清理
+
+- [ ] 检查partner_cities表中的重复"未分配城市"数据
+- [ ] 删除孤儿数据（关联到不存在的城市或合伙人）
+
+
+### 建立users-partners关联（方案A）
+
+- [x] 调查partner_cities表中有实际业务关联的partners记录
+- [x] 在partners表schema中添加userId字段（已存在）
+- [x] 执行数据库迁移添加userId字段（已存在）
+- [x] 为users表中的真实合伙人创建对应的partners记录
+- [x] 建立users-partners的userId关联
+- [x] 删除没有业务关联的重复测试数据（保留有partner_cities的记录）
+- [x] 验证数据一致性（用户管理和合伙人管理页面）

@@ -1,0 +1,129 @@
+{
+  "query": "SELECT pc.id, pc.partnerId, pc.cityId, c.name as cityName, p.name as partnerName \nFROM partner_cities pc \nLEFT JOIN cities c ON pc.cityId = c.id \nLEFT JOIN partners p ON pc.partnerId = p.id \nORDER BY pc.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT pc.id, pc.partnerId, pc.cityId, c.name as cityName, p.name as partnerName \nFROM partner_cities pc \nLEFT JOIN cities c ON pc.cityId = c.id \nLEFT JOIN partners p ON pc.partnerId = p.id \nORDER BY pc.id;",
+  "rows": [
+    {
+      "id": "37",
+      "partnerId": "25",
+      "cityId": "13",
+      "cityName": "福州",
+      "partnerName": "冯玉智"
+    },
+    {
+      "id": "38",
+      "partnerId": "25",
+      "cityId": "14",
+      "cityName": "泉州",
+      "partnerName": "冯玉智"
+    },
+    {
+      "id": "120004",
+      "partnerId": "120001",
+      "cityId": "90003",
+      "cityName": "杭州",
+      "partnerName": "陈治霖"
+    },
+    {
+      "id": "120008",
+      "partnerId": "120003",
+      "cityId": "3",
+      "cityName": "重庆",
+      "partnerName": "test"
+    },
+    {
+      "id": "150001",
+      "partnerId": "150001",
+      "cityId": "90004",
+      "cityName": "长沙",
+      "partnerName": "许博睿"
+    },
+    {
+      "id": "150004",
+      "partnerId": "150004",
+      "cityId": "4",
+      "cityName": "天津",
+      "partnerName": "张雪婷"
+    },
+    {
+      "id": "150005",
+      "partnerId": "150004",
+      "cityId": "9",
+      "cityName": "石家庄",
+      "partnerName": "张雪婷"
+    },
+    {
+      "id": "150006",
+      "partnerId": "150004",
+      "cityId": "10",
+      "cityName": "大连",
+      "partnerName": "张雪婷"
+    },
+    {
+      "id": "150007",
+      "partnerId": "150005",
+      "cityId": "6",
+      "cityName": "武汉",
+      "partnerName": "王开霖"
+    },
+    {
+      "id": "150008",
+      "partnerId": "150006",
+      "cityId": "7",
+      "cityName": "郑州",
+      "partnerName": "李一涵"
+    },
+    {
+      "id": "150009",
+      "partnerId": "150007",
+      "cityId": "8",
+      "cityName": "太原",
+      "partnerName": "康培源"
+    },
+    {
+      "id": "150011",
+      "partnerId": "150009",
+      "cityId": "12",
+      "cityName": "南京",
+      "partnerName": "赵浩然"
+    },
+    {
+      "id": "150012",
+      "partnerId": "150010",
+      "cityId": "15",
+      "cityName": "无锡",
+      "partnerName": "周建虎"
+    },
+    {
+      "id": "150013",
+      "partnerId": "150011",
+      "cityId": "16",
+      "cityName": "深圳",
+      "partnerName": "韩顗杰"
+    },
+    {
+      "id": "150014",
+      "partnerId": "150012",
+      "cityId": "17",
+      "cityName": "宁波",
+      "partnerName": "朱利闻"
+    },
+    {
+      "id": "150015",
+      "partnerId": "150013",
+      "cityId": "5",
+      "cityName": "济南",
+      "partnerName": "孙志俊"
+    },
+    {
+      "id": "210001",
+      "partnerId": "210001",
+      "cityId": "11",
+      "cityName": "东莞",
+      "partnerName": "曹⼼茹"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tpartnerId\tcityId\tcityName\tpartnerName\n37\t25\t13\t福州\t冯玉智\n38\t25\t14\t泉州\t冯玉智\n120004\t120001\t90003\t杭州\t陈治霖\n120008\t120003\t3\t重庆\ttest\n150001\t150001\t90004\t长沙\t许博睿\n150004\t150004\t4\t天津\t张雪婷\n150005\t150004\t9\t石家庄\t张雪婷\n150006\t150004\t10\t大连\t张雪婷\n150007\t150005\t6\t武汉\t王开霖\n150008\t150006\t7\t郑州\t李一涵\n150009\t150007\t8\t太原\t康培源\n150011\t150009\t12\t南京\t赵浩然\n150012\t150010\t15\t无锡\t周建虎\n150013\t150011\t16\t深圳\t韩顗杰\n150014\t150012\t17\t宁波\t朱利闻\n150015\t150013\t5\t济南\t孙志俊\n210001\t210001\t11\t东莞\t曹⼼茹\n",
+  "stderr": "",
+  "execution_time_ms": 1558
+}

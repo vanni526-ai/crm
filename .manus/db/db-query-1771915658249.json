@@ -1,0 +1,58 @@
+{
+  "query": "SELECT p.id, p.name, p.phone, p.isActive, p.createdAt, \n       GROUP_CONCAT(c.name) as cities\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId AND pc.contractStatus = 'active'\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.name IN ('孙志俊', '朱利闻', '韩颖杰', '周建虎', '赵浩然', '康培源', '李一涵')\nGROUP BY p.id, p.name, p.phone, p.isActive, p.createdAt\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.phone, p.isActive, p.createdAt, \n       GROUP_CONCAT(c.name) as cities\nFROM partners p\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId AND pc.contractStatus = 'active'\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.name IN ('孙志俊', '朱利闻', '韩颖杰', '周建虎', '赵浩然', '康培源', '李一涵')\nGROUP BY p.id, p.name, p.phone, p.isActive, p.createdAt\nORDER BY p.id;",
+  "rows": [
+    {
+      "id": "150006",
+      "name": "李一涵",
+      "phone": "18037191907",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:55:24",
+      "cities": "郑州"
+    },
+    {
+      "id": "150007",
+      "name": "康培源",
+      "phone": "19101699968",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:55:55",
+      "cities": "太原"
+    },
+    {
+      "id": "150009",
+      "name": "赵浩然",
+      "phone": "18222302129",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:56:38",
+      "cities": "南京"
+    },
+    {
+      "id": "150010",
+      "name": "周建虎",
+      "phone": "18151080911",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:57:04",
+      "cities": "无锡"
+    },
+    {
+      "id": "150012",
+      "name": "朱利闻",
+      "phone": "17762475169",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:58:08",
+      "cities": "宁波"
+    },
+    {
+      "id": "150013",
+      "name": "孙志俊",
+      "phone": "13818789873",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:59:07",
+      "cities": "济南"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\tisActive\tcreatedAt\tcities\n150006\t李一涵\t18037191907\t1\t2026-02-16 02:55:24\t郑州\n150007\t康培源\t19101699968\t1\t2026-02-16 02:55:55\t太原\n150009\t赵浩然\t18222302129\t1\t2026-02-16 02:56:38\t南京\n150010\t周建虎\t18151080911\t1\t2026-02-16 02:57:04\t无锡\n150012\t朱利闻\t17762475169\t1\t2026-02-16 02:58:08\t宁波\n150013\t孙志俊\t13818789873\t1\t2026-02-16 02:59:07\t济南\n",
+  "stderr": "",
+  "execution_time_ms": 1589
+}

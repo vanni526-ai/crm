@@ -1,0 +1,164 @@
+{
+  "query": "SELECT p.id, p.userId, p.name as partner_name, p.phone as partner_phone,\n       u.name as user_name, u.phone as user_phone, u.roles,\n       COUNT(pc.id) as city_count,\n       GROUP_CONCAT(c.name) as cities\nFROM partners p\nINNER JOIN users u ON p.userId = u.id\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId AND pc.contractStatus = 'active'\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.isActive = 1 AND u.isActive = 1\nGROUP BY p.id, p.userId, p.name, p.phone, u.name, u.phone, u.roles\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.userId, p.name as partner_name, p.phone as partner_phone,\n       u.name as user_name, u.phone as user_phone, u.roles,\n       COUNT(pc.id) as city_count,\n       GROUP_CONCAT(c.name) as cities\nFROM partners p\nINNER JOIN users u ON p.userId = u.id\nLEFT JOIN partner_cities pc ON p.id = pc.partnerId AND pc.contractStatus = 'active'\nLEFT JOIN cities c ON pc.cityId = c.id\nWHERE p.isActive = 1 AND u.isActive = 1\nGROUP BY p.id, p.userId, p.name, p.phone, u.name, u.phone, u.roles\nORDER BY p.id;",
+  "rows": [
+    {
+      "id": "25",
+      "userId": "15372555",
+      "partner_name": "冯玉智",
+      "partner_phone": "18321298886",
+      "user_name": "冯玉智",
+      "user_phone": "18321298886",
+      "roles": "cityPartner,user",
+      "city_count": "2",
+      "cities": "福州,泉州"
+    },
+    {
+      "id": "120001",
+      "userId": "16800523",
+      "partner_name": "陈治霖",
+      "partner_phone": "15321700153",
+      "user_name": "陈治霖",
+      "user_phone": "15321700153",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "杭州"
+    },
+    {
+      "id": "120003",
+      "userId": "16800186",
+      "partner_name": "test",
+      "partner_phone": "13381928825",
+      "user_name": "test",
+      "user_phone": "13381928825",
+      "roles": "user,admin,sales,cityPartner,teacher",
+      "city_count": "1",
+      "cities": "重庆"
+    },
+    {
+      "id": "150001",
+      "userId": "17370026",
+      "partner_name": "许博睿",
+      "partner_phone": "13161932601",
+      "user_name": "许博睿",
+      "user_phone": "13161932601",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "长沙"
+    },
+    {
+      "id": "150004",
+      "userId": "15362146",
+      "partner_name": "张雪婷",
+      "partner_phone": "18835697789",
+      "user_name": "张雪婷",
+      "user_phone": "18835697789",
+      "roles": "user,cityPartner",
+      "city_count": "3",
+      "cities": "天津,石家庄,大连"
+    },
+    {
+      "id": "150005",
+      "userId": "17370373",
+      "partner_name": "王开霖",
+      "partner_phone": "17671650296",
+      "user_name": "王开霖",
+      "user_phone": "17671650296",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "武汉"
+    },
+    {
+      "id": "150006",
+      "userId": "17370377",
+      "partner_name": "李一涵",
+      "partner_phone": "18037191907",
+      "user_name": "李一涵",
+      "user_phone": "18037191907",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "郑州"
+    },
+    {
+      "id": "150007",
+      "userId": "17370382",
+      "partner_name": "康培源",
+      "partner_phone": "19101699968",
+      "user_name": "康培源",
+      "user_phone": "19101699968",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "太原"
+    },
+    {
+      "id": "150009",
+      "userId": "17370392",
+      "partner_name": "赵浩然",
+      "partner_phone": "18222302129",
+      "user_name": "赵浩然",
+      "user_phone": "18222302129",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "南京"
+    },
+    {
+      "id": "150010",
+      "userId": "17370399",
+      "partner_name": "周建虎",
+      "partner_phone": "18151080911",
+      "user_name": "周建虎",
+      "user_phone": "18151080911",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "无锡"
+    },
+    {
+      "id": "150011",
+      "userId": "17370405",
+      "partner_name": "韩顗杰",
+      "partner_phone": "18602111141",
+      "user_name": "韩顗杰",
+      "user_phone": "18602111141",
+      "roles": "user,cityPartner,admin,sales",
+      "city_count": "1",
+      "cities": "深圳"
+    },
+    {
+      "id": "150012",
+      "userId": "17370409",
+      "partner_name": "朱利闻",
+      "partner_phone": "17762475169",
+      "user_name": "朱利闻",
+      "user_phone": "17762475169",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "宁波"
+    },
+    {
+      "id": "150013",
+      "userId": "17370417",
+      "partner_name": "孙志俊",
+      "partner_phone": "13818789873",
+      "user_name": "孙志俊",
+      "user_phone": "13818789873",
+      "roles": "user,cityPartner",
+      "city_count": "1",
+      "cities": "济南"
+    },
+    {
+      "id": "210001",
+      "userId": "16028821",
+      "partner_name": "曹⼼茹",
+      "partner_phone": "17760810422",
+      "user_name": "曹⼼茹",
+      "user_phone": "17760810422",
+      "roles": "user,teacher,cityPartner",
+      "city_count": "1",
+      "cities": "东莞"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tpartner_name\tpartner_phone\tuser_name\tuser_phone\troles\tcity_count\tcities\n25\t15372555\t冯玉智\t18321298886\t冯玉智\t18321298886\tcityPartner,user\t2\t福州,泉州\n120001\t16800523\t陈治霖\t15321700153\t陈治霖\t15321700153\tuser,cityPartner\t1\t杭州\n120003\t16800186\ttest\t13381928825\ttest\t13381928825\tuser,admin,sales,cityPartner,teacher\t1\t重庆\n150001\t17370026\t许博睿\t13161932601\t许博睿\t13161932601\tuser,cityPartner\t1\t长沙\n150004\t15362146\t张雪婷\t18835697789\t张雪婷\t18835697789\tuser,cityPartner\t3\t天津,石家庄,大连\n150005\t17370373\t王开霖\t17671650296\t王开霖\t17671650296\tuser,cityPartner\t1\t武汉\n150006\t17370377\t李一涵\t18037191907\t李一涵\t18037191907\tuser,cityPartner\t1\t郑州\n150007\t17370382\t康培源\t19101699968\t康培源\t19101699968\tuser,cityPartner\t1\t太原\n150009\t17370392\t赵浩然\t18222302129\t赵浩然\t18222302129\tuser,cityPartner\t1\t南京\n150010\t17370399\t周建虎\t18151080911\t周建虎\t18151080911\tuser,cityPartner\t1\t无锡\n150011\t17370405\t韩顗杰\t18602111141\t韩顗杰\t18602111141\tuser,cityPartner,admin,sales\t1\t深圳\n150012\t17370409\t朱利闻\t17762475169\t朱利闻\t17762475169\tuser,cityPartner\t1\t宁波\n150013\t17370417\t孙志俊\t13818789873\t孙志俊\t13818789873\tuser,cityPartner\t1\t济南\n210001\t16028821\t曹⼼茹\t17760810422\t曹⼼茹\t17760810422\tuser,teacher,cityPartner\t1\t东莞\n",
+  "stderr": "",
+  "execution_time_ms": 1512
+}

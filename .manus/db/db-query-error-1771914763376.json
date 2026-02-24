@@ -1,0 +1,8 @@
+{
+  "query": "SELECT p.id, p.name, p.isActive, COUNT(pc.id) as city_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.partnerId = pc.partnerId AND pc.contractStatus = 'active'\nWHERE p.isActive = 1\nGROUP BY p.id, p.name, p.isActive\nHAVING city_count = 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.name, p.isActive, COUNT(pc.id) as city_count\nFROM partners p\nLEFT JOIN partner_cities pc ON p.partnerId = pc.partnerId AND pc.contractStatus = 'active'\nWHERE p.isActive = 1\nGROUP BY p.id, p.name, p.isActive\nHAVING city_count = 0;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'p.partnerid' in 'on clause'"
+  ]
+}

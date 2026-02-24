@@ -1,0 +1,76 @@
+{
+  "query": "SELECT id, name, nickname, email, phone, role, roles, isActive, createdAt \nFROM users \nWHERE name IN ('张雪婷', '冯玉智', '曹心茹', 'test', '陈治霖', '许博睿') \nOR phone IN ('18835697789', '18321298886', '17760810422', '13381928825', '15321700153', '13161932601')\nORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, email, phone, role, roles, isActive, createdAt \nFROM users \nWHERE name IN ('张雪婷', '冯玉智', '曹心茹', 'test', '陈治霖', '许博睿') \nOR phone IN ('18835697789', '18321298886', '17760810422', '13381928825', '15321700153', '13161932601')\nORDER BY id;",
+  "rows": [
+    {
+      "id": "15362146",
+      "name": "张雪婷",
+      "nickname": "橘子",
+      "email": "NULL",
+      "phone": "18835697789",
+      "role": "user",
+      "roles": "user,cityPartner",
+      "isActive": "1",
+      "createdAt": "2026-02-08 08:46:34"
+    },
+    {
+      "id": "15372555",
+      "name": "冯玉智",
+      "nickname": "NULL",
+      "email": "NULL",
+      "phone": "18321298886",
+      "role": "cityPartner",
+      "roles": "cityPartner,user",
+      "isActive": "1",
+      "createdAt": "2026-02-10 09:39:21"
+    },
+    {
+      "id": "16028821",
+      "name": "曹⼼茹",
+      "nickname": "yy",
+      "email": "NULL",
+      "phone": "17760810422",
+      "role": "user",
+      "roles": "user,teacher,cityPartner",
+      "isActive": "1",
+      "createdAt": "2026-02-13 10:34:58"
+    },
+    {
+      "id": "16800186",
+      "name": "test",
+      "nickname": "开发者账号",
+      "email": "NULL",
+      "phone": "13381928825",
+      "role": "user",
+      "roles": "user,admin,sales,cityPartner,teacher",
+      "isActive": "1",
+      "createdAt": "2026-02-15 15:16:51"
+    },
+    {
+      "id": "16800523",
+      "name": "陈治霖",
+      "nickname": "NULL",
+      "email": "NULL",
+      "phone": "15321700153",
+      "role": "user",
+      "roles": "user,cityPartner",
+      "isActive": "1",
+      "createdAt": "2026-02-15 16:27:27"
+    },
+    {
+      "id": "17370026",
+      "name": "许博睿",
+      "nickname": "NULL",
+      "email": "NULL",
+      "phone": "13161932601",
+      "role": "user",
+      "roles": "user,cityPartner",
+      "isActive": "1",
+      "createdAt": "2026-02-16 02:00:08"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\temail\tphone\trole\troles\tisActive\tcreatedAt\n15362146\t张雪婷\t橘子\tNULL\t18835697789\tuser\tuser,cityPartner\t1\t2026-02-08 08:46:34\n15372555\t冯玉智\tNULL\tNULL\t18321298886\tcityPartner\tcityPartner,user\t1\t2026-02-10 09:39:21\n16028821\t曹⼼茹\tyy\tNULL\t17760810422\tuser\tuser,teacher,cityPartner\t1\t2026-02-13 10:34:58\n16800186\ttest\t开发者账号\tNULL\t13381928825\tuser\tuser,admin,sales,cityPartner,teacher\t1\t2026-02-15 15:16:51\n16800523\t陈治霖\tNULL\tNULL\t15321700153\tuser\tuser,cityPartner\t1\t2026-02-15 16:27:27\n17370026\t许博睿\tNULL\tNULL\t13161932601\tuser\tuser,cityPartner\t1\t2026-02-16 02:00:08\n",
+  "stderr": "",
+  "execution_time_ms": 1509
+}

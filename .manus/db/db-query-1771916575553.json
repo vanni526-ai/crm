@@ -1,0 +1,170 @@
+{
+  "query": "SELECT p.id, p.userId, p.name, p.phone, p.isActive,\n       u.id as actual_user_id, u.name as user_name, u.phone as user_phone\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nWHERE p.isActive = 1\nORDER BY p.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT p.id, p.userId, p.name, p.phone, p.isActive,\n       u.id as actual_user_id, u.name as user_name, u.phone as user_phone\nFROM partners p\nLEFT JOIN users u ON p.userId = u.id\nWHERE p.isActive = 1\nORDER BY p.id;",
+  "rows": [
+    {
+      "id": "25",
+      "userId": "15372555",
+      "name": "冯玉智",
+      "phone": "18321298886",
+      "isActive": "1",
+      "actual_user_id": "15372555",
+      "user_name": "冯玉智",
+      "user_phone": "18321298886"
+    },
+    {
+      "id": "120001",
+      "userId": "16800523",
+      "name": "陈治霖",
+      "phone": "15321700153",
+      "isActive": "1",
+      "actual_user_id": "16800523",
+      "user_name": "陈治霖",
+      "user_phone": "15321700153"
+    },
+    {
+      "id": "120003",
+      "userId": "16800186",
+      "name": "test",
+      "phone": "13381928825",
+      "isActive": "1",
+      "actual_user_id": "16800186",
+      "user_name": "test",
+      "user_phone": "13381928825"
+    },
+    {
+      "id": "150001",
+      "userId": "17370026",
+      "name": "许博睿",
+      "phone": "13161932601",
+      "isActive": "1",
+      "actual_user_id": "17370026",
+      "user_name": "许博睿",
+      "user_phone": "13161932601"
+    },
+    {
+      "id": "150004",
+      "userId": "15362146",
+      "name": "张雪婷",
+      "phone": "18835697789",
+      "isActive": "1",
+      "actual_user_id": "15362146",
+      "user_name": "张雪婷",
+      "user_phone": "18835697789"
+    },
+    {
+      "id": "150005",
+      "userId": "17370373",
+      "name": "王开霖",
+      "phone": "17671650296",
+      "isActive": "1",
+      "actual_user_id": "17370373",
+      "user_name": "王开霖",
+      "user_phone": "17671650296"
+    },
+    {
+      "id": "150006",
+      "userId": "17370377",
+      "name": "李一涵",
+      "phone": "18037191907",
+      "isActive": "1",
+      "actual_user_id": "17370377",
+      "user_name": "李一涵",
+      "user_phone": "18037191907"
+    },
+    {
+      "id": "150007",
+      "userId": "17370382",
+      "name": "康培源",
+      "phone": "19101699968",
+      "isActive": "1",
+      "actual_user_id": "17370382",
+      "user_name": "康培源",
+      "user_phone": "19101699968"
+    },
+    {
+      "id": "150009",
+      "userId": "17370392",
+      "name": "赵浩然",
+      "phone": "18222302129",
+      "isActive": "1",
+      "actual_user_id": "17370392",
+      "user_name": "赵浩然",
+      "user_phone": "18222302129"
+    },
+    {
+      "id": "150010",
+      "userId": "17370399",
+      "name": "周建虎",
+      "phone": "18151080911",
+      "isActive": "1",
+      "actual_user_id": "17370399",
+      "user_name": "周建虎",
+      "user_phone": "18151080911"
+    },
+    {
+      "id": "150011",
+      "userId": "17370405",
+      "name": "韩顗杰",
+      "phone": "18602111141",
+      "isActive": "1",
+      "actual_user_id": "17370405",
+      "user_name": "韩顗杰",
+      "user_phone": "18602111141"
+    },
+    {
+      "id": "150012",
+      "userId": "17370409",
+      "name": "朱利闻",
+      "phone": "17762475169",
+      "isActive": "1",
+      "actual_user_id": "17370409",
+      "user_name": "朱利闻",
+      "user_phone": "17762475169"
+    },
+    {
+      "id": "150013",
+      "userId": "17370417",
+      "name": "孙志俊",
+      "phone": "13818789873",
+      "isActive": "1",
+      "actual_user_id": "17370417",
+      "user_name": "孙志俊",
+      "user_phone": "13818789873"
+    },
+    {
+      "id": "180001",
+      "userId": "22771306",
+      "name": "测试城市合伙人",
+      "phone": "13900139000",
+      "isActive": "1",
+      "actual_user_id": "NULL",
+      "user_name": "NULL",
+      "user_phone": "NULL"
+    },
+    {
+      "id": "180002",
+      "userId": "22771313",
+      "name": "测试城市合伙人",
+      "phone": "13900139000",
+      "isActive": "1",
+      "actual_user_id": "NULL",
+      "user_name": "NULL",
+      "user_phone": "NULL"
+    },
+    {
+      "id": "210001",
+      "userId": "16028821",
+      "name": "曹⼼茹",
+      "phone": "17760810422",
+      "isActive": "1",
+      "actual_user_id": "16028821",
+      "user_name": "曹⼼茹",
+      "user_phone": "17760810422"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\tphone\tisActive\tactual_user_id\tuser_name\tuser_phone\n25\t15372555\t冯玉智\t18321298886\t1\t15372555\t冯玉智\t18321298886\n120001\t16800523\t陈治霖\t15321700153\t1\t16800523\t陈治霖\t15321700153\n120003\t16800186\ttest\t13381928825\t1\t16800186\ttest\t13381928825\n150001\t17370026\t许博睿\t13161932601\t1\t17370026\t许博睿\t13161932601\n150004\t15362146\t张雪婷\t18835697789\t1\t15362146\t张雪婷\t18835697789\n150005\t17370373\t王开霖\t17671650296\t1\t17370373\t王开霖\t17671650296\n150006\t17370377\t李一涵\t18037191907\t1\t17370377\t李一涵\t18037191907\n150007\t17370382\t康培源\t19101699968\t1\t17370382\t康培源\t19101699968\n150009\t17370392\t赵浩然\t18222302129\t1\t17370392\t赵浩然\t18222302129\n150010\t17370399\t周建虎\t18151080911\t1\t17370399\t周建虎\t18151080911\n150011\t17370405\t韩顗杰\t18602111141\t1\t17370405\t韩顗杰\t18602111141\n150012\t17370409\t朱利闻\t17762475169\t1\t17370409\t朱利闻\t17762475169\n150013\t17370417\t孙志俊\t13818789873\t1\t17370417\t孙志俊\t13818789873\n180001\t22771306\t测试城市合伙人\t13900139000\t1\tNULL\tNULL\tNULL\n180002\t22771313\t测试城市合伙人\t13900139000\t1\tNULL\tNULL\tNULL\n210001\t16028821\t曹⼼茹\t17760810422\t1\t16028821\t曹⼼茹\t17760810422\n",
+  "stderr": "",
+  "execution_time_ms": 1513
+}

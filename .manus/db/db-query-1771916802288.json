@@ -1,0 +1,64 @@
+{
+  "query": "SELECT u.id, u.name, u.nickname, u.phone, u.email, u.roles,\n       p.id as partner_id\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId AND p.isActive = 1\nWHERE u.roles LIKE '%cityPartner%' \n  AND u.isActive = 1\n  AND u.id IN (15362146, 15372555, 16028821, 16800186, 16800523, 17370026)\nORDER BY u.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id, u.name, u.nickname, u.phone, u.email, u.roles,\n       p.id as partner_id\nFROM users u\nLEFT JOIN partners p ON u.id = p.userId AND p.isActive = 1\nWHERE u.roles LIKE '%cityPartner%' \n  AND u.isActive = 1\n  AND u.id IN (15362146, 15372555, 16028821, 16800186, 16800523, 17370026)\nORDER BY u.id;",
+  "rows": [
+    {
+      "id": "15362146",
+      "name": "张雪婷",
+      "nickname": "橘子",
+      "phone": "18835697789",
+      "email": "NULL",
+      "roles": "user,cityPartner",
+      "partner_id": "150004"
+    },
+    {
+      "id": "15372555",
+      "name": "冯玉智",
+      "nickname": "NULL",
+      "phone": "18321298886",
+      "email": "NULL",
+      "roles": "cityPartner,user",
+      "partner_id": "25"
+    },
+    {
+      "id": "16028821",
+      "name": "曹⼼茹",
+      "nickname": "yy",
+      "phone": "17760810422",
+      "email": "NULL",
+      "roles": "user,teacher,cityPartner",
+      "partner_id": "210001"
+    },
+    {
+      "id": "16800186",
+      "name": "test",
+      "nickname": "开发者账号",
+      "phone": "13381928825",
+      "email": "NULL",
+      "roles": "user,admin,sales,cityPartner,teacher",
+      "partner_id": "120003"
+    },
+    {
+      "id": "16800523",
+      "name": "陈治霖",
+      "nickname": "NULL",
+      "phone": "15321700153",
+      "email": "NULL",
+      "roles": "user,cityPartner",
+      "partner_id": "120001"
+    },
+    {
+      "id": "17370026",
+      "name": "许博睿",
+      "nickname": "NULL",
+      "phone": "13161932601",
+      "email": "NULL",
+      "roles": "user,cityPartner",
+      "partner_id": "150001"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\tphone\temail\troles\tpartner_id\n15362146\t张雪婷\t橘子\t18835697789\tNULL\tuser,cityPartner\t150004\n15372555\t冯玉智\tNULL\t18321298886\tNULL\tcityPartner,user\t25\n16028821\t曹⼼茹\tyy\t17760810422\tNULL\tuser,teacher,cityPartner\t210001\n16800186\ttest\t开发者账号\t13381928825\tNULL\tuser,admin,sales,cityPartner,teacher\t120003\n16800523\t陈治霖\tNULL\t15321700153\tNULL\tuser,cityPartner\t120001\n17370026\t许博睿\tNULL\t13161932601\tNULL\tuser,cityPartner\t150001\n",
+  "stderr": "",
+  "execution_time_ms": 1565
+}

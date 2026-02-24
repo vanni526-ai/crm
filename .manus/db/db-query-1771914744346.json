@@ -1,0 +1,100 @@
+{
+  "query": "SELECT id, name, isActive FROM partners ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, isActive FROM partners ORDER BY id;",
+  "rows": [
+    {
+      "id": "25",
+      "name": "冯玉智",
+      "isActive": "1"
+    },
+    {
+      "id": "120001",
+      "name": "陈治霖",
+      "isActive": "1"
+    },
+    {
+      "id": "120003",
+      "name": "test",
+      "isActive": "1"
+    },
+    {
+      "id": "150001",
+      "name": "许博睿",
+      "isActive": "1"
+    },
+    {
+      "id": "150002",
+      "name": "雨欣 林",
+      "isActive": "0"
+    },
+    {
+      "id": "150004",
+      "name": "张雪婷",
+      "isActive": "1"
+    },
+    {
+      "id": "150005",
+      "name": "王开霖",
+      "isActive": "1"
+    },
+    {
+      "id": "150006",
+      "name": "李一涵",
+      "isActive": "1"
+    },
+    {
+      "id": "150007",
+      "name": "康培源",
+      "isActive": "1"
+    },
+    {
+      "id": "150008",
+      "name": "曹⼼茹",
+      "isActive": "0"
+    },
+    {
+      "id": "150009",
+      "name": "赵浩然",
+      "isActive": "1"
+    },
+    {
+      "id": "150010",
+      "name": "周建虎",
+      "isActive": "1"
+    },
+    {
+      "id": "150011",
+      "name": "韩顗杰",
+      "isActive": "1"
+    },
+    {
+      "id": "150012",
+      "name": "朱利闻",
+      "isActive": "1"
+    },
+    {
+      "id": "150013",
+      "name": "孙志俊",
+      "isActive": "1"
+    },
+    {
+      "id": "180001",
+      "name": "测试城市合伙人",
+      "isActive": "1"
+    },
+    {
+      "id": "180002",
+      "name": "测试城市合伙人",
+      "isActive": "1"
+    },
+    {
+      "id": "210001",
+      "name": "曹⼼茹",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\n25\t冯玉智\t1\n120001\t陈治霖\t1\n120003\ttest\t1\n150001\t许博睿\t1\n150002\t雨欣 林\t0\n150004\t张雪婷\t1\n150005\t王开霖\t1\n150006\t李一涵\t1\n150007\t康培源\t1\n150008\t曹⼼茹\t0\n150009\t赵浩然\t1\n150010\t周建虎\t1\n150011\t韩顗杰\t1\n150012\t朱利闻\t1\n150013\t孙志俊\t1\n180001\t测试城市合伙人\t1\n180002\t测试城市合伙人\t1\n210001\t曹⼼茹\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1584
+}
