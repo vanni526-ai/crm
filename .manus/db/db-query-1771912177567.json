@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, isActive FROM cities WHERE name = '其他城市_1771820943670';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, isActive FROM cities WHERE name = '其他城市_1771820943670';",
+  "rows": [
+    {
+      "id": "210007",
+      "name": "其他城市_1771820943670",
+      "isActive": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\n210007\t其他城市_1771820943670\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1560
+}

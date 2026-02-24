@@ -196,4 +196,79 @@ export const analyticsRouter = router({
 
       return await getAllCitiesWithStats(options);
     }),
+
+  /**
+   * 创建城市配置
+   */
+  createCityConfig: protectedProcedure
+    .input(
+      z.object({
+        city: z.string(),
+        areaCode: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      const result = await db.insert(cities).values({
+        name: input.city,
+        areaCode: input.areaCode || null,
+        isActive: true,
+      });
+
+      return { success: true, id: Number((result as any).insertId) };
+    }),
+
+  /**
+   * 更新城市配置
+   */
+  updateCityPartnerConfig: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        areaCode: z.string().optional(),
+        description: z.string().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      await db
+        .update(cities)
+        .set({
+          areaCode: input.areaCode || null,
+          updatedAt: new Date(),
+        })
+        .where(eq(cities.id, input.id));
+
+      return { success: true };
+    }),
+
+  /**
+   * 删除城市配置
+   */
+  deleteCityConfig: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      // 软删除：将isActive设置为0
+      await db
+        .update(cities)
+        .set({
+          isActive: false,
+          updatedAt: new Date(),
+        })
+        .where(eq(cities.id, input.id));
+
+      return { success: true };
+    }),
 });

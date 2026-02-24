@@ -1,0 +1,27 @@
+{
+  "query": "SELECT \n  COUNT(*) as total_orders,\n  SUM(CASE WHEN orderNo IS NULL OR orderNo = '' THEN 1 ELSE 0 END) as missing_orderNo,\n  SUM(CASE WHEN customerName IS NULL OR customerName = '' THEN 1 ELSE 0 END) as missing_customerName,\n  SUM(CASE WHEN salespersonId IS NULL THEN 1 ELSE 0 END) as missing_salesperson,\n  SUM(CASE WHEN trafficSource IS NULL OR trafficSource = '' THEN 1 ELSE 0 END) as missing_trafficSource,\n  SUM(CASE WHEN courseAmount IS NULL OR courseAmount = 0 THEN 1 ELSE 0 END) as missing_courseAmount,\n  SUM(CASE WHEN paymentAmount IS NULL OR paymentAmount = 0 THEN 1 ELSE 0 END) as missing_paymentAmount,\n  SUM(CASE WHEN teacherFee IS NULL THEN 1 ELSE 0 END) as missing_teacherFee,\n  SUM(CASE WHEN paymentChannel IS NULL OR paymentChannel = '' THEN 1 ELSE 0 END) as missing_paymentChannel,\n  SUM(CASE WHEN channelOrderNo IS NULL OR channelOrderNo = '' THEN 1 ELSE 0 END) as missing_channelOrderNo,\n  SUM(CASE WHEN classDate IS NULL THEN 1 ELSE 0 END) as missing_classDate,\n  SUM(CASE WHEN deliveryCity IS NULL OR deliveryCity = '' THEN 1 ELSE 0 END) as missing_deliveryCity,\n  SUM(CASE WHEN deliveryTeacher IS NULL OR deliveryTeacher = '' THEN 1 ELSE 0 END) as missing_deliveryTeacher,\n  SUM(CASE WHEN deliveryCourse IS NULL OR deliveryCourse = '' THEN 1 ELSE 0 END) as missing_deliveryCourse,\n  SUM(CASE WHEN status IS NULL OR status = '' THEN 1 ELSE 0 END) as missing_status\nFROM orders;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  COUNT(*) as total_orders,\n  SUM(CASE WHEN orderNo IS NULL OR orderNo = '' THEN 1 ELSE 0 END) as missing_orderNo,\n  SUM(CASE WHEN customerName IS NULL OR customerName = '' THEN 1 ELSE 0 END) as missing_customerName,\n  SUM(CASE WHEN salespersonId IS NULL THEN 1 ELSE 0 END) as missing_salesperson,\n  SUM(CASE WHEN trafficSource IS NULL OR trafficSource = '' THEN 1 ELSE 0 END) as missing_trafficSource,\n  SUM(CASE WHEN courseAmount IS NULL OR courseAmount = 0 THEN 1 ELSE 0 END) as missing_courseAmount,\n  SUM(CASE WHEN paymentAmount IS NULL OR paymentAmount = 0 THEN 1 ELSE 0 END) as missing_paymentAmount,\n  SUM(CASE WHEN teacherFee IS NULL THEN 1 ELSE 0 END) as missing_teacherFee,\n  SUM(CASE WHEN paymentChannel IS NULL OR paymentChannel = '' THEN 1 ELSE 0 END) as missing_paymentChannel,\n  SUM(CASE WHEN channelOrderNo IS NULL OR channelOrderNo = '' THEN 1 ELSE 0 END) as missing_channelOrderNo,\n  SUM(CASE WHEN classDate IS NULL THEN 1 ELSE 0 END) as missing_classDate,\n  SUM(CASE WHEN deliveryCity IS NULL OR deliveryCity = '' THEN 1 ELSE 0 END) as missing_deliveryCity,\n  SUM(CASE WHEN deliveryTeacher IS NULL OR deliveryTeacher = '' THEN 1 ELSE 0 END) as missing_deliveryTeacher,\n  SUM(CASE WHEN deliveryCourse IS NULL OR deliveryCourse = '' THEN 1 ELSE 0 END) as missing_deliveryCourse,\n  SUM(CASE WHEN status IS NULL OR status = '' THEN 1 ELSE 0 END) as missing_status\nFROM orders;",
+  "rows": [
+    {
+      "total_orders": "421",
+      "missing_orderNo": "0",
+      "missing_customerName": "72",
+      "missing_salesperson": "94",
+      "missing_trafficSource": "13",
+      "missing_courseAmount": "21",
+      "missing_paymentAmount": "13",
+      "missing_teacherFee": "0",
+      "missing_paymentChannel": "46",
+      "missing_channelOrderNo": "74",
+      "missing_classDate": "7",
+      "missing_deliveryCity": "35",
+      "missing_deliveryTeacher": "21",
+      "missing_deliveryCourse": "3",
+      "missing_status": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_orders\tmissing_orderNo\tmissing_customerName\tmissing_salesperson\tmissing_trafficSource\tmissing_courseAmount\tmissing_paymentAmount\tmissing_teacherFee\tmissing_paymentChannel\tmissing_channelOrderNo\tmissing_classDate\tmissing_deliveryCity\tmissing_deliveryTeacher\tmissing_deliveryCourse\tmissing_status\n421\t0\t72\t94\t13\t21\t13\t0\t46\t74\t7\t35\t21\t3\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1523
+}

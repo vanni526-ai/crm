@@ -1,0 +1,8 @@
+{
+  "query": "SELECT \n  id,\n  order_no,\n  customer_name,\n  salesperson_id,\n  traffic_source,\n  course_amount,\n  payment_amount,\n  teacher_fee,\n  transport_fee,\n  partner_fee,\n  payment_channel,\n  channel_order_no,\n  class_date,\n  delivery_city,\n  delivery_teacher,\n  delivery_course,\n  status,\n  notes\nFROM orders \nORDER BY created_at DESC \nLIMIT 50;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  id,\n  order_no,\n  customer_name,\n  salesperson_id,\n  traffic_source,\n  course_amount,\n  payment_amount,\n  teacher_fee,\n  transport_fee,\n  partner_fee,\n  payment_channel,\n  channel_order_no,\n  class_date,\n  delivery_city,\n  delivery_teacher,\n  delivery_course,\n  status,\n  notes\nFROM orders \nORDER BY created_at DESC \nLIMIT 50;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'created_at' in 'order clause'"
+  ]
+}

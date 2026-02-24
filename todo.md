@@ -4633,3 +4633,21 @@
 
 - [x] 修复CityOrdersDialog中的toFixed类型错误（value.toFixed is not a function）
 - [x] 修夏analytics.getAllCitiesWithStats接口缺失问题（NOT_FOUND错误）
+
+
+### 数据清理任务
+
+- [x] 将脏数据城市"其他城市_1771820943670"的isActive字段设置为0
+
+
+### 订单数据质量检查
+
+- [x] 查询订单样本数据分析字段规范性
+- [x] 统计数据质量问题并分类（缺失字段、格式错误、数据不一致等）
+- [x] 生成数据质量报告
+
+
+### Analytics接口修复
+
+- [x] 添加analytics.getAllCities接口
+- [x] 添加analytics.updateCityPartnerConfig接口
