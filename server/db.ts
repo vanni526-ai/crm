@@ -1087,7 +1087,8 @@ export async function getAllTeachers() {
   const db = await getDb();
   if (!db) return [];
   const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/JopHWzeEmqAYxCyT.png";
-   // 从u users表读取角色包含teacher的用户，过滤已删除记录
+  
+  // 1. 从u users表读取角色包含teacher的用户，过滤已删除记录
   const results = await db.select({
     id: users.id,
     name: users.name,
@@ -1104,10 +1105,36 @@ export async function getAllTeachers() {
     )
   ).orderBy(desc(users.createdAt));
   
-  // 如果avatarUrl为null,使用统一默认头像
+  // 2. 获取所有老师的城市数据
+  const teacherIds = results.map(t => t.id);
+  if (teacherIds.length === 0) return [];
+  
+  const roleCitiesData = await db
+    .select()
+    .from(userRoleCities)
+    .where(
+      and(
+        inArray(userRoleCities.userId, teacherIds),
+        eq(userRoleCities.role, 'teacher')
+      )
+    );
+  
+  // 3. 构建userId到cities的映射
+  const userCitiesMap = new Map<number, string>();
+  roleCitiesData.forEach(rc => {
+    try {
+      const citiesArray = JSON.parse(rc.cities);
+      userCitiesMap.set(rc.userId, Array.isArray(citiesArray) ? citiesArray.join(';') : rc.cities);
+    } catch {
+      userCitiesMap.set(rc.userId, rc.cities);
+    }
+  });
+  
+  // 4. 合并数据，如果avatarUrl为null,使用统一默认头像
   return results.map(teacher => ({
     ...teacher,
-    avatarUrl: teacher.avatarUrl || DEFAULT_AVATAR_URL
+    avatarUrl: teacher.avatarUrl || DEFAULT_AVATAR_URL,
+    city: userCitiesMap.get(teacher.id) || null,
   }));
 }
 

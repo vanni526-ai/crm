@@ -1,0 +1,70 @@
+{
+  "query": "SELECT urc.userId, u.name, urc.role, urc.cities \nFROM user_role_cities urc\nINNER JOIN users u ON urc.userId = u.id\nWHERE urc.role = 'teacher'\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT urc.userId, u.name, urc.role, urc.cities \nFROM user_role_cities urc\nINNER JOIN users u ON urc.userId = u.id\nWHERE urc.role = 'teacher'\nLIMIT 10;",
+  "rows": [
+    {
+      "userId": "13860030",
+      "name": "admin",
+      "role": "teacher",
+      "cities": "[\"东莞\"]"
+    },
+    {
+      "userId": "15362121",
+      "name": "安雅",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362122",
+      "name": "姜一",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362124",
+      "name": "黑桃",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362126",
+      "name": "水水",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362127",
+      "name": "唐泽",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362128",
+      "name": "无浪",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362129",
+      "name": "米妮",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362131",
+      "name": "小梨",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    },
+    {
+      "userId": "15362132",
+      "name": "韦德",
+      "role": "teacher",
+      "cities": "[\"上海\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tname\trole\tcities\n13860030\tadmin\tteacher\t[\"东莞\"]\n15362121\t安雅\tteacher\t[\"上海\"]\n15362122\t姜一\tteacher\t[\"上海\"]\n15362124\t黑桃\tteacher\t[\"上海\"]\n15362126\t水水\tteacher\t[\"上海\"]\n15362127\t唐泽\tteacher\t[\"上海\"]\n15362128\t无浪\tteacher\t[\"上海\"]\n15362129\t米妮\tteacher\t[\"上海\"]\n15362131\t小梨\tteacher\t[\"上海\"]\n15362132\t韦德\tteacher\t[\"上海\"]\n",
+  "stderr": "",
+  "execution_time_ms": 1636
+}
