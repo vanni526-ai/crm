@@ -399,11 +399,19 @@ export default function Teachers() {
         
         // 定义所有可能的列名(中英文)
         const validColumnNames = [
+          'ID', 'id',
           '姓名', '老师', 'name',
-          '电话号码', 'phone',
+          '昵称', 'nickname',
+          '电话号码', '手机号', 'phone',
+          '邮箱', 'email',
+          '微信号', 'wechat',
           '活跃状态', 'status',
           '老师属性', 'teacherAttribute',
-          '受众客户类型', 'customerType',
+          '受众客户类型', '客户类型', 'customerType',
+          '类别', 'category',
+          '时薪', 'hourlyRate',
+          '银行账户', 'bankAccount',
+          '开户行', 'bankName',
           '地区', '城市', 'city',
           '合同到期时间', 'contractEndDate',
           '入职时间', 'joinDate',
@@ -421,27 +429,41 @@ export default function Teachers() {
           return validColumnNames.includes(cellStr);
         });
         
-        // 如果第一行是标题行,则不需要跳过;  否则检查是否有额外标题行
+        // 如果第一行是标题行,则从第2行开始读取数据;  否则检查是否有额外标题行
         const hasExtraTitle = !isHeaderRow && firstRow.length > 0 &&
           (firstRow[0]?.toString().includes('老师信息') || firstRow[0]?.toString().includes('合伙'));
         
         // 根据是否有额外标题行决定跳过的行数
-        const skipRows = hasExtraTitle ? 2 : 1;
+        // 如果第一行是表头，则从第2行开始读取（range=1）
+        // 如果有额外标题行，则从第3行开始读取（range=2）
+        const skipRows = isHeaderRow ? 1 : (hasExtraTitle ? 2 : 1);
         const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { range: skipRows });
         
         jsonData.forEach((row: any) => {
           console.log('解析行数据:', row);
           const teacher: any = {
             name: row['老师'] || row['姓名'] || row['name'] || '',
-            phone: row['电话号码'] || row['phone'] ? String(row['电话号码'] || row['phone']) : '',
+            nickname: row['昵称'] || row['nickname'] || '',
+            phone: row['电话号码'] || row['手机号'] || row['phone'] ? String(row['电话号码'] || row['手机号'] || row['phone']) : '',
+            email: row['邮箱'] || row['email'] || '',
+            wechat: row['微信号'] || row['wechat'] || '',
             status: row['活跃状态'] || row['status'] || '活跃',
             teacherAttribute: row['老师属性'] || row['teacherAttribute'] || undefined,
             customerType: row['受众客户类型'] || row['customerType'] || '',
+            category: row['类别'] || row['category'] || (sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他'),
+            hourlyRate: row['时薪'] || row['hourlyRate'] || '',
+            bankAccount: row['银行账户'] || row['bankAccount'] || '',
+            bankName: row['开户行'] || row['bankName'] || '',
             aliases: row['别名'] || row['aliases'] || '',
             notes: row['备注'] || row['notes'] || '',
-            category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他',
             city: row['城市'] || row['地区'] || (sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : ''),
           };
+          
+          // 如果Excel中有ID字段，添加到teacher对象中用于更新
+          const idValue = row['ID'] || row['id'];
+          if (idValue) {
+            teacher.id = Number(idValue);
+          }
           
           // 处理日期字段，将字符串转换为Date对象
           const contractEndDateStr = row['合同到期时间'] || row['contractEndDate'];

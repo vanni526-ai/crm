@@ -1472,13 +1472,21 @@ export const appRouter = router({
     importFromExcel: adminProcedure
       .input(z.object({
         teachers: z.array(z.object({
+          id: z.number().optional(), // 支持ID字段用于更新
           name: z.string(),
+          nickname: z.string().optional(),
           phone: z.string().optional(),
+          email: z.string().optional(),
+          wechat: z.string().optional(),
           status: z.string().optional(),
           teacherAttribute: z.enum(["S", "M", "Switch"]).optional(),
           customerType: z.string().optional(),
-          notes: z.string().optional(),
           category: z.string().optional(),
+          hourlyRate: z.string().optional(),
+          bankAccount: z.string().optional(),
+          bankName: z.string().optional(),
+          aliases: z.string().optional(), // 别名字段
+          notes: z.string().optional(),
           city: z.string().optional().refine(
             (val) => {
               // 如果提供了city值,验证格式

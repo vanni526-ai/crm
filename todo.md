@@ -4776,3 +4776,25 @@
 - [x] 更新下载模板逻辑支持别名字段
 - [x] 测试验证并保存检查点
 
+
+### 141. 实现批量更新老师数据功能（通过Excel导入更新现有老师信息）
+- [x] 检查当前导入逻辑（通过姓名+城市匹配）
+- [x] 读取用户上传的Excel文件（64行数据，包含ID字段）
+- [x] 修改batchCreateTeachers函数，优先通过ID匹配更新
+- [x] 更新routers.ts的input schema，支持id和其他字段
+- [x] 更新Teachers.tsx的导入逻辑，解析ID和所有字段
+- [ ] 测试批量更新功能
+- [ ] 保存检查点
+
+
+### 141. 实现批量更新老师数据功能(通过Excel导入更新现有老师信息)
+- [x] 检查当前导入逻辑(通过姓名+城市匹配)
+- [x] 读取用户上传的Excel文件(64行数据,包含ID字段)
+- [x] 修改batchCreateTeachers函数,优先通过ID匹配更新
+- [x] 更新routers.ts的input schema,支持id和其他字段
+- [x] 更新Teachers.tsx的导入逻辑,解析ID和所有字段
+- [x] 前端Excel解析失败,采用方案一:生成SQL语句通过Database UI执行
+- [x] 生成batch_update_teachers.sql文件(63条UPDATE语句)
+- [x] 创建使用说明文档
+- [x] 保存检查点
+

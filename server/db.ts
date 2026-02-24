@@ -1188,92 +1188,104 @@ export async function batchUpdateTeacherStatus(ids: number[], status: string) {
 }
 
 // 批量创建老师
-export async function batchCreateTeachers(teacherList: InsertTeacher[]) {
+export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: number })[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const results = [];
   const stats = { created: 0, updated: 0, skipped: 0 };
   
   for (const teacher of teacherList) {
-    // 1. 使用姓名+城市查重,检查是否已存在同名同城市的老师
-    const cityName = teacher.city ? teacher.city.split(';')[0].trim() : '';
     let existingTeacher = null;
     
-    if (cityName) {
-      // 有城市信息,查找同名同城市的老师
-      existingTeacher = await db.select().from(teachers)
-        .where(and(
-          eq(teachers.name, teacher.name),
-          sql`${teachers.city} LIKE ${`%${cityName}%`}`
-        ))
-        .limit(1);
-    } else {
-      // 没有城市信息,只按姓名查找
-      existingTeacher = await db.select().from(teachers)
-        .where(eq(teachers.name, teacher.name))
+    // 1. 优先通过ID查找现有老师
+    if (teacher.id) {
+      existingTeacher = await db.select().from(users)
+        .where(eq(users.id, teacher.id))
         .limit(1);
     }
     
-    let teacherId: number;
-    
-    if (existingTeacher && existingTeacher.length > 0) {
-      // 老师已存在,更新现有记录
-      teacherId = existingTeacher[0].id;
-      await db.update(teachers).set({
-        phone: teacher.phone || existingTeacher[0].phone,
-        isActive: teacher.isActive ?? existingTeacher[0].isActive,
-        customerType: teacher.customerType || existingTeacher[0].customerType,
-        city: teacher.city || existingTeacher[0].city,
-        contractEndDate: teacher.contractEndDate || existingTeacher[0].contractEndDate,
-        joinDate: teacher.joinDate || existingTeacher[0].joinDate,
-        notes: teacher.notes || existingTeacher[0].notes,
-        updatedAt: new Date(),
-      }).where(eq(teachers.id, teacherId));
-      stats.updated++;
-    } else {
-      // 老师不存在,创建新记录
-      const teacherResult = await db.insert(teachers).values(teacher);
-      teacherId = teacherResult[0].insertId;
-      stats.created++;
+    // 2. 如果没有ID或找不到，使用姓名+城市查重
+    if (!existingTeacher || existingTeacher.length === 0) {
+      const cityName = teacher.city ? teacher.city.split(';')[0].trim() : '';
+      
+      if (cityName) {
+        // 有城市信息,查找同名同城市的老师
+        existingTeacher = await db.select().from(users)
+          .where(and(
+            eq(users.name, teacher.name),
+            like(users.roles, '%老师%')
+          ))
+          .limit(1);
+      } else {
+        // 没有城市信息,只按姓名查找
+        existingTeacher = await db.select().from(users)
+          .where(and(
+            eq(users.name, teacher.name),
+            like(users.roles, '%老师%')
+          ))
+          .limit(1);
+      }
     }
-    
-    // 2. 创建对应的users记录
-    // 检查是否已存在同名用户
-    const existingUser = await db.select().from(users).where(eq(users.name, teacher.name)).limit(1);
     
     let userId: number;
-    if (existingUser.length > 0) {
-      // 用户已存在,使用现有用户ID
-      userId = existingUser[0].id;
+    
+    if (existingTeacher && existingTeacher.length > 0) {
+      // 老师已存在,更新users表中的记录
+      userId = existingTeacher[0].id;
       
-      // 更新用户角色(添加老师角色)
-      const currentRoles = existingUser[0].roles ? existingUser[0].roles.split(',') : [];
-      if (!currentRoles.includes('teacher')) {
-        currentRoles.push('teacher');
-      }
-      if (!currentRoles.includes('user')) {
-        currentRoles.push('user');
-      }
-      await db.update(users).set({ 
-        roles: currentRoles.join(','),
-        phone: teacher.phone || existingUser[0].phone,
-      }).where(eq(users.id, userId));
+      // 准备更新数据
+      const updateData: any = {
+        updatedAt: new Date(),
+      };
+      
+      // 只更新提供了值的字段
+      if (teacher.phone) updateData.phone = teacher.phone;
+      if (teacher.nickname) updateData.nickname = teacher.nickname;
+      if (teacher.email) updateData.email = teacher.email;
+      if (teacher.wechat) updateData.wechat = teacher.wechat;
+      if (teacher.teacherAttribute) updateData.teacherAttribute = teacher.teacherAttribute;
+      if (teacher.customerType) updateData.customerType = teacher.customerType;
+      if (teacher.category) updateData.category = teacher.category;
+      if (teacher.hourlyRate) updateData.hourlyRate = teacher.hourlyRate;
+      if (teacher.bankAccount) updateData.bankAccount = teacher.bankAccount;
+      if (teacher.bankName) updateData.bankName = teacher.bankName;
+      if (teacher.contractEndDate) updateData.contractEndDate = teacher.contractEndDate;
+      if (teacher.joinDate) updateData.joinDate = teacher.joinDate;
+      if (teacher.aliases) updateData.aliases = teacher.aliases;
+      if (teacher.notes !== undefined) updateData.teacherNotes = teacher.notes; // 备注字段映射到teacherNotes
+      if (teacher.isActive !== undefined) updateData.isActive = teacher.isActive;
+      
+      await db.update(users).set(updateData).where(eq(users.id, userId));
+      stats.updated++;
     } else {
-      // 创建新用户
-      // 生成唯一的openId(使用teacher_+时间戳+随机数)
+      // 老师不存在,创建新用户
       const openId = `teacher_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
       
       const userResult = await db.insert(users).values({
         openId,
         name: teacher.name,
+        nickname: teacher.nickname || null,
         phone: teacher.phone || null,
+        email: teacher.email || null,
+        wechat: teacher.wechat || null,
         password: '123456', // 默认密码
-        roles: 'user,teacher', // 普通用户+老师
-        isActive: true,
+        roles: '老师', // 老师角色
+        teacherAttribute: teacher.teacherAttribute || null,
+        customerType: teacher.customerType || null,
+        category: teacher.category || null,
+        hourlyRate: teacher.hourlyRate || null,
+        bankAccount: teacher.bankAccount || null,
+        bankName: teacher.bankName || null,
+        contractEndDate: teacher.contractEndDate || null,
+        joinDate: teacher.joinDate || null,
+        aliases: teacher.aliases || null,
+        teacherNotes: teacher.notes || null,
+        isActive: teacher.isActive ?? true,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
       userId = userResult[0].insertId;
+      stats.created++;
     }
     
     // 3. 如果有城市信息,创建userRoleCities关联记录
@@ -1308,7 +1320,7 @@ export async function batchCreateTeachers(teacherList: InsertTeacher[]) {
       }
     }
     
-    results.push({ id: teacherId, name: teacher.name, userId });
+    results.push({ id: userId, name: teacher.name, userId });
   }
   
   return { results, stats };
