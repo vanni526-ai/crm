@@ -407,6 +407,7 @@ export default function Teachers() {
           '地区', '城市', 'city',
           '合同到期时间', 'contractEndDate',
           '入职时间', 'joinDate',
+          '别名', 'aliases',
           '备注', 'notes'
         ];
         
@@ -436,6 +437,7 @@ export default function Teachers() {
             status: row['活跃状态'] || row['status'] || '活跃',
             teacherAttribute: row['老师属性'] || row['teacherAttribute'] || undefined,
             customerType: row['受众客户类型'] || row['customerType'] || '',
+            aliases: row['别名'] || row['aliases'] || '',
             notes: row['备注'] || row['notes'] || '',
             category: sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他',
             city: row['城市'] || row['地区'] || (sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : ''),
@@ -487,26 +489,44 @@ export default function Teachers() {
     // 创建模板数据(包含字段说明和示例数据)
     const templateData = [
       {
+        'ID': '15362121',
         '姓名': '张老师',
+        '昵称': '小张',
         '电话号码': '13800138000',
+        '邮箱': 'zhang@example.com',
+        '微信号': 'zhang_teacher',
         '活跃状态': '活跃',
         '老师属性': 'S',
         '受众客户类型': '成人',
+        '类别': '本部老师',
+        '时薪': '200',
+        '银行账户': '6222021234567890',
+        '开户行': '工商银行',
         '地区': '重庆',
         '合同到期时间': '2026-12-31',
         '入职时间': '2024-01-01',
-        '备注': '示例数据',
+        '别名': '橘子,小橘,橘子老师',
+        '备注': '擅长儿童教学，周末不可约课',
       },
       {
+        'ID': '15362122',
         '姓名': '李老师',
+        '昵称': '小李',
         '电话号码': '13900139000',
+        '邮箱': 'li@example.com',
+        '微信号': 'li_teacher',
         '活跃状态': '活跃',
         '老师属性': 'M',
         '受众客户类型': '青少年',
+        '类别': '合伙店老师',
+        '时薪': '180',
+        '银行账户': '6222029876543210',
+        '开户行': '建设银行',
         '地区': '上海;天津',
         '合同到期时间': '2027-06-30',
         '入职时间': '2024-03-15',
-        '备注': '多个城市用分号分隔',
+        '别名': '小李子,李老师',
+        '备注': '多个城市用分号分隔，别名用逗号分隔',
       },
     ];
 
@@ -561,10 +581,16 @@ export default function Teachers() {
         '示例': '2024-01-01',
       },
       {
+        '字段名': '别名',
+        '是否必填': '否',
+        '说明': '老师的别名列表，用逗号分隔，用于智能识别和Gmail导入',
+        '示例': '橘子,小橘,橘子老师',
+      },
+      {
         '字段名': '备注',
         '是否必填': '否',
-        '说明': '其他需要记录的信息',
-        '示例': '擅长深度课程',
+        '说明': '对老师的备注信息',
+        '示例': '擅长儿童教学，周末不可约课',
       },
     ];
 
@@ -637,12 +663,22 @@ export default function Teachers() {
         categories[category] = [];
       }
       categories[category].push({
+        'ID': teacher.id,
         '姓名': teacher.name,
+        '昵称': teacher.nickname || '',
         '电话号码': teacher.phone || '',
+        '邮箱': teacher.email || '',
+        '微信号': teacher.wechat || '',
         '活跃状态': teacher.status || '活跃',
+        '老师属性': teacher.teacherAttribute || '',
         '受众客户类型': teacher.customerType || '',
+        '类别': teacher.category || '',
+        '时薪': teacher.hourlyRate || '',
+        '银行账户': teacher.bankAccount || '',
+        '开户行': teacher.bankName || '',
         '合同到期时间': teacher.contractEndDate || '',
         '入职时间': teacher.joinDate || '',
+        '别名': teacher.aliases || '',
         '备注': teacher.notes || '',
       });
     });
