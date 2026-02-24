@@ -175,7 +175,8 @@ export default function UserManagementContent() {
   const { data: users, isLoading, refetch } = trpc.userManagement.list.useQuery();
   
   // 查询城市列表
-  const { data: cities } = trpc.analytics.getAllCities.useQuery();
+  const { data: citiesData } = trpc.analytics.getAllCitiesWithStats.useQuery();
+  const cities = citiesData?.map(c => c.city) || [];
 
   // 创建用户
   const createMutation = trpc.userManagement.create.useMutation({
@@ -599,18 +600,18 @@ export default function UserManagementContent() {
                   <Label>合伙人管理城市 *</Label>
                   <div className="mt-2 p-3 border rounded-md space-y-2">
                     {cities?.map((city) => (
-                      <label key={city.name} className="flex items-center space-x-2 cursor-pointer">
+                      <label key={city} className="flex items-center space-x-2 cursor-pointer">
                         <Checkbox
-                          checked={createPartnerCities.includes(city.name)}
+                          checked={createPartnerCities.includes(city)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setCreatePartnerCities([...createPartnerCities, city.name]);
+                              setCreatePartnerCities([...createPartnerCities, city]);
                             } else {
-                              setCreatePartnerCities(createPartnerCities.filter(c => c !== city.name));
+                              setCreatePartnerCities(createPartnerCities.filter(c => c !== city));
                             }
                           }}
                         />
-                        <span className="text-sm">{city.name}</span>
+                        <span className="text-sm">{city}</span>
                       </label>
                     ))}
                   </div>
@@ -733,7 +734,7 @@ export default function UserManagementContent() {
                           >
                             <option value="">添加城市...</option>
                             {cities?.map((city) => (
-                              <option key={city.id} value={city.name}>{city.name}</option>
+                              <option key={city} value={city}>{city}</option>
                             ))}
                           </select>
                         </div>
@@ -789,7 +790,7 @@ export default function UserManagementContent() {
                           >
                             <option value="">添加城市...</option>
                             {cities?.map((city) => (
-                              <option key={city.id} value={city.name}>{city.name}</option>
+                              <option key={city} value={city}>{city}</option>
                             ))}
                           </select>
                         </div>

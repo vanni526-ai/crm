@@ -64,7 +64,8 @@ export default function Teachers() {
   });
   
   // 查询城市列表
-  const { data: cities } = trpc.analytics.getAllCities.useQuery();
+  const { data: citiesData } = trpc.analytics.getAllCitiesWithStats.useQuery();
+  const cities = citiesData?.map(c => c.city) || [];
   
   // 城市选择状态
   const [editCities, setEditCities] = useState<string[]>([]);

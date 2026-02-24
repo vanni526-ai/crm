@@ -4651,3 +4651,8 @@
 
 - [x] 添加analytics.getAllCities接口
 - [x] 添加analytics.updateCityPartnerConfig接口
+
+
+### 客户管理页面接口修复
+
+- [x] 修复客户管理页面调用不存在的analytics.getAllCities接口
