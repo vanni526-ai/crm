@@ -4734,3 +4734,14 @@
 - [x] 生成修复验证报告文档
 - [x] 保存检查点
 
+
+### 137. 实现cities表和cityPartnerConfig表的areaCode双向同步机制
+- [x] 分析当前代码中的城市数据更新逻辑
+- [x] 设计双向同步方案（应用层实现，cityPartnerConfig作为主表）
+- [x] 修改updateCityPartnerConfig函数实现自动同步到cities表
+- [x] 修改updateCity函数实现自动同步到cityPartnerConfig表
+- [x] 添加批量同步函数（syncAreaCodeFromConfigToCities和syncAreaCodeFromCitiesToConfig）
+- [x] 优化批量同步性能（使用SQL JOIN语句替代逐个更新）
+- [x] 编写单元测试验证功能（5个测试全部通过）
+- [x] 保存检查点并交付
+

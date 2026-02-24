@@ -3370,7 +3370,21 @@ export async function updateCityPartnerConfig(
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  return db
+  // 1. 获取城市名称
+  const config = await db
+    .select()
+    .from(cityPartnerConfig)
+    .where(eq(cityPartnerConfig.id, id))
+    .limit(1);
+  
+  if (config.length === 0) {
+    throw new Error("城市配置不存在");
+  }
+  
+  const cityName = config[0].city;
+  
+  // 2. 更新cityPartnerConfig表
+  await db
     .update(cityPartnerConfig)
     .set({
       ...data,
@@ -3378,6 +3392,16 @@ export async function updateCityPartnerConfig(
       updatedAt: new Date(),
     })
     .where(eq(cityPartnerConfig.id, id));
+  
+  // 3. 如果更新了areaCode，同步到cities表
+  if (data.areaCode !== undefined) {
+    await db
+      .update(cities)
+      .set({ areaCode: data.areaCode })
+      .where(eq(cities.name, cityName));
+  }
+  
+  return true;
 }
 
 /**
@@ -4735,7 +4759,30 @@ export async function updateCity(id: number, data: Partial<InsertCity>) {
   if (!db) throw new Error("数据库连接失败");
 
   try {
+    // 1. 获取城市名称
+    const city = await db
+      .select()
+      .from(cities)
+      .where(eq(cities.id, id))
+      .limit(1);
+    
+    if (city.length === 0) {
+      throw new Error("城市不存在");
+    }
+    
+    const cityName = city[0].name;
+    
+    // 2. 更新cities表
     await db.update(cities).set(data).where(eq(cities.id, id));
+    
+    // 3. 如果更新了areaCode，同步到cityPartnerConfig表
+    if (data.areaCode !== undefined) {
+      await db
+        .update(cityPartnerConfig)
+        .set({ areaCode: data.areaCode })
+        .where(eq(cityPartnerConfig.city, cityName));
+    }
+    
     return true;
   } catch (error) {
     console.error("更新城市失败:", error);
@@ -4760,6 +4807,50 @@ export async function deleteCity(id: number) {
     console.error("删除城市失败:", error);
     throw error;
   }
+}
+
+/**
+ * 批量同步区号：从cityPartnerConfig同步到cities
+ * 使用SQL原生查询提高性能
+ */
+export async function syncAreaCodeFromConfigToCities() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 使用SQL JOIN语句一次性更新所有城市
+  const result = await db.execute(`
+    UPDATE cities c
+    INNER JOIN cityPartnerConfig cpc ON c.name = cpc.city
+    SET c.areaCode = cpc.areaCode
+    WHERE cpc.isActive = 1 AND cpc.areaCode IS NOT NULL AND cpc.areaCode != ''
+  `);
+  
+  return { 
+    total: Number(result[0].affectedRows) || 0, 
+    synced: Number(result[0].affectedRows) || 0 
+  };
+}
+
+/**
+ * 批量同步区号：从cities同步到cityPartnerConfig
+ * 使用SQL原生查询提高性能
+ */
+export async function syncAreaCodeFromCitiesToConfig() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  // 使用SQL JOIN语句一次性更新所有配置
+  const result = await db.execute(`
+    UPDATE cityPartnerConfig cpc
+    INNER JOIN cities c ON cpc.city = c.name
+    SET cpc.areaCode = c.areaCode
+    WHERE c.isActive = 1 AND c.areaCode IS NOT NULL AND c.areaCode != ''
+  `);
+  
+  return { 
+    total: Number(result[0].affectedRows) || 0, 
+    synced: Number(result[0].affectedRows) || 0 
+  };
 }
 
 // ==================== 教室管理 ====================
