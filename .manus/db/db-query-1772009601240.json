@@ -1,0 +1,178 @@
+{
+  "query": "SELECT id, name, areaCode, sortOrder, isActive, createdAt FROM cities ORDER BY sortOrder, name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, areaCode, sortOrder, isActive, createdAt FROM cities ORDER BY sortOrder, name;",
+  "rows": [
+    {
+      "id": "270001",
+      "name": "巡游",
+      "areaCode": "000",
+      "sortOrder": "0",
+      "isActive": "0",
+      "createdAt": "2026-02-25 07:42:17"
+    },
+    {
+      "id": "270002",
+      "name": "巡游专用",
+      "areaCode": "000",
+      "sortOrder": "0",
+      "isActive": "1",
+      "createdAt": "2026-02-25 08:02:53"
+    },
+    {
+      "id": "90003",
+      "name": "杭州",
+      "areaCode": "571",
+      "sortOrder": "0",
+      "isActive": "1",
+      "createdAt": "2026-02-15 16:19:04"
+    },
+    {
+      "id": "90004",
+      "name": "长沙",
+      "areaCode": "731",
+      "sortOrder": "0",
+      "isActive": "1",
+      "createdAt": "2026-02-15 16:19:04"
+    },
+    {
+      "id": "1",
+      "name": "上海",
+      "areaCode": "021",
+      "sortOrder": "1",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:05"
+    },
+    {
+      "id": "2",
+      "name": "苏州",
+      "areaCode": "512",
+      "sortOrder": "2",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "3",
+      "name": "重庆",
+      "areaCode": "023",
+      "sortOrder": "3",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "4",
+      "name": "天津",
+      "areaCode": "022",
+      "sortOrder": "4",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "5",
+      "name": "济南",
+      "areaCode": "531",
+      "sortOrder": "5",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "6",
+      "name": "武汉",
+      "areaCode": "027",
+      "sortOrder": "6",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "7",
+      "name": "郑州",
+      "areaCode": "371",
+      "sortOrder": "7",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "8",
+      "name": "太原",
+      "areaCode": "351",
+      "sortOrder": "8",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "9",
+      "name": "石家庄",
+      "areaCode": "311",
+      "sortOrder": "9",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "10",
+      "name": "大连",
+      "areaCode": "411",
+      "sortOrder": "10",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "11",
+      "name": "东莞",
+      "areaCode": "769",
+      "sortOrder": "11",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "12",
+      "name": "南京",
+      "areaCode": "025",
+      "sortOrder": "12",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "13",
+      "name": "福州",
+      "areaCode": "591",
+      "sortOrder": "13",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "14",
+      "name": "泉州",
+      "areaCode": "595",
+      "sortOrder": "14",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "15",
+      "name": "无锡",
+      "areaCode": "510",
+      "sortOrder": "15",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "16",
+      "name": "深圳",
+      "areaCode": "755",
+      "sortOrder": "16",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:09"
+    },
+    {
+      "id": "17",
+      "name": "宁波",
+      "areaCode": "574",
+      "sortOrder": "17",
+      "isActive": "1",
+      "createdAt": "2026-02-04 05:23:09"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tareaCode\tsortOrder\tisActive\tcreatedAt\n270001\t巡游\t000\t0\t0\t2026-02-25 07:42:17\n270002\t巡游专用\t000\t0\t1\t2026-02-25 08:02:53\n90003\t杭州\t571\t0\t1\t2026-02-15 16:19:04\n90004\t长沙\t731\t0\t1\t2026-02-15 16:19:04\n1\t上海\t021\t1\t1\t2026-02-04 05:23:05\n2\t苏州\t512\t2\t1\t2026-02-04 05:23:06\n3\t重庆\t023\t3\t1\t2026-02-04 05:23:06\n4\t天津\t022\t4\t1\t2026-02-04 05:23:06\n5\t济南\t531\t5\t1\t2026-02-04 05:23:06\n6\t武汉\t027\t6\t1\t2026-02-04 05:23:06\n7\t郑州\t371\t7\t1\t2026-02-04 05:23:07\n8\t太原\t351\t8\t1\t2026-02-04 05:23:07\n9\t石家庄\t311\t9\t1\t2026-02-04 05:23:07\n10\t大连\t411\t10\t1\t2026-02-04 05:23:07\n11\t东莞\t769\t11\t1\t2026-02-04 05:23:08\n12\t南京\t025\t12\t1\t2026-02-04 05:23:08\n13\t福州\t591\t13\t1\t2026-02-04 05:23:08\n14\t泉州\t595\t14\t1\t2026-02-04 05:23:08\n15\t无锡\t510\t15\t1\t2026-02-04 05:23:08\n16\t深圳\t755\t16\t1\t2026-02-04 05:23:09\n17\t宁波\t574\t17\t1\t2026-02-04 05:23:09\n",
+  "stderr": "",
+  "execution_time_ms": 1607
+}

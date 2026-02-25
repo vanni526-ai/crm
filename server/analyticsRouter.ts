@@ -212,14 +212,22 @@ export const analyticsRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
 
+      // 获取当前最大的sortOrder值
+      const maxSortOrderResult = await db
+        .select({ maxSort: sql<number>`MAX(${cities.sortOrder})` })
+        .from(cities);
+      
+      const maxSortOrder = maxSortOrderResult[0]?.maxSort || 0;
+      const newSortOrder = maxSortOrder + 1;
+
       const result = await db.insert(cities).values({
         name: input.city,
         areaCode: input.areaCode || null,
         isActive: true,
-        sortOrder: 0,
+        sortOrder: newSortOrder,
       });
 
-      return { success: true, id: Number((result as any).insertId) };
+      return { success: true, id: Number((result as any).insertId), sortOrder: newSortOrder };
     }),
 
   /**

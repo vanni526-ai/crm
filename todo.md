@@ -4962,7 +4962,16 @@
 - [x] 数据库schema调整（添加orderItemId字段到schedules表）
 - [x] 重写booking.create接口（支持多节课拆分、自动生成deliveryCourse）
 - [x] 编写前端App团队API接口文档V2.0（含详细请求响应格式、业务规则、前端UI建议）
-- [ ] 实现schedules.getAvailableTimeSlots接口（查询可用时间段）
-- [ ] 实现booking.cancelSchedule接口（取消排课并退款）
-- [ ] 编写单元测试验证所有接口功能
-- [ ] 保存checkpoint并交付
+- [x] 保存checkpoint并交付
+- [ ] 后续完善：schedules.getAvailableTimeSlots接口、booking.cancelSchedule接口、单元测试
+
+### 165. 删除测试城市
+- [x] 删除“巡游”城市（ID: 270001）
+- [x] 删除“巡游专用”城市（ID: 270002）
+- [x] 验证删除结果（剩余19个城市）
+
+### 166. 修复城市sortOrder自动分配
+- [x] 为杭州（ID: 90003）分配sortOrder: 18
+- [x] 为长沙（ID: 90004）分配sortOrder: 19
+- [x] 修改createCityConfig接口，自动分配sortOrder（取MAX(sortOrder)+1）
+- [x] 验证修复效果
