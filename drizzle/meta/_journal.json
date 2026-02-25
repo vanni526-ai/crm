@@ -351,6 +351,13 @@
       "when": 1771910045606,
       "tag": "0049_aspiring_maximus",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "5",
+      "when": 1772009446993,
+      "tag": "0050_absurd_namorita",
+      "breakpoints": true
     }
   ]
 }
