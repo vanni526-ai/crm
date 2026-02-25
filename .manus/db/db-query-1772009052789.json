@@ -1,0 +1,9 @@
+{
+  "query": "SHOW COLUMNS FROM schedules LIKE 'orderItemId';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SHOW COLUMNS FROM schedules LIKE 'orderItemId';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1595
+}

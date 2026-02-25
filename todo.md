@@ -4957,3 +4957,12 @@
 - [x] 定位问题根源(插入语句缺少sortOrder字段)
 - [x] 修复createCity Config接口(添加sortOrder: 0)
 - [x] 编写单元测试验证修复(所有测试通过)
+
+### 164. 实现多节课预约功能（方案B）
+- [x] 数据库schema调整（添加orderItemId字段到schedules表）
+- [x] 重写booking.create接口（支持多节课拆分、自动生成deliveryCourse）
+- [x] 编写前端App团队API接口文档V2.0（含详细请求响应格式、业务规则、前端UI建议）
+- [ ] 实现schedules.getAvailableTimeSlots接口（查询可用时间段）
+- [ ] 实现booking.cancelSchedule接口（取消排课并退款）
+- [ ] 编写单元测试验证所有接口功能
+- [ ] 保存checkpoint并交付

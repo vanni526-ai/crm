@@ -250,26 +250,7 @@ export const bookingRouter = router({
         });
       }
 
-      // 5. 创建schedules记录
-      const scheduleResult = await db.insert(schedules).values({
-        customerId: ctx.user.id,
-        customerName: ctx.user.name || '',
-        teacherId,
-        classroomId: finalClassroomId,
-        courseType: courseItems.map(item => `课程${item.courseId}`).join(', '),
-        classDate: new Date(date),
-        classTime: `${startTime}-${endTime}`,
-        startTime: new Date(startTimestamp),
-        endTime: new Date(endTimestamp),
-        city: '', // TODO: 从cityId查询城市名称
-        status: 'scheduled',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-
-      const scheduleId = Number(scheduleResult[0].insertId);
-
-      // 6. 创建 orders记录
+      // 5. 创建 orders记录
       const orderNo = generateOrderNo();
       const orderResult = await db.insert(orders).values({
         orderNo,
@@ -287,12 +268,23 @@ export const bookingRouter = router({
       });
       const orderId = Number(orderResult[0].insertId);
 
-      // 7. 创建order_items记录
+      // 6. 创建 order_items记录并获取课程名称
+      const orderItemsData: Array<{ orderItemId: number; courseId: number; courseName: string; quantity: number; duration: number }> = [];
+      
       for (const item of courseItems) {
-        await db.insert(orderItems).values({
+        // 查询课程名称
+        const courseResult = await db
+          .select({ name: courses.name })
+          .from(courses)
+          .where(eq(courses.id, item.courseId))
+          .limit(1);
+        
+        const courseName = courseResult[0]?.name || `课程${item.courseId}`;
+        
+        const orderItemResult = await db.insert(orderItems).values({
           orderId,
           courseId: item.courseId,
-          courseName: `课程${item.courseId}`, // TODO: 从 courses表查询课程名称
+          courseName,
           quantity: item.quantity,
           price: item.price.toString(),
           subtotal: (item.price * item.quantity).toString(),
@@ -300,12 +292,70 @@ export const bookingRouter = router({
           createdAt: new Date(),
           updatedAt: new Date(),
         });
+        
+        const orderItemId = Number(orderItemResult[0].insertId);
+        orderItemsData.push({
+          orderItemId,
+          courseId: item.courseId,
+          courseName,
+          quantity: item.quantity,
+          duration: item.duration,
+        });
       }
+
+      // 7. 为每个课程创建多条 schedules记录（每节课1条）
+      const scheduleIds: number[] = [];
+      let currentStartTime = new Date(startTimestamp);
+      
+      for (const itemData of orderItemsData) {
+        for (let i = 0; i < itemData.quantity; i++) {
+          const currentEndTime = new Date(currentStartTime.getTime() + itemData.duration * 60 * 60 * 1000);
+          
+          const scheduleResult = await db.insert(schedules).values({
+            orderId,
+            orderItemId: itemData.orderItemId,
+            customerId: ctx.user.id,
+            customerName: ctx.user.name || '',
+            teacherId,
+            classroomId: finalClassroomId,
+            courseType: itemData.courseName,
+            deliveryCourse: itemData.courseName, // 设置 deliveryCourse字段
+            classDate: new Date(date),
+            classTime: `${currentStartTime.getHours().toString().padStart(2, '0')}:${currentStartTime.getMinutes().toString().padStart(2, '0')}-${currentEndTime.getHours().toString().padStart(2, '0')}:${currentEndTime.getMinutes().toString().padStart(2, '0')}`,
+            startTime: currentStartTime,
+            endTime: currentEndTime,
+            city: '', // TODO: 从 cityId查询城市名称
+            status: 'scheduled',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+          
+          scheduleIds.push(Number(scheduleResult[0].insertId));
+          
+          // 更新下一节课的开始时间
+          currentStartTime = currentEndTime;
+        }
+      }
+
+      // 8. 更新orders表的deliveryCourse字段（逗号分隔，支持x2简化显示）
+      const deliveryCourseMap = new Map<string, number>();
+      for (const itemData of orderItemsData) {
+        const count = deliveryCourseMap.get(itemData.courseName) || 0;
+        deliveryCourseMap.set(itemData.courseName, count + itemData.quantity);
+      }
+      
+      const deliveryCourseStr = Array.from(deliveryCourseMap.entries())
+        .map(([courseName, count]) => count > 1 ? `${courseName} x${count}` : courseName)
+        .join(', ');
+      
+      await db.update(orders)
+        .set({ deliveryCourse: deliveryCourseStr })
+        .where(eq(orders.id, orderId));
 
       return {
         success: true,
         data: {
-          scheduleId,
+          scheduleIds, // 返回所有创建的排课 ID
           orderId,
           orderNo,
           classroomId: finalClassroomId,
@@ -313,6 +363,7 @@ export const bookingRouter = router({
           totalPrice,
           startTime,
           endTime,
+          deliveryCourse: deliveryCourseStr,
         },
         message: '预约创建成功',
       };

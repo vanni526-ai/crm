@@ -202,6 +202,7 @@ export const teachers = mysqlTable("teachers", {
 export const schedules = mysqlTable("schedules", {
   id: int("id").autoincrement().primaryKey(),
   orderId: int("orderId"), // 关联订单(可选)
+  orderItemId: int("orderItemId"), // 关联订单项(可选,用于多节课拆分)
   
   // 客户信息
   customerId: int("customerId"), // 学员ID(可选)
