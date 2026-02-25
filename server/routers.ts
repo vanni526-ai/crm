@@ -112,8 +112,6 @@ export const appRouter = router({
   membership: membershipRouter,
   schedules: schedulesRouter,
   analytics: analyticsRouter,
-  classrooms: classroomsRouter,
-  teachers: teachersRouter,
   booking: bookingRouter,
 
   // 数据质量检查
@@ -1442,6 +1440,7 @@ export const appRouter = router({
           joinDate: z.union([z.string(), z.date()]).optional().transform(val => val ? (typeof val === 'string' ? new Date(val) : val) : undefined),
           aliases: z.string().optional(), // 别名(逗号分隔)
           avatarUrl: z.string().optional(), // 头像 URL（通过头像编辑对话框更新）
+          teacherAttribute: z.enum(["S", "M", "Switch"]).optional(), // 老师属性
         }),
       }))
       .mutation(async ({ input }) => {
@@ -2023,7 +2022,8 @@ export const appRouter = router({
   }),
 
   // 教室管理
-  classrooms: router({    // 获取所有教室列表(公开接口)
+  classrooms: router({
+    // 获取所有教室列表(公开接口)
     list: publicProcedure.query(async () => {
       try {
         const classroomList = await db.getAllClassrooms();

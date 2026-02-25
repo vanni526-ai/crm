@@ -25,9 +25,9 @@ import AvatarEditDialog from "@/components/AvatarEditDialog";
 const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/HXEdLrUBRLbZoGqS.png";
 
 const teacherSchema = z.object({
-  name: z.string().min(1, "老师姓名不能为空"),
-  phone: z.string().min(1, "电话号码不能为空"),
-  status: z.enum(["激活", "不激活"], { message: "请选择活跃状态" }),
+  name: z.string().optional(), // 编辑时disabled，不参与validation
+  phone: z.string().optional(), // 编辑时disabled，不参与validation
+  status: z.string().optional(), // 编辑时disabled，不参与validation
   teacherAttribute: z.enum(["S", "M", "Switch"], { message: "请选择老师属性" }).optional(),
   customerType: z.string().optional(),
   notes: z.string().optional(),
@@ -230,6 +230,7 @@ export default function Teachers() {
       customerType: data.customerType,
       aliases: data.aliases,
       notes: data.notes,
+      teacherAttribute: data.teacherAttribute === "未设置" ? undefined : (data.teacherAttribute as "S" | "M" | "Switch" | undefined),
       contractEndDate: data.contractEndDate ? new Date(data.contractEndDate) : undefined,
       joinDate: data.joinDate ? new Date(data.joinDate) : undefined,
     };
