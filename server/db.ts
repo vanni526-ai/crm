@@ -4558,6 +4558,7 @@ export async function getAllCourses() {
     const courseList = await db
       .select()
       .from(courses)
+      .where(eq(courses.isBookable, true)) // 过滤不可预约的课程(如会员费)
       .orderBy(courses.createdAt);
     
     return courseList;

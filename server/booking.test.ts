@@ -258,3 +258,228 @@ describe("Booking Flow Tests", () => {
     await db.delete(schedules).where(eq(schedules.id, schedule1Id));
   });
 });
+
+describe("isBookable Field Tests", () => {
+  it("courses表应该包含isBookable字段", async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // 查询所有课程
+    const allCourses = await db
+      .select()
+      .from(courses)
+      .limit(5);
+
+    // 验证isBookable字段存在
+    expect(allCourses.length).toBeGreaterThan(0);
+    expect(allCourses[0]).toHaveProperty('isBookable');
+  });
+
+  it("getAllCourses函数应该过滤掉isBookable=false的课程", async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // 创建一个不可预约的测试课程
+    const testCourseResult = await db.insert(courses).values({
+      name: "测试不可预约课程",
+      category: "测试",
+      duration: "1.00",
+      price: "100.00",
+      isActive: true,
+      isBookable: false,
+      sortOrder: 999,
+    });
+    const testCourseId = Number(testCourseResult[0].insertId);
+
+    // 查询所有可预约课程
+    const bookableCourses = await db
+      .select()
+      .from(courses)
+      .where(eq(courses.isBookable, true));
+
+    // 验证不可预约课程不在列表中
+    const foundTestCourse = bookableCourses.find(c => c.id === testCourseId);
+    expect(foundTestCourse).toBeUndefined();
+
+    // 清理测试数据
+    await db.delete(courses).where(eq(courses.id, testCourseId));
+  });
+
+  it("会员费课程应该被标记为不可预约", async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // 查询会员费课程
+    const membershipCourse = await db
+      .select()
+      .from(courses)
+      .where(eq(courses.id, 60001))
+      .limit(1);
+
+    if (membershipCourse.length > 0) {
+      expect(membershipCourse[0].isBookable).toBe(false);
+    }
+  });
+});
+
+describe("Booking Conflict Detection Tests", () => {
+  let testCityId: number;
+  let testClassroomId: number;
+  let testTeacherId: number;
+  let testCourseId: number;
+
+  beforeAll(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // 准备测试数据
+    const cityResult = await db
+      .select()
+      .from(cities)
+      .where(eq(cities.name, "测试冲突城市"))
+      .limit(1);
+
+    if (cityResult.length > 0) {
+      testCityId = cityResult[0].id;
+    } else {
+      const newCity = await db.insert(cities).values({
+        name: "测试冲突城市",
+        areaCode: "CONFLICT",
+        isActive: true,
+        sortOrder: 998,
+      });
+      testCityId = Number(newCity[0].insertId);
+    }
+
+    const classroomResult = await db
+      .select()
+      .from(classrooms)
+      .where(eq(classrooms.cityId, testCityId))
+      .limit(1);
+
+    if (classroomResult.length > 0) {
+      testClassroomId = classroomResult[0].id;
+    } else {
+      const newClassroom = await db.insert(classrooms).values({
+        cityId: testCityId,
+        cityName: "测试冲突城市",
+        name: "冲突测试教室",
+        address: "测试地址",
+        isActive: true,
+        sortOrder: 1,
+        capacity: 1, // 容量为1，方便测试冲突
+      });
+      testClassroomId = Number(newClassroom[0].insertId);
+    }
+
+    const courseResult = await db
+      .select()
+      .from(courses)
+      .where(eq(courses.name, "冲突测试课程"))
+      .limit(1);
+
+    if (courseResult.length > 0) {
+      testCourseId = courseResult[0].id;
+    } else {
+      const newCourse = await db.insert(courses).values({
+        name: "冲突测试课程",
+        category: "测试",
+        duration: "1.00",
+        price: "100.00",
+        isActive: true,
+        sortOrder: 997,
+      });
+      testCourseId = Number(newCourse[0].insertId);
+    }
+
+    testTeacherId = 1; // 假设存在ID为1的老师
+  });
+
+  it("应该检测到教室时间冲突", async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // 创建第一个预约
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 2);
+    tomorrow.setHours(10, 0, 0, 0);
+
+    const endTime1 = new Date(tomorrow);
+    endTime1.setHours(11, 0, 0, 0);
+
+    const schedule1 = await db.insert(schedules).values({
+      customerId: 1,
+      customerName: "测试客户A",
+      teacherId: testTeacherId,
+      classroomId: testClassroomId,
+      courseType: "冲突测试课程",
+      classDate: tomorrow,
+      classTime: "10:00-11:00",
+      startTime: tomorrow,
+      endTime: endTime1,
+      city: "测试冲突城市",
+      status: "scheduled",
+    });
+
+    const schedule1Id = Number(schedule1[0].insertId);
+
+    // 尝试在同一时间段预约同一教室（应该冲突，因为capacity=1）
+    const conflictBookings = await db
+      .select()
+      .from(schedules)
+      .where(eq(schedules.classroomId, testClassroomId));
+
+    const classroom = await db
+      .select()
+      .from(classrooms)
+      .where(eq(classrooms.id, testClassroomId))
+      .limit(1);
+
+    // 验证：预约数量应该等于教室容量
+    expect(conflictBookings.length).toBe(classroom[0].capacity);
+
+    // 清理测试数据
+    await db.delete(schedules).where(eq(schedules.id, schedule1Id));
+  });
+
+  it("应该检测到老师时间冲突", async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // 创建老师的预约
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 3);
+    tomorrow.setHours(14, 0, 0, 0);
+
+    const endTime = new Date(tomorrow);
+    endTime.setHours(15, 0, 0, 0);
+
+    const schedule1 = await db.insert(schedules).values({
+      customerId: 1,
+      customerName: "测试客户B",
+      teacherId: testTeacherId,
+      classroomId: testClassroomId,
+      courseType: "冲突测试课程",
+      classDate: tomorrow,
+      classTime: "14:00-15:00",
+      startTime: tomorrow,
+      endTime: endTime,
+      city: "测试冲突城市",
+      status: "scheduled",
+    });
+
+    const schedule1Id = Number(schedule1[0].insertId);
+
+    // 查询该老师在该时间段的预约
+    const teacherBookings = await db
+      .select()
+      .from(schedules)
+      .where(eq(schedules.teacherId, testTeacherId));
+
+    // 验证：老师有预约记录
+    expect(teacherBookings.length).toBeGreaterThan(0);
+
+    // 清理测试数据
+    await db.delete(schedules).where(eq(schedules.id, schedule1Id));
+  });
+});

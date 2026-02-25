@@ -4975,3 +4975,13 @@
 - [x] 为长沙（ID: 90004）分配sortOrder: 19
 - [x] 修改createCityConfig接口，自动分配sortOrder（取MAX(sortOrder)+1）
 - [x] 验证修复效果
+
+### 167. 根据前端建议完善多节课预约功能
+- [ ] 在courses表添加isBookable字段（默认true）
+- [ ] 将"会员费"课程（ID: 60001）标记为isBookable=false
+- [ ] 修改courses.list接口，过滤掉isBookable=false的课程
+- [ ] 新增booking.getAvailableSlots接口（查询可用起始时间）
+- [ ] 实现支付冲突处理逻辑（乐观锁+原子操作）
+- [ ] 明确多课程必须同一老师的规则
+- [ ] 编写单元测试验证所有功能
+- [ ] 保存checkpoint并交付
