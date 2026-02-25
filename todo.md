@@ -4862,3 +4862,12 @@
 - [x] 修改前端UI将状态改为开关控件(活跃/不活跃)
 - [x] 创建独立的老师状态更新API(teachers.updateStatus)
 - [x] 测试验证并保存检查点
+
+### 149. 修复老师管理页面中状态开关显示不正确的问题
+- [x] 分析开关显示问题的根本原因(getAllTeachers查询未返回 status 字段)
+- [x] 检查后端API返回的字段名(teacherStatus vs status)
+- [x] 修复db.ts中getAllTeachers函数，添加status字段映射
+- [x] 确保状态更新后触发数据刷新(invalidate)
+- [x] 测试验证并保存检查点
+
+

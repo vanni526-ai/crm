@@ -1098,6 +1098,7 @@ export async function getAllTeachers() {
     isActive: sql<number>`1`, // users表没有isActive字段，默认为1
     avatarUrl: users.avatarUrl,
     teacherAttribute: users.teacherAttribute,
+    status: users.teacherStatus, // 添加teacherStatus字段，映射为status
   }).from(users).where(
     and(
       like(users.roles, '%teacher%'),
