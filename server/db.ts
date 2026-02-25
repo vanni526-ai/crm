@@ -1180,11 +1180,26 @@ export async function batchDeleteTeachers(ids: number[]) {
   console.log('[batchDeleteTeachers] 删除成功: count=', ids.length);
 }
 
+// 更新单个老师状态
+export async function updateTeacherStatus(id: number, status: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // 直接更新users表的teacherStatus字段
+  await db.update(users).set({ teacherStatus: status }).where(eq(users.id, id));
+  
+  console.log(`[更新老师状态] userId=${id}, status=${status}`);
+}
+
 // 批量更新老师状态
 export async function batchUpdateTeacherStatus(ids: number[], status: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.update(teachers).set({ status }).where(inArray(teachers.id, ids));
+  
+  // 直接更新users表的teacherStatus字段
+  await db.update(users).set({ teacherStatus: status }).where(inArray(users.id, ids));
+  
+  console.log(`[批量更新老师状态] count=${ids.length}, status=${status}`);
 }
 
 // 批量创建老师

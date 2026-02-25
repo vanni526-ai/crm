@@ -4856,3 +4856,9 @@
 - [x] 创建批量更新API接口(batchUpdateTeacherAttributes)
 - [x] 执行批量更新并验证结果(成功64位、失败0位)
 - [x] 保存检查点并交付结果
+
+### 148. 将老师管理列表中的"状态"改为独立控制的开关
+- [x] 分析老师状态字段的数据来源和逻辑(teacherStatus字段，已与 isActive 分离)
+- [x] 修改前端UI将状态改为开关控件(活跃/不活跃)
+- [x] 创建独立的老师状态更新API(teachers.updateStatus)
+- [x] 测试验证并保存检查点

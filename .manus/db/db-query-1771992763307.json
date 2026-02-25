@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, teacherStatus FROM users WHERE id = 16800186;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, teacherStatus FROM users WHERE id = 16800186;",
+  "rows": [
+    {
+      "id": "16800186",
+      "name": "test",
+      "teacherStatus": "活跃"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tteacherStatus\n16800186\ttest\t活跃\n",
+  "stderr": "",
+  "execution_time_ms": 1621
+}

@@ -1456,6 +1456,17 @@ export const appRouter = router({
         return { success: true, deletedCount: input.ids.length };
       }),
 
+    // 更新单个老师状态
+    updateStatus: adminProcedure
+      .input(z.object({ 
+        id: z.number(),
+        status: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateTeacherStatus(input.id, input.status);
+        return { success: true };
+      }),
+
     // 批量更新状态
     batchUpdateStatus: adminProcedure
       .input(z.object({ 

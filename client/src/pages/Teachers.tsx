@@ -84,6 +84,16 @@ export default function Teachers() {
     },
   });
 
+  const updateTeacherStatusMutation = trpc.teachers.updateStatus.useMutation({
+    onSuccess: () => {
+      utils.teachers.list.invalidate();
+      toast.success("老师状态更新成功");
+    },
+    onError: (error) => {
+      toast.error(error.message || "状态更新失败");
+    },
+  });
+
   const batchDeleteMutation = trpc.teachers.batchDelete.useMutation({
     onSuccess: (data) => {
       utils.teachers.list.invalidate();
@@ -1065,9 +1075,16 @@ export default function Teachers() {
                       <TableCell className="text-muted-foreground">{teacher.nickname || '-'}</TableCell>
                       <TableCell>{teacher.phone || '-'}</TableCell>
                       <TableCell>
-                        <Badge variant={teacher.status === '活跃' ? 'default' : 'secondary'}>
-                          {teacher.status || '活跃'}
-                        </Badge>
+                        <Switch
+                          checked={teacher.status === '活跃'}
+                          onCheckedChange={(checked) => {
+                            const newStatus = checked ? '活跃' : '不活跃';
+                            updateTeacherStatusMutation.mutate({
+                              id: teacher.id,
+                              status: newStatus,
+                            });
+                          }}
+                        />
                       </TableCell>
                       <TableCell>
                         {teacher.teacherAttribute ? (
