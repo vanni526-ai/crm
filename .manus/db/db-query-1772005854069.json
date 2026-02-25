@@ -1,0 +1,150 @@
+{
+  "query": "SELECT id, name, isActive, sortOrder, createdAt FROM cities ORDER BY name;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, isActive, sortOrder, createdAt FROM cities ORDER BY name;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "上海",
+      "isActive": "1",
+      "sortOrder": "1",
+      "createdAt": "2026-02-04 05:23:05"
+    },
+    {
+      "id": "11",
+      "name": "东莞",
+      "isActive": "1",
+      "sortOrder": "11",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "12",
+      "name": "南京",
+      "isActive": "1",
+      "sortOrder": "12",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "10",
+      "name": "大连",
+      "isActive": "1",
+      "sortOrder": "10",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "4",
+      "name": "天津",
+      "isActive": "1",
+      "sortOrder": "4",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "8",
+      "name": "太原",
+      "isActive": "1",
+      "sortOrder": "8",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "17",
+      "name": "宁波",
+      "isActive": "1",
+      "sortOrder": "17",
+      "createdAt": "2026-02-04 05:23:09"
+    },
+    {
+      "id": "270001",
+      "name": "巡游",
+      "isActive": "1",
+      "sortOrder": "0",
+      "createdAt": "2026-02-25 07:42:17"
+    },
+    {
+      "id": "15",
+      "name": "无锡",
+      "isActive": "1",
+      "sortOrder": "15",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "90003",
+      "name": "杭州",
+      "isActive": "1",
+      "sortOrder": "0",
+      "createdAt": "2026-02-15 16:19:04"
+    },
+    {
+      "id": "6",
+      "name": "武汉",
+      "isActive": "1",
+      "sortOrder": "6",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "14",
+      "name": "泉州",
+      "isActive": "1",
+      "sortOrder": "14",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "5",
+      "name": "济南",
+      "isActive": "1",
+      "sortOrder": "5",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "16",
+      "name": "深圳",
+      "isActive": "1",
+      "sortOrder": "16",
+      "createdAt": "2026-02-04 05:23:09"
+    },
+    {
+      "id": "9",
+      "name": "石家庄",
+      "isActive": "1",
+      "sortOrder": "9",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "13",
+      "name": "福州",
+      "isActive": "1",
+      "sortOrder": "13",
+      "createdAt": "2026-02-04 05:23:08"
+    },
+    {
+      "id": "2",
+      "name": "苏州",
+      "isActive": "1",
+      "sortOrder": "2",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "7",
+      "name": "郑州",
+      "isActive": "1",
+      "sortOrder": "7",
+      "createdAt": "2026-02-04 05:23:07"
+    },
+    {
+      "id": "3",
+      "name": "重庆",
+      "isActive": "1",
+      "sortOrder": "3",
+      "createdAt": "2026-02-04 05:23:06"
+    },
+    {
+      "id": "90004",
+      "name": "长沙",
+      "isActive": "1",
+      "sortOrder": "0",
+      "createdAt": "2026-02-15 16:19:04"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tisActive\tsortOrder\tcreatedAt\n1\t上海\t1\t1\t2026-02-04 05:23:05\n11\t东莞\t1\t11\t2026-02-04 05:23:08\n12\t南京\t1\t12\t2026-02-04 05:23:08\n10\t大连\t1\t10\t2026-02-04 05:23:07\n4\t天津\t1\t4\t2026-02-04 05:23:06\n8\t太原\t1\t8\t2026-02-04 05:23:07\n17\t宁波\t1\t17\t2026-02-04 05:23:09\n270001\t巡游\t1\t0\t2026-02-25 07:42:17\n15\t无锡\t1\t15\t2026-02-04 05:23:08\n90003\t杭州\t1\t0\t2026-02-15 16:19:04\n6\t武汉\t1\t6\t2026-02-04 05:23:06\n14\t泉州\t1\t14\t2026-02-04 05:23:08\n5\t济南\t1\t5\t2026-02-04 05:23:06\n16\t深圳\t1\t16\t2026-02-04 05:23:09\n9\t石家庄\t1\t9\t2026-02-04 05:23:07\n13\t福州\t1\t13\t2026-02-04 05:23:08\n2\t苏州\t1\t2\t2026-02-04 05:23:06\n7\t郑州\t1\t7\t2026-02-04 05:23:07\n3\t重庆\t1\t3\t2026-02-04 05:23:06\n90004\t长沙\t1\t0\t2026-02-15 16:19:04\n",
+  "stderr": "",
+  "execution_time_ms": 1516
+}

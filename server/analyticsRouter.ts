@@ -216,6 +216,7 @@ export const analyticsRouter = router({
         name: input.city,
         areaCode: input.areaCode || null,
         isActive: true,
+        sortOrder: 0,
       });
 
       return { success: true, id: Number((result as any).insertId) };

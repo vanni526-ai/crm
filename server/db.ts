@@ -3472,14 +3472,14 @@ export async function getAllCitiesWithStats(options?: {
   // 获取所有城市配置，并关联partner_cities表获取合伙人分红比例
   const cityConfigs = await db
     .select({
-      id: cityPartnerConfig.id,
-      city: cityPartnerConfig.city,
-      areaCode: cityPartnerConfig.areaCode,
-      description: cityPartnerConfig.description,
-      isActive: cityPartnerConfig.isActive,
-      updatedBy: cityPartnerConfig.updatedBy,
-      updatedAt: cityPartnerConfig.updatedAt,
-      createdAt: cityPartnerConfig.createdAt,
+      id: cities.id,
+      city: cities.name,
+      areaCode: cities.areaCode,
+      description: sql<string | null>`NULL`, // cities表没有description字段
+      isActive: cities.isActive,
+      updatedBy: sql<number | null>`NULL`, // cities表没有updatedBy字段
+      updatedAt: cities.updatedAt,
+      createdAt: cities.createdAt,
       // 从 partner_cities 表查询合伙人分红比例
       currentProfitStage: partnerCities.currentProfitStage,
       isInvestmentRecovered: partnerCities.isInvestmentRecovered,
@@ -3488,10 +3488,10 @@ export async function getAllCitiesWithStats(options?: {
       profitRatioStage2BPartner: partnerCities.profitRatioStage2BPartner,
       profitRatioStage3Partner: partnerCities.profitRatioStage3Partner,
     })
-    .from(cityPartnerConfig)
-    .leftJoin(cities, eq(cityPartnerConfig.city, cities.name))
+    .from(cities)
     .leftJoin(partnerCities, eq(cities.id, partnerCities.cityId))
-    .orderBy(cityPartnerConfig.city);
+    .where(eq(cities.isActive, true))
+    .orderBy(cities.name);
   
   // 计算每个城市的当前合伙人分红比例
   const citiesWithPartnerFeeRate = cityConfigs.map(city => {
@@ -4289,55 +4289,22 @@ export async function refreshCustomerStats(
 
 /**
  * 获取所有唯一城市列表
- * 从orders和schedules表中提取所有不重复的城市名称
+ * 从Cities表中查询所有启用的城市
  */
 export async function getUniqueCities() {
   const db = await getDb();
   if (!db) return [];
 
   try {
-    // 从订单表获取交付城市和支付城市
-    const orderDeliveryCities = await db
-      .selectDistinct({ city: orders.deliveryCity })
-      .from(orders)
-      .where(sql`${orders.deliveryCity} IS NOT NULL AND ${orders.deliveryCity} != ''`);
+    // 从Cities表查询所有启用的城市
+    const activeCities = await db
+      .select({ city: cities.name })
+      .from(cities)
+      .where(eq(cities.isActive, true));
 
-    const orderPaymentCities = await db
-      .selectDistinct({ city: orders.paymentCity })
-      .from(orders)
-      .where(sql`${orders.paymentCity} IS NOT NULL AND ${orders.paymentCity} != ''`);
-
-    // 从排课表获取城市
-    const scheduleCities = await db
-      .selectDistinct({ city: schedules.city })
-      .from(schedules)
-      .where(sql`${schedules.city} IS NOT NULL AND ${schedules.city} != ''`);
-
-    const scheduleDeliveryCities = await db
-      .selectDistinct({ city: schedules.deliveryCity })
-      .from(schedules)
-      .where(sql`${schedules.deliveryCity} IS NOT NULL AND ${schedules.deliveryCity} != ''`);
-
-    // 从老师表获取城市
-    const teacherCities = await db
-      .selectDistinct({ city: teachers.city })
-      .from(teachers)
-      .where(sql`${teachers.city} IS NOT NULL AND ${teachers.city} != ''`);
-
-    // 合并所有城市并去重
-    const allCities = [
-      ...orderDeliveryCities.map((r) => r.city),
-      ...orderPaymentCities.map((r) => r.city),
-      ...scheduleCities.map((r) => r.city),
-      ...scheduleDeliveryCities.map((r) => r.city),
-      ...teacherCities.map((r) => r.city),
-    ];
-
-    const uniqueCities = Array.from(new Set(allCities))
-      .filter(Boolean)
-      .sort((a, b) => a!.localeCompare(b!, "zh-CN"));
-
-    return uniqueCities;
+    // 按中文拼音排序
+    const cityNames = activeCities.map((r) => r.city).filter(Boolean);
+    return cityNames.sort((a, b) => a.localeCompare(b, "zh-CN"));
   } catch (error) {
     console.error("获取唯一城市列表失败:", error);
     return [];
