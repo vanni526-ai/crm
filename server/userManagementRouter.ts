@@ -831,4 +831,84 @@ export const userManagementRouter = router({
         });
       }
     }),
+
+  // 批量更新老师属性和备注
+  batchUpdateTeacherAttributes: adminProcedure
+    .input(z.object({
+      updates: z.array(z.object({
+        userId: z.number(),
+        teacherAttribute: z.enum(["S", "M", "Switch"]).optional(),
+        teacherNotes: z.string().optional(),
+      })),
+    }))
+    .mutation(async ({ input }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+
+      const results = {
+        success: 0,
+        failed: 0,
+        errors: [] as Array<{ userId: number; error: string }>,
+      };
+
+      // 逐个更新
+      for (const update of input.updates) {
+        try {
+          // 检查用户是否存在
+          const [existingUser] = await drizzle
+            .select()
+            .from(users)
+            .where(eq(users.id, update.userId))
+            .limit(1);
+
+          if (!existingUser) {
+            results.failed++;
+            results.errors.push({
+              userId: update.userId,
+              error: "用户不存在",
+            });
+            continue;
+          }
+
+          // 准备更新数据
+          const updateData: any = {};
+          if (update.teacherAttribute) {
+            updateData.teacherAttribute = update.teacherAttribute;
+          }
+          if (update.teacherNotes !== undefined) {
+            updateData.teacherNotes = update.teacherNotes;
+          }
+
+          // 执行更新
+          if (Object.keys(updateData).length > 0) {
+            await drizzle
+              .update(users)
+              .set(updateData)
+              .where(eq(users.id, update.userId));
+            results.success++;
+            console.log(`[批量更新] 成功更新用户 ${update.userId}`);
+          } else {
+            results.failed++;
+            results.errors.push({
+              userId: update.userId,
+              error: "无有需要更新的字段",
+            });
+          }
+        } catch (error) {
+          results.failed++;
+          results.errors.push({
+            userId: update.userId,
+            error: error instanceof Error ? error.message : "未知错误",
+          });
+          console.error(`[批量更新] 更新用户 ${update.userId} 失败:`, error);
+        }
+      }
+
+      return results;
+    }),
 });

@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, teacherAttribute, teacherNotes FROM users WHERE id IN (16028822, 15362136, 16028805, 15362157, 16800186) ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, teacherAttribute, teacherNotes FROM users WHERE id IN (16028822, 15362136, 16028805, 15362157, 16800186) ORDER BY id;",
+  "rows": [
+    {
+      "id": "15362136",
+      "name": "Nemo",
+      "teacherAttribute": "S",
+      "teacherNotes": "踩踏 虐乳 k9 sp tk 感官剥夺      角色扮演"
+    },
+    {
+      "id": "15362157",
+      "name": "Sherry",
+      "teacherAttribute": "S",
+      "teacherNotes": "sp，耳光，踩ta，视觉剥夺，角色扮演，恋zu，刑fa"
+    },
+    {
+      "id": "16028805",
+      "name": "River",
+      "teacherAttribute": "S",
+      "teacherNotes": "k8、k9、sp、绳艺、4i、恋zu等"
+    },
+    {
+      "id": "16028822",
+      "name": "Nancy",
+      "teacherAttribute": "Switch",
+      "teacherNotes": "k8 k9 角色.情景扮演 服从 语言管教 角色扮演 制服诱惑"
+    },
+    {
+      "id": "16800186",
+      "name": "test",
+      "teacherAttribute": "S",
+      "teacherNotes": "开发者账号"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tteacherAttribute\tteacherNotes\n15362136\tNemo\tS\t踩踏 虐乳 k9 sp tk 感官剥夺      角色扮演\n15362157\tSherry\tS\tsp，耳光，踩ta，视觉剥夺，角色扮演，恋zu，刑fa\n16028805\tRiver\tS\tk8、k9、sp、绳艺、4i、恋zu等\n16028822\tNancy\tSwitch\tk8 k9 角色.情景扮演 服从 语言管教 角色扮演 制服诱惑\n16800186\ttest\tS\t开发者账号\n",
+  "stderr": "",
+  "execution_time_ms": 1595
+}
