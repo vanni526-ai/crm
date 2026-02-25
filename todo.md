@@ -4826,3 +4826,27 @@
 - [ ] 测试验证修复效果
 - [ ] 保存检查点
 
+
+### 145. 生成批量更新老师属性和备注的Excel模板
+- [x] 查询所有老师数据（71位老师）
+- [x] 生成Excel模板供用户填写老师属性和备注
+- [ ] 等待用户填写并接收数据
+- [ ] 批量更新老师属性和备注到users表
+- [ ] 验证更新结果
+- [ ] 保存检查点
+
+
+### 146. 修复用户管理和老师管理页面中尝试向teachers表插入数据的错误
+- [ ] 分析错误根源并定位问题代码（userManagementRouter.ts第591行）
+- [ ] 修复userManagementRouter.ts中的teachers表插入逻辑
+- [ ] 修复React表单控件从非受控变为受控状态的警告
+- [ ] 测试验证修复效果
+- [ ] 保存检查点
+
+
+### 146. 修复用户管理和老师管理页面中尝试向teachers表插入数据的错误
+- [x] 分析错误根源并定位问题代码(userManagementRouter.ts第425、591、648行)
+- [x] 修复userManagementRouter.ts中的teachers表插入逻辑(添加name和phone字段)
+- [x] 修复React表单控件从非受控变为受控状态的警告(city.name → city)
+- [x] 测试验证修复效果(TypeScript错误从71个减少到4个)
+- [x] 保存检查点

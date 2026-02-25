@@ -576,18 +576,18 @@ export default function UserManagementContent() {
                   <Label>老师所在城市 *</Label>
                   <div className="mt-2 p-3 border rounded-md space-y-2">
                     {cities?.map((city) => (
-                      <label key={city.name} className="flex items-center space-x-2 cursor-pointer">
+                      <label key={city} className="flex items-center space-x-2 cursor-pointer">
                         <Checkbox
-                          checked={createTeacherCities.includes(city.name)}
+                          checked={createTeacherCities.includes(city)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setCreateTeacherCities([...createTeacherCities, city.name]);
+                              setCreateTeacherCities([...createTeacherCities, city]);
                             } else {
-                              setCreateTeacherCities(createTeacherCities.filter(c => c !== city.name));
+                              setCreateTeacherCities(createTeacherCities.filter(c => c !== city));
                             }
                           }}
                         />
-                        <span className="text-sm">{city.name}</span>
+                        <span className="text-sm">{city}</span>
                       </label>
                     ))}
                   </div>
