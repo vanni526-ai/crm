@@ -1,0 +1,810 @@
+{
+  "query": "SELECT id, deliveryTeacher, deliveryCourse, classTime, deliveryRoom, deliveryClassroomId FROM orders WHERE deliveryTeacher IS NOT NULL OR deliveryCourse IS NOT NULL LIMIT 100;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, deliveryTeacher, deliveryCourse, classTime, deliveryRoom, deliveryClassroomId FROM orders WHERE deliveryTeacher IS NOT NULL OR deliveryCourse IS NOT NULL LIMIT 100;",
+  "rows": [
+    {
+      "id": "1050008",
+      "deliveryTeacher": "黑桃",
+      "deliveryCourse": "情趣变装课",
+      "classTime": "20:00-21:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1050012",
+      "deliveryTeacher": "唐泽",
+      "deliveryCourse": "基础局+线下乳首课",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1110014",
+      "deliveryTeacher": "唐泽",
+      "deliveryCourse": "基础局+线下乳首课",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1140008",
+      "deliveryTeacher": "唐泽上",
+      "deliveryCourse": "基础局+线下乳首课",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1200014",
+      "deliveryTeacher": "唐泽",
+      "deliveryCourse": "基础局+线下乳首课",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1230008",
+      "deliveryTeacher": "唐泽",
+      "deliveryCourse": "基础局+线下乳首课",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1230023",
+      "deliveryTeacher": "唐泽上",
+      "deliveryCourse": "基础局+线下乳首课",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1560001",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "基础两节",
+      "classTime": "15:00-17:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560002",
+      "deliveryTeacher": "jojo",
+      "deliveryCourse": "jojo会员门槛",
+      "classTime": "",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560003",
+      "deliveryTeacher": "唐泽",
+      "deliveryCourse": "女m局+埃及艳后",
+      "classTime": "13:00-15:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560004",
+      "deliveryTeacher": "小梨",
+      "deliveryCourse": "基础局",
+      "classTime": "14:00-15:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1560005",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "基础局+埃及艳后课",
+      "classTime": "20:00-22:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560006",
+      "deliveryTeacher": "",
+      "deliveryCourse": "十一面销",
+      "classTime": "",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560007",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "基础局",
+      "classTime": "20:20-22:20",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560008",
+      "deliveryTeacher": "瑶瑶",
+      "deliveryCourse": "基础局",
+      "classTime": "20:20-22:20",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560009",
+      "deliveryTeacher": "唐泽",
+      "deliveryCourse": "女m局两节",
+      "classTime": "17:00-19:00",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1560010",
+      "deliveryTeacher": "嘟嘟",
+      "deliveryCourse": "基础局",
+      "classTime": "20:30-22:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560011",
+      "deliveryTeacher": "水水",
+      "deliveryCourse": "基础局俩小时",
+      "classTime": "14:00-16:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560012",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "屈辱剧本1h+情趣变装1h",
+      "classTime": "14:00-16:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560013",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "臣服",
+      "classTime": "23:40-1:40",
+      "deliveryRoom": "天津教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560014",
+      "deliveryTeacher": "小凡",
+      "deliveryCourse": "基础局+埃及艳后2h",
+      "classTime": "17:30-19:30",
+      "deliveryRoom": "泉州",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560015",
+      "deliveryTeacher": "小羊",
+      "deliveryCourse": "基础一节",
+      "classTime": "10:00-11:00",
+      "deliveryRoom": "武汉教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560016",
+      "deliveryTeacher": "鱼鱼",
+      "deliveryCourse": "丝袜课俩小时",
+      "classTime": "13:00-15:00",
+      "deliveryRoom": "福州教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560017",
+      "deliveryTeacher": "鱼鱼",
+      "deliveryCourse": "基础局俩小时",
+      "classTime": "16:00-18:00",
+      "deliveryRoom": "福州教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560018",
+      "deliveryTeacher": "兮敏",
+      "deliveryCourse": "基础局",
+      "classTime": "13:00-15:00",
+      "deliveryRoom": "郑州教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560019",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "基础局一个半小时",
+      "classTime": "12:00-13:30",
+      "deliveryRoom": "天津教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560020",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "luo足+埃及艳后+情趣变装",
+      "classTime": "17:00-20:00",
+      "deliveryRoom": "天津教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560021",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "luo足+埃及艳后+情趣变装",
+      "classTime": "18:00-21:00",
+      "deliveryRoom": "天津教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560022",
+      "deliveryTeacher": "小夜",
+      "deliveryCourse": "基础局",
+      "classTime": "19:30-20:30",
+      "deliveryRoom": "南京教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560023",
+      "deliveryTeacher": "鱼鱼",
+      "deliveryCourse": "埃及艳后一小时",
+      "classTime": "15:00-16:00",
+      "deliveryRoom": "福州教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560024",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "木乃伊",
+      "classTime": "16:00-17:00",
+      "deliveryRoom": "天津教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560025",
+      "deliveryTeacher": "皮皮",
+      "deliveryCourse": "ru首➕埃及艳后各一个小时",
+      "classTime": "14:00-16:00",
+      "deliveryRoom": "济南教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560026",
+      "deliveryTeacher": "雨凝",
+      "deliveryCourse": "基础局一小时➕医生剧本",
+      "classTime": "20:00-22:00",
+      "deliveryRoom": "石家庄教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560027",
+      "deliveryTeacher": "小梨",
+      "deliveryCourse": "胶衣一节+丝足一节",
+      "classTime": "18:30-20:30",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560028",
+      "deliveryTeacher": "",
+      "deliveryCourse": "3v3第二场",
+      "classTime": "18:00-19:30",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560029",
+      "deliveryTeacher": "紫萱",
+      "deliveryCourse": "2个小时基础女王局",
+      "classTime": "19:00-21:00",
+      "deliveryRoom": "苏州1406",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560030",
+      "deliveryTeacher": "",
+      "deliveryCourse": "3v3第一场",
+      "classTime": "16:00-17:30",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560031",
+      "deliveryTeacher": "姜一",
+      "deliveryCourse": "基础局",
+      "classTime": "19:30-21:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1560032",
+      "deliveryTeacher": "紫萱",
+      "deliveryCourse": "1个小时乳首开发课",
+      "classTime": "10:00-11:00",
+      "deliveryRoom": "苏州1406",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560033",
+      "deliveryTeacher": "米妮",
+      "deliveryCourse": "裸足+深度裸足",
+      "classTime": "19:00-21:00",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560034",
+      "deliveryTeacher": "野人",
+      "deliveryCourse": "基础局+裸足丝袜课",
+      "classTime": "12:30-14:30",
+      "deliveryRoom": "重庆1907",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560035",
+      "deliveryTeacher": "米妮",
+      "deliveryCourse": "基础+裸足丝袜课",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560036",
+      "deliveryTeacher": "JOJO",
+      "deliveryCourse": "2个小时拍摄",
+      "classTime": "14:00-16:00",
+      "deliveryRoom": "酒店拍摄",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560037",
+      "deliveryTeacher": "grace",
+      "deliveryCourse": "线上理论课 1h",
+      "classTime": "19:30-20:30",
+      "deliveryRoom": "16D",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560038",
+      "deliveryTeacher": "",
+      "deliveryCourse": "3v3第一场",
+      "classTime": "16:00-17:30",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560039",
+      "deliveryTeacher": "紫萱",
+      "deliveryCourse": "基础局 超越之旅",
+      "classTime": "15:00-16:00",
+      "deliveryRoom": "苏州上",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560040",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "sp+ 丝袜",
+      "classTime": "21:30-23:30",
+      "deliveryRoom": "ゴミ箱",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560041",
+      "deliveryTeacher": "紫萱",
+      "deliveryCourse": "2个小时基础女王局",
+      "classTime": "19:00-21:00",
+      "deliveryRoom": "苏州1406",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560042",
+      "deliveryTeacher": "姜一",
+      "deliveryCourse": "基础局",
+      "classTime": "19:30-21:30",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1560043",
+      "deliveryTeacher": "紫萱",
+      "deliveryCourse": "1个小时乳首开发课",
+      "classTime": "10:00-11:00",
+      "deliveryRoom": "苏州1406",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560044",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "丝足课1节",
+      "classTime": "13:00-14:00",
+      "deliveryRoom": "天津教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560045",
+      "deliveryTeacher": "云云",
+      "deliveryCourse": "埃及艳后+sp",
+      "classTime": "22.00-00.00",
+      "deliveryRoom": "无锡教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560046",
+      "deliveryTeacher": "米妮",
+      "deliveryCourse": "丝足2节",
+      "classTime": "18:00-20:00",
+      "deliveryRoom": "宁波1103",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560047",
+      "deliveryTeacher": "唐泽上",
+      "deliveryCourse": "399基础网调",
+      "classTime": "20:00-20:30",
+      "deliveryRoom": "腾讯会议",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560048",
+      "deliveryTeacher": "米妮上",
+      "deliveryCourse": "基础局一小时➕丝袜一小时",
+      "classTime": "13:00-15:00",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560049",
+      "deliveryTeacher": "米妮上",
+      "deliveryCourse": "臣服剧本一小时",
+      "classTime": "15:30-16:30",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560050",
+      "deliveryTeacher": "声声",
+      "deliveryCourse": "基础局2小时（第二节半价）+丝足1小时",
+      "classTime": "18:30-21:30",
+      "deliveryRoom": "天津教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560051",
+      "deliveryTeacher": "苏苏",
+      "deliveryCourse": "基础局2小时",
+      "classTime": "19:00-21:00",
+      "deliveryRoom": "南京教室 KL",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560052",
+      "deliveryTeacher": "小羊",
+      "deliveryCourse": "2个小时基础女王局",
+      "classTime": "13:00-15:00",
+      "deliveryRoom": "武汉单",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560053",
+      "deliveryTeacher": "小夜",
+      "deliveryCourse": "裸足丝袜进阶课",
+      "classTime": "16:00-17:00",
+      "deliveryRoom": "南京教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560054",
+      "deliveryTeacher": "小夜",
+      "deliveryCourse": "痛与罚+sp",
+      "classTime": "12:30-15:00",
+      "deliveryRoom": "南京教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560055",
+      "deliveryTeacher": "小羊",
+      "deliveryCourse": "基础局1.5小时",
+      "classTime": "12:00-13:30",
+      "deliveryRoom": "武汉教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560056",
+      "deliveryTeacher": "小凡",
+      "deliveryCourse": "女m+20分钟沟通了解",
+      "classTime": "23:00-0:20",
+      "deliveryRoom": "泉州",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560057",
+      "deliveryTeacher": "声声",
+      "deliveryCourse": "2个小时基础女王局",
+      "classTime": "21:00-23:00",
+      "deliveryRoom": "巡游单",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560058",
+      "deliveryTeacher": "瑶瑶",
+      "deliveryCourse": "线下理论课",
+      "classTime": "15:15-16:15",
+      "deliveryRoom": "捷运大厦16D",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560059",
+      "deliveryTeacher": "安雅",
+      "deliveryCourse": "疯狂星期三基础1节+TK1节",
+      "classTime": "15:00-17:00",
+      "deliveryRoom": "上海404",
+      "deliveryClassroomId": "1"
+    },
+    {
+      "id": "1560060",
+      "deliveryTeacher": "姜一",
+      "deliveryCourse": "上下级90分钟+基础局+问罪",
+      "classTime": "19:00-22:30",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560061",
+      "deliveryTeacher": "瑶瑶",
+      "deliveryCourse": "线上理论课",
+      "classTime": "19:00-19:30",
+      "deliveryRoom": "捷运大厦16D",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560062",
+      "deliveryTeacher": "嘟嘟",
+      "deliveryCourse": "线上理论课",
+      "classTime": "15:00-15:30",
+      "deliveryRoom": "捷运大厦16D",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560063",
+      "deliveryTeacher": "野人",
+      "deliveryCourse": "胶衣课一小时+变装课一小时",
+      "classTime": "15:00-17:00",
+      "deliveryRoom": "重庆1907",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560064",
+      "deliveryTeacher": "小羊",
+      "deliveryCourse": "2个小时基础女王局",
+      "classTime": "14:30~16:30",
+      "deliveryRoom": "武汉教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560065",
+      "deliveryTeacher": "野人",
+      "deliveryCourse": "木乃伊一小时",
+      "classTime": "17:00-18:00",
+      "deliveryRoom": "重庆1907",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560066",
+      "deliveryTeacher": "小羊",
+      "deliveryCourse": "基础局",
+      "classTime": "17:00-18:00",
+      "deliveryRoom": "武汉1921",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560067",
+      "deliveryTeacher": "韦德",
+      "deliveryCourse": "基础局俩小时",
+      "classTime": "19:00-21:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560068",
+      "deliveryTeacher": "瑶瑶",
+      "deliveryCourse": "线下理论课",
+      "classTime": "18:00-19:00",
+      "deliveryRoom": "捷运大厦16D",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560069",
+      "deliveryTeacher": "小凡",
+      "deliveryCourse": "基础局俩小时",
+      "classTime": "16:00-18:00",
+      "deliveryRoom": "Chatbox",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560070",
+      "deliveryTeacher": "米妮",
+      "deliveryCourse": "sheng水课+臣服两个小时",
+      "classTime": "14:00-17:00",
+      "deliveryRoom": "深圳1309",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560071",
+      "deliveryTeacher": "兮灵",
+      "deliveryCourse": "丝袜➕电击各一小时",
+      "classTime": "15:00-17:30",
+      "deliveryRoom": "石家庄2034",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560072",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "基础局俩小时",
+      "classTime": "17:00-19:00",
+      "deliveryRoom": "天津1501",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560073",
+      "deliveryTeacher": "小夜",
+      "deliveryCourse": "埃及艳后一小时",
+      "classTime": "20:00-21:00",
+      "deliveryRoom": "南京1609",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560074",
+      "deliveryTeacher": "小羊",
+      "deliveryCourse": "基础局2小时",
+      "classTime": "18:00-20:00",
+      "deliveryRoom": "武汉1921",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560075",
+      "deliveryTeacher": "YY",
+      "deliveryCourse": "臣服一小时",
+      "classTime": "13:00-14:00",
+      "deliveryRoom": "天津1501",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560076",
+      "deliveryTeacher": "韦德",
+      "deliveryCourse": "基础局+埃及艳后课",
+      "classTime": "15:30-17:30",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560077",
+      "deliveryTeacher": "米妮",
+      "deliveryCourse": "裸足丝袜课",
+      "classTime": "11:30-12:30",
+      "deliveryRoom": "8023",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560078",
+      "deliveryTeacher": "皮皮",
+      "deliveryCourse": "sheng水一节+丝一节",
+      "classTime": "14:00-16:00",
+      "deliveryRoom": "济南教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560079",
+      "deliveryTeacher": "小夜",
+      "deliveryCourse": "屈辱+裸足2h",
+      "classTime": "13:00-15:00",
+      "deliveryRoom": "南京教室",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560080",
+      "deliveryTeacher": "米妮",
+      "deliveryCourse": "埃及艳后一节+绳艺一节",
+      "classTime": "12:30-14:30",
+      "deliveryRoom": "深圳1309",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560081",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "基础局",
+      "classTime": "20:40-21:40",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560082",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "基础局一小时➕丝袜一小时",
+      "classTime": "18:30-20:30",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560083",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "基础局加时加面销",
+      "classTime": "21:40-22:10",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560084",
+      "deliveryTeacher": "黑桃",
+      "deliveryCourse": "基础局",
+      "classTime": "21:00-22:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560085",
+      "deliveryTeacher": "紫萱",
+      "deliveryCourse": "1个小时圣shui+2个小时裸足丝袜课",
+      "classTime": "20:00-23:00",
+      "deliveryRoom": "苏州1406",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560086",
+      "deliveryTeacher": "紫萱",
+      "deliveryCourse": "",
+      "classTime": "21:00-23:00",
+      "deliveryRoom": "苏州1406",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560087",
+      "deliveryTeacher": "淼淼",
+      "deliveryCourse": "1个半小时基础女王局",
+      "classTime": "19:00-20:30",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1560088",
+      "deliveryTeacher": "米妮",
+      "deliveryCourse": "基础局+裸足丝袜课+埃及艳后课",
+      "classTime": "18:30-21:30",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1560089",
+      "deliveryTeacher": "瑶瑶",
+      "deliveryCourse": "线下理论课",
+      "classTime": "18:00-19:00",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1680001",
+      "deliveryTeacher": "韦德",
+      "deliveryCourse": "基础绳艺一小时",
+      "classTime": "21:00-22:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    },
+    {
+      "id": "1680002",
+      "deliveryTeacher": "安雅",
+      "deliveryCourse": "包月带锁",
+      "classTime": "每周三周天四周",
+      "deliveryRoom": "",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1680003",
+      "deliveryTeacher": "安雅",
+      "deliveryCourse": "699高定网调",
+      "classTime": "16:00-16:40",
+      "deliveryRoom": "腾讯会议",
+      "deliveryClassroomId": "NULL"
+    },
+    {
+      "id": "1680004",
+      "deliveryTeacher": "姜一",
+      "deliveryCourse": "基础局俩小时",
+      "classTime": "13:00-15:00",
+      "deliveryRoom": "上海1101",
+      "deliveryClassroomId": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdeliveryTeacher\tdeliveryCourse\tclassTime\tdeliveryRoom\tdeliveryClassroomId\n1050008\t黑桃\t情趣变装课\t20:00-21:30\t上海404\t1\n1050012\t唐泽\t基础局+线下乳首课\t21:30-23:30\t上海404\t1\n1110014\t唐泽\t基础局+线下乳首课\t21:30-23:30\t上海404\t1\n1140008\t唐泽上\t基础局+线下乳首课\t21:30-23:30\t上海404\t1\n1200014\t唐泽\t基础局+线下乳首课\t21:30-23:30\t上海404\t1\n1230008\t唐泽\t基础局+线下乳首课\t21:30-23:30\t上海404\t1\n1230023\t唐泽上\t基础局+线下乳首课\t21:30-23:30\t上海404\t1\n1560001\t淼淼\t基础两节\t15:00-17:00\t上海1101\t2\n1560002\tjojo\tjojo会员门槛\t\t\tNULL\n1560003\t唐泽\t女m局+埃及艳后\t13:00-15:00\t上海1101\t2\n1560004\t小梨\t基础局\t14:00-15:30\t上海404\t1\n1560005\t淼淼\t基础局+埃及艳后课\t20:00-22:00\t上海1101\t2\n1560006\t\t十一面销\t\t\tNULL\n1560007\t淼淼\t基础局\t20:20-22:20\t上海1101\t2\n1560008\t瑶瑶\t基础局\t20:20-22:20\t上海1101\t2\n1560009\t唐泽\t女m局两节\t17:00-19:00\t上海404\t1\n1560010\t嘟嘟\t基础局\t20:30-22:00\t上海1101\t2\n1560011\t水水\t基础局俩小时\t14:00-16:00\t上海1101\t2\n1560012\t淼淼\t屈辱剧本1h+情趣变装1h\t14:00-16:00\t上海1101\t2\n1560013\tYY\t臣服\t23:40-1:40\t天津教室\tNULL\n1560014\t小凡\t基础局+埃及艳后2h\t17:30-19:30\t泉州\tNULL\n1560015\t小羊\t基础一节\t10:00-11:00\t武汉教室\tNULL\n1560016\t鱼鱼\t丝袜课俩小时\t13:00-15:00\t福州教室\tNULL\n1560017\t鱼鱼\t基础局俩小时\t16:00-18:00\t福州教室\tNULL\n1560018\t兮敏\t基础局\t13:00-15:00\t郑州教室\tNULL\n1560019\tYY\t基础局一个半小时\t12:00-13:30\t天津教室\tNULL\n1560020\tYY\tluo足+埃及艳后+情趣变装\t17:00-20:00\t天津教室\tNULL\n1560021\tYY\tluo足+埃及艳后+情趣变装\t18:00-21:00\t天津教室\tNULL\n1560022\t小夜\t基础局\t19:30-20:30\t南京教室\tNULL\n1560023\t鱼鱼\t埃及艳后一小时\t15:00-16:00\t福州教室\tNULL\n1560024\tYY\t木乃伊\t16:00-17:00\t天津教室\tNULL\n1560025\t皮皮\tru首➕埃及艳后各一个小时\t14:00-16:00\t济南教室\tNULL\n1560026\t雨凝\t基础局一小时➕医生剧本\t20:00-22:00\t石家庄教室\tNULL\n1560027\t小梨\t胶衣一节+丝足一节\t18:30-20:30\t上海1101\t2\n1560028\t\t3v3第二场\t18:00-19:30\t上海1101\t2\n1560029\t紫萱\t2个小时基础女王局\t19:00-21:00\t苏州1406\tNULL\n1560030\t\t3v3第一场\t16:00-17:30\t上海1101\t2\n1560031\t姜一\t基础局\t19:30-21:30\t上海404\t1\n1560032\t紫萱\t1个小时乳首开发课\t10:00-11:00\t苏州1406\tNULL\n1560033\t米妮\t裸足+深度裸足\t19:00-21:00\t\tNULL\n1560034\t野人\t基础局+裸足丝袜课\t12:30-14:30\t重庆1907\tNULL\n1560035\t米妮\t基础+裸足丝袜课\t21:30-23:30\t\tNULL\n1560036\tJOJO\t2个小时拍摄\t14:00-16:00\t酒店拍摄\tNULL\n1560037\tgrace\t线上理论课 1h\t19:30-20:30\t16D\tNULL\n1560038\t\t3v3第一场\t16:00-17:30\t\tNULL\n1560039\t紫萱\t基础局 超越之旅\t15:00-16:00\t苏州上\tNULL\n1560040\tYY\tsp+ 丝袜\t21:30-23:30\tゴミ箱\tNULL\n1560041\t紫萱\t2个小时基础女王局\t19:00-21:00\t苏州1406\tNULL\n1560042\t姜一\t基础局\t19:30-21:30\t上海404\t1\n1560043\t紫萱\t1个小时乳首开发课\t10:00-11:00\t苏州1406\tNULL\n1560044\tYY\t丝足课1节\t13:00-14:00\t天津教室\tNULL\n1560045\t云云\t埃及艳后+sp\t22.00-00.00\t无锡教室\tNULL\n1560046\t米妮\t丝足2节\t18:00-20:00\t宁波1103\tNULL\n1560047\t唐泽上\t399基础网调\t20:00-20:30\t腾讯会议\tNULL\n1560048\t米妮上\t基础局一小时➕丝袜一小时\t13:00-15:00\t\tNULL\n1560049\t米妮上\t臣服剧本一小时\t15:30-16:30\t\tNULL\n1560050\t声声\t基础局2小时（第二节半价）+丝足1小时\t18:30-21:30\t天津教室\tNULL\n1560051\t苏苏\t基础局2小时\t19:00-21:00\t南京教室 KL\tNULL\n1560052\t小羊\t2个小时基础女王局\t13:00-15:00\t武汉单\tNULL\n1560053\t小夜\t裸足丝袜进阶课\t16:00-17:00\t南京教室\tNULL\n1560054\t小夜\t痛与罚+sp\t12:30-15:00\t南京教室\tNULL\n1560055\t小羊\t基础局1.5小时\t12:00-13:30\t武汉教室\tNULL\n1560056\t小凡\t女m+20分钟沟通了解\t23:00-0:20\t泉州\tNULL\n1560057\t声声\t2个小时基础女王局\t21:00-23:00\t巡游单\tNULL\n1560058\t瑶瑶\t线下理论课\t15:15-16:15\t捷运大厦16D\tNULL\n1560059\t安雅\t疯狂星期三基础1节+TK1节\t15:00-17:00\t上海404\t1\n1560060\t姜一\t上下级90分钟+基础局+问罪\t19:00-22:30\t上海1101\t2\n1560061\t瑶瑶\t线上理论课\t19:00-19:30\t捷运大厦16D\tNULL\n1560062\t嘟嘟\t线上理论课\t15:00-15:30\t捷运大厦16D\tNULL\n1560063\t野人\t胶衣课一小时+变装课一小时\t15:00-17:00\t重庆1907\tNULL\n1560064\t小羊\t2个小时基础女王局\t14:30~16:30\t武汉教室\tNULL\n1560065\t野人\t木乃伊一小时\t17:00-18:00\t重庆1907\tNULL\n1560066\t小羊\t基础局\t17:00-18:00\t武汉1921\tNULL\n1560067\t韦德\t基础局俩小时\t19:00-21:00\t上海1101\t2\n1560068\t瑶瑶\t线下理论课\t18:00-19:00\t捷运大厦16D\tNULL\n1560069\t小凡\t基础局俩小时\t16:00-18:00\tChatbox\tNULL\n1560070\t米妮\tsheng水课+臣服两个小时\t14:00-17:00\t深圳1309\tNULL\n1560071\t兮灵\t丝袜➕电击各一小时\t15:00-17:30\t石家庄2034\tNULL\n1560072\tYY\t基础局俩小时\t17:00-19:00\t天津1501\tNULL\n1560073\t小夜\t埃及艳后一小时\t20:00-21:00\t南京1609\tNULL\n1560074\t小羊\t基础局2小时\t18:00-20:00\t武汉1921\tNULL\n1560075\tYY\t臣服一小时\t13:00-14:00\t天津1501\tNULL\n1560076\t韦德\t基础局+埃及艳后课\t15:30-17:30\t\tNULL\n1560077\t米妮\t裸足丝袜课\t11:30-12:30\t8023\tNULL\n1560078\t皮皮\tsheng水一节+丝一节\t14:00-16:00\t济南教室\tNULL\n1560079\t小夜\t屈辱+裸足2h\t13:00-15:00\t南京教室\tNULL\n1560080\t米妮\t埃及艳后一节+绳艺一节\t12:30-14:30\t深圳1309\tNULL\n1560081\t淼淼\t基础局\t20:40-21:40\t上海1101\t2\n1560082\t淼淼\t基础局一小时➕丝袜一小时\t18:30-20:30\t上海1101\t2\n1560083\t淼淼\t基础局加时加面销\t21:40-22:10\t上海1101\t2\n1560084\t黑桃\t基础局\t21:00-22:00\t上海1101\t2\n1560085\t紫萱\t1个小时圣shui+2个小时裸足丝袜课\t20:00-23:00\t苏州1406\tNULL\n1560086\t紫萱\t\t21:00-23:00\t苏州1406\tNULL\n1560087\t淼淼\t1个半小时基础女王局\t19:00-20:30\t上海1101\t2\n1560088\t米妮\t基础局+裸足丝袜课+埃及艳后课\t18:30-21:30\t\tNULL\n1560089\t瑶瑶\t线下理论课\t18:00-19:00\t\tNULL\n1680001\t韦德\t基础绳艺一小时\t21:00-22:00\t上海1101\t2\n1680002\t安雅\t包月带锁\t每周三周天四周\t\tNULL\n1680003\t安雅\t699高定网调\t16:00-16:40\t腾讯会议\tNULL\n1680004\t姜一\t基础局俩小时\t13:00-15:00\t上海1101\t2\n",
+  "stderr": "",
+  "execution_time_ms": 1620
+}

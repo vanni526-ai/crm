@@ -17,6 +17,7 @@ import { cityRouter } from "./cityRouter";
 import { permissionRouter } from "./permissionRouter";
 import { authRouter } from "./authRouter";
 import { userManagementRouter } from "./userManagementRouter";
+import { normalizeOrderRouter } from "./normalizeOrderRouter";
 import { uploadRouter } from "./uploadRouter";
 import { excelReportRouter } from "./excelReportRouter";
 import { contentGeneratorRouter } from "./contentGeneratorRouter";
@@ -94,6 +95,7 @@ export const appRouter = router({
   permissions: permissionRouter,
   auth: authRouter,
   userManagement: userManagementRouter,
+  normalizeOrder: normalizeOrderRouter,
   upload: uploadRouter,
   excelReport: excelReportRouter,
   contentGenerator: contentGeneratorRouter,
