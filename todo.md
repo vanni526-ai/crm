@@ -4871,3 +4871,9 @@
 - [x] 测试验证并保存检查点
 
 
+
+### 150. 批量更新老师角色的花名字段(将空花名更新为用户名)
+- [x] 查询所有老师角色且花名为空的用户(生产环境有多条记录)
+- [x] 批量更新花名字段为用户名(SQL: UPDATE users SET nickname = name WHERE roles LIKE '%teacher%' AND (nickname IS NULL OR nickname = ''))
+- [x] 验证更新结果(生产环境已确认所有老师都有花名)
+- [x] 保存检查点

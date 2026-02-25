@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, name, nickname, roles FROM users WHERE roles LIKE '%teacher%' LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, roles FROM users WHERE roles LIKE '%teacher%' LIMIT 20;",
+  "rows": [
+    {
+      "id": "15362121",
+      "name": "安雅",
+      "nickname": "安雅",
+      "roles": "user,teacher"
+    },
+    {
+      "id": "15362122",
+      "name": "姜一",
+      "nickname": "姜一",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362124",
+      "name": "黑桃",
+      "nickname": "黑桃",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362125",
+      "name": "嘟嘟",
+      "nickname": "嘟嘟",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362126",
+      "name": "水水",
+      "nickname": "水水",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362127",
+      "name": "唐泽",
+      "nickname": "唐泽",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362128",
+      "name": "无浪",
+      "nickname": "无浪",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362129",
+      "name": "米妮",
+      "nickname": "米妮",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362131",
+      "name": "小梨",
+      "nickname": "小梨",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362132",
+      "name": "韦德",
+      "nickname": "韦德",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362133",
+      "name": "枝",
+      "nickname": "枝",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362134",
+      "name": "井盖",
+      "nickname": "井盖",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362135",
+      "name": "温言",
+      "nickname": "温言",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362136",
+      "name": "Nemo",
+      "nickname": "Nemo",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362137",
+      "name": "巳月",
+      "nickname": "巳月",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362138",
+      "name": "小小",
+      "nickname": "小小",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362139",
+      "name": "淼淼",
+      "nickname": "淼淼",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362143",
+      "name": "米朵",
+      "nickname": "米朵",
+      "roles": "teacher,user"
+    },
+    {
+      "id": "15362146",
+      "name": "张雪婷",
+      "nickname": "橘子",
+      "roles": "user,cityPartner,teacher"
+    },
+    {
+      "id": "15362148",
+      "name": "声声",
+      "nickname": "声声",
+      "roles": "teacher,user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\troles\n15362121\t安雅\t安雅\tuser,teacher\n15362122\t姜一\t姜一\tteacher,user\n15362124\t黑桃\t黑桃\tteacher,user\n15362125\t嘟嘟\t嘟嘟\tteacher,user\n15362126\t水水\t水水\tteacher,user\n15362127\t唐泽\t唐泽\tteacher,user\n15362128\t无浪\t无浪\tteacher,user\n15362129\t米妮\t米妮\tteacher,user\n15362131\t小梨\t小梨\tteacher,user\n15362132\t韦德\t韦德\tteacher,user\n15362133\t枝\t枝\tteacher,user\n15362134\t井盖\t井盖\tteacher,user\n15362135\t温言\t温言\tteacher,user\n15362136\tNemo\tNemo\tteacher,user\n15362137\t巳月\t巳月\tteacher,user\n15362138\t小小\t小小\tteacher,user\n15362139\t淼淼\t淼淼\tteacher,user\n15362143\t米朵\t米朵\tteacher,user\n15362146\t张雪婷\t橘子\tuser,cityPartner,teacher\n15362148\t声声\t声声\tteacher,user\n",
+  "stderr": "",
+  "execution_time_ms": 1499
+}

@@ -1,0 +1,150 @@
+{
+  "query": "SELECT id, name, nickname, LENGTH(nickname) as nickname_length, HEX(nickname) as nickname_hex FROM users WHERE roles LIKE '%teacher%' LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, LENGTH(nickname) as nickname_length, HEX(nickname) as nickname_hex FROM users WHERE roles LIKE '%teacher%' LIMIT 20;",
+  "rows": [
+    {
+      "id": "15362121",
+      "name": "安雅",
+      "nickname": "安雅",
+      "nickname_length": "6",
+      "nickname_hex": "E5AE89E99B85"
+    },
+    {
+      "id": "15362122",
+      "name": "姜一",
+      "nickname": "姜一",
+      "nickname_length": "6",
+      "nickname_hex": "E5A79CE4B880"
+    },
+    {
+      "id": "15362124",
+      "name": "黑桃",
+      "nickname": "黑桃",
+      "nickname_length": "6",
+      "nickname_hex": "E9BB91E6A183"
+    },
+    {
+      "id": "15362125",
+      "name": "嘟嘟",
+      "nickname": "嘟嘟",
+      "nickname_length": "6",
+      "nickname_hex": "E5989FE5989F"
+    },
+    {
+      "id": "15362126",
+      "name": "水水",
+      "nickname": "水水",
+      "nickname_length": "6",
+      "nickname_hex": "E6B0B4E6B0B4"
+    },
+    {
+      "id": "15362127",
+      "name": "唐泽",
+      "nickname": "唐泽",
+      "nickname_length": "6",
+      "nickname_hex": "E59490E6B3BD"
+    },
+    {
+      "id": "15362128",
+      "name": "无浪",
+      "nickname": "无浪",
+      "nickname_length": "6",
+      "nickname_hex": "E697A0E6B5AA"
+    },
+    {
+      "id": "15362129",
+      "name": "米妮",
+      "nickname": "米妮",
+      "nickname_length": "6",
+      "nickname_hex": "E7B1B3E5A6AE"
+    },
+    {
+      "id": "15362131",
+      "name": "小梨",
+      "nickname": "小梨",
+      "nickname_length": "6",
+      "nickname_hex": "E5B08FE6A2A8"
+    },
+    {
+      "id": "15362132",
+      "name": "韦德",
+      "nickname": "韦德",
+      "nickname_length": "6",
+      "nickname_hex": "E99FA6E5BEB7"
+    },
+    {
+      "id": "15362133",
+      "name": "枝",
+      "nickname": "枝",
+      "nickname_length": "3",
+      "nickname_hex": "E69E9D"
+    },
+    {
+      "id": "15362134",
+      "name": "井盖",
+      "nickname": "井盖",
+      "nickname_length": "6",
+      "nickname_hex": "E4BA95E79B96"
+    },
+    {
+      "id": "15362135",
+      "name": "温言",
+      "nickname": "温言",
+      "nickname_length": "6",
+      "nickname_hex": "E6B8A9E8A880"
+    },
+    {
+      "id": "15362136",
+      "name": "Nemo",
+      "nickname": "Nemo",
+      "nickname_length": "4",
+      "nickname_hex": "4E656D6F"
+    },
+    {
+      "id": "15362137",
+      "name": "巳月",
+      "nickname": "巳月",
+      "nickname_length": "6",
+      "nickname_hex": "E5B7B3E69C88"
+    },
+    {
+      "id": "15362138",
+      "name": "小小",
+      "nickname": "小小",
+      "nickname_length": "6",
+      "nickname_hex": "E5B08FE5B08F"
+    },
+    {
+      "id": "15362139",
+      "name": "淼淼",
+      "nickname": "淼淼",
+      "nickname_length": "6",
+      "nickname_hex": "E6B7BCE6B7BC"
+    },
+    {
+      "id": "15362143",
+      "name": "米朵",
+      "nickname": "米朵",
+      "nickname_length": "6",
+      "nickname_hex": "E7B1B3E69CB5"
+    },
+    {
+      "id": "15362146",
+      "name": "张雪婷",
+      "nickname": "橘子",
+      "nickname_length": "6",
+      "nickname_hex": "E6A998E5AD90"
+    },
+    {
+      "id": "15362148",
+      "name": "声声",
+      "nickname": "声声",
+      "nickname_length": "6",
+      "nickname_hex": "E5A3B0E5A3B0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\tnickname_length\tnickname_hex\n15362121\t安雅\t安雅\t6\tE5AE89E99B85\n15362122\t姜一\t姜一\t6\tE5A79CE4B880\n15362124\t黑桃\t黑桃\t6\tE9BB91E6A183\n15362125\t嘟嘟\t嘟嘟\t6\tE5989FE5989F\n15362126\t水水\t水水\t6\tE6B0B4E6B0B4\n15362127\t唐泽\t唐泽\t6\tE59490E6B3BD\n15362128\t无浪\t无浪\t6\tE697A0E6B5AA\n15362129\t米妮\t米妮\t6\tE7B1B3E5A6AE\n15362131\t小梨\t小梨\t6\tE5B08FE6A2A8\n15362132\t韦德\t韦德\t6\tE99FA6E5BEB7\n15362133\t枝\t枝\t3\tE69E9D\n15362134\t井盖\t井盖\t6\tE4BA95E79B96\n15362135\t温言\t温言\t6\tE6B8A9E8A880\n15362136\tNemo\tNemo\t4\t4E656D6F\n15362137\t巳月\t巳月\t6\tE5B7B3E69C88\n15362138\t小小\t小小\t6\tE5B08FE5B08F\n15362139\t淼淼\t淼淼\t6\tE6B7BCE6B7BC\n15362143\t米朵\t米朵\t6\tE7B1B3E69CB5\n15362146\t张雪婷\t橘子\t6\tE6A998E5AD90\n15362148\t声声\t声声\t6\tE5A3B0E5A3B0\n",
+  "stderr": "",
+  "execution_time_ms": 1588
+}
