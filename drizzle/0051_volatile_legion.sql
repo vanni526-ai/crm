@@ -1,0 +1,1 @@
+ALTER TABLE `courses` ADD `isBookable` boolean DEFAULT true NOT NULL;
