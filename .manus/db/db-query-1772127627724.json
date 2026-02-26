@@ -1,0 +1,388 @@
+{
+  "query": "SELECT \n  userId,\n  COUNT(*) as count,\n  GROUP_CONCAT(id ORDER BY createdAt DESC) as teacher_ids,\n  GROUP_CONCAT(name ORDER BY createdAt DESC) as names\nFROM teachers\nGROUP BY userId\nHAVING COUNT(*) > 1\nORDER BY count DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  userId,\n  COUNT(*) as count,\n  GROUP_CONCAT(id ORDER BY createdAt DESC) as teacher_ids,\n  GROUP_CONCAT(name ORDER BY createdAt DESC) as names\nFROM teachers\nGROUP BY userId\nHAVING COUNT(*) > 1\nORDER BY count DESC;",
+  "rows": [
+    {
+      "userId": "16028800",
+      "count": "4",
+      "teacher_ids": "570148,570122,570084,570058",
+      "names": "小钰,小钰,小钰,小钰"
+    },
+    {
+      "userId": "15362121",
+      "count": "2",
+      "teacher_ids": "570119,570055",
+      "names": "安雅,安雅"
+    },
+    {
+      "userId": "16028798",
+      "count": "2",
+      "teacher_ids": "570120,570056",
+      "names": "烨,烨"
+    },
+    {
+      "userId": "16028799",
+      "count": "2",
+      "teacher_ids": "570121,570057",
+      "names": "圆圆,圆圆"
+    },
+    {
+      "userId": "16028801",
+      "count": "2",
+      "teacher_ids": "570123,570059",
+      "names": "玥玥,玥玥"
+    },
+    {
+      "userId": "15362127",
+      "count": "2",
+      "teacher_ids": "570124,570060",
+      "names": "唐泽,唐泽"
+    },
+    {
+      "userId": "15362136",
+      "count": "2",
+      "teacher_ids": "570125,570061",
+      "names": "Nemo,Nemo"
+    },
+    {
+      "userId": "15362139",
+      "count": "2",
+      "teacher_ids": "570126,570062",
+      "names": "淼淼,淼淼"
+    },
+    {
+      "userId": "16028802",
+      "count": "2",
+      "teacher_ids": "570127,570063",
+      "names": "璐璐,璐璐"
+    },
+    {
+      "userId": "15362126",
+      "count": "2",
+      "teacher_ids": "570128,570064",
+      "names": "水水,水水"
+    },
+    {
+      "userId": "15362129",
+      "count": "2",
+      "teacher_ids": "570129,570065",
+      "names": "米妮,米妮"
+    },
+    {
+      "userId": "15362122",
+      "count": "2",
+      "teacher_ids": "570130,570066",
+      "names": "姜一,姜一"
+    },
+    {
+      "userId": "15362133",
+      "count": "2",
+      "teacher_ids": "570131,570067",
+      "names": "枝,枝"
+    },
+    {
+      "userId": "15362132",
+      "count": "2",
+      "teacher_ids": "570132,570068",
+      "names": "韦德,韦德"
+    },
+    {
+      "userId": "15362124",
+      "count": "2",
+      "teacher_ids": "570133,570069",
+      "names": "黑桃,黑桃"
+    },
+    {
+      "userId": "15362134",
+      "count": "2",
+      "teacher_ids": "570134,570070",
+      "names": "井盖,井盖"
+    },
+    {
+      "userId": "16028804",
+      "count": "2",
+      "teacher_ids": "570135,570071",
+      "names": "紫野,紫野"
+    },
+    {
+      "userId": "15362128",
+      "count": "2",
+      "teacher_ids": "570136,570072",
+      "names": "无浪,无浪"
+    },
+    {
+      "userId": "15362135",
+      "count": "2",
+      "teacher_ids": "570137,570073",
+      "names": "温言,温言"
+    },
+    {
+      "userId": "15362137",
+      "count": "2",
+      "teacher_ids": "570138,570074",
+      "names": "巳月,巳月"
+    },
+    {
+      "userId": "15362131",
+      "count": "2",
+      "teacher_ids": "570139,570075",
+      "names": "小梨,小梨"
+    },
+    {
+      "userId": "16028805",
+      "count": "2",
+      "teacher_ids": "570140,570076",
+      "names": "River,River"
+    },
+    {
+      "userId": "15362143",
+      "count": "2",
+      "teacher_ids": "570141,570077",
+      "names": "米朵,米朵"
+    },
+    {
+      "userId": "16028806",
+      "count": "2",
+      "teacher_ids": "570142,570078",
+      "names": "七七,七七"
+    },
+    {
+      "userId": "16028807",
+      "count": "2",
+      "teacher_ids": "570143,570079",
+      "names": "瑶瑶,瑶瑶"
+    },
+    {
+      "userId": "16028808",
+      "count": "2",
+      "teacher_ids": "570144,570080",
+      "names": "九淑,九淑"
+    },
+    {
+      "userId": "16028809",
+      "count": "2",
+      "teacher_ids": "570145,570081",
+      "names": "晚晚,晚晚"
+    },
+    {
+      "userId": "16028810",
+      "count": "2",
+      "teacher_ids": "570146,570082",
+      "names": "大崎,大崎"
+    },
+    {
+      "userId": "16028811",
+      "count": "2",
+      "teacher_ids": "570147,570083",
+      "names": "黛茜,黛茜"
+    },
+    {
+      "userId": "16028812",
+      "count": "2",
+      "teacher_ids": "570149,570085",
+      "names": "星斗,星斗"
+    },
+    {
+      "userId": "16028813",
+      "count": "2",
+      "teacher_ids": "570150,570086",
+      "names": "佳佳,佳佳"
+    },
+    {
+      "userId": "16028814",
+      "count": "2",
+      "teacher_ids": "570151,570087",
+      "names": "昭昭,昭昭"
+    },
+    {
+      "userId": "16028815",
+      "count": "2",
+      "teacher_ids": "570152,570088",
+      "names": "蜜咕咕,蜜咕咕"
+    },
+    {
+      "userId": "15362138",
+      "count": "2",
+      "teacher_ids": "570153,570089",
+      "names": "小小,小小"
+    },
+    {
+      "userId": "16028816",
+      "count": "2",
+      "teacher_ids": "570154,570090",
+      "names": "琴酒,琴酒"
+    },
+    {
+      "userId": "15362167",
+      "count": "2",
+      "teacher_ids": "570155,570091",
+      "names": "鱼鱼,鱼鱼"
+    },
+    {
+      "userId": "15362168",
+      "count": "2",
+      "teacher_ids": "570156,570092",
+      "names": "宥香,宥香"
+    },
+    {
+      "userId": "15362160",
+      "count": "2",
+      "teacher_ids": "570157,570093",
+      "names": "依一,依一"
+    },
+    {
+      "userId": "15362161",
+      "count": "2",
+      "teacher_ids": "570158,570094",
+      "names": "云云,云云"
+    },
+    {
+      "userId": "15362150",
+      "count": "2",
+      "teacher_ids": "570159,570095",
+      "names": "兮灵,兮灵"
+    },
+    {
+      "userId": "15362151",
+      "count": "2",
+      "teacher_ids": "570160,570096",
+      "names": "絮絮,絮絮"
+    },
+    {
+      "userId": "15362153",
+      "count": "2",
+      "teacher_ids": "570161,570097",
+      "names": "雨凝,雨凝"
+    },
+    {
+      "userId": "16028818",
+      "count": "2",
+      "teacher_ids": "570162,570098",
+      "names": "酥酥,酥酥"
+    },
+    {
+      "userId": "16028819",
+      "count": "2",
+      "teacher_ids": "570163,570099",
+      "names": "甜儿,甜儿"
+    },
+    {
+      "userId": "15362154",
+      "count": "2",
+      "teacher_ids": "570164,570100",
+      "names": "小米,小米"
+    },
+    {
+      "userId": "15362156",
+      "count": "2",
+      "teacher_ids": "570165,570101",
+      "names": "奚敏,奚敏"
+    },
+    {
+      "userId": "15362149",
+      "count": "2",
+      "teacher_ids": "570166,570102",
+      "names": "皮皮,皮皮"
+    },
+    {
+      "userId": "16028820",
+      "count": "2",
+      "teacher_ids": "570167,570103",
+      "names": "铴铴,铴铴"
+    },
+    {
+      "userId": "15362146",
+      "count": "2",
+      "teacher_ids": "570168,570104",
+      "names": "橘子,橘子"
+    },
+    {
+      "userId": "15362148",
+      "count": "2",
+      "teacher_ids": "570169,570105",
+      "names": "声声,声声"
+    },
+    {
+      "userId": "16028821",
+      "count": "2",
+      "teacher_ids": "570170,570106",
+      "names": "YY,YY"
+    },
+    {
+      "userId": "16028822",
+      "count": "2",
+      "teacher_ids": "570171,570107",
+      "names": "Nancy,Nancy"
+    },
+    {
+      "userId": "16028823",
+      "count": "2",
+      "teacher_ids": "570172,570108",
+      "names": "爱丽丝,爱丽丝"
+    },
+    {
+      "userId": "15362169",
+      "count": "2",
+      "teacher_ids": "570173,570109",
+      "names": "小凡,小凡"
+    },
+    {
+      "userId": "15362158",
+      "count": "2",
+      "teacher_ids": "570174,570110",
+      "names": "苏苏,苏苏"
+    },
+    {
+      "userId": "15362157",
+      "count": "2",
+      "teacher_ids": "570175,570111",
+      "names": "Sherry,Sherry"
+    },
+    {
+      "userId": "15362159",
+      "count": "2",
+      "teacher_ids": "570176,570112",
+      "names": "小夜,小夜"
+    },
+    {
+      "userId": "15362166",
+      "count": "2",
+      "teacher_ids": "570177,570113",
+      "names": "兔子,兔子"
+    },
+    {
+      "userId": "16028825",
+      "count": "2",
+      "teacher_ids": "570178,570114",
+      "names": "十字蛇,十字蛇"
+    },
+    {
+      "userId": "15362165",
+      "count": "2",
+      "teacher_ids": "570179,570115",
+      "names": "欣欣,欣欣"
+    },
+    {
+      "userId": "15362163",
+      "count": "2",
+      "teacher_ids": "570180,570116",
+      "names": "汐梨,汐梨"
+    },
+    {
+      "userId": "15362162",
+      "count": "2",
+      "teacher_ids": "570181,570117",
+      "names": "小羊,小羊"
+    },
+    {
+      "userId": "16028826",
+      "count": "2",
+      "teacher_ids": "570182,570118",
+      "names": "Luna,Luna"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tcount\tteacher_ids\tnames\n16028800\t4\t570148,570122,570084,570058\t小钰,小钰,小钰,小钰\n15362121\t2\t570119,570055\t安雅,安雅\n16028798\t2\t570120,570056\t烨,烨\n16028799\t2\t570121,570057\t圆圆,圆圆\n16028801\t2\t570123,570059\t玥玥,玥玥\n15362127\t2\t570124,570060\t唐泽,唐泽\n15362136\t2\t570125,570061\tNemo,Nemo\n15362139\t2\t570126,570062\t淼淼,淼淼\n16028802\t2\t570127,570063\t璐璐,璐璐\n15362126\t2\t570128,570064\t水水,水水\n15362129\t2\t570129,570065\t米妮,米妮\n15362122\t2\t570130,570066\t姜一,姜一\n15362133\t2\t570131,570067\t枝,枝\n15362132\t2\t570132,570068\t韦德,韦德\n15362124\t2\t570133,570069\t黑桃,黑桃\n15362134\t2\t570134,570070\t井盖,井盖\n16028804\t2\t570135,570071\t紫野,紫野\n15362128\t2\t570136,570072\t无浪,无浪\n15362135\t2\t570137,570073\t温言,温言\n15362137\t2\t570138,570074\t巳月,巳月\n15362131\t2\t570139,570075\t小梨,小梨\n16028805\t2\t570140,570076\tRiver,River\n15362143\t2\t570141,570077\t米朵,米朵\n16028806\t2\t570142,570078\t七七,七七\n16028807\t2\t570143,570079\t瑶瑶,瑶瑶\n16028808\t2\t570144,570080\t九淑,九淑\n16028809\t2\t570145,570081\t晚晚,晚晚\n16028810\t2\t570146,570082\t大崎,大崎\n16028811\t2\t570147,570083\t黛茜,黛茜\n16028812\t2\t570149,570085\t星斗,星斗\n16028813\t2\t570150,570086\t佳佳,佳佳\n16028814\t2\t570151,570087\t昭昭,昭昭\n16028815\t2\t570152,570088\t蜜咕咕,蜜咕咕\n15362138\t2\t570153,570089\t小小,小小\n16028816\t2\t570154,570090\t琴酒,琴酒\n15362167\t2\t570155,570091\t鱼鱼,鱼鱼\n15362168\t2\t570156,570092\t宥香,宥香\n15362160\t2\t570157,570093\t依一,依一\n15362161\t2\t570158,570094\t云云,云云\n15362150\t2\t570159,570095\t兮灵,兮灵\n15362151\t2\t570160,570096\t絮絮,絮絮\n15362153\t2\t570161,570097\t雨凝,雨凝\n16028818\t2\t570162,570098\t酥酥,酥酥\n16028819\t2\t570163,570099\t甜儿,甜儿\n15362154\t2\t570164,570100\t小米,小米\n15362156\t2\t570165,570101\t奚敏,奚敏\n15362149\t2\t570166,570102\t皮皮,皮皮\n16028820\t2\t570167,570103\t铴铴,铴铴\n15362146\t2\t570168,570104\t橘子,橘子\n15362148\t2\t570169,570105\t声声,声声\n16028821\t2\t570170,570106\tYY,YY\n16028822\t2\t570171,570107\tNancy,Nancy\n16028823\t2\t570172,570108\t爱丽丝,爱丽丝\n15362169\t2\t570173,570109\t小凡,小凡\n15362158\t2\t570174,570110\t苏苏,苏苏\n15362157\t2\t570175,570111\tSherry,Sherry\n15362159\t2\t570176,570112\t小夜,小夜\n15362166\t2\t570177,570113\t兔子,兔子\n16028825\t2\t570178,570114\t十字蛇,十字蛇\n15362165\t2\t570179,570115\t欣欣,欣欣\n15362163\t2\t570180,570116\t汐梨,汐梨\n15362162\t2\t570181,570117\t小羊,小羊\n16028826\t2\t570182,570118\tLuna,Luna\n",
+  "stderr": "",
+  "execution_time_ms": 1728
+}

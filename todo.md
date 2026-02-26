@@ -5074,4 +5074,13 @@
 - [x] 修复getAllTeachers函数LEFT JOIN导致的重复记录问题（以users表为准，使用MAX聚合函数获取teachers.notes）
 - [x] 验证修复后老师列表不再出现重复记录（64位老师，没有重复）
 - [x] 验证React控制台没有重复key错误
+- [x] 保存检查点
+
+### 143. 清理teachers表中不在users表的孤儿记录
+- [x] 查询users表中带有teacher角色的账号信息（64个）
+- [x] 查询teachers表的所有记录（129条）
+- [x] 比对两张表，找出孤儿记录（3条）和重复记录（63个userId）
+- [x] 删除teachers表中不在users表的记录（3条）
+- [x] 删除teachers表中的重复记录（63条）
+- [x] 验证清理结果（users:64, teachers:63, 一一对应）
 - [ ] 保存检查点

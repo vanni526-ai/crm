@@ -1,0 +1,40 @@
+{
+  "query": "SELECT \n  t.id,\n  t.userId,\n  t.name,\n  t.phone,\n  t.teacherAttribute,\n  t.status,\n  LEFT(t.notes, 30) as notes_preview,\n  DATE(t.createdAt) as createdDate\nFROM teachers t\nLEFT JOIN users u ON t.userId = u.id AND u.roles LIKE '%teacher%' AND u.deletedAt IS NULL\nWHERE u.id IS NULL\nORDER BY t.createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  t.id,\n  t.userId,\n  t.name,\n  t.phone,\n  t.teacherAttribute,\n  t.status,\n  LEFT(t.notes, 30) as notes_preview,\n  DATE(t.createdAt) as createdDate\nFROM teachers t\nLEFT JOIN users u ON t.userId = u.id AND u.roles LIKE '%teacher%' AND u.deletedAt IS NULL\nWHERE u.id IS NULL\nORDER BY t.createdAt DESC;",
+  "rows": [
+    {
+      "id": "630001",
+      "userId": "15362125",
+      "name": "嘟嘟",
+      "phone": "18267846167",
+      "teacherAttribute": "NULL",
+      "status": "不活跃",
+      "notes_preview": "多nv tj、捆绑、sp、滴蜡、cai踏、刑具惩罚、耳光、体",
+      "createdDate": "2026-02-26"
+    },
+    {
+      "id": "570182",
+      "userId": "16028826",
+      "name": "Luna",
+      "phone": "",
+      "teacherAttribute": "Switch",
+      "status": "不活跃",
+      "notes_preview": "丝zu  踩踏 刑fa 羞ru 角色.情景扮演 绳艺 sp ",
+      "createdDate": "2026-02-13"
+    },
+    {
+      "id": "570118",
+      "userId": "16028826",
+      "name": "Luna",
+      "phone": "",
+      "teacherAttribute": "Switch",
+      "status": "不活跃",
+      "notes_preview": "丝zu  踩踏 刑fa 羞ru 角色.情景扮演 绳艺 sp ",
+      "createdDate": "2026-02-13"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\tphone\tteacherAttribute\tstatus\tnotes_preview\tcreatedDate\n630001\t15362125\t嘟嘟\t18267846167\tNULL\t不活跃\t多nv tj、捆绑、sp、滴蜡、cai踏、刑具惩罚、耳光、体\t2026-02-26\n570182\t16028826\tLuna\t\tSwitch\t不活跃\t丝zu  踩踏 刑fa 羞ru 角色.情景扮演 绳艺 sp \t2026-02-13\n570118\t16028826\tLuna\t\tSwitch\t不活跃\t丝zu  踩踏 刑fa 羞ru 角色.情景扮演 绳艺 sp \t2026-02-13\n",
+  "stderr": "",
+  "execution_time_ms": 1653
+}
