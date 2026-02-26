@@ -1,0 +1,21 @@
+{
+  "query": "SELECT u.id, u.name, u.nickname, u.phone, u.email, u.wechat, u.role, u.isActive, u.createdAt\nFROM users u\nLEFT JOIN salespersons s ON u.id = s.userId\nWHERE u.role = 'sales' AND s.id IS NULL\nORDER BY u.createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id, u.name, u.nickname, u.phone, u.email, u.wechat, u.role, u.isActive, u.createdAt\nFROM users u\nLEFT JOIN salespersons s ON u.id = s.userId\nWHERE u.role = 'sales' AND s.id IS NULL\nORDER BY u.createdAt DESC;",
+  "rows": [
+    {
+      "id": "22771332",
+      "name": "其他销售",
+      "nickname": "NULL",
+      "phone": "NULL",
+      "email": "sales_other_1771820942997@test.com",
+      "wechat": "NULL",
+      "role": "sales",
+      "isActive": "1",
+      "createdAt": "2026-02-23 04:29:03"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\tphone\temail\twechat\trole\tisActive\tcreatedAt\n22771332\t其他销售\tNULL\tNULL\tsales_other_1771820942997@test.com\tNULL\tsales\t1\t2026-02-23 04:29:03\n",
+  "stderr": "",
+  "execution_time_ms": 1723
+}

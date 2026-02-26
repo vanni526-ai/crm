@@ -1,0 +1,21 @@
+{
+  "query": "SELECT u.id as user_id, u.name, u.nickname, u.role, u.roles, u.isActive as user_active,\n       s.id as salesperson_id, s.userId, s.isActive as salesperson_active\nFROM users u\nLEFT JOIN salespersons s ON u.id = s.userId\nWHERE u.id = 15362125;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id as user_id, u.name, u.nickname, u.role, u.roles, u.isActive as user_active,\n       s.id as salesperson_id, s.userId, s.isActive as salesperson_active\nFROM users u\nLEFT JOIN salespersons s ON u.id = s.userId\nWHERE u.id = 15362125;",
+  "rows": [
+    {
+      "user_id": "15362125",
+      "name": "嘟嘟",
+      "nickname": "嘟嘟",
+      "role": "user",
+      "roles": "user,teacher",
+      "user_active": "1",
+      "salesperson_id": "30001",
+      "userId": "15362125",
+      "salesperson_active": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "user_id\tname\tnickname\trole\troles\tuser_active\tsalesperson_id\tuserId\tsalesperson_active\n15362125\t嘟嘟\t嘟嘟\tuser\tuser,teacher\t1\t30001\t15362125\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1636
+}

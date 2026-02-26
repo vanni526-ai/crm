@@ -234,7 +234,36 @@ export async function getAllUsers() {
 export async function updateUserRole(userId: number, role: UserRole) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // 获取用户当前角色
+  const currentUser = await db.select({ role: users.role }).from(users).where(eq(users.id, userId)).limit(1);
+  const oldRole = currentUser[0]?.role;
+  
+  // 更新users表的role
   await db.update(users).set({ role }).where(eq(users.id, userId));
+  
+  // 反向同步到salespersons表
+  if (oldRole === 'sales' && role !== 'sales') {
+    // 从sales角色改为其他角色 → 软删除salesperson记录
+    await db.update(salespersons)
+      .set({ isActive: false })
+      .where(eq(salespersons.userId, userId));
+  } else if (oldRole !== 'sales' && role === 'sales') {
+    // 从其他角色改为sales → 检查是否已有salesperson记录
+    const existing = await db.select().from(salespersons).where(eq(salespersons.userId, userId)).limit(1);
+    if (existing.length > 0) {
+      // 已有记录，恢复isActive=1
+      await db.update(salespersons)
+        .set({ isActive: true })
+        .where(eq(salespersons.userId, userId));
+    } else {
+      // 没有记录，创建新的salesperson记录
+      await db.insert(salespersons).values({
+        userId,
+        // commissionRate, orderCount, totalSales, isActive 都有默认值，不需要显式指定
+      });
+    }
+  }
 }
 
 // ===== User Role Cities Functions =====
