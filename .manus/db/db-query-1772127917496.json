@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO teachers (userId, name, phone, teacherAttribute, status, notes, createdAt, updatedAt)\nSELECT \n  u.id as userId,\n  u.name,\n  u.phone,\n  u.teacherAttribute,\n  u.teacherStatus as status,\n  u.teacherNotes as notes,\n  NOW() as createdAt,\n  NOW() as updatedAt\nFROM users u\nLEFT JOIN teachers t ON u.id = t.userId\nWHERE u.roles LIKE '%teacher%' \nAND u.deletedAt IS NULL\nAND t.id IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute INSERT INTO teachers (userId, name, phone, teacherAttribute, status, notes, createdAt, updatedAt)\nSELECT \n  u.id as userId,\n  u.name,\n  u.phone,\n  u.teacherAttribute,\n  u.teacherStatus as status,\n  u.teacherNotes as notes,\n  NOW() as createdAt,\n  NOW() as updatedAt\nFROM users u\nLEFT JOIN teachers t ON u.id = t.userId\nWHERE u.roles LIKE '%teacher%' \nAND u.deletedAt IS NULL\nAND t.id IS NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1739
+}

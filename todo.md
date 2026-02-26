@@ -5084,3 +5084,9 @@
 - [x] 删除teachers表中的重复记录（63条）
 - [x] 验证清理结果（users:64, teachers:63, 一一对应）
 - [ ] 保存检查点
+
+### 144. 确保所有有teacher角色的用户在teachers表都有记录
+- [x] 为test和露娜在teachers表创建记录
+- [x] 验证users表和teachers表的userId一一对应（users:64, teachers:65, 完全对应）
+- [x] 统一使用teachers.notes存储老师备注（移除users.teacherNotes的使用）
+- [ ] 保存检查点

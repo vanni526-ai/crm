@@ -1,0 +1,16 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%' AND deletedAt IS NULL) as users_with_teacher_role,\n  (SELECT COUNT(*) FROM teachers) as teachers_table_count,\n  (SELECT COUNT(DISTINCT userId) FROM teachers) as unique_userId_in_teachers,\n  (SELECT COUNT(*) FROM (SELECT userId FROM teachers GROUP BY userId HAVING COUNT(*) > 1) AS temp) as duplicate_userId_count;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  (SELECT COUNT(*) FROM users WHERE roles LIKE '%teacher%' AND deletedAt IS NULL) as users_with_teacher_role,\n  (SELECT COUNT(*) FROM teachers) as teachers_table_count,\n  (SELECT COUNT(DISTINCT userId) FROM teachers) as unique_userId_in_teachers,\n  (SELECT COUNT(*) FROM (SELECT userId FROM teachers GROUP BY userId HAVING COUNT(*) > 1) AS temp) as duplicate_userId_count;",
+  "rows": [
+    {
+      "users_with_teacher_role": "64",
+      "teachers_table_count": "64",
+      "unique_userId_in_teachers": "64",
+      "duplicate_userId_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "users_with_teacher_role\tteachers_table_count\tunique_userId_in_teachers\tduplicate_userId_count\n64\t64\t64\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1657
+}
