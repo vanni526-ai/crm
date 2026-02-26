@@ -5089,4 +5089,10 @@
 - [x] 为test和露娜在teachers表创建记录
 - [x] 验证users表和teachers表的userId一一对应（users:64, teachers:65, 完全对应）
 - [x] 统一使用teachers.notes存储老师备注（移除users.teacherNotes的使用）
+- [x] 保存检查点
+
+### 145. 重新设计批量更新脚本使用UPDATE逻辑
+- [x] 创建新的批量更新脚本，使用UPDATE而非INSERT
+- [x] 脚本逻辑：读取Excel文件，根据用户ID匹配teachers表记录，更新notes字段
+- [x] 测试脚本，验证只更新现有记录，不创建新记录（64/65成功，1个不存在）
 - [ ] 保存检查点
