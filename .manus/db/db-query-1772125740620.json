@@ -1,0 +1,24 @@
+{
+  "query": "SELECT u.id, u.name, u.nickname, t.id as teacher_id, t.notes \nFROM users u\nLEFT JOIN teachers t ON u.id = t.userId\nWHERE u.id = 16028816;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id, u.name, u.nickname, t.id as teacher_id, t.notes \nFROM users u\nLEFT JOIN teachers t ON u.id = t.userId\nWHERE u.id = 16028816;",
+  "rows": [
+    {
+      "id": "16028816",
+      "name": "琴酒",
+      "nickname": "琴酒",
+      "teacher_id": "570154",
+      "notes": "丝zu、sp、踩ta、刑fa、羞ru、k9、tk、角色/情景扮演、捆绑、电击"
+    },
+    {
+      "id": "16028816",
+      "name": "琴酒",
+      "nickname": "琴酒",
+      "teacher_id": "570090",
+      "notes": "丝zu、sp、踩ta、刑fa、羞ru、k9、tk、角色/情景扮演、捆绑、电击"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\tteacher_id\tnotes\n16028816\t琴酒\t琴酒\t570154\t丝zu、sp、踩ta、刑fa、羞ru、k9、tk、角色/情景扮演、捆绑、电击\n16028816\t琴酒\t琴酒\t570090\t丝zu、sp、踩ta、刑fa、羞ru、k9、tk、角色/情景扮演、捆绑、电击\n",
+  "stderr": "",
+  "execution_time_ms": 1658
+}

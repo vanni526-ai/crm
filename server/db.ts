@@ -1120,7 +1120,7 @@ export async function getAllTeachers() {
   if (!db) return [];
   const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/JopHWzeEmqAYxCyT.png";
   
-  // 1. 从u users表读取角色包含teacher的用户，过滤已删除记录
+  // 1. 从users表读取角色包含teacher的用户，LEFT JOIN teachers表获取notes
   const results = await db.select({
     id: users.id,
     name: users.name,
@@ -1131,7 +1131,11 @@ export async function getAllTeachers() {
     avatarUrl: users.avatarUrl,
     teacherAttribute: users.teacherAttribute,
     status: users.teacherStatus, // 添加teacherStatus字段，映射为status
-  }).from(users).where(
+    teacherNotes: users.teacherNotes, // users表的teacherNotes（多角色用户）
+    notes: teachers.notes, // teachers表的notes（主角色为teacher的用户）
+  }).from(users)
+  .leftJoin(teachers, eq(users.id, teachers.userId))
+  .where(
     and(
       like(users.roles, '%teacher%'),
       isNull(users.deletedAt) // 过滤已删除记录
@@ -1164,10 +1168,13 @@ export async function getAllTeachers() {
   });
   
   // 4. 合并数据，如果avatarUrl为null,使用统一默认头像
+  // 合并notes字段：优先使用teachers.notes，如果为空则使用users.teacherNotes
   return results.map(teacher => ({
     ...teacher,
     avatarUrl: teacher.avatarUrl || DEFAULT_AVATAR_URL,
     city: userCitiesMap.get(teacher.id) || null,
+    notes: teacher.notes || teacher.teacherNotes || null, // 合并两个notes字段
+    teacherNotes: undefined, // 移除teacherNotes字段，避免混淆
   }));
 }
 

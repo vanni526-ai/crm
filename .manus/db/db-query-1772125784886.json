@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, nickname, role, roles \nFROM users \nWHERE id IN (15362164, 16800186);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, role, roles \nFROM users \nWHERE id IN (15362164, 16800186);",
+  "rows": [
+    {
+      "id": "15362164",
+      "name": "露娜",
+      "nickname": "露娜",
+      "role": "user",
+      "roles": "user,teacher"
+    },
+    {
+      "id": "16800186",
+      "name": "test",
+      "nickname": "开发者账号",
+      "role": "user",
+      "roles": "user,admin,sales,cityPartner,teacher"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\trole\troles\n15362164\t露娜\t露娜\tuser\tuser,teacher\n16800186\ttest\t开发者账号\tuser\tuser,admin,sales,cityPartner,teacher\n",
+  "stderr": "",
+  "execution_time_ms": 1643
+}
