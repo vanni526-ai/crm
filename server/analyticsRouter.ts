@@ -280,4 +280,230 @@ export const analyticsRouter = router({
 
       return { success: true };
     }),
+
+  /**
+   * 获取城市财务统计数据
+   */
+  cityFinancialStats: protectedProcedure
+    .input(
+      z.object({
+        dateRange: z.string().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      // 构建日期过滤条件
+      let whereConditions = [eq(orders.status, 'paid')];
+      
+      if (input?.startDate && input?.endDate) {
+        whereConditions.push(sql`${orders.classDate} >= ${input.startDate}`);
+        whereConditions.push(sql`${orders.classDate} <= ${input.endDate}`);
+      } else if (input?.dateRange) {
+        const now = new Date();
+        let startDateStr: string;
+        switch (input.dateRange) {
+          case 'today':
+            startDateStr = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString().split('T')[0];
+            whereConditions.push(sql`${orders.classDate} >= ${startDateStr}`);
+            break;
+          case 'thisWeek':
+            startDateStr = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay()).toISOString().split('T')[0];
+            whereConditions.push(sql`${orders.classDate} >= ${startDateStr}`);
+            break;
+          case 'thisMonth':
+            startDateStr = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+            whereConditions.push(sql`${orders.classDate} >= ${startDateStr}`);
+            break;
+          case 'thisYear':
+            startDateStr = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+            whereConditions.push(sql`${orders.classDate} >= ${startDateStr}`);
+            break;
+        }
+      }
+
+      // 查询城市财务统计
+      const stats = await db
+        .select({
+          city: orders.deliveryCity,
+          orderCount: sql<number>`COUNT(*)`,
+          totalRevenue: sql<number>`SUM(${orders.courseAmount})`,
+          totalTeacherFee: sql<number>`SUM(${orders.teacherFee})`,
+          totalTransportFee: sql<number>`SUM(${orders.transportFee})`,
+          totalOtherFee: sql<number>`SUM(${orders.otherFee})`,
+          totalConsumablesFee: sql<number>`SUM(${orders.consumablesFee})`,
+          totalRentFee: sql<number>`SUM(${orders.rentFee})`,
+          totalPropertyFee: sql<number>`SUM(${orders.propertyFee})`,
+          totalUtilityFee: sql<number>`SUM(${orders.utilityFee})`,
+          totalPartnerFee: sql<number>`SUM(${orders.partnerFee})`,
+        })
+        .from(orders)
+        .where(and(...whereConditions))
+        .groupBy(orders.deliveryCity);
+
+      return stats.map(s => {
+        const totalRevenue = Number(s.totalRevenue) || 0;
+        const teacherFee = Number(s.totalTeacherFee) || 0;
+        const transportFee = Number(s.totalTransportFee) || 0;
+        const rentFee = Number(s.totalRentFee) || 0;
+        const propertyFee = Number(s.totalPropertyFee) || 0;
+        const utilityFee = Number(s.totalUtilityFee) || 0;
+        const consumablesFee = Number(s.totalConsumablesFee) || 0;
+        const otherFee = Number(s.totalOtherFee) || 0;
+        const partnerFee = Number(s.totalPartnerFee) || 0;
+        
+        // 数据库中不存在的字段，设置为0
+        const cleaningFee = 0;
+        const phoneFee = 0;
+        const expressFee = 0;
+        const promotionFee = 0;
+        
+        const totalExpense = teacherFee + transportFee + rentFee + propertyFee + 
+                            utilityFee + consumablesFee + cleaningFee + phoneFee + 
+                            expressFee + promotionFee + otherFee + partnerFee;
+        
+        const profit = totalRevenue - totalExpense;
+        const profitMargin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
+        
+        return {
+          city: s.city || '未知',
+          orderCount: Number(s.orderCount) || 0,
+          totalRevenue,
+          teacherFee,
+          transportFee,
+          rentFee,
+          propertyFee,
+          utilityFee,
+          consumablesFee,
+          cleaningFee,
+          phoneFee,
+          expressFee,
+          promotionFee,
+          otherFee,
+          totalExpense,
+          partnerShare: partnerFee, // 合伙人分成就是partnerFee
+          deferredPayment: 0, // TODO: 延期支付需要从其他表查询
+          profit,
+          profitMargin,
+        };
+      });
+    }),
+
+  /**
+   * 获取流量来源分析数据
+   */
+  trafficSourceAnalysis: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      const stats = await db
+        .select({
+          source: orders.trafficSource,
+          orderCount: sql<number>`COUNT(*)`,
+          totalRevenue: sql<number>`SUM(${orders.courseAmount})`,
+        })
+        .from(orders)
+        .where(eq(orders.status, 'paid'))
+        .groupBy(orders.trafficSource);
+
+      return stats.map(s => ({
+        source: s.source || '未知',
+        orderCount: Number(s.orderCount) || 0,
+        totalRevenue: Number(s.totalRevenue) || 0,
+        conversionRate: 0, // TODO: 实现转化率计算
+      }));
+    }),
+
+  /**
+   * 获取城市收入趋势数据
+   */
+  cityRevenueTrend: protectedProcedure
+    .input(
+      z.object({
+        cityId: z.number().optional(),
+        months: z.number().optional().default(12),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      const months = input?.months || 12;
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - months);
+
+      let whereConditions = [
+        eq(orders.status, 'paid'),
+        sql`${orders.classDate} >= ${startDate.toISOString().split('T')[0]}`
+      ];
+
+      if (input?.cityId) {
+        // TODO: 添加城市ID过滤
+      }
+
+      const monthColumn = sql<string>`DATE_FORMAT(${orders.classDate}, '%Y-%m')`;
+      
+      const stats = await db
+        .select({
+          month: monthColumn,
+          city: orders.deliveryCity,
+          totalRevenue: sql<number>`SUM(${orders.courseAmount})`,
+          orderCount: sql<number>`COUNT(*)`,
+        })
+        .from(orders)
+        .where(and(...whereConditions))
+        .groupBy(monthColumn, orders.deliveryCity)
+        .orderBy(monthColumn);
+
+      return stats.map(s => ({
+        month: s.month,
+        city: s.city || '未知',
+        totalRevenue: Number(s.totalRevenue) || 0,
+        orderCount: Number(s.orderCount) || 0,
+      }));
+    }),
+
+  /**
+   * 获取城市收入汇总数据
+   */
+  cityRevenue: protectedProcedure
+    .input(
+      z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+
+      let whereConditions = [eq(orders.status, 'paid')];
+
+      if (input?.startDate) {
+        whereConditions.push(sql`${orders.classDate} >= ${input.startDate}`);
+      }
+      if (input?.endDate) {
+        whereConditions.push(sql`${orders.classDate} <= ${input.endDate}`);
+      }
+
+      const stats = await db
+        .select({
+          city: orders.deliveryCity,
+          totalRevenue: sql<number>`SUM(${orders.courseAmount})`,
+          orderCount: sql<number>`COUNT(*)`,
+        })
+        .from(orders)
+        .where(and(...whereConditions))
+        .groupBy(orders.deliveryCity);
+
+      return stats.map(s => ({
+        city: s.city || '未知',
+        totalRevenue: Number(s.totalRevenue) || 0,
+        orderCount: Number(s.orderCount) || 0,
+      }));
+    }),
 });

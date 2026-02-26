@@ -4977,11 +4977,23 @@
 - [x] 验证修复效果
 
 ### 167. 根据前端建议完善多节课预约功能
-- [ ] 在courses表添加isBookable字段（默认true）
-- [ ] 将"会员费"课程（ID: 60001）标记为isBookable=false
-- [ ] 修改courses.list接口，过滤掉isBookable=false的课程
-- [ ] 新增booking.getAvailableSlots接口（查询可用起始时间）
-- [ ] 实现支付冲突处理逻辑（乐观锁+原子操作）
-- [ ] 明确多课程必须同一老师的规则
-- [ ] 编写单元测试验证所有功能
-- [ ] 保存checkpoint并交付
+- [x] 在courses表添加isBookable字段（默认true）
+- [x] 将"会员费"课程（ID: 60001）标记为isBookable=false
+- [x] 修改courses.list接口，过滤掉isBookable=false的课程
+- [x] 新增booking.getAvailableSlots接口（查询可用起始时间）
+- [x] 实现支付冲突处理逻辑（乐观锁+原子操作）
+- [x] 明确多课程必须同一老师的规则
+- [x] 编写单元测试验证所有功能
+- [x] 保存checkpoint并交付
+
+### 168. 批量更新订单数据
+- [x] 检查Excel文件数据质量（421条订单）
+- [x] 用创建时间填充空的支付日期字段
+- [x] 批量更新数据库中的所有订单记录
+- [x] 验证更新结果（100%成功）
+- [x] 生成更新报告
+
+### 169. 修复城市费用管理页面analytics接口缺失错误
+- [x] 检查analytics路由是否存在
+- [x] 创建或修复缺失的analytics接口（cityFinancialStats, trafficSourceAnalysis, cityRevenueTrend, cityRevenue）
+- [x] 测试接口并验证修复结果

@@ -1,0 +1,66 @@
+{
+  "query": "SELECT \n  COUNT(*) as total_orders,\n  SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) as paid_orders,\n  SUM(CASE WHEN isVoided = 1 THEN 1 ELSE 0 END) as voided_orders,\n  ROUND(SUM(courseAmount), 2) as total_course_amount,\n  SUM(CASE WHEN paymentDate IS NOT NULL THEN 1 ELSE 0 END) as has_payment_date,\n  SUM(CASE WHEN paymentDate IS NULL THEN 1 ELSE 0 END) as no_payment_date\nFROM orders;\n\nSELECT orderNo, customerName, courseAmount, paymentDate, status, isVoided\nFROM orders\nORDER BY id DESC\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  COUNT(*) as total_orders,\n  SUM(CASE WHEN status = 'paid' THEN 1 ELSE 0 END) as paid_orders,\n  SUM(CASE WHEN isVoided = 1 THEN 1 ELSE 0 END) as voided_orders,\n  ROUND(SUM(courseAmount), 2) as total_course_amount,\n  SUM(CASE WHEN paymentDate IS NOT NULL THEN 1 ELSE 0 END) as has_payment_date,\n  SUM(CASE WHEN paymentDate IS NULL THEN 1 ELSE 0 END) as no_payment_date\nFROM orders;\n\nSELECT orderNo, customerName, courseAmount, paymentDate, status, isVoided\nFROM orders\nORDER BY id DESC\nLIMIT 5;",
+  "rows": [
+    {
+      "total_orders": "421",
+      "paid_orders": "414",
+      "voided_orders": "7",
+      "total_course_amount": "1095350.00",
+      "has_payment_date": "421",
+      "no_payment_date": "0"
+    },
+    {
+      "total_orders": "orderNo",
+      "paid_orders": "customerName",
+      "voided_orders": "courseAmount",
+      "total_course_amount": "paymentDate",
+      "has_payment_date": "status",
+      "no_payment_date": "isVoided"
+    },
+    {
+      "total_orders": "20260224075626-000",
+      "paid_orders": "韩顗杰",
+      "voided_orders": "1500.00",
+      "total_course_amount": "2026-02-23",
+      "has_payment_date": "paid",
+      "no_payment_date": "0"
+    },
+    {
+      "total_orders": "20260222081554-000",
+      "paid_orders": "18321298888",
+      "voided_orders": "39.00",
+      "total_course_amount": "2026-02-22",
+      "has_payment_date": "paid",
+      "no_payment_date": "0"
+    },
+    {
+      "total_orders": "20260222054936-021",
+      "paid_orders": "韩顗杰",
+      "voided_orders": "1500.00",
+      "total_course_amount": "2026-02-21",
+      "has_payment_date": "paid",
+      "no_payment_date": "0"
+    },
+    {
+      "total_orders": "20260222054823-021",
+      "paid_orders": "韩顗杰",
+      "voided_orders": "1500.00",
+      "total_course_amount": "2026-02-21",
+      "has_payment_date": "paid",
+      "no_payment_date": "0"
+    },
+    {
+      "total_orders": "20260222054707-000",
+      "paid_orders": "韩顗杰",
+      "voided_orders": "39.00",
+      "total_course_amount": "2026-02-22",
+      "has_payment_date": "paid",
+      "no_payment_date": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_orders\tpaid_orders\tvoided_orders\ttotal_course_amount\thas_payment_date\tno_payment_date\n421\t414\t7\t1095350.00\t421\t0\norderNo\tcustomerName\tcourseAmount\tpaymentDate\tstatus\tisVoided\n20260224075626-000\t韩顗杰\t1500.00\t2026-02-23\tpaid\t0\n20260222081554-000\t18321298888\t39.00\t2026-02-22\tpaid\t0\n20260222054936-021\t韩顗杰\t1500.00\t2026-02-21\tpaid\t0\n20260222054823-021\t韩顗杰\t1500.00\t2026-02-21\tpaid\t0\n20260222054707-000\t韩顗杰\t39.00\t2026-02-22\tpaid\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1859
+}
