@@ -5051,3 +5051,9 @@
 - [x] 修复getAllSalespersons和searchSalespersons：添加isActive=true过滤
 - [x] 删除销售管理页面的删除按钮
 - [x] 测试验证：嘟嘟已从列表移除，删除按钮已移除
+
+### 177. 修复反向同步失败问题（其他角色→sales时salesperson记录未创建/恢复）
+- [x] 查询数据库：user.role='sales'但salesperson.isActive=false
+- [x] 排查原因：updateUserRoles函数中的创建salesperson逻辑使用了已废弃的name字段
+- [x] 修夏updateUserRoles函数：移除name和phone字段
+- [x] 测试验证：嘟嘟重新出现在销售管理列表

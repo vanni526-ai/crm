@@ -425,20 +425,10 @@ export async function updateUserRoles(userId: number, roles: string[]) {
       await db.update(salespersons).set({ isActive: true }).where(eq(salespersons.userId, userId));
     } else {
       // 不存在记录,创建新记录
-      const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-      if (user.length > 0) {
-        // 确保name字段不为null或undefined
-        const userName = user[0].name || user[0].nickname || user[0].email || `User_${userId}`;
-        const salesData: any = {
-          userId: userId,
-          name: userName,
-          isActive: true,
-        };
-        if (user[0].phone) {
-          salesData.phone = user[0].phone;
-        }
-        await db.insert(salespersons).values(salesData);
-      }
+      await db.insert(salespersons).values({
+        userId: userId,
+        // commissionRate, orderCount, totalSales, isActive 都有默认值，不需要显式指定
+      });
     }
   }
 }
