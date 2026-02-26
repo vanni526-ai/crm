@@ -1,0 +1,20 @@
+{
+  "query": "SELECT u.id, u.name, u.nickname, u.role, u.isActive as user_active,\n       s.id as salesperson_id, s.isActive as salesperson_active, s.updatedAt\nFROM users u\nLEFT JOIN salespersons s ON u.id = s.userId\nWHERE u.id = 15362125;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT u.id, u.name, u.nickname, u.role, u.isActive as user_active,\n       s.id as salesperson_id, s.isActive as salesperson_active, s.updatedAt\nFROM users u\nLEFT JOIN salespersons s ON u.id = s.userId\nWHERE u.id = 15362125;",
+  "rows": [
+    {
+      "id": "15362125",
+      "name": "嘟嘟",
+      "nickname": "嘟嘟",
+      "role": "user",
+      "user_active": "1",
+      "salesperson_id": "30001",
+      "salesperson_active": "0",
+      "updatedAt": "2026-02-26 08:17:13"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\trole\tuser_active\tsalesperson_id\tsalesperson_active\tupdatedAt\n15362125\t嘟嘟\t嘟嘟\tuser\t1\t30001\t0\t2026-02-26 08:17:13\n",
+  "stderr": "",
+  "execution_time_ms": 1667
+}

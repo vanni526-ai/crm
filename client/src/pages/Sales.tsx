@@ -77,16 +77,7 @@ export default function Sales() {
     },
   });
 
-  // 删除销售人员
-  const deleteMutation = trpc.salespersons.delete.useMutation({
-    onSuccess: () => {
-      toast.success("销售人员已删除");
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(`删除失败: ${error.message}`);
-    },
-  });
+  // 删除功能已移除：请在用户管理页面取消销售角色
 
   // 更新所有销售人员的销售数据
   const updateStatsMutation = trpc.salespersons.updateAllStats.useMutation({
@@ -272,11 +263,7 @@ export default function Sales() {
     }
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm("确定要删除这个销售人员吗?")) {
-      deleteMutation.mutate({ id });
-    }
-  };
+  // handleDelete 函数已移除
 
   // 导出CSV
   const handleExport = () => {
@@ -571,13 +558,7 @@ export default function Sales() {
                       >
                         编辑
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(sp.id)}
-                      >
-                        删除
-                      </Button>
+                      {/* 删除按钮已移除：请在用户管理页面取消销售角色 */}
                     </div>
                   </TableCell>
                 </TableRow>

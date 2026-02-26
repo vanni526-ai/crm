@@ -5044,3 +5044,10 @@
 - [x] 实现反向同步：修改updateUserRole函数，自动同步salespersons表
 - [x] 逻辑实现：sales→其他（软删除），其他→sales（创建/恢复）
 - [ ] 用户测试：通过UI修改角色验证同步效果
+
+### 176. 删除销售管理的删除按钮并修复角色同步问题
+- [x] 排查生产环境问题：嘟嘟（ID: 15362125）仍在销售管理列表
+- [x] 检查getAllSalespersons查询：没有过滤isActive=false
+- [x] 修复getAllSalespersons和searchSalespersons：添加isActive=true过滤
+- [x] 删除销售管理页面的删除按钮
+- [x] 测试验证：嘟嘟已从列表移除，删除按钮已移除

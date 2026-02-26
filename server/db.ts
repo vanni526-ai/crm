@@ -2573,6 +2573,7 @@ export async function getAllSalespersons() {
     })
     .from(salespersons)
     .leftJoin(users, eq(salespersons.userId, users.id))
+    .where(eq(salespersons.isActive, true))
     .orderBy(desc(salespersons.createdAt));
   
   return results;
@@ -2618,11 +2619,14 @@ export async function searchSalespersons(keyword: string) {
     .from(salespersons)
     .leftJoin(users, eq(salespersons.userId, users.id))
     .where(
-      or(
-        like(users.name, `%${keyword}%`),
-        like(users.nickname, `%${keyword}%`),
-        like(users.phone, `%${keyword}%`),
-        like(users.wechat, `%${keyword}%`)
+      and(
+        eq(salespersons.isActive, true),
+        or(
+          like(users.name, `%${keyword}%`),
+          like(users.nickname, `%${keyword}%`),
+          like(users.phone, `%${keyword}%`),
+          like(users.wechat, `%${keyword}%`)
+        )
       )
     )
     .orderBy(desc(salespersons.createdAt));
