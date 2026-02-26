@@ -273,10 +273,11 @@ export const bookingRouter = router({
         duration: z.number().positive(), // 课程时长(小时)
         price: z.number().positive(), // 课程单价
       })).min(1),
+      transportFee: z.number().nonnegative().optional(), // 车费（可选）
       customerNote: z.string().max(500).optional(), // 客户备注
     }))
     .mutation(async ({ ctx, input }) => {
-      const { cityId, teacherId, date, startTime, classroomId, courseItems, customerNote } = input;
+      const { cityId, teacherId, date, startTime, classroomId, courseItems, transportFee, customerNote } = input;
       const db = await getDb();
       if (!db) throw new Error("Database connection failed");
 
@@ -449,6 +450,7 @@ export const bookingRouter = router({
         salesId: ctx.user.id, // 必需字段
         paymentAmount: totalPrice.toString(),
         courseAmount: totalPrice.toString(),
+        transportFee: transportFee ? transportFee.toString() : '0.00',
         classDate: new Date(date),
         classTime: `${startTime}-${endTime}`,
         status: 'pending',
@@ -551,6 +553,7 @@ export const bookingRouter = router({
             classroomId: finalClassroomId,
             totalDuration,
             totalPrice,
+            transportFee: transportFee || 0,
             startTime,
             endTime,
             deliveryCourse: deliveryCourseStr,

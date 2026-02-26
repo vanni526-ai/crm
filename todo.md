@@ -5005,3 +5005,11 @@
 - [x] 修复"23:00最晚"规则（开始时间最晚为23:00）
 - [x] 编写测试用例验证修复
 - [x] 保存checkpoint
+
+### 171. 修复booking.create接口缺少transportFee字段
+- [x] 检查booking.create接口的请求参数定义
+- [x] 检查booking.create接口的响应格式
+- [x] 添加transportFee字段到请求参数（可选字段）
+- [x] 在创建订单和排课记录时保存transportFee
+- [x] 在响应中返回transportFee字段
+- [x] 测试验证并保存checkpoint
