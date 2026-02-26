@@ -1,0 +1,28 @@
+{
+  "query": "SELECT \n  u.id,\n  u.name,\n  u.nickname,\n  u.phone,\n  u.roles,\n  u.teacherAttribute,\n  DATE(u.createdAt) as createdDate\nFROM users u\nLEFT JOIN teachers t ON u.id = t.userId\nWHERE u.roles LIKE '%teacher%' \nAND u.deletedAt IS NULL\nAND t.id IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT \n  u.id,\n  u.name,\n  u.nickname,\n  u.phone,\n  u.roles,\n  u.teacherAttribute,\n  DATE(u.createdAt) as createdDate\nFROM users u\nLEFT JOIN teachers t ON u.id = t.userId\nWHERE u.roles LIKE '%teacher%' \nAND u.deletedAt IS NULL\nAND t.id IS NULL;",
+  "rows": [
+    {
+      "id": "15362164",
+      "name": "露娜",
+      "nickname": "露娜",
+      "phone": "15172042276",
+      "roles": "user,teacher",
+      "teacherAttribute": "Switch",
+      "createdDate": "2026-02-08"
+    },
+    {
+      "id": "16800186",
+      "name": "test",
+      "nickname": "开发者账号",
+      "phone": "13381928825",
+      "roles": "user,admin,sales,cityPartner,teacher",
+      "teacherAttribute": "S",
+      "createdDate": "2026-02-15"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\tphone\troles\tteacherAttribute\tcreatedDate\n15362164\t露娜\t露娜\t15172042276\tuser,teacher\tSwitch\t2026-02-08\n16800186\ttest\t开发者账号\t13381928825\tuser,admin,sales,cityPartner,teacher\tS\t2026-02-15\n",
+  "stderr": "",
+  "execution_time_ms": 1696
+}
