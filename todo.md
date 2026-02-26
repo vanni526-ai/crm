@@ -5057,3 +5057,8 @@
 - [x] 排查原因：updateUserRoles函数中的创建salesperson逻辑使用了已废弃的name字段
 - [x] 修夏updateUserRoles函数：移除name和phone字段
 - [x] 测试验证：嘟嘟重新出现在销售管理列表
+
+### 178. 批量更新老师备注信息
+- [x] 读取Excel文件（65条老师记录）
+- [x] 编写批量更新脚本，根据用户ID更新teachers表的notes字段
+- [x] 执行更新：成功63条，未找到2条（ID: 15362164, 16800186）
