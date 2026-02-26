@@ -4997,3 +4997,11 @@
 - [x] 检查analytics路由是否存在
 - [x] 创建或修复缺失的analytics接口（cityFinancialStats, trafficSourceAnalysis, cityRevenueTrend, cityRevenue）
 - [x] 测试接口并验证修复结果
+
+### 170. 修复booking.getAvailableSlots接口的时间限制逻辑
+- [x] 检查当前接口实现的时间过滤逻辑
+- [x] 修复"过去不可选"规则（选择的日期如果是今天，需要过滤掉已经过去的时间）
+- [x] 修复"当前+2小时最早"规则（最早可预约时间为当前时间+2小时）
+- [x] 修复"23:00最晚"规则（开始时间最晚为23:00）
+- [x] 编写测试用例验证修复
+- [x] 保存checkpoint

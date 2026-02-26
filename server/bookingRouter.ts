@@ -66,22 +66,27 @@ export const bookingRouter = router({
 
       // 3. 生成所有可能的时间段（从09:00到23:00，每30分钟一个时间点）
       const availableSlots: string[] = [];
+      
+      // 使用UTC+8时区（北京时间）计算最早预约时间
       const now = new Date();
-      const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 至少提前2小时
+      const nowInBeijing = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));
+      const minBookingTime = new Date(nowInBeijing.getTime() + 2 * 60 * 60 * 1000); // 至少提前2小时
 
-      for (let hour = 9; hour < 23; hour++) {
+      for (let hour = 9; hour <= 23; hour++) {
         for (let minute = 0; minute < 60; minute += 30) {
           const startTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-          const startDateTime = new Date(`${date}T${startTime}:00`);
+          
+          // 检查开始时间是否超过23:00（开始时间最晚为23:00）
+          if (hour > 23 || (hour === 23 && minute > 0)) {
+            continue;
+          }
+          
+          // 使用UTC+8时区解析日期时间
+          const startDateTime = new Date(`${date}T${startTime}:00+08:00`);
           const endDateTime = new Date(startDateTime.getTime() + totalDuration * 60 * 60 * 1000);
           
           // 检查是否是过去的时间或不满足提前2小时的要求
           if (startDateTime < minBookingTime) {
-            continue;
-          }
-          
-          // 检查结束时间是否超过23:00
-          if (endDateTime.getHours() >= 23 || (endDateTime.getHours() === 23 && endDateTime.getMinutes() > 0)) {
             continue;
           }
 
