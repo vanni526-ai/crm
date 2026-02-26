@@ -1,0 +1,23 @@
+{
+  "query": "SELECT id, openId, name, nickname, phone, email, wechat, aliases, role, roles, isActive FROM users WHERE name = '测试销售' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, openId, name, nickname, phone, email, wechat, aliases, role, roles, isActive FROM users WHERE name = '测试销售' LIMIT 1;",
+  "rows": [
+    {
+      "id": "23910995",
+      "openId": "sales_1772091094511_um8we4wbp",
+      "name": "测试销售",
+      "nickname": "小测",
+      "phone": "13800138000",
+      "email": "test@example.com",
+      "wechat": "test_wechat",
+      "aliases": "[\"test\",\"测试\"]",
+      "role": "sales",
+      "roles": "sales",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\tnickname\tphone\temail\twechat\taliases\trole\troles\tisActive\n23910995\tsales_1772091094511_um8we4wbp\t测试销售\t小测\t13800138000\ttest@example.com\ttest_wechat\t[\"test\",\"测试\"]\tsales\tsales\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1703
+}

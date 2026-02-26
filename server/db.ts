@@ -420,6 +420,19 @@ export async function updateUserStatus(userId: number, isActive: boolean) {
   await db.update(users).set({ isActive }).where(eq(users.id, userId));
 }
 
+export async function createUser(data: InsertUser) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(users).values(data);
+  return result[0].insertId;
+}
+
+export async function updateUser(userId: number, data: Partial<InsertUser>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set(data).where(eq(users.id, userId));
+}
+
 // ========== 客户管理 ==========
 
 export async function createCustomer(customer: InsertCustomer) {
@@ -2509,28 +2522,83 @@ export async function getAllSalespersons() {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  return db
+  // JOIN users表获取基础信息
+  const results = await db
+    .select({
+      id: salespersons.id,
+      userId: salespersons.userId,
+      commissionRate: salespersons.commissionRate,
+      orderCount: salespersons.orderCount,
+      totalSales: salespersons.totalSales,
+      notes: salespersons.notes,
+      isActive: salespersons.isActive,
+      createdAt: salespersons.createdAt,
+      updatedAt: salespersons.updatedAt,
+      // 从 users 表获取基础信息
+      name: users.name,
+      nickname: users.nickname,
+      phone: users.phone,
+      email: users.email,
+      wechat: users.wechat,
+      aliases: users.aliases,
+    })
+    .from(salespersons)
+    .leftJoin(users, eq(salespersons.userId, users.id))
+    .orderBy(desc(salespersons.createdAt));
+  
+  return results;
+}
+
+export async function getSalespersonById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  
+  const results = await db
     .select()
     .from(salespersons)
-    .orderBy(desc(salespersons.createdAt));
+    .where(eq(salespersons.id, id))
+    .limit(1);
+  
+  return results[0] || null;
 }
 
 export async function searchSalespersons(keyword: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not initialized");
   
-  return db
-    .select()
+  // JOIN users表并在users表中搜索
+  const results = await db
+    .select({
+      id: salespersons.id,
+      userId: salespersons.userId,
+      commissionRate: salespersons.commissionRate,
+      orderCount: salespersons.orderCount,
+      totalSales: salespersons.totalSales,
+      notes: salespersons.notes,
+      isActive: salespersons.isActive,
+      createdAt: salespersons.createdAt,
+      updatedAt: salespersons.updatedAt,
+      // 从 users 表获取基础信息
+      name: users.name,
+      nickname: users.nickname,
+      phone: users.phone,
+      email: users.email,
+      wechat: users.wechat,
+      aliases: users.aliases,
+    })
     .from(salespersons)
+    .leftJoin(users, eq(salespersons.userId, users.id))
     .where(
       or(
-        like(salespersons.name, `%${keyword}%`),
-        like(salespersons.nickname, `%${keyword}%`),
-        like(salespersons.phone, `%${keyword}%`),
-        like(salespersons.wechat, `%${keyword}%`)
+        like(users.name, `%${keyword}%`),
+        like(users.nickname, `%${keyword}%`),
+        like(users.phone, `%${keyword}%`),
+        like(users.wechat, `%${keyword}%`)
       )
     )
     .orderBy(desc(salespersons.createdAt));
+  
+  return results;
 }
 
 export async function createSalesperson(data: InsertSalesperson) {
@@ -2587,7 +2655,16 @@ export async function getSalesStatistics(params: {
   
   if (params.salespersonId) {
     // 同时匹配salespersonId和salesPerson文本（name/nickname）
-    const spList = await db.select().from(salespersons).where(eq(salespersons.id, params.salespersonId)).limit(1);
+    const spList = await db
+      .select({
+        id: salespersons.id,
+        name: users.name,
+        nickname: users.nickname,
+      })
+      .from(salespersons)
+      .leftJoin(users, eq(salespersons.userId, users.id))
+      .where(eq(salespersons.id, params.salespersonId))
+      .limit(1);
     const sp = spList[0];
     if (sp) {
       const spConditions: any[] = [eq(orders.salespersonId, params.salespersonId)];
@@ -2643,7 +2720,16 @@ export async function getMonthlySales(salespersonId: number | undefined, year: n
   
   if (salespersonId) {
     // 同时匹配salespersonId和salesPerson文本（name/nickname）
-    const spList = await db.select().from(salespersons).where(eq(salespersons.id, salespersonId)).limit(1);
+    const spList = await db
+      .select({
+        id: salespersons.id,
+        name: users.name,
+        nickname: users.nickname,
+      })
+      .from(salespersons)
+      .leftJoin(users, eq(salespersons.userId, users.id))
+      .where(eq(salespersons.id, salespersonId))
+      .limit(1);
     const sp = spList[0];
     if (sp) {
       const spConditions: any[] = [eq(orders.salespersonId, salespersonId)];
@@ -2703,7 +2789,16 @@ export async function getYearlySales(
   
   if (salespersonId) {
     // 同时匹配salespersonId和salesPerson文本（name/nickname）
-    const spList = await db.select().from(salespersons).where(eq(salespersons.id, salespersonId)).limit(1);
+    const spList = await db
+      .select({
+        id: salespersons.id,
+        name: users.name,
+        nickname: users.nickname,
+      })
+      .from(salespersons)
+      .leftJoin(users, eq(salespersons.userId, users.id))
+      .where(eq(salespersons.id, salespersonId))
+      .limit(1);
     const sp = spList[0];
     if (sp) {
       const spConditions: any[] = [eq(orders.salespersonId, salespersonId)];
@@ -3907,8 +4002,16 @@ export async function updateAllSalespersonStats() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // 获取所有销售人员
-  const allSalespersons = await db.select().from(salespersons);
+  // 获取所有销售人员（JOIN users表获取name和nickname）
+  const allSalespersons = await db
+    .select({
+      id: salespersons.id,
+      userId: salespersons.userId,
+      name: users.name,
+      nickname: users.nickname,
+    })
+    .from(salespersons)
+    .leftJoin(users, eq(salespersons.userId, users.id));
   
   const results = [];
   
@@ -3924,7 +4027,7 @@ export async function updateAllSalespersonStats() {
       .where(
         or(
           eq(orders.salespersonId, salesperson.id),
-          eq(orders.salesPerson, salesperson.name),
+          eq(orders.salesPerson, salesperson.name || ""),
           eq(orders.salesPerson, salesperson.nickname || "")
         )
       );
@@ -3943,8 +4046,8 @@ export async function updateAllSalespersonStats() {
     
     results.push({
       salespersonId: salesperson.id,
-      name: salesperson.name,
-      nickname: salesperson.nickname,
+      name: salesperson.name || null,
+      nickname: salesperson.nickname || null,
       orderCount,
       totalAmount,
     });
@@ -3960,10 +4063,16 @@ export async function updateSalespersonStats(salespersonId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // 获取销售人员信息
+  // 获取销售人员信息（JOIN users表获取name和nickname）
   const salesperson = await db
-    .select()
+    .select({
+      id: salespersons.id,
+      userId: salespersons.userId,
+      name: users.name,
+      nickname: users.nickname,
+    })
     .from(salespersons)
+    .leftJoin(users, eq(salespersons.userId, users.id))
     .where(eq(salespersons.id, salespersonId))
     .limit(1);
   
@@ -3983,7 +4092,7 @@ export async function updateSalespersonStats(salespersonId: number) {
     .where(
       or(
         eq(orders.salespersonId, sp.id),
-        eq(orders.salesPerson, sp.name),
+        eq(orders.salesPerson, sp.name || ""),
         eq(orders.salesPerson, sp.nickname || "")
       )
     );
@@ -4002,8 +4111,8 @@ export async function updateSalespersonStats(salespersonId: number) {
   
   return {
     salespersonId: sp.id,
-    name: sp.name,
-    nickname: sp.nickname,
+    name: sp.name || null,
+    nickname: sp.nickname || null,
     orderCount,
     totalAmount,
   };

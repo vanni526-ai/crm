@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, name, nickname, email, phone, role, roles, isActive FROM users WHERE role = 'sales' OR roles LIKE '%sales%' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, nickname, email, phone, role, roles, isActive FROM users WHERE role = 'sales' OR roles LIKE '%sales%' LIMIT 10;",
+  "rows": [
+    {
+      "id": "16800186",
+      "name": "test",
+      "nickname": "开发者账号",
+      "email": "NULL",
+      "phone": "13381928825",
+      "role": "user",
+      "roles": "user,admin,sales,cityPartner,teacher",
+      "isActive": "1"
+    },
+    {
+      "id": "17370405",
+      "name": "韩顗杰",
+      "nickname": "NULL",
+      "email": "NULL",
+      "phone": "18602111141",
+      "role": "user",
+      "roles": "user,cityPartner,admin,sales",
+      "isActive": "1"
+    },
+    {
+      "id": "21030324",
+      "name": "多角色用户",
+      "nickname": "NULL",
+      "email": "test_update@example.com",
+      "phone": "13900000100",
+      "role": "user",
+      "roles": "user,sales,finance",
+      "isActive": "1"
+    },
+    {
+      "id": "22771332",
+      "name": "其他销售",
+      "nickname": "NULL",
+      "email": "sales_other_1771820942997@test.com",
+      "phone": "NULL",
+      "role": "sales",
+      "roles": "sales",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tnickname\temail\tphone\trole\troles\tisActive\n16800186\ttest\t开发者账号\tNULL\t13381928825\tuser\tuser,admin,sales,cityPartner,teacher\t1\n17370405\t韩顗杰\tNULL\tNULL\t18602111141\tuser\tuser,cityPartner,admin,sales\t1\n21030324\t多角色用户\tNULL\ttest_update@example.com\t13900000100\tuser\tuser,sales,finance\t1\n22771332\t其他销售\tNULL\tsales_other_1771820942997@test.com\tNULL\tsales\tsales\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1659
+}

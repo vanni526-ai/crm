@@ -24,7 +24,7 @@ export const salespersonRouter = router({
       return db.searchSalespersons(input.keyword);
     }),
 
-  // 创建销售人员
+  // 创建销售人员：自动同步到users表
   create: adminProcedure
     .input(z.object({
       name: z.string().min(1, "姓名不能为空"),
@@ -32,20 +32,36 @@ export const salespersonRouter = router({
       phone: z.string().optional(),
       email: z.string().email().optional().or(z.literal("")),
       wechat: z.string().optional(),
+      aliases: z.string().optional(), // JSON字符串
       commissionRate: z.number().min(0).max(100).optional(),
-      city: z.string().optional(),
       notes: z.string().optional(),
     }))
-    .mutation(async ({ input }) => {
-      const data = {
-        ...input,
-        commissionRate: input.commissionRate !== undefined ? input.commissionRate.toString() : undefined,
-      };
-      const id = await db.createSalesperson(data);
-      return { id, success: true };
+    .mutation(async ({ input, ctx }) => {
+      // 1. 先在users表创建用户记录
+      const userId = await db.createUser({
+        openId: `sales_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        name: input.name,
+        nickname: input.nickname,
+        phone: input.phone,
+        email: input.email,
+        wechat: input.wechat,
+        aliases: input.aliases,
+        role: 'sales',
+        roles: 'sales',
+        isActive: true,
+      } as any);
+
+      // 2. 再在salespersons表创建业务记录
+      const salespersonId = await db.createSalesperson({
+        userId,
+        commissionRate: input.commissionRate?.toString(),
+        notes: input.notes,
+      } as any);
+
+      return { id: salespersonId, success: true };
     }),
 
-  // 更新销售人员
+  // 更新销售人员：自动同步到users表
   update: adminProcedure
     .input(z.object({
       id: z.number(),
@@ -54,17 +70,35 @@ export const salespersonRouter = router({
       phone: z.string().optional(),
       email: z.string().email().optional().or(z.literal("")),
       wechat: z.string().optional(),
+      aliases: z.string().optional(), // JSON字符串
       commissionRate: z.number().min(0).max(100).optional(),
-      city: z.string().optional(),
       notes: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
-      const { id, ...data } = input;
-      const updateData = {
-        ...data,
-        commissionRate: data.commissionRate !== undefined ? data.commissionRate.toString() : undefined,
-      };
-      await db.updateSalesperson(id, updateData);
+      const { id, name, nickname, phone, email, wechat, aliases, commissionRate, notes } = input;
+      
+      // 1. 获取salesperson记录以找到userId
+      const salesperson = await db.getSalespersonById(id);
+      if (!salesperson) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "销售人员不存在" });
+      }
+      
+      // 2. 更新users表的基础信息
+      await db.updateUser(salesperson.userId, {
+        name,
+        nickname,
+        phone,
+        email,
+        wechat,
+        aliases,
+      });
+      
+      // 3. 更新salespersons表的业务信息
+      await db.updateSalesperson(id, {
+        commissionRate: commissionRate?.toString(),
+        notes,
+      });
+      
       return { success: true };
     }),
 

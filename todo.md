@@ -5021,3 +5021,12 @@
 - [ ] 实现向上取整到下一个半点（如12:38+2小时=14:38→15:00）
 - [ ] 测试验证修复结果
 - [ ] 保存checkpoint
+
+### 173. 重构salespersons表与users表的双向同步（参照teachers表模式）
+- [x] 分析users表与teachers表的同步机制
+- [x] 修改schema：调整salespersons表字段，移除与users表重复的字段
+- [x] 数据迁移：将现有18条salespersons记录迁移到users表
+- [x] 修改后端API：重构salespersonRouter的create/update逻辑，实现自动同步
+- [x] 修改数据库函数：调整db.ts中的salesperson相关函数，JOIN users表
+- [x] 修复TypeScript错误：从102个降到6个（与salesperson无关）
+- [x] 测试验证：创建功能正常，双向同步成功

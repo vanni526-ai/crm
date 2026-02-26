@@ -752,7 +752,7 @@ export const appRouter = router({
               );
               if (sp) {
                 salespersonId = sp.id;
-                salesPerson = sp.nickname || sp.name; // 优先使用花名
+                salesPerson = sp.nickname || sp.name || undefined; // 优先使用花名
               } else {
                 // 如果找不到匹配的销售人员,仍然保存名字
                 salesPerson = orderData.salesperson;

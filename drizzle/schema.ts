@@ -418,28 +418,22 @@ export type InsertSalesperson = typeof salespersons.$inferInsert;
 
 /**
  * 销售人员表
+ * 注意：基础信息（姓名、花名、电话、邮箱、微信等）存储在users表
+ * 本表只存储销售业务相关字段（提成比例、订单统计等）
+ * 通过userId字段关联users表（必须，不能为NULL）
  */
 export const salespersons = mysqlTable("salespersons", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId"), // 关联用户表(可选)
-  name: varchar("name", { length: 100 }).notNull(), // 真实姓名
-  nickname: varchar("nickname", { length: 50 }), // 花名/昵称
-  aliases: text("aliases"), // 别名列表(JSON数组存储,如["ivy","山竹","妖渊"])
-  phone: varchar("phone", { length: 20 }),
-  email: varchar("email", { length: 320 }),
-  wechat: varchar("wechat", { length: 100 }), // 微信号
+  userId: int("userId").notNull(), // 关联用户表(必须)
   commissionRate: decimal("commissionRate", { precision: 5, scale: 2 }).default("0.00"), // 提成比例(%)
-  city: varchar("city", { length: 50 }), // 所在城市
-  isActive: boolean("isActive").default(true).notNull(), // 是否在职
   orderCount: int("orderCount").default(0).notNull(), // 订单数量(统计字段)
   totalSales: decimal("totalSales", { precision: 12, scale: 2 }).default("0.00").notNull(), // 销售总额(统计字段)
-  notes: text("notes"),
+  notes: text("notes"), // 业务备注
+  isActive: boolean("isActive").default(true).notNull(), // 是否在职
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   userIdx: index("sales_user_idx").on(table.userId),
-  phoneIdx: index("sales_phone_idx").on(table.phone),
-  cityIdx: index("sales_city_idx").on(table.city),
 }));
 
 /**

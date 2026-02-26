@@ -131,6 +131,9 @@ export async function parseTransferNotes(text: string) {
   const nicknameMapping: Map<string, string> = new Map(); // 真实姓名 -> 花名的映射
   
   salespersons.forEach(sp => {
+    // 跳过没有姓名的记录
+    if (!sp.name) return;
+    
     // 优先使用花名,如果没有花名则使用真实姓名
     const displayName = sp.nickname || sp.name;
     
@@ -167,10 +170,14 @@ export async function parseTransferNotes(text: string) {
   // 构建别名说明
   const aliasExplanations: string[] = [];
   salespersons.forEach(sp => {
-    if (sp.aliases && sp.aliases.length > 0) {
-      const aliases = JSON.parse(sp.aliases);
-      if (aliases.length > 0) {
-        aliasExplanations.push(`${aliases.join("/")} 是 ${sp.name} 的别名`);
+    if (sp.aliases && sp.aliases.length > 0 && sp.name) {
+      try {
+        const aliases = JSON.parse(sp.aliases);
+        if (Array.isArray(aliases) && aliases.length > 0) {
+          aliasExplanations.push(`${aliases.join("/")} 是 ${sp.name} 的别名`);
+        }
+      } catch (e) {
+        // 忽略JSON解析错误
       }
     }
   });

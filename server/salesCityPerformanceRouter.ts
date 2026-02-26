@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "./db";
-import { orders, salespersons, salesCommissionConfigs, cities } from "../drizzle/schema";
+import { orders, salespersons, salesCommissionConfigs, cities, users } from "../drizzle/schema";
 import { eq, and, sql, ne, or } from "drizzle-orm";
 
 // 权限检查:只有管理员可以管理提成配置
@@ -107,10 +107,16 @@ export const salesCityPerformanceRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库未连接" });
 
-      // 获取所有销售人员
+      // 获取所有销售人员（JOIN users表获取姓名和花名）
       const allSalespersons = await db
-        .select({ id: salespersons.id, name: salespersons.name, nickname: salespersons.nickname, isActive: salespersons.isActive })
-        .from(salespersons);
+        .select({ 
+          id: salespersons.id, 
+          name: users.name, 
+          nickname: users.nickname, 
+          isActive: salespersons.isActive 
+        })
+        .from(salespersons)
+        .leftJoin(users, eq(salespersons.userId, users.id));
 
       const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
 
@@ -219,10 +225,15 @@ export const salesCityPerformanceRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库未连接" });
 
-      // 获取所有销售人员用于名字匹配
+      // 获取所有销售人员用于名字匹配（JOIN users表获取姓名和花名）
       const allSalespersons = await db
-        .select({ id: salespersons.id, name: salespersons.name, nickname: salespersons.nickname })
-        .from(salespersons);
+        .select({ 
+          id: salespersons.id, 
+          name: users.name, 
+          nickname: users.nickname 
+        })
+        .from(salespersons)
+        .leftJoin(users, eq(salespersons.userId, users.id));
       const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
 
       const baseConditions: any[] = [
@@ -441,10 +452,15 @@ export const salesCityPerformanceRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库未连接" });
 
-      // 获取所有销售人员用于名字匹配
+      // 获取所有销售人员用于名字匹配（JOIN users表获取姓名和花名）
       const allSalespersons = await db
-        .select({ id: salespersons.id, name: salespersons.name, nickname: salespersons.nickname })
-        .from(salespersons);
+        .select({ 
+          id: salespersons.id, 
+          name: users.name, 
+          nickname: users.nickname 
+        })
+        .from(salespersons)
+        .leftJoin(users, eq(salespersons.userId, users.id));
       const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
 
       const conditions: any[] = [

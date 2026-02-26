@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, userId, name, nickname, phone, email, city, isActive, orderCount, totalSales FROM salespersons LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, userId, name, nickname, phone, email, city, isActive, orderCount, totalSales FROM salespersons LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "NULL",
+      "name": "谢碧欣",
+      "nickname": "妍渊",
+      "phone": "18529130242",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    },
+    {
+      "id": "2",
+      "userId": "NULL",
+      "name": "刘丽雯",
+      "nickname": "好好",
+      "phone": "13977712346",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    },
+    {
+      "id": "3",
+      "userId": "NULL",
+      "name": "崔晓静",
+      "nickname": "大崎",
+      "phone": "15209863480",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    },
+    {
+      "id": "4",
+      "userId": "NULL",
+      "name": "杨敏",
+      "nickname": "yamy",
+      "phone": "18362721868",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    },
+    {
+      "id": "5",
+      "userId": "NULL",
+      "name": "刘安迪",
+      "nickname": "ivy",
+      "phone": "15688637179",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "69",
+      "totalSales": "165359.00"
+    },
+    {
+      "id": "6",
+      "userId": "NULL",
+      "name": "覃涓",
+      "nickname": "峯灵",
+      "phone": "19169108403",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    },
+    {
+      "id": "7",
+      "userId": "NULL",
+      "name": "王舒婷",
+      "nickname": "山竹",
+      "phone": "15000045719",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "116",
+      "totalSales": "426273.00"
+    },
+    {
+      "id": "8",
+      "userId": "NULL",
+      "name": "郭佳瑶",
+      "nickname": "瑶瑶",
+      "phone": "15080589606",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    },
+    {
+      "id": "9",
+      "userId": "NULL",
+      "name": "顾思颖",
+      "nickname": "昭昭",
+      "phone": "18861300495",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    },
+    {
+      "id": "10",
+      "userId": "NULL",
+      "name": "柴宇",
+      "nickname": "十一",
+      "phone": "18193655357",
+      "email": "NULL",
+      "city": "上海",
+      "isActive": "1",
+      "orderCount": "0",
+      "totalSales": "0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tname\tnickname\tphone\temail\tcity\tisActive\torderCount\ttotalSales\n1\tNULL\t谢碧欣\t妍渊\t18529130242\tNULL\t上海\t1\t0\t0.00\n2\tNULL\t刘丽雯\t好好\t13977712346\tNULL\t上海\t1\t0\t0.00\n3\tNULL\t崔晓静\t大崎\t15209863480\tNULL\t上海\t1\t0\t0.00\n4\tNULL\t杨敏\tyamy\t18362721868\tNULL\t上海\t1\t0\t0.00\n5\tNULL\t刘安迪\tivy\t15688637179\tNULL\t上海\t1\t69\t165359.00\n6\tNULL\t覃涓\t峯灵\t19169108403\tNULL\t上海\t1\t0\t0.00\n7\tNULL\t王舒婷\t山竹\t15000045719\tNULL\t上海\t1\t116\t426273.00\n8\tNULL\t郭佳瑶\t瑶瑶\t15080589606\tNULL\t上海\t1\t0\t0.00\n9\tNULL\t顾思颖\t昭昭\t18861300495\tNULL\t上海\t1\t0\t0.00\n10\tNULL\t柴宇\t十一\t18193655357\tNULL\t上海\t1\t0\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 1648
+}

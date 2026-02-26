@@ -365,6 +365,13 @@
       "when": 1772012472062,
       "tag": "0051_volatile_legion",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "5",
+      "when": 1772089972900,
+      "tag": "0052_sloppy_manta",
+      "breakpoints": true
     }
   ]
 }

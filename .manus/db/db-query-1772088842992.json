@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, name, email, role, phone, isActive, createdAt, updatedAt FROM users WHERE role = 'sales' ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, email, role, phone, isActive, createdAt, updatedAt FROM users WHERE role = 'sales' ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "22771332",
+      "name": "其他销售",
+      "email": "sales_other_1771820942997@test.com",
+      "role": "sales",
+      "phone": "NULL",
+      "isActive": "1",
+      "createdAt": "2026-02-23 04:29:03",
+      "updatedAt": "2026-02-23 04:29:03"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tphone\tisActive\tcreatedAt\tupdatedAt\n22771332\t其他销售\tsales_other_1771820942997@test.com\tsales\tNULL\t1\t2026-02-23 04:29:03\t2026-02-23 04:29:03\n",
+  "stderr": "",
+  "execution_time_ms": 1730
+}

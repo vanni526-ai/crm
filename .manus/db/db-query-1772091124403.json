@@ -1,0 +1,19 @@
+{
+  "query": "SELECT s.id, s.userId, s.commissionRate, s.orderCount, s.totalSales, s.notes, s.isActive \nFROM salespersons s \nJOIN users u ON s.userId = u.id \nWHERE u.name = '测试销售' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT s.id, s.userId, s.commissionRate, s.orderCount, s.totalSales, s.notes, s.isActive \nFROM salespersons s \nJOIN users u ON s.userId = u.id \nWHERE u.name = '测试销售' LIMIT 1;",
+  "rows": [
+    {
+      "id": "120001",
+      "userId": "23910995",
+      "commissionRate": "5.00",
+      "orderCount": "0",
+      "totalSales": "0.00",
+      "notes": "这是一个测试销售人员",
+      "isActive": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tcommissionRate\torderCount\ttotalSales\tnotes\tisActive\n120001\t23910995\t5.00\t0\t0.00\t这是一个测试销售人员\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1733
+}

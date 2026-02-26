@@ -1,0 +1,9 @@
+{
+  "query": "-- 先获取userId\nSET @userId = (SELECT id FROM users WHERE name = '测试销售' LIMIT 1);\n\n-- 删除salespersons表记录\nDELETE FROM salespersons WHERE userId = @userId;\n\n-- 删除users表记录\nDELETE FROM users WHERE id = @userId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 先获取userId\nSET @userId = (SELECT id FROM users WHERE name = '测试销售' LIMIT 1);\n\n-- 删除salespersons表记录\nDELETE FROM salespersons WHERE userId = @userId;\n\n-- 删除users表记录\nDELETE FROM users WHERE id = @userId;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2146
+}
