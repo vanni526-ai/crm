@@ -70,14 +70,37 @@ export const bookingRouter = router({
       // 使用UTC+8时区（北京时间）计算最早预约时间
       const now = new Date();
       const nowInBeijing = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Shanghai' }));
-      const minBookingTime = new Date(nowInBeijing.getTime() + 2 * 60 * 60 * 1000); // 至少提前2小时
+      const twoHoursLater = new Date(nowInBeijing.getTime() + 2 * 60 * 60 * 1000);
+      
+      // 向上取整到下一个半点（12:38+2小时=14:38→15:00）
+      const minutes = twoHoursLater.getMinutes();
+      let minBookingHour = twoHoursLater.getHours();
+      let minBookingMinute = 0;
+      
+      if (minutes > 0 && minutes <= 30) {
+        minBookingMinute = 30;
+      } else if (minutes > 30) {
+        minBookingHour += 1;
+        minBookingMinute = 0;
+      }
+      
+      // 判断查询日期是否是今天（北京时间）
+      const todayInBeijing = nowInBeijing.toISOString().split('T')[0]; // YYYY-MM-DD格式
+      const isToday = date === todayInBeijing;
+      
+      // 只对今天应用2小时限制
+      let minBookingTime: Date | null = null;
+      if (isToday) {
+        const minBookingTimeStr = `${date}T${String(minBookingHour).padStart(2, '0')}:${String(minBookingMinute).padStart(2, '0')}:00+08:00`;
+        minBookingTime = new Date(minBookingTimeStr);
+      }
 
       for (let hour = 9; hour <= 23; hour++) {
         for (let minute = 0; minute < 60; minute += 30) {
           const startTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
           
-          // 检查开始时间是否超过23:00（开始时间最晚为23:00）
-          if (hour > 23 || (hour === 23 && minute > 0)) {
+          // 开始时间最晚为23:00，所以当hour=23且minute=30时跳过
+          if (hour === 23 && minute === 30) {
             continue;
           }
           
@@ -85,8 +108,8 @@ export const bookingRouter = router({
           const startDateTime = new Date(`${date}T${startTime}:00+08:00`);
           const endDateTime = new Date(startDateTime.getTime() + totalDuration * 60 * 60 * 1000);
           
-          // 检查是否是过去的时间或不满足提前2小时的要求
-          if (startDateTime < minBookingTime) {
+          // 检查是否是过去的时间或不满足提前2小时的要求（仅对今天）
+          if (minBookingTime && startDateTime < minBookingTime) {
             continue;
           }
 
