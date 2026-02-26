@@ -1120,7 +1120,7 @@ export async function getAllTeachers() {
   if (!db) return [];
   const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/JopHWzeEmqAYxCyT.png";
   
-  // 1. 从users表读取角色包含teacher的用户，LEFT JOIN teachers表获取notes
+  // 1. 从users表读取角色包含teacher的用户（以users表为准，一一对应）
   const results = await db.select({
     id: users.id,
     name: users.name,
@@ -1132,9 +1132,7 @@ export async function getAllTeachers() {
     teacherAttribute: users.teacherAttribute,
     status: users.teacherStatus, // 添加teacherStatus字段，映射为status
     teacherNotes: users.teacherNotes, // users表的teacherNotes（多角色用户）
-    notes: teachers.notes, // teachers表的notes（主角色为teacher的用户）
   }).from(users)
-  .leftJoin(teachers, eq(users.id, teachers.userId))
   .where(
     and(
       like(users.roles, '%teacher%'),
@@ -1142,8 +1140,18 @@ export async function getAllTeachers() {
     )
   ).orderBy(desc(users.createdAt));
   
+  // 1.5. 为每个老师获取teachers表的notes（如果有多条记录，只取第一条）
+  const teacherIds = results.map(r => r.id);
+  const teacherNotesData = teacherIds.length > 0 ? await db.select({
+    userId: teachers.userId,
+    notes: sql<string>`MAX(${teachers.notes})`.as('notes'), // 使用MAX聚合函数符合ONLY_FULL_GROUP_BY模式
+  }).from(teachers)
+    .where(inArray(teachers.userId, teacherIds))
+    .groupBy(teachers.userId) : [];
+  
+  const teacherNotesMap = new Map(teacherNotesData.map(t => [t.userId, t.notes]));
+  
   // 2. 获取所有老师的城市数据
-  const teacherIds = results.map(t => t.id);
   if (teacherIds.length === 0) return [];
   
   const roleCitiesData = await db
@@ -1173,7 +1181,7 @@ export async function getAllTeachers() {
     ...teacher,
     avatarUrl: teacher.avatarUrl || DEFAULT_AVATAR_URL,
     city: userCitiesMap.get(teacher.id) || null,
-    notes: teacher.notes || teacher.teacherNotes || null, // 合并两个notes字段
+     notes: teacherNotesMap.get(teacher.id) || teacher.teacherNotes || null, // 合并notes字段
     teacherNotes: undefined, // 移除teacherNotes字段，避免混淆
   }));
 }
