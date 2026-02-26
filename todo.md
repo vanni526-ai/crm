@@ -5030,3 +5030,10 @@
 - [x] 修改数据库函数：调整db.ts中的salesperson相关函数，JOIN users表
 - [x] 修复TypeScript错误：从102个降到6个（与salesperson无关）
 - [x] 测试验证：创建功能正常，双向同步成功
+
+### 174. 优化salesperson更新接口并检查角色同步
+- [x] 优化update接口：支持部分字段更新（PATCH语义）
+- [x] 检查角色同步：所有salesperson的user.role都正确设置为'sales'
+- [x] 检查销售管理页面：18个销售人员全部正确显示
+- [x] 检查用户管理页面：销售角色正确显示在下拉框中
+- [x] 验证结果：角色同步正常，页面显示正确

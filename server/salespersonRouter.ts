@@ -61,11 +61,11 @@ export const salespersonRouter = router({
       return { id: salespersonId, success: true };
     }),
 
-  // 更新销售人员：自动同步到users表
+  // 更新销售人员：自动同步到users表（支持部分字段更新）
   update: adminProcedure
     .input(z.object({
       id: z.number(),
-      name: z.string().min(1, "姓名不能为空"),
+      name: z.string().min(1, "姓名不能为空").optional(),
       nickname: z.string().optional(),
       phone: z.string().optional(),
       email: z.string().email().optional().or(z.literal("")),
@@ -75,7 +75,7 @@ export const salespersonRouter = router({
       notes: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
-      const { id, name, nickname, phone, email, wechat, aliases, commissionRate, notes } = input;
+      const { id, ...updates } = input;
       
       // 1. 获取salesperson记录以找到userId
       const salesperson = await db.getSalespersonById(id);
@@ -83,21 +83,34 @@ export const salespersonRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "销售人员不存在" });
       }
       
-      // 2. 更新users表的基础信息
-      await db.updateUser(salesperson.userId, {
-        name,
-        nickname,
-        phone,
-        email,
-        wechat,
-        aliases,
-      });
+      // 2. 分离基础信息和业务信息
+      const userUpdates: any = {};
+      const salespersonUpdates: any = {};
       
-      // 3. 更新salespersons表的业务信息
-      await db.updateSalesperson(id, {
-        commissionRate: commissionRate?.toString(),
-        notes,
-      });
+      // 基础信息字段（users表）
+      const userFields = ['name', 'nickname', 'phone', 'email', 'wechat', 'aliases'];
+      for (const field of userFields) {
+        if (field in updates && updates[field as keyof typeof updates] !== undefined) {
+          userUpdates[field] = updates[field as keyof typeof updates];
+        }
+      }
+      
+      // 业务信息字段（salespersons表）
+      if ('commissionRate' in updates && updates.commissionRate !== undefined) {
+        salespersonUpdates.commissionRate = updates.commissionRate.toString();
+      }
+      if ('notes' in updates && updates.notes !== undefined) {
+        salespersonUpdates.notes = updates.notes;
+      }
+      
+      // 3. 只更新有变化的字段
+      if (Object.keys(userUpdates).length > 0) {
+        await db.updateUser(salesperson.userId, userUpdates);
+      }
+      
+      if (Object.keys(salespersonUpdates).length > 0) {
+        await db.updateSalesperson(id, salespersonUpdates);
+      }
       
       return { success: true };
     }),
