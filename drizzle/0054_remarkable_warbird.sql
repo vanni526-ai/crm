@@ -1,0 +1,1 @@
+ALTER TABLE `courses` ADD `alias` varchar(100);
