@@ -5148,4 +5148,14 @@
 - [x] 移除前端对matchedOrder字段的引用
 - [x] 修复前端 invalidate调用
 - [x] 测试验证修复效果（页面正常显示7919条排课记录）
+- [x] 保存checkpoint
+
+### 154. 清理schedules表重复数据并修复ICS导入逻辑
+- [x] 调查schedules表数据异常原因（7919条 vs 418条订单）
+- [x] 分析数据来源：发现所有schedules记录orderId都为NULL
+- [x] 清空schedules表的所有无效数据（7919条）
+- [x] 从orders表批量生成正确的schedules记录（411条）
+- [x] 检查ICS导入逻辑（importRouter.ts）
+- [x] 禁用ICS直接导入功能，添加错误提示和正确做法说明
+- [x] 测试验证修复效果（总排课数411，所有记录都关联orderId）
 - [ ] 保存checkpoint

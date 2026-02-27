@@ -496,7 +496,8 @@ export const importRouter = router({
       }
     }),
 
-  // 导入ICS数据到排课表
+  // 导入ICS数据到排课表（已废弃：ICS导入会导致schedules表数据与orders表不一致）
+  // 正确的做法是：从orders表自动生成schedules记录，或者通过订单导入同时创建order和schedule
   importICSToSchedules: importProcedure
     .input(
       z.object({
@@ -504,6 +505,14 @@ export const importRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // 返回错误提示，禁止直接导入ICS到schedules表
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "ICS导入功能已禁用。\n\n原因：直接从ICS文件导入会创建没有orderId关联的排课记录，导致数据不一致。\n\n正确做法：\n1. 先通过订单导入功能创建订单（orders表）\n2. 系统会自动从订单生成对应的排课记录（schedules表）\n3. 或者使用'导入订单'功能，同时创建订单和排课记录",
+      });
+      
+      // 以下代码已废弃，保留作为参考
+      /*
       try {
         const buffer = Buffer.from(input.fileContent, "base64");
         const events = await parseICS(buffer);
@@ -527,6 +536,7 @@ export const importRouter = router({
             const endMin = event.endTime.getMinutes().toString().padStart(2, '0');
             const classTime = `${startHour}:${startMin}-${endHour}:${endMin}`;
             
+            // ❌ 问题：没有设置orderId字段，导致schedules记录无法关联到orders表
             await db.createSchedule({
               courseType: event.summary,
               startTime: event.startTime,
@@ -548,31 +558,7 @@ export const importRouter = router({
             errors.push(`事件${event.summary}: ${error.message}`);
           }
         }
-
-        await db.createImportLog({
-          fileName: "calendar.ics",
-          fileType: "ics",
-          dataType: "schedules",
-          totalRows: events.length,
-          successRows: successCount,
-          failedRows: failedCount,
-          errorLog: errors.length > 0 ? errors.slice(0, 5).join("; ") : undefined,
-          importedBy: ctx.user.id,
-        });
-
-        return {
-          success: true,
-          totalRecords: events.length,
-          successCount,
-          failedCount,
-          errors: errors.slice(0, 10),
-        };
-      } catch (error: any) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: `导入失败: ${error.message}`,
-        });
-      }
+      */
     }),
 
   // 获取导入历史记录

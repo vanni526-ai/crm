@@ -1,0 +1,31 @@
+{
+  "query": "SELECT COUNT(*) as schedules_count FROM schedules;\nSELECT COUNT(*) as orders_count FROM orders;\nSELECT COUNT(*) as with_orderId FROM schedules WHERE orderId IS NOT NULL;\nSELECT COUNT(*) as without_orderId FROM schedules WHERE orderId IS NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as schedules_count FROM schedules;\nSELECT COUNT(*) as orders_count FROM orders;\nSELECT COUNT(*) as with_orderId FROM schedules WHERE orderId IS NOT NULL;\nSELECT COUNT(*) as without_orderId FROM schedules WHERE orderId IS NULL;",
+  "rows": [
+    {
+      "schedules_count": "7919"
+    },
+    {
+      "schedules_count": "orders_count"
+    },
+    {
+      "schedules_count": "418"
+    },
+    {
+      "schedules_count": "with_orderId"
+    },
+    {
+      "schedules_count": "0"
+    },
+    {
+      "schedules_count": "without_orderId"
+    },
+    {
+      "schedules_count": "7919"
+    }
+  ],
+  "messages": [],
+  "stdout": "schedules_count\n7919\norders_count\n418\nwith_orderId\n0\nwithout_orderId\n7919\n",
+  "stderr": "",
+  "execution_time_ms": 2307
+}

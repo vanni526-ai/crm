@@ -1,0 +1,9 @@
+{
+  "query": "-- 直接清空schedules表（数据已经确认都是无效的，没有orderId关联）\nDELETE FROM schedules;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 直接清空schedules表（数据已经确认都是无效的，没有orderId关联）\nDELETE FROM schedules;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1925
+}

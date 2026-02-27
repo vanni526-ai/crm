@@ -1,0 +1,8 @@
+{
+  "query": "-- 1. 先创建备份表\nCREATE TABLE schedules_backup_20260227 AS SELECT * FROM schedules;\n\n-- 2. 清空schedules表\nTRUNCATE TABLE schedules;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 1. 先创建备份表\nCREATE TABLE schedules_backup_20260227 AS SELECT * FROM schedules;\n\n-- 2. 清空schedules表\nTRUNCATE TABLE schedules;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1105 (HY000) at line 2: 'CREATE TABLE ... SELECT' is not implemented yet"
+  ]
+}
