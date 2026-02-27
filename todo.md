@@ -5231,4 +5231,11 @@
 - [x] 修改 PartnerManagement.tsx，移除合同解析功能
 - [x] 重启服务器清除模块缓存错误
 - [x] 系统基本功能正常（服务器启动成功）
+- [x] 保存checkpoint
+
+### 159. 移除导航栏中的“数据导入”、“解析学习”和“Gmail导入”菜单项及对应页面
+- [x] 从DashboardLayout中移除“数据导入”、“解析学习”、“Gmail导入”菜单项
+- [x] 从App.tsx中移除对应的路由
+- [x] 删除Import.tsx、ParsingLearning.tsx页面文件（Gmail相关页面已删除）
+- [x] 测试验证导航栏和路由正常
 - [ ] 保存checkpoint

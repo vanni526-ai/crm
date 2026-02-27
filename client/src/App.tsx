@@ -14,7 +14,7 @@ import Reconciliations from "./pages/Reconciliations";
 import Finance from "./pages/Finance";
 import Analytics from "./pages/Analytics";
 import Users from "./pages/Users";
-import Import from "./pages/Import";
+
 import CustomerOverview from "./pages/CustomerOverview";
 import Sales from "./pages/Sales";
 // Gmail导入功能已移除
@@ -25,7 +25,7 @@ import ReconciliationExport from "./pages/ReconciliationExport";
 import TransportFeeFixTool from "./pages/TransportFeeFixTool";
 import TrafficSourceConfig from "./pages/TrafficSourceConfig";
 import TrafficSourceDashboard from "./pages/TrafficSourceDashboard";
-import ParsingLearning from "./pages/ParsingLearning";
+
 import CityPartnerConfig from "./pages/CityPartnerConfig";
 import Cities from "./pages/Cities";
 import ReconciliationMatch from "./pages/ReconciliationMatch";
@@ -57,7 +57,7 @@ function Router() {
       <Route path={"/finance"} component={Finance} />
       <Route path={"/analytics"} component={Analytics} />
       <Route path={"/users"} component={Users} />
-      <Route path={"/import"} component={Import} />
+
       <Route path={"/customer-overview"} component={CustomerOverview} />
       <Route path={"/sales"} component={Sales} />
       {/* Gmail导入功能已移除 */}
@@ -68,7 +68,7 @@ function Router() {
       <Route path={"/transport-fee-fix"} component={TransportFeeFixTool} />
       <Route path={"/traffic-source-config"} component={TrafficSourceConfig} />
       <Route path={"/traffic-source-dashboard"} component={TrafficSourceDashboard} />
-      <Route path={"/parsing-learning"} component={ParsingLearning} />
+
       <Route path={"/city-partner-config"} component={CityPartnerConfig} />
       <Route path={"/cities"} component={Cities} />
       <Route path={"/reconciliation-match"} component={ReconciliationMatch} />
