@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, name, alias, isHot FROM courses LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, alias, isHot FROM courses LIMIT 5;",
+  "rows": [
+    {
+      "id": "2",
+      "name": "1V1 女王深度局",
+      "alias": "女王深度体验",
+      "isHot": "1"
+    },
+    {
+      "id": "4",
+      "name": "1V1 情趣变装课",
+      "alias": "NULL",
+      "isHot": "0"
+    },
+    {
+      "id": "5",
+      "name": "TK 挠痒体验课 1V1",
+      "alias": "NULL",
+      "isHot": "0"
+    },
+    {
+      "id": "6",
+      "name": "1V1 埃及 Y 后木乃伊主题课",
+      "alias": "NULL",
+      "isHot": "0"
+    },
+    {
+      "id": "7",
+      "name": "1V1 RU首开发课",
+      "alias": "NULL",
+      "isHot": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\talias\tisHot\n2\t1V1 女王深度局\t女王深度体验\t1\n4\t1V1 情趣变装课\tNULL\t0\n5\tTK 挠痒体验课 1V1\tNULL\t0\n6\t1V1 埃及 Y 后木乃伊主题课\tNULL\t0\n7\t1V1 RU首开发课\tNULL\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1506
+}

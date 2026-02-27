@@ -5172,9 +5172,21 @@
 ### 155. 课程管理增强：添加课程别名显示、编辑和批量导入导出功能
 - [x] 在课程列表中显示课程别名列
 - [x] 在编辑对话框中添加课程别名输入框
-- [x] 后端API支持alias字段（create/update/importFromExcel）
+- [x] 后端 API支持alias字段（create/update/importFromExcel）
 - [x] 添加导出功能，包含alias字段
 - [x] 添加下载导入模板功能，包含alias字段
 - [x] 更新导入逻辑，支持alias字段
 - [x] 测试验证所有功能（别名显示、编辑、导出、模板下载均正常）
+- [x] 保存checkpoint
+
+### 156. 课程添加isHot热门字段并生成API文档
+- [x] 在courses表schema中添加isHot字段（tinyint类型，0=不热门，1=热门）
+- [x] 执行数据库迁移，添加isHot列（默认值0）
+- [x] 在courses router的create/update/importFromExcel方法中添加isHot字段支持
+- [x] 在Courses.tsx中添加isHot字段到类型定义和表单状态
+- [x] 在课程列表中添加热门列和开关
+- [x] 添加handleToggleHot函数
+- [x] 在导出和导入逻辑中添加isHot字段支持
+- [x] 生成完整的课程API文档v1.1（包含isHot和alias字段说明）
+- [x] 测试验证热门列显示和开关功能
 - [ ] 保存checkpoint

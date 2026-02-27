@@ -44,6 +44,7 @@ type Course = {
   duration: string | null;
   level: string | null;
   isActive: boolean;
+  isHot: number;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -62,6 +63,7 @@ export default function Courses() {
     price: "",
     duration: "",
     level: "入门",
+    isHot: 0,
   });
 
   // 查询课程列表
@@ -213,6 +215,12 @@ export default function Courses() {
     toggleActiveMutation.mutate({ id });
   };
 
+  // 切换热门状态
+  const handleToggleHot = (id: number, currentIsHot: number) => {
+    const newIsHot = currentIsHot === 1 ? 0 : 1;
+    updateMutation.mutate({ id, isHot: newIsHot });
+  };
+
   // 导出所有课程为Excel
   const handleExport = () => {
     try {
@@ -225,6 +233,7 @@ export default function Courses() {
         "时长(小时)": course.duration ? parseFloat(course.duration) : "",
         "课程介绍": course.introduction || "",
         "课程描述": course.description || "",
+        "热门": course.isHot === 1 ? "是" : "否",
         "状态": course.isActive ? "启用" : "停用",
       }));
 
@@ -242,6 +251,7 @@ export default function Courses() {
         { wch: 12 }, // 时长
         { wch: 30 }, // 课程介绍
         { wch: 50 }, // 课程描述
+        { wch: 10 }, // 热门
         { wch: 10 }, // 状态
       ];
       worksheet['!cols'] = colWidths;
@@ -263,12 +273,13 @@ export default function Courses() {
       const templateData = [
         {
           "课程名称": "示例课程1",
-          "课程别名": "别名1",
+          "课程别名": "别吁1",
           "课程程度": "入门",
           "价格(元)": 1000,
           "时长(小时)": 2,
           "课程介绍": "这是课程介绍",
           "课程描述": "这是课程详细描述",
+          "热门": "否",
         },
         {
           "课程名称": "示例课程2",
@@ -361,6 +372,7 @@ export default function Courses() {
           duration: parseFloat(row[4]) || 1,
           introduction: row[5] || undefined,
           description: row[6] || undefined,
+          isHot: row[7] === "是" ? 1 : 0,
         });
       }
 
@@ -421,6 +433,7 @@ export default function Courses() {
               <TableHead>课程程度</TableHead>
               <TableHead>价格(元)</TableHead>
               <TableHead>时长(小时)</TableHead>
+              <TableHead>热门</TableHead>
               <TableHead>状态</TableHead>
               <TableHead>创建时间</TableHead>
               <TableHead className="text-right">操作</TableHead>
@@ -429,7 +442,7 @@ export default function Courses() {
           <TableBody>
             {courses.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-muted-foreground">
                   暂无课程数据
                 </TableCell>
               </TableRow>
@@ -447,6 +460,12 @@ export default function Courses() {
                     {course.price !== null ? `¥${parseFloat(course.price).toFixed(2)}` : "-"}
                   </TableCell>
                   <TableCell>{course.duration !== null ? `${parseFloat(course.duration)}h` : "-"}</TableCell>
+                  <TableCell>
+                    <Switch
+                      checked={course.isHot === 1}
+                      onCheckedChange={() => handleToggleHot(course.id, course.isHot)}
+                    />
+                  </TableCell>
                   <TableCell>
                     <Switch
                       checked={course.isActive}

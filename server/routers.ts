@@ -1873,6 +1873,7 @@ export const appRouter = router({
           price: z.number().min(0, "课程价格不能为负数"),
           duration: z.number().min(0, "课程时长不能为负数"),
           level: z.enum(["入门", "深度", "订制", "剧本"]),
+          isHot: z.number().min(0).max(1).optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -1886,6 +1887,7 @@ export const appRouter = router({
             duration: input.duration.toString(),
             level: input.level,
             isActive: true,
+            isHot: input.isHot !== undefined ? input.isHot : 0,
           });
           return {
             success: true,
@@ -1913,6 +1915,7 @@ export const appRouter = router({
           price: z.number().min(0, "课程价格不能为负数").optional(),
           duration: z.number().min(0, "课程时长不能为负数").optional(),
           level: z.enum(["入门", "深度", "订制", "剧本"]).optional(),
+          isHot: z.number().min(0).max(1).optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -1927,6 +1930,7 @@ export const appRouter = router({
           if (updateData.price !== undefined) dataToUpdate.price = updateData.price.toString();
           if (updateData.duration !== undefined) dataToUpdate.duration = updateData.duration.toString();
           if (updateData.level !== undefined) dataToUpdate.level = updateData.level;
+          if (updateData.isHot !== undefined) dataToUpdate.isHot = updateData.isHot;
 
           await db.updateCourse(id, dataToUpdate);
           return {
@@ -1994,6 +1998,7 @@ export const appRouter = router({
               price: z.number().min(0, "课程价格不能为负数"),
               duration: z.number().min(0, "课程时长不能为负数"),
               level: z.enum(["入门", "深度", "订制", "剧本"]),
+              isHot: z.number().min(0).max(1).optional(),
             })
           ),
         })
@@ -2017,6 +2022,7 @@ export const appRouter = router({
                 duration: course.duration.toString(),
                 level: course.level,
                 isActive: true,
+                isHot: course.isHot !== undefined ? course.isHot : 0,
               });
               results.success++;
             } catch (error: any) {
