@@ -19,11 +19,12 @@ export default function Import() {
   const parseExcel = trpc.import.parseExcel.useMutation();
   const importExcel = trpc.import.importExcelToOrders.useMutation();
   const parseICS = trpc.import.parseICS.useMutation();
-  const parseICSToOrders = trpc.import.parseICSToOrders.useMutation();
+  // ICS导入到订单功能已移除，等待重构
+  // const parseICSToOrders = trpc.import.parseICSToOrders.useMutation();
   const importICS = trpc.import.importICSToSchedules.useMutation();
-  const importICSToOrders = trpc.import.importICSToOrders.useMutation();
+  // const importICSToOrders = trpc.import.importICSToOrders.useMutation();
   
-  const [icsImportMode, setIcsImportMode] = useState<'schedule' | 'order'>('order');
+  const [icsImportMode, setIcsImportMode] = useState<'schedule' | 'order'>('schedule'); // 默认为schedule模式
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState<any[]>([]);
@@ -66,7 +67,9 @@ export default function Import() {
           toast.success(`成功解析 ${result.recordCount} 条记录`);
         } else if (type === "ics") {
           if (icsImportMode === 'order') {
-            const result = await parseICSToOrders.mutateAsync({ fileContent: base64 });
+            toast.error("ICS导入到订单功能已移除，等待重构");
+            return;
+            // const result = await parseICSToOrders.mutateAsync({ fileContent: base64 });
             setPreviewData(result.orders);
             
             // 优化提示信息:显示事件数量和订单数量
@@ -128,7 +131,9 @@ export default function Import() {
         result = await importExcel.mutateAsync({ fileContent: currentFile.content });
       } else if (currentFile.type === "ics") {
         if (icsImportMode === 'order') {
-          result = await importICSToOrders.mutateAsync({ fileContent: currentFile.content });
+          toast.error("ICS导入到订单功能已移除，等待重构");
+          return;
+          // result = await importICSToOrders.mutateAsync({ fileContent: currentFile.content });
         } else {
           result = await importICS.mutateAsync({ fileContent: currentFile.content });
         }
@@ -271,10 +276,10 @@ export default function Import() {
               <Button
                 className="w-full"
                 onClick={() => icsInputRef.current?.click()}
-                disabled={parseICS.isPending || parseICSToOrders.isPending}
+                disabled={parseICS.isPending}
               >
                 <Upload className="mr-2 h-4 w-4" />
-                {(parseICS.isPending || parseICSToOrders.isPending) ? "解析中..." : "上传ICS"}
+                {parseICS.isPending ? "解析中..." : "上传ICS"}
               </Button>
             </CardContent>
           </Card>

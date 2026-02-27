@@ -4,7 +4,7 @@ import { getDb } from "./db";
 import { partners, partnerExpenses, partnerProfitRecords, partnerCities, cities, orders, users, cityMonthlyExpenses, userRoleCities } from "../drizzle/schema";
 import { eq, and, desc, sql, inArray, not } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { uploadAndParseContract } from "./contractParser";
+// 合同解析功能已移除，等待重构
 import { updateProfitStageAndRecoveryStatus } from "./profitCalculator";
 
 export const partnerManagementRouter = router({
@@ -1114,20 +1114,13 @@ export const partnerManagementRouter = router({
         // 将Base64转换为Buffer
         const fileBuffer = Buffer.from(input.fileBase64, 'base64');
         
-        // 上传并识别合同
-        const { contractFileUrl, contractInfo } = await uploadAndParseContract(
-          fileBuffer,
-          input.fileName,
-          input.partnerId,
-          input.cityId
-        );
+        // 合同解析功能已移除，只上传文件
+        // TODO: 使用storagePut上传文件到S3或阿里云OSS
         
-        // 只返回识别结果，不保存到数据库
-        return {
-          success: true,
-          contractFileUrl,
-          contractInfo,
-        };
+        throw new TRPCError({
+          code: "NOT_IMPLEMENTED",
+          message: "合同上传功能已移除，等待重构",
+        });
       } catch (error: any) {
         console.error("合同上传失败:", error);
         throw new TRPCError({

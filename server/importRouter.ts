@@ -12,7 +12,7 @@ import {
   type AlipayXMLRecord,
   type ICSEvent,
 } from "./fileParser";
-import { parseICSOrderContent, type ParsedICSOrder } from "./icsOrderParser";
+// ICS导入功能已移除，等待重构
 import { generateOrderNo } from "./orderNoGenerator";
 import { validateTeacherFee } from "./teacherFeeValidator";
 
@@ -308,7 +308,7 @@ export const importRouter = router({
       }
     }),
 
-  // 解析ICS文件为订单格式(使用LLM)
+  // ICS导入功能已移除，等待重构
   parseICSToOrders: importProcedure
     .input(
       z.object({
@@ -316,10 +316,15 @@ export const importRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      throw new TRPCError({
+        code: "NOT_IMPLEMENTED",
+        message: "ICS导入功能已移除，等待重构",
+      });
+      /*
       try {
         const buffer = Buffer.from(input.fileContent, "base64");
         const events = await parseICS(buffer);
-        const orders = await parseICSOrderContent(events);
+        // const orders = await parseICSOrderContent(events);
 
         await db.createImportLog({
           fileName: "calendar.ics",
@@ -354,7 +359,7 @@ export const importRouter = router({
       }
     }),
 
-  // 导入ICS数据到订单表
+  // 导入ICS数据到订单表（已移除，等待重构）
   importICSToOrders: importProcedure
     .input(
       z.object({
@@ -362,10 +367,15 @@ export const importRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      throw new TRPCError({
+        code: "NOT_IMPLEMENTED",
+        message: "ICS导入功能已移除，等待重构",
+      });
+      /*
       try {
         const buffer = Buffer.from(input.fileContent, "base64");
         const events = await parseICS(buffer);
-        const orders = await parseICSOrderContent(events);
+        // const orders = await parseICSOrderContent(events);
 
         let successCount = 0;
         let failedCount = 0;

@@ -17,7 +17,8 @@ import Users from "./pages/Users";
 import Import from "./pages/Import";
 import CustomerOverview from "./pages/CustomerOverview";
 import Sales from "./pages/Sales";
-import GmailImport from "./pages/GmailImport";
+// Gmail导入功能已移除
+// import GmailImport from "./pages/GmailImport";
 // import GmailImportConfig from "./pages/GmailImportConfig";
 import ChannelOrderNoManagement from "./pages/ChannelOrderNoManagement";
 import ReconciliationExport from "./pages/ReconciliationExport";
@@ -59,7 +60,8 @@ function Router() {
       <Route path={"/import"} component={Import} />
       <Route path={"/customer-overview"} component={CustomerOverview} />
       <Route path={"/sales"} component={Sales} />
-      <Route path={"/gmail-import"} component={GmailImport} />
+      {/* Gmail导入功能已移除 */}
+      {/* <Route path={"/gmail-import"} component={GmailImport} /> */}
       {/* <Route path={"/gmail-import/config"} component={GmailImportConfig} /> */}
       <Route path={"/channel-orderno-management"} component={ChannelOrderNoManagement} />
       <Route path={"/reconciliation-export"} component={ReconciliationExport} />

@@ -77,22 +77,12 @@ export default function PartnerManagement() {
     { enabled: !!selectedPartnerId && !!selectedCityId }
   );
 
-  // 上传合同（只识别，不保存）
+  // 合同上传功能（已移除解析，只保留上传）
   const uploadContractMutation = trpc.partnerManagement.uploadContract.useMutation({
     onSuccess: (data) => {
-      toast.success("合同识别成功，请检查并修改信息");
+      toast.error("合同上传功能已移除，等待重构");
       setContractDialogOpen(false);
       setUploadingContract(false);
-      
-      // 设置预览数据
-      setContractPreview({
-        contractFileUrl: data.contractFileUrl,
-        contractInfo: data.contractInfo,
-      });
-      
-      // 初始化编辑表单数据
-      setEditFormData(data.contractInfo);
-      setEditingContract(true);
     },
     onError: (error) => {
       toast.error(`合同上传失败: ${error.message}`);

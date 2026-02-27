@@ -5205,4 +5205,30 @@
 - [x] 确认getAvailableSlots已经正确：开始时间最晚23:00，结束时间无限制
 - [x] 删除create中对结束时间的校验，允许结束时间超过23:00
 - [x] 修改原则：开始时间最晚23:00，结束时间可以是任意时间
+- [x] 保存checkpoint
+
+### 158. 移除LLM和S3依赖，为迁移到阿里云做准备
+- [ ] 移除合同解析功能，保留合同上传（contractParser.ts）
+- [ ] 移除课程介绍生成功能（contentGenerator.ts）
+- [ ] 移除营销文案生成功能（contentGenerator.ts）
+- [ ] 移除跟进话术生成功能（contentGenerator.ts）
+- [ ] 移除Gmail邮件订单解析功能（gmailOrderParser.ts）
+- [ ] 移除ICS日历文件订单解析功能（icsOrderParser.ts）
+- [ ] 移除身份证OCR识别功能（idCardOCR.ts）
+- [ ] 清理相关路由和前端调用
+- [ ] 测试验证所有功能正常
+- [ ] 保存checkpoint
+
+### 158. 移除LLM和S3依赖，为迁移到阿里云做准备
+- [x] 删除LLM相关文件（contentGenerator, gmailOrderParser, icsOrderParser, idCardOCR, contractParser）
+- [x] 从 routers.ts 中移除 contentGeneratorRouter 和 gmailAutoImportRouter
+- [x] 修改 importRouter.ts，禁用ICS导入到订单功能
+- [x] 修改 uploadRouter.ts，移除idCardOCR调用
+- [x] 修改 partnerManagementRouter.ts，移除contractParser调用
+- [x] 删除前端 GmailImport.tsx 和 GmailImportConfig.tsx
+- [x] 从 App.tsx 中移除Gmail导入页面路由
+- [x] 修改 Import.tsx，禁用ICS导入到订单功能
+- [x] 修改 PartnerManagement.tsx，移除合同解析功能
+- [x] 重启服务器清除模块缓存错误
+- [x] 系统基本功能正常（服务器启动成功）
 - [ ] 保存checkpoint

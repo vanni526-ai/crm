@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
-import { recognizeIDCard } from "./idCardOCR";
+// 身份证OCR功能已移除，等待重构
 
 /**
  * 文件上传路由
@@ -127,11 +127,8 @@ export const uploadRouter = router({
         const contentType = `image/${imageType}`;
         const result = await storagePut(fileKey, buffer, contentType);
 
-        // 调用OCR识别（只对正面进行识别）
+        // OCR识别功能已移除，等待重构
         let ocrResult = null;
-        if (input.side === "front") {
-          ocrResult = await recognizeIDCard(result.url);
-        }
 
         return {
           success: true,

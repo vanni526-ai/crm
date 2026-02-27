@@ -5,7 +5,6 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { importRouter } from "./importRouter";
 import { salespersonRouter } from "./salespersonRouter";
-import { gmailAutoImportRouter } from "./gmailAutoImportRouter";
 import { trafficSourceConfigRouter } from "./trafficSourceConfigRouter";
 import { transportFeeFixRouter } from "./transportFeeFixRouter";
 import { parsingLearningRouter } from "./parsingLearningRouter";
@@ -20,7 +19,6 @@ import { userManagementRouter } from "./userManagementRouter";
 import { normalizeOrderRouter } from "./normalizeOrderRouter";
 import { uploadRouter } from "./uploadRouter";
 import { excelReportRouter } from "./excelReportRouter";
-import { contentGeneratorRouter } from "./contentGeneratorRouter";
 import { notificationRouter } from "./notificationRouter";
 import { salesCityPerformanceRouter } from "./salesCityPerformanceRouter";
 import { teacherPaymentRouter } from "./teacherPaymentRouter";
@@ -98,9 +96,7 @@ export const appRouter = router({
   normalizeOrder: normalizeOrderRouter,
   upload: uploadRouter,
   excelReport: excelReportRouter,
-  contentGenerator: contentGeneratorRouter,
   notifications: notificationRouter,
-  gmailAutoImport: gmailAutoImportRouter,
   trafficSourceConfig: trafficSourceConfigRouter,
   transportFeeFix: transportFeeFixRouter,
   parsingLearning: parsingLearningRouter,
