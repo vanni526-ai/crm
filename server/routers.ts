@@ -33,6 +33,7 @@ import { analyticsRouter } from "./analyticsRouter";
 import { classroomsRouter } from "./classroomsRouter";
 import { teachersRouter } from "./teachersRouter";
 import { bookingRouter } from "./bookingRouter";
+import { paymentRouter } from "./paymentRouter";
 import { recommendCity, getRecommendedCity } from "./cityRecommendation";
 
 import { TRPCError } from "@trpc/server";
@@ -111,6 +112,7 @@ export const appRouter = router({
   schedules: schedulesRouter,
   analytics: analyticsRouter,
   booking: bookingRouter,
+  payment: paymentRouter,
 
   // 数据质量检查
   dataQuality: router({

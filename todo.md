@@ -5299,3 +5299,27 @@
 - [x] 确保导入功能支持新增和更新订单(通过订单号匹配)
 - [x] 测试导入导出功能(模板下载7.1KB,导出31KB,字段21个)
 - [x] 保存检查点
+
+### 139. 实现完整的支付接口系统
+- [x] 数据库schema检查
+  - [x] 确认orders表已有status, paymentChannel, channelOrderNo, paymentDate字段
+- [x] 实现支付核心接口
+  - [x] 实现payment.prepay接口(支持微信、支付宝、余额支付)
+  - [x] 实现payment.updateStatus内部接口
+  - [x] 实现payment.getStatus轮询接口
+- [x] 实现支付回调Webhook
+  - [x] 实现/api/webhook/wechat-payment-notify和/api/webhook/alipay-payment-notify接口
+  - [x] 添加微信支付回调验签逻辑
+  - [x] 添加支付宝回调验签逻辑
+  - [x] 实现幂等性处理
+- [x] 调整booking.create接口
+  - [x] 确认返回orderId和orderNo
+  - [x] 订单初始状态为pending(已存在)
+- [x] 生成API接口文档
+  - [x] 编写完整的支付接口文档(docs/payment-api-documentation.md)
+  - [x] 包含Webhook回调格式说明
+  - [x] 包含前端集成指南(React Native示例代码)
+- [ ] 测试验证
+  - [ ] 编写单元测试
+  - [ ] 测试余额支付流程
+  - [ ] 保存检查点并交付

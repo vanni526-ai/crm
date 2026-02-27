@@ -7,6 +7,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
+import { handleWechatPaymentNotify, handleAlipayPaymentNotify } from "./paymentWebhook";
 import { serveStatic, setupVite } from "./vite";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -118,6 +119,10 @@ async function startServer() {
 
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+
+  // Payment webhook routes
+  app.post("/api/webhook/wechat-payment-notify", handleWechatPaymentNotify);
+  app.post("/api/webhook/alipay-payment-notify", handleAlipayPaymentNotify);
   // tRPC API
   app.use(
     "/api/trpc",
