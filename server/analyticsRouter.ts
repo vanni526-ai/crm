@@ -42,17 +42,47 @@ export const analyticsRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
 
-      // TODO: 实现真实的订单统计逻辑
+      // 构建查询条件
+      let whereConditions = [];
+      
+      if (input?.startDate) {
+        whereConditions.push(sql`${orders.classDate} >= ${input.startDate}`);
+      }
+      if (input?.endDate) {
+        whereConditions.push(sql`${orders.classDate} <= ${input.endDate}`);
+      }
+
+      // 查询订单统计数据
+      const statsResult = await db
+        .select({
+          totalOrders: sql<number>`COUNT(*)`,
+          completedOrders: sql<number>`SUM(CASE WHEN ${orders.status} = 'paid' THEN 1 ELSE 0 END)`,
+          pendingOrders: sql<number>`SUM(CASE WHEN ${orders.status} = 'pending' THEN 1 ELSE 0 END)`,
+          cancelledOrders: sql<number>`SUM(CASE WHEN ${orders.status} = 'cancelled' THEN 1 ELSE 0 END)`,
+          totalRevenue: sql<string>`COALESCE(SUM(${orders.courseAmount}), 0)`,
+          totalPaymentAmount: sql<number>`COALESCE(SUM(${orders.paymentAmount}), 0)`,
+          totalTeacherFee: sql<number>`COALESCE(SUM(${orders.teacherFee}), 0)`,
+        })
+        .from(orders)
+        .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+
+      const stats = statsResult[0];
+      const totalPaymentAmount = Number(stats.totalPaymentAmount) || 0;
+      const totalTeacherFee = Number(stats.totalTeacherFee) || 0;
+      const netProfit = totalPaymentAmount - totalTeacherFee;
+
       return {
-        totalOrders: 1250,
-        completedOrders: 1100,
-        pendingOrders: 120,
-        cancelledOrders: 30,
-        totalRevenue: '1250000.00',
-        averageOrderValue: '1000.00',
-        totalPaymentAmount: 1250000,
-        totalTeacherFee: 450000,
-        netProfit: 800000,
+        totalOrders: Number(stats.totalOrders) || 0,
+        completedOrders: Number(stats.completedOrders) || 0,
+        pendingOrders: Number(stats.pendingOrders) || 0,
+        cancelledOrders: Number(stats.cancelledOrders) || 0,
+        totalRevenue: String(stats.totalRevenue || '0'),
+        averageOrderValue: stats.totalOrders > 0 
+          ? String((Number(stats.totalRevenue) / Number(stats.totalOrders)).toFixed(2))
+          : '0.00',
+        totalPaymentAmount,
+        totalTeacherFee,
+        netProfit,
       };
     }),
 

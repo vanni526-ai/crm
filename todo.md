@@ -5282,3 +5282,11 @@
 - [ ] analytics.getAllCityPartnerConfig - 城市合伙人配置接口
 - [ ] analytics.updateCityPartnerConfig - 更新城市合伙人配置接口
 - [ ] schedules.getMonthlyPartnerSettlement - 月度合伙人结算接口
+
+### 137. 修复首页统计数据显示为0的问题
+- [x] 检查Home.tsx的数据查询逻辑
+- [x] 检查analyticsRouter.ts中orderStats接口的实现
+- [x] 诊断为什么返回的数据全部为0(原因:返回的是硬编码测试数据)
+- [x] 修复数据计算逻辑(实现真实的数据库查询)
+- [x] 测试验证修复效果(数据正确显示)
+- [x] 保存检查点
