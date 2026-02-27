@@ -1,0 +1,1 @@
+ALTER TABLE `courses` ADD `isHot` tinyint DEFAULT 0 NOT NULL;
