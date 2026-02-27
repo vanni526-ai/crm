@@ -100,11 +100,11 @@ export const schedulesRouter = router({
         isAvailable: boolean;
       }> = [];
 
-      // 生成从startHour:startMinute到23:00的所有半点时间段
-      for (let hour = startHour; hour <= 23; hour++) {
+      // 生成从startHour:startMinute到22:30的所有半点时间段（课程开始时间不能晚于23:00）
+      for (let hour = startHour; hour <= 22; hour++) {
         const minutes = hour === startHour ? [startMinute] : [0, 30];
         for (const minute of minutes) {
-          if (hour === 23 && minute > 0) break; // 23:00是最后一个可选时间
+          if (hour === 22 && minute > 30) break; // 22:30是最后一个可选时间（确保课程开始时间不晚于23:00）
 
           const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
           

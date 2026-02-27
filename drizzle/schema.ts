@@ -1008,6 +1008,7 @@ export const courses = mysqlTable("courses", {
   level: mysqlEnum("level", ["入门", "深度", "订制", "剧本"]).notNull(), // 课程程度
   isActive: boolean("isActive").default(true).notNull(), // 是否启用
   isBookable: boolean("isBookable").default(true).notNull(), // 是否可预约(false表示不在前端App显示)
+  alias: varchar("alias", { length: 100 }), // 课程别名(供前端App显示使用)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
