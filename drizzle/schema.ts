@@ -43,6 +43,9 @@ export const users = mysqlTable("users", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
   deletedAt: timestamp("deletedAt"), // 软删除时间戳
+  isDeleted: int("isDeleted").default(0).notNull(), // 注销状态: 0=正常, 1=注销中(30天缓冲期), 2=已脱敏
+  deletionReason: text("deletionReason"), // 用户填写的注销原因(可选)
+  anonymizedAt: timestamp("anonymizedAt"), // 数据脱敏完成时间
 });
 
 /**

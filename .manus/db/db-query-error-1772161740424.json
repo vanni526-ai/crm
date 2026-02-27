@@ -1,0 +1,8 @@
+{
+  "query": "-- 添加isDeleted字段\nALTER TABLE users \nADD COLUMN isDeleted INT NOT NULL DEFAULT 0 \nCOMMENT '注销状态：0=正常，1=注销中（30天缓冲期），2=已脱敏'\nAFTER deletedAt;\n\n-- 添加deletionReason字段\nALTER TABLE users \nADD COLUMN deletionReason TEXT NULL \nCOMMENT '用户填写的注销原因（可选）'\nAFTER isDeleted;\n\n-- 添加anonymizedAt字段\nALTER TABLE users \nADD COLUMN anonymizedAt DATETIME NULL \nCOMMENT '数据脱敏完成时间'\nAFTER deletionReason;\n\n-- 添加索引优化查询性能\nCREATE INDEX idx_isDeleted_deletedAt ON users(isDeleted, deletedAt);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute -- 添加isDeleted字段\nALTER TABLE users \nADD COLUMN isDeleted INT NOT NULL DEFAULT 0 \nCOMMENT '注销状态：0=正常，1=注销中（30天缓冲期），2=已脱敏'\nAFTER deletedAt;\n\n-- 添加deletionReason字段\nALTER TABLE users \nADD COLUMN deletionReason TEXT NULL \nCOMMENT '用户填写的注销原因（可选）'\nAFTER isDeleted;\n\n-- 添加anonymizedAt字段\nALTER TABLE users \nADD COLUMN anonymizedAt DATETIME NULL \nCOMMENT '数据脱敏完成时间'\nAFTER deletionReason;\n\n-- 添加索引优化查询性能\nCREATE INDEX idx_isDeleted_deletedAt ON users(isDeleted, deletedAt);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1060 (42S21) at line 2: Duplicate column name 'isDeleted'"
+  ]
+}

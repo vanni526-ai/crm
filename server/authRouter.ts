@@ -604,4 +604,161 @@ export const authRouter = router({
         },
       };
     }),
+
+  // 账号恢复接口
+  restoreAccount: publicProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+        phone: z.string(),
+        verificationCode: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+
+      // 1. 查找用户
+      const userList = await drizzle
+        .select()
+        .from(users)
+        .where(eq(users.id, input.userId))
+        .limit(1);
+
+      if (userList.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "用户不存在",
+        });
+      }
+
+      const user = userList[0];
+
+      // 2. 验证手机号
+      if (user.phone !== input.phone) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "手机号不匹配",
+        });
+      }
+
+      // 3. 验证账号状态
+      if (user.isDeleted !== 1) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "账号未处于注销状态",
+        });
+      }
+
+      // 4. 检查是否在30天缓冲期内
+      const deletedAt = user.deletedAt ? new Date(user.deletedAt) : new Date();
+      const recoveryDeadline = new Date(deletedAt);
+      recoveryDeadline.setDate(recoveryDeadline.getDate() + 30);
+      const now = new Date();
+
+      if (now > recoveryDeadline) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "恢复期限已过，账号已永久删除",
+        });
+      }
+
+      // 5. TODO: 验证验证码(这里暂时跳过，实际应该调用短信验证服务)
+      // if (input.verificationCode !== "123456") {
+      //   throw new TRPCError({
+      //     code: "BAD_REQUEST",
+      //     message: "验证码错误",
+      //   });
+      // }
+
+      // 6. 恢复账号
+      await drizzle
+        .update(users)
+        .set({
+          isDeleted: 0,
+          deletedAt: null,
+          deletionReason: null,
+        })
+        .where(eq(users.id, user.id));
+
+      // 7. TODO: 记录审计日志
+      // await logAccountRestoration(user.id);
+
+      return {
+        success: true,
+        message: "账号已成功恢复",
+        user: {
+          id: user.id,
+          name: user.name,
+          phone: user.phone,
+          email: user.email,
+          roles: user.roles,
+        },
+      };
+    }),
+
+  // 查询注销状态接口
+  getDeletionStatus: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.user;
+
+    if (!user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "未登录",
+      });
+    }
+
+    // 正常状态
+    if (user.isDeleted === 0) {
+      return {
+        isDeleted: 0,
+        status: "active",
+        message: "账号正常",
+      };
+    }
+
+    // 注销中(30天缓冲期)
+    if (user.isDeleted === 1) {
+      const deletedAt = user.deletedAt ? new Date(user.deletedAt) : new Date();
+      const recoveryDeadline = new Date(deletedAt);
+      recoveryDeadline.setDate(recoveryDeadline.getDate() + 30);
+      const now = new Date();
+      const daysRemaining = Math.ceil(
+        (recoveryDeadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      return {
+        isDeleted: 1,
+        status: "pending_deletion",
+        deletedAt: deletedAt.toISOString(),
+        recoveryDeadline: recoveryDeadline.toISOString(),
+        daysRemaining,
+        message: `账号处于注销缓冲期，还有${daysRemaining}天可恢复`,
+      };
+    }
+
+    // 已脱敏
+    if (user.isDeleted === 2) {
+      const anonymizedAt = user.anonymizedAt
+        ? new Date(user.anonymizedAt)
+        : new Date();
+      return {
+        isDeleted: 2,
+        status: "anonymized",
+        anonymizedAt: anonymizedAt.toISOString(),
+        message: "账号已永久删除",
+      };
+    }
+
+    return {
+      isDeleted: user.isDeleted,
+      status: "unknown",
+      message: "未知状态",
+    };
+  }),
 });

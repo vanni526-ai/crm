@@ -1,0 +1,38 @@
+{
+  "query": "SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_COMMENT\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = DATABASE()\n  AND TABLE_NAME = 'users'\n  AND COLUMN_NAME IN ('isDeleted', 'deletionReason', 'anonymizedAt', 'deletedAt')\nORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_COMMENT\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = DATABASE()\n  AND TABLE_NAME = 'users'\n  AND COLUMN_NAME IN ('isDeleted', 'deletionReason', 'anonymizedAt', 'deletedAt')\nORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "deletedAt",
+      "COLUMN_TYPE": "timestamp",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "COLUMN_COMMENT": ""
+    },
+    {
+      "COLUMN_NAME": "isDeleted",
+      "COLUMN_TYPE": "tinyint(1)",
+      "IS_NULLABLE": "NO",
+      "COLUMN_DEFAULT": "0",
+      "COLUMN_COMMENT": "注销状态：0=正常，1=注销中（30天缓冲期），2=已脱敏"
+    },
+    {
+      "COLUMN_NAME": "deletionReason",
+      "COLUMN_TYPE": "text",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "COLUMN_COMMENT": "用户填写的注销原因（可选）"
+    },
+    {
+      "COLUMN_NAME": "anonymizedAt",
+      "COLUMN_TYPE": "datetime",
+      "IS_NULLABLE": "YES",
+      "COLUMN_DEFAULT": "NULL",
+      "COLUMN_COMMENT": "数据脱敏完成时间"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tCOLUMN_TYPE\tIS_NULLABLE\tCOLUMN_DEFAULT\tCOLUMN_COMMENT\ndeletedAt\ttimestamp\tYES\tNULL\t\nisDeleted\ttinyint(1)\tNO\t0\t注销状态：0=正常，1=注销中（30天缓冲期），2=已脱敏\ndeletionReason\ttext\tYES\tNULL\t用户填写的注销原因（可选）\nanonymizedAt\tdatetime\tYES\tNULL\t数据脱敏完成时间\n",
+  "stderr": "",
+  "execution_time_ms": 1595
+}

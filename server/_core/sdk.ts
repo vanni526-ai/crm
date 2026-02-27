@@ -376,6 +376,35 @@ class SDKServer {
       throw ForbiddenError("User not found");
     }
 
+    // Check if account is deleted or pending deletion
+    if (user.isDeleted === 1) {
+      // Account is pending deletion (30-day buffer period)
+      const deletedAt = user.deletedAt ? new Date(user.deletedAt) : new Date();
+      const recoveryDeadline = new Date(deletedAt);
+      recoveryDeadline.setDate(recoveryDeadline.getDate() + 30);
+      const now = new Date();
+      const daysRemaining = Math.ceil((recoveryDeadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (daysRemaining > 0) {
+        // Within 30-day buffer period, block login and return structured error
+        const maskedPhone = user.phone ? user.phone.substring(0, 3) + '****' + user.phone.substring(7) : 'N/A';
+        throw new Error(JSON.stringify({
+          error: 'ACCOUNT_PENDING_DELETION',
+          userId: user.id,
+          phone: maskedPhone,
+          daysRemaining,
+          deletedAt: deletedAt.toISOString(),
+          recoveryDeadline: recoveryDeadline.toISOString(),
+          message: `账号处于注销缓冲期，还有${daysRemaining}天可恢复`
+        }));
+      }
+    }
+    
+    if (user.isDeleted === 2) {
+      // Account has been anonymized, permanently deleted
+      throw ForbiddenError("账号已永久删除，无法登录");
+    }
+
     await db.upsertUser({
       openId: user.openId,
       lastSignedIn: signedInAt,

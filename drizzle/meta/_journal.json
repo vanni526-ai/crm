@@ -372,6 +372,13 @@
       "when": 1772089972900,
       "tag": "0052_sloppy_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "5",
+      "when": 1772161723815,
+      "tag": "0053_flat_starhawk",
+      "breakpoints": true
     }
   ]
 }
