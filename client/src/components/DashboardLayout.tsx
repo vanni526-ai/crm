@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, Home, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, Upload, TrendingUp, Mail, PanelLeft, Brain, MapPin, FileCheck, Shield, UserCog, BookOpen, Bell, Handshake, Receipt, Contact } from "lucide-react";
+import { LayoutDashboard, LogOut, ShoppingCart, Users, GraduationCap, UserCheck, DollarSign, TrendingUp, MapPin, FileCheck, BookOpen, Bell, Handshake, Receipt, Contact, PanelLeft } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';

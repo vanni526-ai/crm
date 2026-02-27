@@ -5238,4 +5238,14 @@
 - [x] 从App.tsx中移除对应的路由
 - [x] 删除Import.tsx、ParsingLearning.tsx页面文件（Gmail相关页面已删除）
 - [x] 测试验证导航栏和路由正常
+- [x] 保存checkpoint
+
+### 160. 清理importRouter代码、优化导航栏图标、添加批量导入导出功能
+- [x] 清理importRouter.ts中的ICS和Gmail导入相关代码和依赖
+- [x] 移除DashboardLayout中未使用的图标导入（Upload、Mail、Brain、Home、Shield、UserCog）
+- [x] 修复PanelLeft图标缺失错误
+- [ ] 检查订单管理页面的批量导入导出功能（导入、导出、下载模板）
+- [ ] 检查客户管理页面的批量导入导出功能（导入、导出、下载模板）
+- [ ] 如功能缺失则添加，如已存在则验证功能和模板的正确性
+- [ ] 测试验证所有批量操作功能
 - [ ] 保存checkpoint
