@@ -68,7 +68,7 @@ export default function Schedules() {
 
   const createSchedule = trpc.schedules.create.useMutation({
     onSuccess: () => {
-      utils.schedules.list.invalidate();
+      utils.schedules.listWithOrderInfo.invalidate();
       toast.success("排课创建成功");
       setCreateOpen(false);
       reset();
@@ -80,7 +80,7 @@ export default function Schedules() {
 
   const deleteSchedule = trpc.schedules.delete.useMutation({
     onSuccess: () => {
-      utils.schedules.list.invalidate();
+      utils.schedules.listWithOrderInfo.invalidate();
       toast.success("排课删除成功");
     },
     onError: (error: any) => {
@@ -294,11 +294,8 @@ export default function Schedules() {
                                       {schedule.teacherName && (
                                         <div>老师: {schedule.teacherName}</div>
                                       )}
-                                      {schedule.matchedOrder?.deliveryCity && (
-                                        <div>城市: {schedule.matchedOrder.deliveryCity}</div>
-                                      )}
-                                      {schedule.matchedOrder?.deliveryRoom && (
-                                        <div>教室: {schedule.matchedOrder.deliveryRoom}</div>
+                                      {schedule.location && (
+                                        <div>地点: {schedule.location}</div>
                                       )}
                                       {schedule.salesName && (
                                         <div>销售: {schedule.salesName}</div>
@@ -307,16 +304,6 @@ export default function Schedules() {
                                     {schedule.channelOrderNo && (
                                       <div className="mt-2 p-2 bg-muted rounded-md">
                                         <div className="text-sm font-medium mb-1">渠道订单号: {schedule.channelOrderNo}</div>
-                                        {schedule.matchedOrder ? (
-                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-muted-foreground">
-                                            <div>课程金额: ￥{schedule.matchedOrder.courseAmount || '0.00'}</div>
-                                            <div>老师费用: ￥{schedule.matchedOrder.teacherFee || '0.00'}</div>
-                                            <div>车费: ￥{schedule.matchedOrder.transportFee || '0.00'}</div>
-                                            <div>合伙人费: ￥{schedule.matchedOrder.partnerFee || '0.00'}</div>
-                                          </div>
-                                        ) : (
-                                          <Badge variant="destructive" className="text-xs">未匹配订单</Badge>
-                                        )}
                                       </div>
                                     )}
                                   </div>

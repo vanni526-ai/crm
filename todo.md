@@ -5139,4 +5139,13 @@
 - [x] 执行数据库迁移添加alias字段
 - [x] 创建课程接口文档（包含别名字段的读取和响应示例）
 - [x] 更新登录相关接口文档（包含isDeleted检查逻辑）
-- [ ] 保存checkpoint并交付文档
+- [x] 保存checkpoint并交付文档
+
+### 153. 修复schedules页面错误，添加缺失的listWithOrderInfo接口
+- [x] 查找前端调用schedules.listWithOrderInfo的位置（Schedules.tsx第67行）
+- [x] 检查后端schedulesRouter是否有listWithOrderInfo接口（确认缺失）
+- [x] 添加listWithOrderInfo接口到schedulesRouter.ts
+- [x] 移除前端对matchedOrder字段的引用
+- [x] 修复前端 invalidate调用
+- [x] 测试验证修复效果（页面正常显示7919条排课记录）
+- [ ] 保存checkpoint

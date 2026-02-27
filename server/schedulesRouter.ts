@@ -335,4 +335,22 @@ export const schedulesRouter = router({
         message: 'Unavailability period deleted successfully',
       };
     }),
+
+  /**
+   * 获取所有排课记录（包含订单信息）
+   * 管理端接口：返回所有排课记录
+   */
+  listWithOrderInfo: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database connection failed");
+
+      // 查询所有排课记录
+      const allSchedules = await db
+        .select()
+        .from(schedules)
+        .orderBy(sql`${schedules.startTime} DESC`);
+
+      return allSchedules;
+    }),
 });
