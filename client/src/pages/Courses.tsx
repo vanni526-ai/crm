@@ -30,13 +30,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatDateBJ } from "@/lib/timezone";
-import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import DashboardLayout from "@/components/DashboardLayout";
 
 type Course = {
   id: number;
   name: string;
+  alias: string | null;
   introduction: string | null;
   description: string | null;
   price: string | null;
@@ -55,6 +56,7 @@ export default function Courses() {
   // 表单状态
   const [formData, setFormData] = useState({
     name: "",
+    alias: "",
     introduction: "",
     description: "",
     price: "",
@@ -119,6 +121,7 @@ export default function Courses() {
     setEditingCourse(null);
     setFormData({
       name: "",
+      alias: "",
       introduction: "",
       description: "",
       price: "",
@@ -133,6 +136,7 @@ export default function Courses() {
     setEditingCourse(course);
     setFormData({
       name: course.name,
+      alias: course.alias || "",
       introduction: course.introduction || "",
       description: course.description || "",
       price: course.price || "",
@@ -148,6 +152,7 @@ export default function Courses() {
     setEditingCourse(null);
     setFormData({
       name: "",
+      alias: "",
       introduction: "",
       description: "",
       price: "",
@@ -167,6 +172,7 @@ export default function Courses() {
 
     const baseData = {
       name: formData.name.trim(),
+      alias: formData.alias.trim() || undefined,
       introduction: formData.introduction.trim() || undefined,
       description: formData.description.trim() || undefined,
     };
@@ -205,6 +211,97 @@ export default function Courses() {
   // 切换启用状态
   const handleToggleActive = (id: number) => {
     toggleActiveMutation.mutate({ id });
+  };
+
+  // 导出所有课程为Excel
+  const handleExport = () => {
+    try {
+      // 准备导出数据
+      const exportData = courses.map((course) => ({
+        "课程名称": course.name,
+        "课程别名": course.alias || "",
+        "课程程度": course.level || "",
+        "价格(元)": course.price ? parseFloat(course.price) : "",
+        "时长(小时)": course.duration ? parseFloat(course.duration) : "",
+        "课程介绍": course.introduction || "",
+        "课程描述": course.description || "",
+        "状态": course.isActive ? "启用" : "停用",
+      }));
+
+      // 创建workbook和worksheet
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "课程列表");
+
+      // 设置列宽
+      const colWidths = [
+        { wch: 20 }, // 课程名称
+        { wch: 20 }, // 课程别名
+        { wch: 12 }, // 课程程度
+        { wch: 12 }, // 价格
+        { wch: 12 }, // 时长
+        { wch: 30 }, // 课程介绍
+        { wch: 50 }, // 课程描述
+        { wch: 10 }, // 状态
+      ];
+      worksheet['!cols'] = colWidths;
+
+      // 生成文件名
+      const fileName = `课程列表_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.xlsx`;
+
+      // 下载文件
+      XLSX.writeFile(workbook, fileName);
+      toast.success("导出成功", { description: `已导出${courses.length}条课程数据` });
+    } catch (error: any) {
+      toast.error("导出失败", { description: error.message });
+    }
+  };
+
+  // 下载导入模板
+  const handleDownloadTemplate = () => {
+    try {
+      const templateData = [
+        {
+          "课程名称": "示例课程1",
+          "课程别名": "别名1",
+          "课程程度": "入门",
+          "价格(元)": 1000,
+          "时长(小时)": 2,
+          "课程介绍": "这是课程介绍",
+          "课程描述": "这是课程详细描述",
+        },
+        {
+          "课程名称": "示例课程2",
+          "课程别名": "别名2",
+          "课程程度": "深度",
+          "价格(元)": 2000,
+          "时长(小时)": 3,
+          "课程介绍": "",
+          "课程描述": "",
+        },
+      ];
+
+      const worksheet = XLSX.utils.json_to_sheet(templateData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "课程模板");
+
+      // 设置列宽
+      const colWidths = [
+        { wch: 20 },
+        { wch: 20 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 12 },
+        { wch: 30 },
+        { wch: 50 },
+      ];
+      worksheet['!cols'] = colWidths;
+
+      XLSX.writeFile(workbook, "课程导入模板.xlsx");
+      toast.success("模板下载成功", { description: "请按照模板格式填写数据" });
+    } catch (error: any) {
+      toast.error("下载失败", { description: error.message });
+    }
   };
 
   // 批量导入课程
@@ -246,7 +343,7 @@ export default function Courses() {
       }
 
       if (headerRowIndex === -1) {
-        toast.error("错误", { description: "未找到表头行,请确保有“课程名称”列" });
+        toast.error("错误", { description: "未找到表头行,请确保有'课程名称'列" });
         return;
       }
 
@@ -258,9 +355,12 @@ export default function Courses() {
 
         courses.push({
           name: row[0],
-          level: row[1] || "入门",
-          price: parseFloat(row[2]) || 0,
-          duration: parseFloat(row[3]) || 1,
+          alias: row[1] || undefined,
+          level: row[2] || "入门",
+          price: parseFloat(row[3]) || 0,
+          duration: parseFloat(row[4]) || 1,
+          introduction: row[5] || undefined,
+          description: row[6] || undefined,
         });
       }
 
@@ -296,6 +396,10 @@ export default function Courses() {
           <p className="text-muted-foreground mt-1">管理所有课程信息</p>
         </div>
         <div className="flex gap-2">
+          <Button onClick={handleExport} variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            导出课程
+          </Button>
           <Button onClick={() => setIsImportDialogOpen(true)} variant="outline">
             <Upload className="mr-2 h-4 w-4" />
             导入课程
@@ -313,6 +417,7 @@ export default function Courses() {
           <TableHeader>
             <TableRow>
               <TableHead>课程名称</TableHead>
+              <TableHead>课程别名</TableHead>
               <TableHead>课程程度</TableHead>
               <TableHead>价格(元)</TableHead>
               <TableHead>时长(小时)</TableHead>
@@ -332,6 +437,7 @@ export default function Courses() {
               courses.map((course) => (
                 <TableRow key={course.id}>
                   <TableCell className="font-medium">{course.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{course.alias || "-"}</TableCell>
                   <TableCell>
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {course.level || "-"}
@@ -394,6 +500,16 @@ export default function Courses() {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="请输入课程名称"
                   required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="alias">课程别名</Label>
+                <Input
+                  id="alias"
+                  value={formData.alias}
+                  onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
+                  placeholder="请输入课程别名(供前端App显示)"
                 />
               </div>
 
@@ -505,6 +621,12 @@ export default function Courses() {
               <p className="text-sm text-muted-foreground">
                 支持的格式: .xlsx, .xls
               </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleDownloadTemplate} variant="outline" className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                下载导入模板
+              </Button>
             </div>
           </div>
           <DialogFooter>
