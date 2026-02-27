@@ -350,13 +350,7 @@ export const bookingRouter = router({
       const endDateTime = new Date(bookingDateTime.getTime() + totalDuration * 60 * 60 * 1000);
       const endTime = `${String(endDateTime.getHours()).padStart(2, '0')}:${String(endDateTime.getMinutes()).padStart(2, '0')}`;
 
-      // 检查结束时间是否超过23:00
-      if (endDateTime.getHours() >= 23 || (endDateTime.getHours() === 23 && endDateTime.getMinutes() > 0)) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: `课程结束时间（${endTime}）超过23:00，请调整预约时间或减少课程数量`,
-        });
-      }
+      // 结束时间允许超过23:00，不需要校验
 
       // 3. 自动分配教室（如果未指定）
       let finalClassroomId = classroomId;

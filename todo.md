@@ -5189,4 +5189,20 @@
 - [x] 在导出和导入逻辑中添加isHot字段支持
 - [x] 生成完整的课程API文档v1.1（包含isHot和alias字段说明）
 - [x] 测试验证热门列显示和开关功能
+- [x] 保存checkpoint
+
+### 157. 修复预约时间校验逻辑，允许课程恰好在23:00结束
+- [ ] 查找booking.getAvailableSlots的代码位置
+- [ ] 查找booking.create的代码位置
+- [ ] 修改getAvailableSlots中的时间过滤逻辑，将 endTime >= "23:00" 改为 endTime > "23:00"
+- [ ] 修改create中的时间校验逻辑，将 endTime >= "23:00" 改为 endTime > "23:00"
+- [ ] 测试验证21:00开始+2小时课程（结束时间23:00）可以正常预约
+- [ ] 保存checkpoint
+
+### 157. 修复预约时间校验逻辑，允许结束时间超过23:00
+- [x] 查找booking router中getAvailableSlots的代码
+- [x] 查找booking router中create的代码
+- [x] 确认getAvailableSlots已经正确：开始时间最晚23:00，结束时间无限制
+- [x] 删除create中对结束时间的校验，允许结束时间超过23:00
+- [x] 修改原则：开始时间最晚23:00，结束时间可以是任意时间
 - [ ] 保存checkpoint
