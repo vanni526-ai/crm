@@ -1302,58 +1302,54 @@ export const appRouter = router({
 
           const sheet = workbook.addWorksheet("订单列表");
 
-          // 设置表头
+          // 设置表头 - 按照用户要求的字段顺序
           sheet.columns = [
-            { header: "订单号", key: "orderNo", width: 20 },
             { header: "销售人", key: "salesPerson", width: 12 },
             { header: "流量来源", key: "trafficSource", width: 15 },
-            { header: "客户名", key: "customerName", width: 15 },
-            { header: "支付金额", key: "paymentAmount", width: 12 },
+            { header: "客户微信号", key: "customerWechat", width: 15 },
             { header: "课程金额", key: "courseAmount", width: 12 },
             { header: "账户余额", key: "accountBalance", width: 12 },
-            { header: "支付城市", key: "paymentCity", width: 12 },
-            { header: "渠道订单号", key: "channelOrderNo", width: 25 },
             { header: "老师费用", key: "teacherFee", width: 12 },
             { header: "车费", key: "transportFee", width: 10 },
             { header: "其他费用", key: "otherFee", width: 12 },
-            { header: "合伙人费", key: "partnerFee", width: 12 },
-            { header: "金串到账金额", key: "finalAmount", width: 15 },
+            { header: "合伙人费用", key: "partnerFee", width: 12 },
+            { header: "支付渠道", key: "paymentChannel", width: 15 },
+            { header: "订单号", key: "orderNo", width: 20 },
             { header: "支付日期", key: "paymentDate", width: 12 },
             { header: "支付时间", key: "paymentTime", width: 12 },
+            { header: "上课日期", key: "classDate", width: 12 },
+            { header: "上课时间", key: "classTime", width: 12 },
             { header: "交付城市", key: "deliveryCity", width: 12 },
             { header: "交付教室", key: "deliveryRoom", width: 20 },
             { header: "交付老师", key: "deliveryTeacher", width: 15 },
             { header: "交付课程", key: "deliveryCourse", width: 20 },
-            { header: "上课日期", key: "classDate", width: 12 },
-            { header: "上课时间", key: "classTime", width: 12 },
+            { header: "状态", key: "status", width: 12 },
             { header: "备注", key: "notes", width: 30 },
           ];
 
           // 填充数据
           orders.forEach((order: any) => {
             sheet.addRow({
-              orderNo: order.orderNo || "",
               salesPerson: order.salesPerson || "",
               trafficSource: order.trafficSource || "",
-              customerName: order.customerName || "",
-              paymentAmount: order.paymentAmount || "",
+              customerWechat: "", // TODO: 需要从 customers 表查询微信号
               courseAmount: order.courseAmount || "",
               accountBalance: order.accountBalance || "",
-              paymentCity: order.paymentCity || "",
-              channelOrderNo: order.channelOrderNo || "",
               teacherFee: order.teacherFee || "",
               transportFee: order.transportFee || "",
               otherFee: order.otherFee || "",
               partnerFee: order.partnerFee || "",
-              finalAmount: order.finalAmount || "",
-              paymentDate: order.paymentDate || "",
+              paymentChannel: order.paymentChannel || "",
+              orderNo: order.orderNo || "",
+              paymentDate: order.paymentDate ? formatDateBeijing(order.paymentDate) : "",
               paymentTime: order.paymentTime || "",
+              classDate: order.classDate ? formatDateBeijing(order.classDate) : "",
+              classTime: order.classTime || "",
               deliveryCity: order.deliveryCity || "",
               deliveryRoom: order.deliveryRoom || "",
               deliveryTeacher: order.deliveryTeacher || "",
               deliveryCourse: order.deliveryCourse || "",
-              classDate: order.classDate ? formatDateBeijing(order.classDate) : "",
-              classTime: order.classTime || "",
+              status: order.status || "",
               notes: order.notes || "",
             });
           });
@@ -1382,6 +1378,97 @@ export const appRouter = router({
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
             message: "导出Excel失败",
+          });
+        }
+      }),
+
+    // 下载导入模板
+    downloadTemplate: protectedProcedure
+      .mutation(async () => {
+        try {
+          const ExcelJS = (await import("exceljs")).default;
+          
+          // 创建Excel工作簿
+          const workbook = new ExcelJS.Workbook();
+          workbook.creator = "课程交付CRM系统";
+          workbook.created = new Date();
+
+          const sheet = workbook.addWorksheet("订单导入模板");
+
+          // 设置表头
+          sheet.columns = [
+            { header: "销售人", key: "salesPerson", width: 12 },
+            { header: "流量来源", key: "trafficSource", width: 15 },
+            { header: "客户微信号", key: "customerWechat", width: 15 },
+            { header: "课程金额", key: "courseAmount", width: 12 },
+            { header: "账户余额", key: "accountBalance", width: 12 },
+            { header: "老师费用", key: "teacherFee", width: 12 },
+            { header: "车费", key: "transportFee", width: 10 },
+            { header: "其他费用", key: "otherFee", width: 12 },
+            { header: "合伙人费用", key: "partnerFee", width: 12 },
+            { header: "支付渠道", key: "paymentChannel", width: 15 },
+            { header: "订单号", key: "orderNo", width: 20 },
+            { header: "支付日期", key: "paymentDate", width: 12 },
+            { header: "支付时间", key: "paymentTime", width: 12 },
+            { header: "上课日期", key: "classDate", width: 12 },
+            { header: "上课时间", key: "classTime", width: 12 },
+            { header: "交付城市", key: "deliveryCity", width: 12 },
+            { header: "交付教室", key: "deliveryRoom", width: 20 },
+            { header: "交付老师", key: "deliveryTeacher", width: 15 },
+            { header: "交付课程", key: "deliveryCourse", width: 20 },
+            { header: "状态", key: "status", width: 12 },
+            { header: "备注", key: "notes", width: 30 },
+          ];
+
+          // 添加示例数据行
+          sheet.addRow({
+            salesPerson: "张三",
+            trafficSource: "微信朋友圈",
+            customerWechat: "wx123456",
+            courseAmount: "1000",
+            accountBalance: "0",
+            teacherFee: "300",
+            transportFee: "50",
+            otherFee: "0",
+            partnerFee: "100",
+            paymentChannel: "微信",
+            orderNo: "20240227001",
+            paymentDate: "2024-02-27",
+            paymentTime: "14:30",
+            classDate: "2024-02-28",
+            classTime: "14:00-16:00",
+            deliveryCity: "深圳",
+            deliveryRoom: "福田店",
+            deliveryTeacher: "李四",
+            deliveryCourse: "BDSM基础课",
+            status: "paid",
+            notes: "示例数据",
+          });
+
+          // 设置表头样式
+          sheet.getRow(1).font = { bold: true };
+          sheet.getRow(1).fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFE0E0E0" },
+          };
+
+          // 生成Excel文件的Buffer
+          const buffer = await workbook.xlsx.writeBuffer();
+
+          // 将Buffer转换为Base64字符串
+          const base64 = Buffer.from(buffer).toString("base64");
+
+          return {
+            success: true,
+            data: base64,
+            filename: `订单导入模板.xlsx`,
+          };
+        } catch (error) {
+          console.error("下载模板失败:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "下载模板失败",
           });
         }
       }),

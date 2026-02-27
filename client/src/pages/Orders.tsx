@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Plus, Search, Eye, Edit, Trash2, Download, Upload, UserPlus, Wrench } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { SmartRegisterDialog } from "@/components/SmartRegisterDialog";
+
 import { useForm } from "react-hook-form";
 import { formatDateBJ, formatDateTimeBJ } from "@/lib/timezone";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -175,7 +175,7 @@ export default function Orders() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [smartRegisterOpen, setSmartRegisterOpen] = useState(false);
+
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -562,8 +562,8 @@ export default function Orders() {
         headers[colNumber] = cell.text;
       });
 
-      // 验证表头
-      const requiredHeaders = ["订单号", "客户名", "支付金额", "课程金额"];
+      // 验证表头 - 只需要订单号和课程金额为必填
+      const requiredHeaders = ["订单号", "课程金额"];
       const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
       if (missingHeaders.length > 0) {
         toast.error(`缺少必要字段: ${missingHeaders.join(", ")}`);
@@ -586,19 +586,17 @@ export default function Orders() {
         if (rowData["订单号"]) {
           orders.push({
             orderNo: rowData["订单号"],
-            customerName: rowData["客户名"],
+            customerName: rowData["客户微信号"] || "", // 使用微信号作为客户名
             salesPerson: rowData["销售人"],
             trafficSource: rowData["流量来源"],
-            paymentAmount: rowData["支付金额"],
+            paymentAmount: rowData["课程金额"], // 使用课程金额作为支付金额
             courseAmount: rowData["课程金额"],
             accountBalance: rowData["账户余额"],
-            paymentCity: rowData["支付城市"],
-            channelOrderNo: rowData["渠道订单号"],
+            paymentChannel: rowData["支付渠道"],
             teacherFee: rowData["老师费用"],
             transportFee: rowData["车费"],
             otherFee: rowData["其他费用"],
-            partnerFee: rowData["合伙人费"],
-            finalAmount: rowData["金串到账金额"],
+            partnerFee: rowData["合伙人费用"],
             paymentDate: rowData["支付日期"],
             paymentTime: rowData["支付时间"],
             deliveryCity: rowData["交付城市"],
@@ -607,6 +605,7 @@ export default function Orders() {
             deliveryCourse: rowData["交付课程"],
             classDate: rowData["上课日期"],
             classTime: rowData["上课时间"],
+            status: rowData["状态"],
             notes: rowData["备注"],
           });
         }
@@ -621,26 +620,40 @@ export default function Orders() {
       // 获取所有老师名列表
       const teacherNames = await utils.teachers.getAllTeacherNames.fetch() || [];
       
-      // 批量创建订单
+      // 获取所有订单用于检查是否已存在
+      const allOrders = await utils.orders.list.fetch();
+      const existingOrderMap = new Map(allOrders?.map(o => [o.orderNo, o.id]) || []);
+      
+      // 批量创建/更新订单
       let successCount = 0;
+      let updateCount = 0;
       let failCount = 0;
       for (const order of orders) {
         try {
           // 如果客户名是老师名，则留空
           if (order.customerName && teacherNames.includes(order.customerName.trim())) {
-            console.log(`[Excel导入] 检测到客户名"${order.customerName}"是老师名，已留空`);
+            console.log(`[Excel导入] 检测到客户名“${order.customerName}”是老师名，已留空`);
             order.customerName = '';
           }
           
-          await createOrder.mutateAsync(order);
-          successCount++;
+          // 检查订单号是否已存在
+          const existingOrderId = existingOrderMap.get(order.orderNo);
+          if (existingOrderId) {
+            // 更新已存在的订单
+            await updateOrder.mutateAsync({ id: existingOrderId, ...order });
+            updateCount++;
+          } else {
+            // 创建新订单
+            await createOrder.mutateAsync(order);
+            successCount++;
+          }
         } catch (error) {
           failCount++;
           console.error(`导入订单 ${order.orderNo} 失败:`, error);
         }
       }
 
-      toast.success(`导入完成! 成功: ${successCount} 条, 失败: ${failCount} 条`);
+      toast.success(`导入完成! 新增: ${successCount} 条, 更新: ${updateCount} 条, 失败: ${failCount} 条`);
       setImportOpen(false);
       setImportFile(null);
       utils.orders.list.invalidate();
@@ -653,6 +666,43 @@ export default function Orders() {
   };
 
   const exportMutation = trpc.orders.exportExcel.useMutation();
+
+  const templateMutation = trpc.orders.downloadTemplate.useMutation();
+
+  // 下载导入模板
+  const handleDownloadTemplate = async () => {
+    try {
+      const result = await templateMutation.mutateAsync();
+      
+      if (result.success && result.data) {
+        // 将Base64转换为Blob
+        const byteCharacters = atob(result.data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+
+        // 下载文件
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = result.filename || "订单导入模板.xlsx";
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        toast.success("模板下载成功");
+      } else {
+        toast.error("模板下载失败");
+      }
+    } catch (error) {
+      console.error("下载模板失败:", error);
+      toast.error("下载模板失败,请重试");
+    }
+  };
 
   const handleExport = async () => {
     const ordersToExport = getFilteredOrdersByTimeRange();
@@ -713,6 +763,10 @@ export default function Orders() {
             <p className="text-muted-foreground mt-1">查看和管理所有客户订单</p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={handleDownloadTemplate}>
+              <Download className="mr-2 h-4 w-4" />
+              下载导入模板
+            </Button>
             <Button variant="outline" onClick={() => setImportOpen(true)}>
               <Upload className="mr-2 h-4 w-4" />
               导入订单
@@ -721,15 +775,6 @@ export default function Orders() {
               <Download className="mr-2 h-4 w-4" />
               导出订单
             </Button>
-            <Button variant="outline" onClick={() => setSmartRegisterOpen(true)}>
-              <Upload className="mr-2 h-4 w-4" />
-              智能登记
-            </Button>
-            <Button variant="outline" onClick={() => window.location.href = '/data-cleaning'}>
-              <Wrench className="mr-2 h-4 w-4" />
-              数据清洗
-            </Button>
-
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               新建订单
@@ -2119,15 +2164,7 @@ export default function Orders() {
           </DialogContent>
         </Dialog>
 
-        {/* 智能登记对话框 */}
-        <SmartRegisterDialog 
-          open={smartRegisterOpen} 
-          onOpenChange={setSmartRegisterOpen}
-          onSuccess={() => {
-            utils.orders.list.invalidate();
-            setSmartRegisterOpen(false);
-          }}
-        />
+
 
         {/* 学习记录对话框 */}
         <Dialog open={learnRecordOpen} onOpenChange={setLearnRecordOpen}>
