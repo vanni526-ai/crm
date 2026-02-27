@@ -28,7 +28,7 @@ const teacherSchema = z.object({
   name: z.string().optional(), // 编辑时disabled，不参与validation
   phone: z.string().optional(), // 编辑时disabled，不参与validation
   status: z.string().optional(), // 编辑时disabled，不参与validation
-  teacherAttribute: z.enum(["S", "M", "Switch"], { message: "请选择老师属性" }).optional(),
+  teacherAttribute: z.enum(["S", "M", "Switch"]).optional().or(z.literal("")),
   customerType: z.string().optional(),
   notes: z.string().optional(),
   category: z.string().optional(),
@@ -240,7 +240,7 @@ export default function Teachers() {
       customerType: data.customerType,
       aliases: data.aliases,
       notes: data.notes,
-      teacherAttribute: data.teacherAttribute === "未设置" ? undefined : (data.teacherAttribute as "S" | "M" | "Switch" | undefined),
+      teacherAttribute: data.teacherAttribute || undefined,
       contractEndDate: data.contractEndDate ? new Date(data.contractEndDate) : undefined,
       joinDate: data.joinDate ? new Date(data.joinDate) : undefined,
     };

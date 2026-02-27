@@ -192,10 +192,7 @@ export default function Sales() {
           aValue = a.commissionRate || 0;
           bValue = b.commissionRate || 0;
           break;
-        case "city":
-          aValue = a.city || "";
-          bValue = b.city || "";
-          break;
+
         case "name":
           aValue = a.name || "";
           bValue = b.name || "";
@@ -273,7 +270,7 @@ export default function Sales() {
     }
 
     // 创建CSV内容
-    const headers = ["姓名", "花名", "电话", "邮箱", "微信号", "提成比例(%)", "城市", "状态", "备注"];
+    const headers = ["姓名", "花名", "电话", "邮箱", "微信号", "提成比例(%)", "状态", "备注"];
     const rows = salespersons.map(sp => [
       sp.name || "",
       sp.nickname || "",
@@ -281,7 +278,6 @@ export default function Sales() {
       sp.email || "",
       sp.wechat || "",
       sp.commissionRate || "",
-      sp.city || "",
       sp.isActive ? "在职" : "离职",
       sp.notes || ""
     ]);
@@ -496,12 +492,7 @@ export default function Sales() {
               >
                 提成比例{getSortIcon("commissionRate")}
               </TableHead>
-              <TableHead 
-                className="cursor-pointer hover:bg-muted/50"
-                onClick={() => handleSort("city")}
-              >
-                城市{getSortIcon("city")}
-              </TableHead>
+
               <TableHead 
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => handleSort("orderCount")}
@@ -539,7 +530,7 @@ export default function Sales() {
                   <TableCell>{sp.phone || "-"}</TableCell>
                   <TableCell>{sp.wechat || "-"}</TableCell>
                   <TableCell>{sp.commissionRate ? `${sp.commissionRate}%` : "-"}</TableCell>
-                  <TableCell>{sp.city || "-"}</TableCell>
+
                   <TableCell>{sp.orderCount || 0}</TableCell>
                   <TableCell>¥{sp.totalAmount?.toFixed(2) || "0.00"}</TableCell>
                   <TableCell>
@@ -647,14 +638,7 @@ export default function Sales() {
                   defaultValue={editingSalesperson?.commissionRate}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="city">城市</Label>
-                <Input
-                  id="city"
-                  name="city"
-                  defaultValue={editingSalesperson?.city}
-                />
-              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="notes">备注</Label>
                 <Input

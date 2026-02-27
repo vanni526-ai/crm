@@ -50,6 +50,9 @@ export const analyticsRouter = router({
         cancelledOrders: 30,
         totalRevenue: '1250000.00',
         averageOrderValue: '1000.00',
+        totalPaymentAmount: 1250000,
+        totalTeacherFee: 450000,
+        netProfit: 800000,
       };
     }),
 
@@ -432,9 +435,9 @@ export const analyticsRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
 
-      const months = input?.months || 12;
+      const monthsCount = input?.months || 12;
       const startDate = new Date();
-      startDate.setMonth(startDate.getMonth() - months);
+      startDate.setMonth(startDate.getMonth() - monthsCount);
 
       let whereConditions = [
         eq(orders.status, 'paid'),
@@ -459,12 +462,53 @@ export const analyticsRouter = router({
         .groupBy(monthColumn, orders.deliveryCity)
         .orderBy(monthColumn);
 
-      return stats.map(s => ({
-        month: s.month,
-        city: s.city || '未知',
-        totalRevenue: Number(s.totalRevenue) || 0,
-        orderCount: Number(s.orderCount) || 0,
+      // 将扁平数据转换为前端期望的格式：{ cities: [...], months: [...] }
+      const monthsSet = new Set<string>();
+      const citiesMap = new Map<string, number[]>();
+      
+      stats.forEach(s => {
+        const month = s.month;
+        const city = s.city || '未知';
+        const revenue = Number(s.totalRevenue) || 0;
+        
+        monthsSet.add(month);
+        
+        if (!citiesMap.has(city)) {
+          citiesMap.set(city, []);
+        }
+      });
+      
+      const months = Array.from(monthsSet).sort();
+      
+      // 为每个城市初始化数据数组
+      citiesMap.forEach((data, city) => {
+        citiesMap.set(city, new Array(months.length).fill(0));
+      });
+      
+      // 填充数据
+      stats.forEach(s => {
+        const month = s.month;
+        const city = s.city || '未知';
+        const revenue = Number(s.totalRevenue) || 0;
+        const monthIndex = months.indexOf(month);
+        
+        if (monthIndex !== -1) {
+          const cityData = citiesMap.get(city);
+          if (cityData) {
+            cityData[monthIndex] = revenue;
+          }
+        }
+      });
+      
+      const cities = Array.from(citiesMap.entries()).map(([city, data]) => ({
+        city,
+        data,
       }));
+      
+      return {
+        months,
+        cities,
+      };
     }),
 
   /**

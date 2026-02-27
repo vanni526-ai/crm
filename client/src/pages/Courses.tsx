@@ -129,6 +129,7 @@ export default function Courses() {
       price: "",
       duration: "",
       level: "入门",
+      isHot: 0,
     });
     setIsDialogOpen(true);
   };
@@ -144,6 +145,7 @@ export default function Courses() {
       price: course.price || "",
       duration: course.duration || "",
       level: course.level || "入门",
+      isHot: course.isHot || 0,
     });
     setIsDialogOpen(true);
   };
@@ -160,6 +162,7 @@ export default function Courses() {
       price: "",
       duration: "",
       level: "入门",
+      isHot: 0,
     });
   };
 

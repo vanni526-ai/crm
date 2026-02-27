@@ -1643,7 +1643,7 @@ export default function Orders() {
                           // 自动填充salesPerson字段
                           const sp = salespersons?.find(s => s.id === id);
                           if (sp) {
-                            setValue("salesPerson", sp.nickname || sp.name);
+                            setValue("salesPerson", sp.nickname || sp.name || undefined);
                           }
                         }}
                       >
@@ -1920,7 +1920,7 @@ export default function Orders() {
                           // 自动填充salesPerson字段
                           const sp = salespersons?.find(s => s.id === id);
                           if (sp) {
-                            setValue("salesPerson", sp.nickname || sp.name);
+                            setValue("salesPerson", sp.nickname || sp.name || undefined);
                           }
                         }}
                       >

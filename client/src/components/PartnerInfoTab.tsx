@@ -44,20 +44,21 @@ export default function PartnerInfoTab({ partnerId }: PartnerInfoTabProps) {
       setUploading(false);
       setUploadingSide(null);
       
-      if (data.ocr) {
+      if ((data as any).ocr) {
+        const ocrData = (data as any).ocr;
         // 正面识别成功，自动填充姓名和身份证号
-        if (data.ocr.success) {
+        if (ocrData.success) {
           toast.success("身份证识别成功");
           // 自动保存识别结果
           updateMutation.mutate({
             id: partnerId,
-            name: data.ocr.name,
-            idCardNumber: data.ocr.idCardNumber,
+            name: ocrData.name,
+            idCardNumber: ocrData.idCardNumber,
             idCardFrontUrl: variables.side === "front" ? data.url : partner?.idCardFrontUrl || undefined,
             idCardBackUrl: variables.side === "back" ? data.url : partner?.idCardBackUrl || undefined,
           });
         } else {
-          toast.warning(`识别失败: ${data.ocr.error}，请手动填写`);
+          toast.warning(`识别失败: ${ocrData.error}，请手动填写`);
           // 只保存照片URL
           updateMutation.mutate({
             id: partnerId,

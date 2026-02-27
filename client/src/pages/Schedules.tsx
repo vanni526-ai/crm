@@ -66,27 +66,9 @@ export default function Schedules() {
   const utils = trpc.useUtils();
   const { data: schedules, isLoading } = trpc.schedules.listWithOrderInfo.useQuery();
 
-  const createSchedule = trpc.schedules.create.useMutation({
-    onSuccess: () => {
-      utils.schedules.listWithOrderInfo.invalidate();
-      toast.success("排课创建成功");
-      setCreateOpen(false);
-      reset();
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "创建失败");
-    },
-  });
-
-  const deleteSchedule = trpc.schedules.delete.useMutation({
-    onSuccess: () => {
-      utils.schedules.listWithOrderInfo.invalidate();
-      toast.success("排课删除成功");
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "删除失败");
-    },
-  });
+  // 注意：schedules表的数据是从orders表自动生成的
+  // 不支持直接创建或删除schedules记录
+  // 如需修改排课信息，请通过订单管理页面操作
 
   const [createOpen, setCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -101,44 +83,11 @@ export default function Schedules() {
   });
 
   const onCreateSubmit = (data: ScheduleFormData) => {
-    createSchedule.mutate({
-      customerName: data.customerName,
-      wechatId: data.wechatId,
-      salesName: data.salesName,
-      trafficSource: data.trafficSource,
-      paymentAmount: data.paymentAmount,
-      courseAmount: data.courseAmount,
-      accountBalance: data.accountBalance,
-      paymentCity: data.paymentCity,
-      channelOrderNo: data.channelOrderNo,
-      overflowOrderNo: data.overflowOrderNo,
-      refundNo: data.refundNo,
-      paymentDate: data.paymentDate ? new Date(data.paymentDate) : undefined,
-      paymentTime: data.paymentTime,
-      teacherFee: data.teacherFee,
-      transportFee: data.transportFee,
-      otherFee: data.otherFee,
-      partnerFee: data.partnerFee,
-      receivedAmount: data.receivedAmount,
-      deliveryCity: data.deliveryCity,
-      deliveryClassroom: data.deliveryClassroom,
-      deliveryTeacher: data.deliveryTeacher,
-      deliveryCourse: data.deliveryCourse,
-      teacherName: data.teacherName,
-      courseType: data.courseType,
-      classDate: data.classDate ? new Date(data.classDate) : undefined,
-      classTime: data.classTime,
-      startTime: new Date(data.startTime),
-      endTime: new Date(data.endTime),
-      location: data.location,
-      notes: data.notes,
-    });
+    toast.error("排课记录由订单自动生成，请到订单管理页面创建订单");
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("确定要删除这条排课记录吗?")) {
-      deleteSchedule.mutate({ id });
-    }
+    toast.error("排课记录由订单自动生成，请到订单管理页面修改或删除订单");
   };
 
   // 过滤排课数据
@@ -531,8 +480,8 @@ export default function Schedules() {
                 <Button type="button" variant="outline" onClick={() => setCreateOpen(false)}>
                   取消
                 </Button>
-                <Button type="submit" disabled={createSchedule.isPending}>
-                  {createSchedule.isPending ? "创建中..." : "创建"}
+                <Button type="submit">
+                  创建
                 </Button>
               </DialogFooter>
             </form>

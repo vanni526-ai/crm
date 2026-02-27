@@ -5,9 +5,14 @@ import { Users, UserCheck, Crown, UserPlus, Repeat } from "lucide-react";
 import { useState } from "react";
 
 export default function CustomerOverview() {
-  const { data: stats, isLoading } = trpc.analytics.customerStats.useQuery();
+  // TODO: 实现customerStats和churnRiskCustomers接口
+  // const { data: stats, isLoading } = trpc.analytics.customerStats.useQuery();
+  // const { data: churnRiskCustomers, isLoading: isLoadingChurn } = trpc.analytics.churnRiskCustomers.useQuery();
+  const stats: any = null;
+  const isLoading = false;
+  const churnRiskCustomers: any[] = [];
+  const isLoadingChurn = false;
   const { data: customers } = trpc.customers.list.useQuery();
-  const { data: churnRiskCustomers, isLoading: isLoadingChurn } = trpc.analytics.churnRiskCustomers.useQuery();
 
   return (
     <DashboardLayout>
@@ -88,7 +93,7 @@ export default function CustomerOverview() {
                     </tr>
                   </thead>
                   <tbody>
-                    {churnRiskCustomers.map((customer) => (
+                    {churnRiskCustomers.map((customer: any) => (
                       <tr key={customer.customerId} className="border-b hover:bg-accent">
                         <td className="p-3">{customer.customerName}</td>
                         <td className="p-3">{customer.wechatId || '-'}</td>

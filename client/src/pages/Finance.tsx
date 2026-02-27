@@ -1076,7 +1076,7 @@ export default function Finance() {
                       </div>
                       <div className="text-right">
                         <div className="text-lg font-bold text-green-600">
-                          ¥{parseFloat(city.revenue).toLocaleString()}
+                          ¥{parseFloat(String(city.totalRevenue)).toLocaleString()}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {city.city === '天津' && '50%分配'}

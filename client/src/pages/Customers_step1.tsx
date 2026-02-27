@@ -706,7 +706,7 @@ function CustomerDetailDialog({
   const { data: orders } = trpc.orders.list.useQuery(undefined, {
     enabled: open && !!customer,
   });
-  const { data: schedules } = trpc.schedules.list.useQuery(undefined, {
+  const { data: schedules } = trpc.schedules.listWithOrderInfo.useQuery(undefined, {
     enabled: open && !!customer,
   });
   // const { data: transactions } = trpc.customers.getTransactions.useQuery(
@@ -720,7 +720,7 @@ function CustomerDetailDialog({
   const customerOrders = orders?.filter((order) => 
     order.customerId === customer.id || order.customerName === customer.name
   ) || [];
-  const customerSchedules = schedules?.filter((schedule) => schedule.customerId === customer.id) || [];
+  const customerSchedules = schedules?.filter((schedule: any) => schedule.customerId === customer.id) || [];
 
   const totalSpent = customerOrders.reduce(
     (sum, order) => sum + parseFloat(order.paymentAmount || "0"),
