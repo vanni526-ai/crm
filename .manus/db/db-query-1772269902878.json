@@ -1,0 +1,332 @@
+{
+  "query": "\nSELECT \n  TABLE_NAME,\n  TABLE_ROWS,\n  CREATE_TIME,\n  UPDATE_TIME,\n  TABLE_COMMENT\nFROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE()\nORDER BY TABLE_NAME;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  TABLE_NAME,\n  TABLE_ROWS,\n  CREATE_TIME,\n  UPDATE_TIME,\n  TABLE_COMMENT\nFROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE()\nORDER BY TABLE_NAME;\n",
+  "rows": [
+    {
+      "TABLE_NAME": "__drizzle_migrations",
+      "TABLE_ROWS": "17",
+      "CREATE_TIME": "2025-12-17 06:13:06",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "accountAuditLogs",
+      "TABLE_ROWS": "4",
+      "CREATE_TIME": "2026-01-28 02:13:19",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "accountPermissions",
+      "TABLE_ROWS": "44",
+      "CREATE_TIME": "2026-01-28 02:13:26",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "accountTransactions",
+      "TABLE_ROWS": "26",
+      "CREATE_TIME": "2025-12-17 16:45:55",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "TABLE_ROWS": "24",
+      "CREATE_TIME": "2025-12-18 03:56:59",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "cities",
+      "TABLE_ROWS": "21",
+      "CREATE_TIME": "2026-02-04 05:22:18",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "cityPartnerConfig",
+      "TABLE_ROWS": "19",
+      "CREATE_TIME": "2026-02-13 10:48:05",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "city_monthly_expenses",
+      "TABLE_ROWS": "15",
+      "CREATE_TIME": "2026-02-12 09:22:48",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "classrooms",
+      "TABLE_ROWS": "23",
+      "CREATE_TIME": "2026-02-24 04:58:32",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "courses",
+      "TABLE_ROWS": "28",
+      "CREATE_TIME": "2026-02-27 08:26:03",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "customers",
+      "TABLE_ROWS": "447",
+      "CREATE_TIME": "2026-02-22 18:02:20",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "fieldMappings",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2025-12-21 03:34:56",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "gmailImportConfig",
+      "TABLE_ROWS": "2",
+      "CREATE_TIME": "2025-12-19 04:03:49",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2025-12-20 05:12:19",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "gmailImportLogs",
+      "TABLE_ROWS": "139",
+      "CREATE_TIME": "2026-01-07 10:27:11",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "gmail_error_feedback",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2025-12-19 04:42:45",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "gmail_import_config",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2025-12-19 05:28:10",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "importLogs",
+      "TABLE_ROWS": "21",
+      "CREATE_TIME": "2025-12-17 06:23:34",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "matchedScheduleOrders",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2026-01-07 11:20:46",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "membershipConfig",
+      "TABLE_ROWS": "1",
+      "CREATE_TIME": "2026-02-19 04:38:05",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "membershipOrders",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2026-02-28 04:42:58",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "membershipPlans",
+      "TABLE_ROWS": "3",
+      "CREATE_TIME": "2026-02-28 04:42:47",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "order_items",
+      "TABLE_ROWS": "2",
+      "CREATE_TIME": "2026-02-24 04:58:49",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": "订单明细表"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "TABLE_ROWS": "399",
+      "CREATE_TIME": "2026-02-18 18:51:01",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "parsingCorrections",
+      "TABLE_ROWS": "65",
+      "CREATE_TIME": "2025-12-23 04:51:43",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "parsingLearningConfig",
+      "TABLE_ROWS": "2",
+      "CREATE_TIME": "2025-12-22 05:42:44",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "partnerFeeAuditLogs",
+      "TABLE_ROWS": "5",
+      "CREATE_TIME": "2026-01-16 09:54:29",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "partner_cities",
+      "TABLE_ROWS": "18",
+      "CREATE_TIME": "2026-02-12 10:36:50",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "TABLE_ROWS": "1",
+      "CREATE_TIME": "2026-02-12 09:09:31",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "partner_profit_records",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2026-02-10 06:17:10",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "partners",
+      "TABLE_ROWS": "18",
+      "CREATE_TIME": "2026-02-12 04:40:57",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "promptOptimizationHistory",
+      "TABLE_ROWS": "22",
+      "CREATE_TIME": "2025-12-22 04:48:35",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "reconciliations",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2025-12-17 06:23:41",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "sales_commission_configs",
+      "TABLE_ROWS": "4",
+      "CREATE_TIME": "2026-02-06 10:46:49",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "salespersons",
+      "TABLE_ROWS": "18",
+      "CREATE_TIME": "2026-02-26 07:14:39",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "TABLE_ROWS": "413",
+      "CREATE_TIME": "2026-02-25 08:44:19",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "smartRegisterHistory",
+      "TABLE_ROWS": "29",
+      "CREATE_TIME": "2025-12-17 17:34:11",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "TABLE_ROWS": "7",
+      "CREATE_TIME": "2026-02-19 04:37:05",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "system_tokens",
+      "TABLE_ROWS": "1",
+      "CREATE_TIME": "2026-02-23 02:43:33",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "teacherPayments",
+      "TABLE_ROWS": "16",
+      "CREATE_TIME": "2026-02-08 14:54:23",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "teacher_unavailability",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2026-02-24 04:58:40",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": "老师不接客时段表"
+    },
+    {
+      "TABLE_NAME": "teachers",
+      "TABLE_ROWS": "64",
+      "CREATE_TIME": "2026-02-13 07:07:25",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_deletion_logs",
+      "TABLE_ROWS": "0",
+      "CREATE_TIME": "2026-02-27 02:54:51",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": "用户注销审计日志表"
+    },
+    {
+      "TABLE_NAME": "user_notifications",
+      "TABLE_ROWS": "77",
+      "CREATE_TIME": "2026-02-06 09:19:04",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "user_role_cities",
+      "TABLE_ROWS": "134",
+      "CREATE_TIME": "2026-02-09 08:33:55",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    },
+    {
+      "TABLE_NAME": "users",
+      "TABLE_ROWS": "134",
+      "CREATE_TIME": "2026-02-27 02:54:50",
+      "UPDATE_TIME": "NULL",
+      "TABLE_COMMENT": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\tTABLE_ROWS\tCREATE_TIME\tUPDATE_TIME\tTABLE_COMMENT\n__drizzle_migrations\t17\t2025-12-17 06:13:06\tNULL\t\naccountAuditLogs\t4\t2026-01-28 02:13:19\tNULL\t\naccountPermissions\t44\t2026-01-28 02:13:26\tNULL\t\naccountTransactions\t26\t2025-12-17 16:45:55\tNULL\t\nauditLogs\t24\t2025-12-18 03:56:59\tNULL\t\ncities\t21\t2026-02-04 05:22:18\tNULL\t\ncityPartnerConfig\t19\t2026-02-13 10:48:05\tNULL\t\ncity_monthly_expenses\t15\t2026-02-12 09:22:48\tNULL\t\nclassrooms\t23\t2026-02-24 04:58:32\tNULL\t\ncourses\t28\t2026-02-27 08:26:03\tNULL\t\ncustomers\t447\t2026-02-22 18:02:20\tNULL\t\nfieldMappings\t0\t2025-12-21 03:34:56\tNULL\t\ngmailImportConfig\t2\t2025-12-19 04:03:49\tNULL\t\ngmailImportHistory\t0\t2025-12-20 05:12:19\tNULL\t\ngmailImportLogs\t139\t2026-01-07 10:27:11\tNULL\t\ngmail_error_feedback\t0\t2025-12-19 04:42:45\tNULL\t\ngmail_import_config\t0\t2025-12-19 05:28:10\tNULL\t\nimportLogs\t21\t2025-12-17 06:23:34\tNULL\t\nmatchedScheduleOrders\t0\t2026-01-07 11:20:46\tNULL\t\nmembershipConfig\t1\t2026-02-19 04:38:05\tNULL\t\nmembershipOrders\t0\t2026-02-28 04:42:58\tNULL\t\nmembershipPlans\t3\t2026-02-28 04:42:47\tNULL\t\norder_items\t2\t2026-02-24 04:58:49\tNULL\t订单明细表\norders\t399\t2026-02-18 18:51:01\tNULL\t\nparsingCorrections\t65\t2025-12-23 04:51:43\tNULL\t\nparsingLearningConfig\t2\t2025-12-22 05:42:44\tNULL\t\npartnerFeeAuditLogs\t5\t2026-01-16 09:54:29\tNULL\t\npartner_cities\t18\t2026-02-12 10:36:50\tNULL\t\npartner_expenses\t1\t2026-02-12 09:09:31\tNULL\t\npartner_profit_records\t0\t2026-02-10 06:17:10\tNULL\t\npartners\t18\t2026-02-12 04:40:57\tNULL\t\npromptOptimizationHistory\t22\t2025-12-22 04:48:35\tNULL\t\nreconciliations\t0\t2025-12-17 06:23:41\tNULL\t\nsales_commission_configs\t4\t2026-02-06 10:46:49\tNULL\t\nsalespersons\t18\t2026-02-26 07:14:39\tNULL\t\nschedules\t413\t2026-02-25 08:44:19\tNULL\t\nsmartRegisterHistory\t29\t2025-12-17 17:34:11\tNULL\t\nsystemAccounts\t7\t2026-02-19 04:37:05\tNULL\t\nsystem_tokens\t1\t2026-02-23 02:43:33\tNULL\t\nteacherPayments\t16\t2026-02-08 14:54:23\tNULL\t\nteacher_unavailability\t0\t2026-02-24 04:58:40\tNULL\t老师不接客时段表\nteachers\t64\t2026-02-13 07:07:25\tNULL\t\nuser_deletion_logs\t0\t2026-02-27 02:54:51\tNULL\t用户注销审计日志表\nuser_notifications\t77\t2026-02-06 09:19:04\tNULL\t\nuser_role_cities\t134\t2026-02-09 08:33:55\tNULL\t\nusers\t134\t2026-02-27 02:54:50\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 1668
+}

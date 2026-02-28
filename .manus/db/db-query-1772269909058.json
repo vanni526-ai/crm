@@ -1,0 +1,194 @@
+{
+  "query": "\nSELECT TABLE_NAME, TABLE_ROWS \nFROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE()\nORDER BY TABLE_ROWS DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT TABLE_NAME, TABLE_ROWS \nFROM information_schema.TABLES \nWHERE TABLE_SCHEMA = DATABASE()\nORDER BY TABLE_ROWS DESC;\n",
+  "rows": [
+    {
+      "TABLE_NAME": "customers",
+      "TABLE_ROWS": "447"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "TABLE_ROWS": "413"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "TABLE_ROWS": "399"
+    },
+    {
+      "TABLE_NAME": "gmailImportLogs",
+      "TABLE_ROWS": "139"
+    },
+    {
+      "TABLE_NAME": "users",
+      "TABLE_ROWS": "134"
+    },
+    {
+      "TABLE_NAME": "user_role_cities",
+      "TABLE_ROWS": "134"
+    },
+    {
+      "TABLE_NAME": "user_notifications",
+      "TABLE_ROWS": "77"
+    },
+    {
+      "TABLE_NAME": "parsingCorrections",
+      "TABLE_ROWS": "65"
+    },
+    {
+      "TABLE_NAME": "teachers",
+      "TABLE_ROWS": "64"
+    },
+    {
+      "TABLE_NAME": "accountPermissions",
+      "TABLE_ROWS": "44"
+    },
+    {
+      "TABLE_NAME": "smartRegisterHistory",
+      "TABLE_ROWS": "29"
+    },
+    {
+      "TABLE_NAME": "courses",
+      "TABLE_ROWS": "28"
+    },
+    {
+      "TABLE_NAME": "accountTransactions",
+      "TABLE_ROWS": "26"
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "TABLE_ROWS": "24"
+    },
+    {
+      "TABLE_NAME": "classrooms",
+      "TABLE_ROWS": "23"
+    },
+    {
+      "TABLE_NAME": "promptOptimizationHistory",
+      "TABLE_ROWS": "22"
+    },
+    {
+      "TABLE_NAME": "cities",
+      "TABLE_ROWS": "21"
+    },
+    {
+      "TABLE_NAME": "importLogs",
+      "TABLE_ROWS": "21"
+    },
+    {
+      "TABLE_NAME": "cityPartnerConfig",
+      "TABLE_ROWS": "19"
+    },
+    {
+      "TABLE_NAME": "salespersons",
+      "TABLE_ROWS": "18"
+    },
+    {
+      "TABLE_NAME": "partner_cities",
+      "TABLE_ROWS": "18"
+    },
+    {
+      "TABLE_NAME": "partners",
+      "TABLE_ROWS": "18"
+    },
+    {
+      "TABLE_NAME": "__drizzle_migrations",
+      "TABLE_ROWS": "17"
+    },
+    {
+      "TABLE_NAME": "teacherPayments",
+      "TABLE_ROWS": "16"
+    },
+    {
+      "TABLE_NAME": "city_monthly_expenses",
+      "TABLE_ROWS": "15"
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "TABLE_ROWS": "7"
+    },
+    {
+      "TABLE_NAME": "partnerFeeAuditLogs",
+      "TABLE_ROWS": "5"
+    },
+    {
+      "TABLE_NAME": "sales_commission_configs",
+      "TABLE_ROWS": "4"
+    },
+    {
+      "TABLE_NAME": "accountAuditLogs",
+      "TABLE_ROWS": "4"
+    },
+    {
+      "TABLE_NAME": "membershipPlans",
+      "TABLE_ROWS": "3"
+    },
+    {
+      "TABLE_NAME": "parsingLearningConfig",
+      "TABLE_ROWS": "2"
+    },
+    {
+      "TABLE_NAME": "gmailImportConfig",
+      "TABLE_ROWS": "2"
+    },
+    {
+      "TABLE_NAME": "order_items",
+      "TABLE_ROWS": "2"
+    },
+    {
+      "TABLE_NAME": "system_tokens",
+      "TABLE_ROWS": "1"
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "TABLE_ROWS": "1"
+    },
+    {
+      "TABLE_NAME": "membershipConfig",
+      "TABLE_ROWS": "1"
+    },
+    {
+      "TABLE_NAME": "reconciliations",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "partner_profit_records",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "gmail_error_feedback",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "fieldMappings",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "teacher_unavailability",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "matchedScheduleOrders",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "user_deletion_logs",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "gmail_import_config",
+      "TABLE_ROWS": "0"
+    },
+    {
+      "TABLE_NAME": "membershipOrders",
+      "TABLE_ROWS": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\tTABLE_ROWS\ncustomers\t447\nschedules\t413\norders\t399\ngmailImportLogs\t139\nusers\t134\nuser_role_cities\t134\nuser_notifications\t77\nparsingCorrections\t65\nteachers\t64\naccountPermissions\t44\nsmartRegisterHistory\t29\ncourses\t28\naccountTransactions\t26\nauditLogs\t24\nclassrooms\t23\npromptOptimizationHistory\t22\ncities\t21\nimportLogs\t21\ncityPartnerConfig\t19\nsalespersons\t18\npartner_cities\t18\npartners\t18\n__drizzle_migrations\t17\nteacherPayments\t16\ncity_monthly_expenses\t15\nsystemAccounts\t7\npartnerFeeAuditLogs\t5\nsales_commission_configs\t4\naccountAuditLogs\t4\nmembershipPlans\t3\nparsingLearningConfig\t2\ngmailImportConfig\t2\norder_items\t2\nsystem_tokens\t1\npartner_expenses\t1\nmembershipConfig\t1\nreconciliations\t0\npartner_profit_records\t0\ngmailImportHistory\t0\ngmail_error_feedback\t0\nfieldMappings\t0\nteacher_unavailability\t0\nmatchedScheduleOrders\t0\nuser_deletion_logs\t0\ngmail_import_config\t0\nmembershipOrders\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1562
+}

@@ -1,0 +1,1284 @@
+{
+  "query": "\nSELECT \n  TABLE_NAME, INDEX_NAME, NON_UNIQUE, COLUMN_NAME, INDEX_TYPE\nFROM information_schema.STATISTICS\nWHERE TABLE_SCHEMA = DATABASE()\nORDER BY TABLE_NAME, INDEX_NAME;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  TABLE_NAME, INDEX_NAME, NON_UNIQUE, COLUMN_NAME, INDEX_TYPE\nFROM information_schema.STATISTICS\nWHERE TABLE_SCHEMA = DATABASE()\nORDER BY TABLE_NAME, INDEX_NAME;\n",
+  "rows": [
+    {
+      "TABLE_NAME": "__drizzle_migrations",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "__drizzle_migrations",
+      "INDEX_NAME": "id",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountAuditLogs",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountAuditLogs",
+      "INDEX_NAME": "account_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "accountId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountAuditLogs",
+      "INDEX_NAME": "operation_type_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "operationType",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountAuditLogs",
+      "INDEX_NAME": "operator_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "operatorId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountPermissions",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountPermissions",
+      "INDEX_NAME": "account_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "accountId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountPermissions",
+      "INDEX_NAME": "account_permission_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "permissionKey",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountPermissions",
+      "INDEX_NAME": "account_permission_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "accountId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountPermissions",
+      "INDEX_NAME": "permission_key_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "permissionKey",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountTransactions",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountTransactions",
+      "INDEX_NAME": "created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountTransactions",
+      "INDEX_NAME": "customer_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "customerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountTransactions",
+      "INDEX_NAME": "order_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "relatedOrderId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "accountTransactions",
+      "INDEX_NAME": "type_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "type",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "INDEX_NAME": "action_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "action",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "INDEX_NAME": "created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "INDEX_NAME": "target_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "targetId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "INDEX_NAME": "target_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "targetType",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "auditLogs",
+      "INDEX_NAME": "user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cities",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cities",
+      "INDEX_NAME": "city_active_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isActive",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cities",
+      "INDEX_NAME": "city_name_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "name",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cities",
+      "INDEX_NAME": "name",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "name",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cityPartnerConfig",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cityPartnerConfig",
+      "INDEX_NAME": "active_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isActive",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cityPartnerConfig",
+      "INDEX_NAME": "cityPartnerConfig_city_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "city",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "cityPartnerConfig",
+      "INDEX_NAME": "city_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "city",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "city_monthly_expenses",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "city_monthly_expenses",
+      "INDEX_NAME": "monthly_expense_city_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "cityId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "city_monthly_expenses",
+      "INDEX_NAME": "monthly_expense_month_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "month",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "city_monthly_expenses",
+      "INDEX_NAME": "unique_city_month",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "cityId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "city_monthly_expenses",
+      "INDEX_NAME": "unique_city_month",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "month",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "classrooms",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "classrooms",
+      "INDEX_NAME": "classroom_active_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isActive",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "classrooms",
+      "INDEX_NAME": "classroom_city_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "cityId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "classrooms",
+      "INDEX_NAME": "classroom_city_name_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "cityName",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "courses",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "courses",
+      "INDEX_NAME": "is_active_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isActive",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "courses",
+      "INDEX_NAME": "level_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "level",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "courses",
+      "INDEX_NAME": "name_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "name",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "customers",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "customers",
+      "INDEX_NAME": "created_by_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdBy",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "customers",
+      "INDEX_NAME": "user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "customers",
+      "INDEX_NAME": "wechat_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "wechatId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "fieldMappings",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "fieldMappings",
+      "INDEX_NAME": "source_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "sourceValue",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "fieldMappings",
+      "INDEX_NAME": "type_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "type",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportConfig",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportConfig",
+      "INDEX_NAME": "gmailImportConfig_configKey_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "configKey",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "INDEX_NAME": "gmailImportHistory_messageId_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "messageId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "INDEX_NAME": "imported_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "importedAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "INDEX_NAME": "message_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "messageId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "INDEX_NAME": "operator_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "operatorId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportHistory",
+      "INDEX_NAME": "thread_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "threadId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportLogs",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportLogs",
+      "INDEX_NAME": "created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportLogs",
+      "INDEX_NAME": "status_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "status",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmailImportLogs",
+      "INDEX_NAME": "thread_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "threadId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmail_error_feedback",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "gmail_import_config",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "importLogs",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "matchedScheduleOrders",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "matchedScheduleOrders",
+      "INDEX_NAME": "order_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "orderId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "matchedScheduleOrders",
+      "INDEX_NAME": "schedule_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "scheduleId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "matchedScheduleOrders",
+      "INDEX_NAME": "unique_schedule_order",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "orderId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "matchedScheduleOrders",
+      "INDEX_NAME": "unique_schedule_order",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "scheduleId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipConfig",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipConfig",
+      "INDEX_NAME": "configKey",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "configKey",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipOrders",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipOrders",
+      "INDEX_NAME": "membershipOrders_orderNo_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "orderNo",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipOrders",
+      "INDEX_NAME": "membership_order_no_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "orderNo",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipOrders",
+      "INDEX_NAME": "membership_order_status_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "status",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipOrders",
+      "INDEX_NAME": "membership_order_user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipPlans",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipPlans",
+      "INDEX_NAME": "membership_plan_active_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isActive",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "membershipPlans",
+      "INDEX_NAME": "membership_plan_sort_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "sortOrder",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "order_items",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "order_items",
+      "INDEX_NAME": "idx_course",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "courseId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "order_items",
+      "INDEX_NAME": "idx_order",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "orderId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "INDEX_NAME": "class_date_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "classDate",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "INDEX_NAME": "customer_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "customerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "INDEX_NAME": "orders_orderNo_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "orderNo",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "INDEX_NAME": "payment_date_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "paymentDate",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "INDEX_NAME": "sales_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "salesId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "orders",
+      "INDEX_NAME": "status_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "status",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "parsingCorrections",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "parsingCorrections",
+      "INDEX_NAME": "created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "parsingCorrections",
+      "INDEX_NAME": "field_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "fieldName",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "parsingCorrections",
+      "INDEX_NAME": "learned_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isLearned",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "parsingCorrections",
+      "INDEX_NAME": "user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "parsingLearningConfig",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "parsingLearningConfig",
+      "INDEX_NAME": "parsingLearningConfig_configKey_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "configKey",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partnerFeeAuditLogs",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partnerFeeAuditLogs",
+      "INDEX_NAME": "created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partnerFeeAuditLogs",
+      "INDEX_NAME": "operation_type_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "operationType",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partnerFeeAuditLogs",
+      "INDEX_NAME": "operator_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "operatorId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_cities",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_cities",
+      "INDEX_NAME": "partner_city_city_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "cityId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_cities",
+      "INDEX_NAME": "partner_city_partner_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "partnerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_cities",
+      "INDEX_NAME": "unique_partner_city",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "cityId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_cities",
+      "INDEX_NAME": "unique_partner_city",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "partnerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "INDEX_NAME": "expense_month_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "month",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "INDEX_NAME": "expense_partner_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "partnerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "INDEX_NAME": "unique_partner_month",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "month",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "INDEX_NAME": "unique_partner_month",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "cityId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_expenses",
+      "INDEX_NAME": "unique_partner_month",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "partnerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_profit_records",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_profit_records",
+      "INDEX_NAME": "profit_date_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "transferDate",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_profit_records",
+      "INDEX_NAME": "profit_partner_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "partnerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partner_profit_records",
+      "INDEX_NAME": "profit_status_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "status",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partners",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partners",
+      "INDEX_NAME": "partner_phone_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "phone",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "partners",
+      "INDEX_NAME": "partner_user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "promptOptimizationHistory",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "promptOptimizationHistory",
+      "INDEX_NAME": "active_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isActive",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "promptOptimizationHistory",
+      "INDEX_NAME": "created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "promptOptimizationHistory",
+      "INDEX_NAME": "version_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "version",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "reconciliations",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "reconciliations",
+      "INDEX_NAME": "period_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "periodEnd",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "reconciliations",
+      "INDEX_NAME": "period_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "periodStart",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "sales_commission_configs",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "sales_commission_configs",
+      "INDEX_NAME": "commission_city_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "city",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "sales_commission_configs",
+      "INDEX_NAME": "commission_salesperson_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "salespersonId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "sales_commission_configs",
+      "INDEX_NAME": "unique_salesperson_city",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "city",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "sales_commission_configs",
+      "INDEX_NAME": "unique_salesperson_city",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "salespersonId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "salespersons",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "salespersons",
+      "INDEX_NAME": "sales_user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "classroom_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "classroomId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "payment_date_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "paymentDate",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "sales_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "salesName",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "schedule_city_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "city",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "schedule_customer_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "customerId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "start_time_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "startTime",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "schedules",
+      "INDEX_NAME": "teacher_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "teacherId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "smartRegisterHistory",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "smartRegisterHistory",
+      "INDEX_NAME": "created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "smartRegisterHistory",
+      "INDEX_NAME": "operator_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "operatorId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "INDEX_NAME": "identity_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "identity",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "INDEX_NAME": "is_active_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isActive",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "INDEX_NAME": "related_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "relatedId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "INDEX_NAME": "username",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "username",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "systemAccounts",
+      "INDEX_NAME": "username_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "username",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "system_tokens",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "system_tokens",
+      "INDEX_NAME": "key_name",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "key_name",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacherPayments",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacherPayments",
+      "INDEX_NAME": "order_payment_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "orderId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacherPayments",
+      "INDEX_NAME": "payment_status_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "status",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacherPayments",
+      "INDEX_NAME": "teacher_payment_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "teacherId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacher_unavailability",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacher_unavailability",
+      "INDEX_NAME": "idx_teacher",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "teacherId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacher_unavailability",
+      "INDEX_NAME": "idx_time",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "startTime",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teacher_unavailability",
+      "INDEX_NAME": "idx_time",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "endTime",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teachers",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teachers",
+      "INDEX_NAME": "teacher_name_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "name",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teachers",
+      "INDEX_NAME": "teacher_phone_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "phone",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "teachers",
+      "INDEX_NAME": "teacher_user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_deletion_logs",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_deletion_logs",
+      "INDEX_NAME": "idx_action",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "action",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_deletion_logs",
+      "INDEX_NAME": "idx_createdAt",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_deletion_logs",
+      "INDEX_NAME": "idx_userId",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_notifications",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_notifications",
+      "INDEX_NAME": "notification_created_at_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "createdAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_notifications",
+      "INDEX_NAME": "notification_status_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "status",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_notifications",
+      "INDEX_NAME": "notification_type_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "type",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_notifications",
+      "INDEX_NAME": "notification_user_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_role_cities",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_role_cities",
+      "INDEX_NAME": "user_id_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_role_cities",
+      "INDEX_NAME": "user_role_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "role",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "user_role_cities",
+      "INDEX_NAME": "user_role_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "userId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "users",
+      "INDEX_NAME": "PRIMARY",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "id",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "users",
+      "INDEX_NAME": "idx_isDeleted_deletedAt",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "isDeleted",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "users",
+      "INDEX_NAME": "idx_isDeleted_deletedAt",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "deletedAt",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "users",
+      "INDEX_NAME": "salesperson_idx",
+      "NON_UNIQUE": "1",
+      "COLUMN_NAME": "salespersonId",
+      "INDEX_TYPE": "BTREE"
+    },
+    {
+      "TABLE_NAME": "users",
+      "INDEX_NAME": "users_openId_unique",
+      "NON_UNIQUE": "0",
+      "COLUMN_NAME": "openId",
+      "INDEX_TYPE": "BTREE"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\tINDEX_NAME\tNON_UNIQUE\tCOLUMN_NAME\tINDEX_TYPE\n__drizzle_migrations\tPRIMARY\t0\tid\tBTREE\n__drizzle_migrations\tid\t0\tid\tBTREE\naccountAuditLogs\tPRIMARY\t0\tid\tBTREE\naccountAuditLogs\taccount_id_idx\t1\taccountId\tBTREE\naccountAuditLogs\toperation_type_idx\t1\toperationType\tBTREE\naccountAuditLogs\toperator_id_idx\t1\toperatorId\tBTREE\naccountPermissions\tPRIMARY\t0\tid\tBTREE\naccountPermissions\taccount_id_idx\t1\taccountId\tBTREE\naccountPermissions\taccount_permission_unique\t0\tpermissionKey\tBTREE\naccountPermissions\taccount_permission_unique\t0\taccountId\tBTREE\naccountPermissions\tpermission_key_idx\t1\tpermissionKey\tBTREE\naccountTransactions\tPRIMARY\t0\tid\tBTREE\naccountTransactions\tcreated_at_idx\t1\tcreatedAt\tBTREE\naccountTransactions\tcustomer_idx\t1\tcustomerId\tBTREE\naccountTransactions\torder_idx\t1\trelatedOrderId\tBTREE\naccountTransactions\ttype_idx\t1\ttype\tBTREE\nauditLogs\tPRIMARY\t0\tid\tBTREE\nauditLogs\taction_idx\t1\taction\tBTREE\nauditLogs\tcreated_at_idx\t1\tcreatedAt\tBTREE\nauditLogs\ttarget_idx\t1\ttargetId\tBTREE\nauditLogs\ttarget_idx\t1\ttargetType\tBTREE\nauditLogs\tuser_idx\t1\tuserId\tBTREE\ncities\tPRIMARY\t0\tid\tBTREE\ncities\tcity_active_idx\t1\tisActive\tBTREE\ncities\tcity_name_idx\t1\tname\tBTREE\ncities\tname\t0\tname\tBTREE\ncityPartnerConfig\tPRIMARY\t0\tid\tBTREE\ncityPartnerConfig\tactive_idx\t1\tisActive\tBTREE\ncityPartnerConfig\tcityPartnerConfig_city_unique\t0\tcity\tBTREE\ncityPartnerConfig\tcity_idx\t1\tcity\tBTREE\ncity_monthly_expenses\tPRIMARY\t0\tid\tBTREE\ncity_monthly_expenses\tmonthly_expense_city_idx\t1\tcityId\tBTREE\ncity_monthly_expenses\tmonthly_expense_month_idx\t1\tmonth\tBTREE\ncity_monthly_expenses\tunique_city_month\t0\tcityId\tBTREE\ncity_monthly_expenses\tunique_city_month\t0\tmonth\tBTREE\nclassrooms\tPRIMARY\t0\tid\tBTREE\nclassrooms\tclassroom_active_idx\t1\tisActive\tBTREE\nclassrooms\tclassroom_city_idx\t1\tcityId\tBTREE\nclassrooms\tclassroom_city_name_idx\t1\tcityName\tBTREE\ncourses\tPRIMARY\t0\tid\tBTREE\ncourses\tis_active_idx\t1\tisActive\tBTREE\ncourses\tlevel_idx\t1\tlevel\tBTREE\ncourses\tname_idx\t1\tname\tBTREE\ncustomers\tPRIMARY\t0\tid\tBTREE\ncustomers\tcreated_by_idx\t1\tcreatedBy\tBTREE\ncustomers\tuser_idx\t1\tuserId\tBTREE\ncustomers\twechat_idx\t1\twechatId\tBTREE\nfieldMappings\tPRIMARY\t0\tid\tBTREE\nfieldMappings\tsource_idx\t1\tsourceValue\tBTREE\nfieldMappings\ttype_idx\t1\ttype\tBTREE\ngmailImportConfig\tPRIMARY\t0\tid\tBTREE\ngmailImportConfig\tgmailImportConfig_configKey_unique\t0\tconfigKey\tBTREE\ngmailImportHistory\tPRIMARY\t0\tid\tBTREE\ngmailImportHistory\tgmailImportHistory_messageId_unique\t0\tmessageId\tBTREE\ngmailImportHistory\timported_at_idx\t1\timportedAt\tBTREE\ngmailImportHistory\tmessage_id_idx\t1\tmessageId\tBTREE\ngmailImportHistory\toperator_idx\t1\toperatorId\tBTREE\ngmailImportHistory\tthread_id_idx\t1\tthreadId\tBTREE\ngmailImportLogs\tPRIMARY\t0\tid\tBTREE\ngmailImportLogs\tcreated_at_idx\t1\tcreatedAt\tBTREE\ngmailImportLogs\tstatus_idx\t1\tstatus\tBTREE\ngmailImportLogs\tthread_id_idx\t1\tthreadId\tBTREE\ngmail_error_feedback\tPRIMARY\t0\tid\tBTREE\ngmail_import_config\tPRIMARY\t0\tid\tBTREE\nimportLogs\tPRIMARY\t0\tid\tBTREE\nmatchedScheduleOrders\tPRIMARY\t0\tid\tBTREE\nmatchedScheduleOrders\torder_idx\t1\torderId\tBTREE\nmatchedScheduleOrders\tschedule_idx\t1\tscheduleId\tBTREE\nmatchedScheduleOrders\tunique_schedule_order\t0\torderId\tBTREE\nmatchedScheduleOrders\tunique_schedule_order\t0\tscheduleId\tBTREE\nmembershipConfig\tPRIMARY\t0\tid\tBTREE\nmembershipConfig\tconfigKey\t0\tconfigKey\tBTREE\nmembershipOrders\tPRIMARY\t0\tid\tBTREE\nmembershipOrders\tmembershipOrders_orderNo_unique\t0\torderNo\tBTREE\nmembershipOrders\tmembership_order_no_idx\t1\torderNo\tBTREE\nmembershipOrders\tmembership_order_status_idx\t1\tstatus\tBTREE\nmembershipOrders\tmembership_order_user_idx\t1\tuserId\tBTREE\nmembershipPlans\tPRIMARY\t0\tid\tBTREE\nmembershipPlans\tmembership_plan_active_idx\t1\tisActive\tBTREE\nmembershipPlans\tmembership_plan_sort_idx\t1\tsortOrder\tBTREE\norder_items\tPRIMARY\t0\tid\tBTREE\norder_items\tidx_course\t1\tcourseId\tBTREE\norder_items\tidx_order\t1\torderId\tBTREE\norders\tPRIMARY\t0\tid\tBTREE\norders\tclass_date_idx\t1\tclassDate\tBTREE\norders\tcustomer_idx\t1\tcustomerId\tBTREE\norders\torders_orderNo_unique\t0\torderNo\tBTREE\norders\tpayment_date_idx\t1\tpaymentDate\tBTREE\norders\tsales_idx\t1\tsalesId\tBTREE\norders\tstatus_idx\t1\tstatus\tBTREE\nparsingCorrections\tPRIMARY\t0\tid\tBTREE\nparsingCorrections\tcreated_at_idx\t1\tcreatedAt\tBTREE\nparsingCorrections\tfield_idx\t1\tfieldName\tBTREE\nparsingCorrections\tlearned_idx\t1\tisLearned\tBTREE\nparsingCorrections\tuser_idx\t1\tuserId\tBTREE\nparsingLearningConfig\tPRIMARY\t0\tid\tBTREE\nparsingLearningConfig\tparsingLearningConfig_configKey_unique\t0\tconfigKey\tBTREE\npartnerFeeAuditLogs\tPRIMARY\t0\tid\tBTREE\npartnerFeeAuditLogs\tcreated_at_idx\t1\tcreatedAt\tBTREE\npartnerFeeAuditLogs\toperation_type_idx\t1\toperationType\tBTREE\npartnerFeeAuditLogs\toperator_idx\t1\toperatorId\tBTREE\npartner_cities\tPRIMARY\t0\tid\tBTREE\npartner_cities\tpartner_city_city_idx\t1\tcityId\tBTREE\npartner_cities\tpartner_city_partner_idx\t1\tpartnerId\tBTREE\npartner_cities\tunique_partner_city\t1\tcityId\tBTREE\npartner_cities\tunique_partner_city\t1\tpartnerId\tBTREE\npartner_expenses\tPRIMARY\t0\tid\tBTREE\npartner_expenses\texpense_month_idx\t1\tmonth\tBTREE\npartner_expenses\texpense_partner_idx\t1\tpartnerId\tBTREE\npartner_expenses\tunique_partner_month\t0\tmonth\tBTREE\npartner_expenses\tunique_partner_month\t0\tcityId\tBTREE\npartner_expenses\tunique_partner_month\t0\tpartnerId\tBTREE\npartner_profit_records\tPRIMARY\t0\tid\tBTREE\npartner_profit_records\tprofit_date_idx\t1\ttransferDate\tBTREE\npartner_profit_records\tprofit_partner_idx\t1\tpartnerId\tBTREE\npartner_profit_records\tprofit_status_idx\t1\tstatus\tBTREE\npartners\tPRIMARY\t0\tid\tBTREE\npartners\tpartner_phone_idx\t1\tphone\tBTREE\npartners\tpartner_user_idx\t1\tuserId\tBTREE\npromptOptimizationHistory\tPRIMARY\t0\tid\tBTREE\npromptOptimizationHistory\tactive_idx\t1\tisActive\tBTREE\npromptOptimizationHistory\tcreated_at_idx\t1\tcreatedAt\tBTREE\npromptOptimizationHistory\tversion_idx\t1\tversion\tBTREE\nreconciliations\tPRIMARY\t0\tid\tBTREE\nreconciliations\tperiod_idx\t1\tperiodEnd\tBTREE\nreconciliations\tperiod_idx\t1\tperiodStart\tBTREE\nsales_commission_configs\tPRIMARY\t0\tid\tBTREE\nsales_commission_configs\tcommission_city_idx\t1\tcity\tBTREE\nsales_commission_configs\tcommission_salesperson_idx\t1\tsalespersonId\tBTREE\nsales_commission_configs\tunique_salesperson_city\t0\tcity\tBTREE\nsales_commission_configs\tunique_salesperson_city\t0\tsalespersonId\tBTREE\nsalespersons\tPRIMARY\t0\tid\tBTREE\nsalespersons\tsales_user_idx\t1\tuserId\tBTREE\nschedules\tPRIMARY\t0\tid\tBTREE\nschedules\tclassroom_idx\t1\tclassroomId\tBTREE\nschedules\tpayment_date_idx\t1\tpaymentDate\tBTREE\nschedules\tsales_idx\t1\tsalesName\tBTREE\nschedules\tschedule_city_idx\t1\tcity\tBTREE\nschedules\tschedule_customer_idx\t1\tcustomerId\tBTREE\nschedules\tstart_time_idx\t1\tstartTime\tBTREE\nschedules\tteacher_idx\t1\tteacherId\tBTREE\nsmartRegisterHistory\tPRIMARY\t0\tid\tBTREE\nsmartRegisterHistory\tcreated_at_idx\t1\tcreatedAt\tBTREE\nsmartRegisterHistory\toperator_idx\t1\toperatorId\tBTREE\nsystemAccounts\tPRIMARY\t0\tid\tBTREE\nsystemAccounts\tidentity_idx\t1\tidentity\tBTREE\nsystemAccounts\tis_active_idx\t1\tisActive\tBTREE\nsystemAccounts\trelated_id_idx\t1\trelatedId\tBTREE\nsystemAccounts\tusername\t0\tusername\tBTREE\nsystemAccounts\tusername_idx\t1\tusername\tBTREE\nsystem_tokens\tPRIMARY\t0\tid\tBTREE\nsystem_tokens\tkey_name\t0\tkey_name\tBTREE\nteacherPayments\tPRIMARY\t0\tid\tBTREE\nteacherPayments\torder_payment_idx\t1\torderId\tBTREE\nteacherPayments\tpayment_status_idx\t1\tstatus\tBTREE\nteacherPayments\tteacher_payment_idx\t1\tteacherId\tBTREE\nteacher_unavailability\tPRIMARY\t0\tid\tBTREE\nteacher_unavailability\tidx_teacher\t1\tteacherId\tBTREE\nteacher_unavailability\tidx_time\t1\tstartTime\tBTREE\nteacher_unavailability\tidx_time\t1\tendTime\tBTREE\nteachers\tPRIMARY\t0\tid\tBTREE\nteachers\tteacher_name_idx\t1\tname\tBTREE\nteachers\tteacher_phone_idx\t1\tphone\tBTREE\nteachers\tteacher_user_idx\t1\tuserId\tBTREE\nuser_deletion_logs\tPRIMARY\t0\tid\tBTREE\nuser_deletion_logs\tidx_action\t1\taction\tBTREE\nuser_deletion_logs\tidx_createdAt\t1\tcreatedAt\tBTREE\nuser_deletion_logs\tidx_userId\t1\tuserId\tBTREE\nuser_notifications\tPRIMARY\t0\tid\tBTREE\nuser_notifications\tnotification_created_at_idx\t1\tcreatedAt\tBTREE\nuser_notifications\tnotification_status_idx\t1\tstatus\tBTREE\nuser_notifications\tnotification_type_idx\t1\ttype\tBTREE\nuser_notifications\tnotification_user_idx\t1\tuserId\tBTREE\nuser_role_cities\tPRIMARY\t0\tid\tBTREE\nuser_role_cities\tuser_id_idx\t1\tuserId\tBTREE\nuser_role_cities\tuser_role_idx\t1\trole\tBTREE\nuser_role_cities\tuser_role_idx\t1\tuserId\tBTREE\nusers\tPRIMARY\t0\tid\tBTREE\nusers\tidx_isDeleted_deletedAt\t1\tisDeleted\tBTREE\nusers\tidx_isDeleted_deletedAt\t1\tdeletedAt\tBTREE\nusers\tsalesperson_idx\t1\tsalespersonId\tBTREE\nusers\tusers_openId_unique\t0\topenId\tBTREE\n",
+  "stderr": "",
+  "execution_time_ms": 1542
+}

@@ -1,0 +1,17 @@
+{
+  "query": "\n-- 检查有多少用户没有密码（迁移后无法登录）\nSELECT \n  COUNT(*) as total_users,\n  SUM(CASE WHEN password IS NULL OR password = '' THEN 1 ELSE 0 END) as no_password,\n  SUM(CASE WHEN phone IS NULL OR phone = '' THEN 1 ELSE 0 END) as no_phone,\n  SUM(CASE WHEN isDeleted = 1 THEN 1 ELSE 0 END) as deleted_users,\n  SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) as admin_count\nFROM users;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \n-- 检查有多少用户没有密码（迁移后无法登录）\nSELECT \n  COUNT(*) as total_users,\n  SUM(CASE WHEN password IS NULL OR password = '' THEN 1 ELSE 0 END) as no_password,\n  SUM(CASE WHEN phone IS NULL OR phone = '' THEN 1 ELSE 0 END) as no_phone,\n  SUM(CASE WHEN isDeleted = 1 THEN 1 ELSE 0 END) as deleted_users,\n  SUM(CASE WHEN role = 'admin' THEN 1 ELSE 0 END) as admin_count\nFROM users;\n",
+  "rows": [
+    {
+      "total_users": "134",
+      "no_password": "0",
+      "no_phone": "34",
+      "deleted_users": "0",
+      "admin_count": "4"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_users\tno_password\tno_phone\tdeleted_users\tadmin_count\n134\t0\t34\t0\t4\n",
+  "stderr": "",
+  "execution_time_ms": 1535
+}
