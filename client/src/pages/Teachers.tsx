@@ -119,31 +119,25 @@ export default function Teachers() {
 
 
 
+  // 导入结果弹窗状态
+  const [importResultOpen, setImportResultOpen] = useState(false);
+  const [importResultData, setImportResultData] = useState<{
+    updated: number;
+    skipped: number;
+    notFoundErrors: string[];
+  } | null>(null);
+
   const importMutation = trpc.teachers.importFromExcel.useMutation({
     onSuccess: (data) => {
       utils.teachers.list.invalidate();
       const { stats, notFoundErrors } = data;
-      
-      // 如果有找不到账号的记录，显示详细错误信息
-      if (notFoundErrors && notFoundErrors.length > 0) {
-        // 先显示成功更新的统计
-        if (stats && stats.updated > 0) {
-          toast.success(`已更新 ${stats.updated} 位老师信息`, { duration: 4000 });
-        }
-        // 显示找不到账号的错误（每条单独弹出）
-        notFoundErrors.forEach((errMsg: string, idx: number) => {
-          setTimeout(() => {
-            toast.error(errMsg, { duration: 8000 });
-          }, idx * 300);
-        });
-      } else if (stats) {
-        toast.success(
-          `导入完成！更新 ${stats.updated} 位老师信息`,
-          { duration: 5000 }
-        );
-      } else {
-        toast.success(`成功导入 ${data.importedCount} 位老师`);
-      }
+      // 显示汇总弹窗
+      setImportResultData({
+        updated: stats?.updated ?? 0,
+        skipped: stats?.skipped ?? 0,
+        notFoundErrors: notFoundErrors ?? [],
+      });
+      setImportResultOpen(true);
       setImporting(false);
     },
     onError: (error) => {
@@ -529,222 +523,82 @@ export default function Teachers() {
     }
   };
 
-  // Excel模板下载
+  // Excel模板下载（单Sheet空字段表头）
   const handleDownloadTemplate = () => {
-    // 创建模板数据(包含字段说明和示例数据)
-    const templateData = [
-      {
-        'ID': '15362121',
-        '姓名': '张老师',
-        '昵称': '小张',
-        '电话号码': '13800138000',
-        '邮箱': 'zhang@example.com',
-        '微信号': 'zhang_teacher',
-        '活跃状态': '活跃',
-        '老师属性': 'S',
-        '受众客户类型': '成人',
-        '类别': '本部老师',
-        '时薪': '200',
-        '银行账户': '6222021234567890',
-        '开户行': '工商银行',
-        '地区': '重庆',
-        '合同到期时间': '2026-12-31',
-        '入职时间': '2024-01-01',
-        '别名': '橘子,小橘,橘子老师',
-        '备注': '擅长儿童教学，周末不可约课',
-      },
-      {
-        'ID': '15362122',
-        '姓名': '李老师',
-        '昵称': '小李',
-        '电话号码': '13900139000',
-        '邮箱': 'li@example.com',
-        '微信号': 'li_teacher',
-        '活跃状态': '活跃',
-        '老师属性': 'M',
-        '受众客户类型': '青少年',
-        '类别': '合伙店老师',
-        '时薪': '180',
-        '银行账户': '6222029876543210',
-        '开户行': '建设银行',
-        '地区': '上海;天津',
-        '合同到期时间': '2027-06-30',
-        '入职时间': '2024-03-15',
-        '别名': '小李子,李老师',
-        '备注': '多个城市用分号分隔，别名用逗号分隔',
-      },
-    ];
+    // 仅包含一行空字段表头，不含示例数据
+    const emptyRow = {
+      'ID': '',
+      '姓名': '',
+      '昵称': '',
+      '电话号码': '',
+      '邮箱': '',
+      '微信号': '',
+      '活跃状态': '',
+      '老师属性': '',
+      '受众': '',
+      '客户类型': '',
+      '类别': '',
+      '时薪': '',
+      '银行账户': '',
+      '开户行': '',
+      '地区': '',
+      '合同到期时间': '',
+      '入职时间': '',
+      '别名': '',
+      '备注': '',
+    };
 
-    // 创建字段说明工作表
-    const fieldDescriptions = [
-      {
-        '字段名': '姓名',
-        '是否必填': '是',
-        '说明': '老师的真实姓名',
-        '示例': '张老师',
-      },
-      {
-        '字段名': '电话号码',
-        '是否必填': '否',
-        '说明': '老师的联系电话',
-        '示例': '13800138000',
-      },
-      {
-        '字段名': '活跃状态',
-        '是否必填': '否',
-        '说明': '老师的工作状态，默认为“活跃”',
-        '示例': '活跃 或 休息',
-      },
-      {
-        '字段名': '老师属性',
-        '是否必填': '否',
-        '说明': '老师的属性类型，可选值：S、M、Switch',
-        '示例': 'S 或 M 或 Switch',
-      },
-      {
-        '字段名': '受众客户类型',
-        '是否必填': '否',
-        '说明': '老师擅长的客户类型',
-        '示例': '成人、青少年、儿童',
-      },
-      {
-        '字段名': '地区',
-        '是否必填': '否',
-        '说明': '老师所在的城市，多个城市用分号分隔',
-        '示例': '重庆 或 上海;天津',
-      },
-      {
-        '字段名': '合同到期时间',
-        '是否必填': '否',
-        '说明': '老师合同的到期日期',
-        '示例': '2026-12-31',
-      },
-      {
-        '字段名': '入职时间',
-        '是否必填': '否',
-        '说明': '老师的入职日期',
-        '示例': '2024-01-01',
-      },
-      {
-        '字段名': '别名',
-        '是否必填': '否',
-        '说明': '老师的别名列表，用逗号分隔，用于智能识别和Gmail导入',
-        '示例': '橘子,小橘,橘子老师',
-      },
-      {
-        '字段名': '备注',
-        '是否必填': '否',
-        '说明': '对老师的备注信息',
-        '示例': '擅长儿童教学，周末不可约课',
-      },
-    ];
-
-    // 创建导入须知工作表
-    const importNotes = [
-      {
-        '序号': '1',
-        '重要说明': '导入后系统会自动为每位老师创建用户账号',
-      },
-      {
-        '序号': '2',
-        '重要说明': '默认密码为: 123456，请提醒老师首次登录后修改密码',
-      },
-      {
-        '序号': '3',
-        '重要说明': '系统会自动分配"普通用户"+"老师"角色',
-      },
-      {
-        '序号': '4',
-        '重要说明': '如果填写了地区，系统会自动关联老师和城市',
-      },
-      {
-        '序号': '5',
-        '重要说明': '如果导入的老师姓名已存在，系统会更新现有用户的角色',
-      },
-      {
-        '序号': '6',
-        '重要说明': '老师属性可选值：S、M、Switch，用于前端App显示',
-      },
-      {
-        '序号': '7',
-        '重要说明': '姓名和电话号码为必填字段，其他字段可选',
-      },
-    ];
-
-    // 创建工作簿
     const wb = XLSX.utils.book_new();
+    // 使用 aoa_to_sheet 确保字段顺序固定
+    const headers = Object.keys(emptyRow);
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    XLSX.utils.book_append_sheet(wb, ws, '老师信息');
 
-    // 添加导入须知工作表
-    const wsNotes = XLSX.utils.json_to_sheet(importNotes);
-    XLSX.utils.book_append_sheet(wb, wsNotes, '导入须知');
-
-    // 添加字段说明工作表
-    const wsFields = XLSX.utils.json_to_sheet(fieldDescriptions);
-    XLSX.utils.book_append_sheet(wb, wsFields, '字段说明');
-
-    // 添加示例数据工作表
-    const wsTemplate = XLSX.utils.json_to_sheet(templateData);
-    XLSX.utils.book_append_sheet(wb, wsTemplate, '本部老师');
-
-    // 下载文件
     const fileName = `老师导入模板_${new Date().toISOString().split('T')[0]}.xlsx`;
     XLSX.writeFile(wb, fileName);
-
-    toast.success('模板下载成功，请查看"导入须知"和"字段说明"工作表');
+    toast.success('模板下载成功');
   };
 
-  // Excel导出
+  // Excel导出（单Sheet全部数据）
   const handleExport = () => {
     if (!teachers || teachers.length === 0) {
       toast.error("没有数据可导出");
       return;
     }
 
-    // 按分类分组
-    const categories: Record<string, any[]> = {};
-    teachers.forEach((teacher: any) => {
-      const category = teacher.category || '其他';
-      if (!categories[category]) {
-        categories[category] = [];
-      }
-      // 严格按照指定字段顺序：ID 姓名 昵称 电话号码 邮箱 微信号 活跃状态 老师属性 受众 客户类型 类别 时薪 银行账户 开户行 地区 合同到期时间 入职时间 别名 备注
-      categories[category].push({
-        'ID': teacher.id,
-        '姓名': teacher.name,
-        '昵称': teacher.nickname || '',
-        '电话号码': teacher.phone || '',
-        '邮箱': teacher.email || '',
-        '微信号': teacher.wechat || '',
-        '活跃状态': teacher.isActive !== false ? '活跃' : '休息',
-        '老师属性': teacher.teacherAttribute || '',
-        '受众': teacher.customerType || '',
-        '客户类型': teacher.customerType || '',
-        '类别': teacher.category || '',
-        '时薪': teacher.hourlyRate || '',
-        '银行账户': teacher.bankAccount || '',
-        '开户行': teacher.bankName || '',
-        '地区': teacher.city || '',
-        '合同到期时间': teacher.contractEndDate ? new Date(teacher.contractEndDate).toISOString().split('T')[0] : '',
-        '入职时间': teacher.joinDate ? new Date(teacher.joinDate).toISOString().split('T')[0] : '',
-        '别名': teacher.aliases || '',
-        '备注': teacher.notes || '',
-      });
-    });
+    // 定义字段顺序，严格按照指定顺序
+    const headers = ['ID', '姓名', '昵称', '电话号码', '邮箱', '微信号', '活跃状态', '老师属性', '受众', '客户类型', '类别', '时薪', '银行账户', '开户行', '地区', '合同到期时间', '入职时间', '别名', '备注'];
 
-    // 创建工作簿
+    // 所有老师数据放入同一个Sheet
+    const rows = teachers.map((teacher: any) => [
+      teacher.id,
+      teacher.name,
+      teacher.nickname || '',
+      teacher.phone || '',
+      teacher.email || '',
+      teacher.wechat || '',
+      teacher.isActive !== false ? '活跃' : '休息',
+      teacher.teacherAttribute || '',
+      teacher.customerType || '',
+      teacher.customerType || '',
+      teacher.category || '',
+      teacher.hourlyRate || '',
+      teacher.bankAccount || '',
+      teacher.bankName || '',
+      teacher.city || '',
+      teacher.contractEndDate ? new Date(teacher.contractEndDate).toISOString().split('T')[0] : '',
+      teacher.joinDate ? new Date(teacher.joinDate).toISOString().split('T')[0] : '',
+      teacher.aliases || '',
+      teacher.notes || '',
+    ]);
+
     const wb = XLSX.utils.book_new();
-    
-    // 为每个分类创建工作表
-    Object.entries(categories).forEach(([category, data]) => {
-      const ws = XLSX.utils.json_to_sheet(data);
-      XLSX.utils.book_append_sheet(wb, ws, category);
-    });
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    XLSX.utils.book_append_sheet(wb, ws, '老师信息');
 
-    // 下载文件
     const fileName = `老师信息_${new Date().toISOString().split('T')[0]}.xlsx`;
     XLSX.writeFile(wb, fileName);
-    
-    toast.success("导出成功");
+    toast.success("导出成功，共 " + teachers.length + " 条记录");
   };
 
   // 排序功能
@@ -1403,6 +1257,57 @@ export default function Teachers() {
             utils.teachers.list.invalidate();
           }}
         />
+
+        {/* 导入结果汇总弹窗 */}
+        <Dialog open={importResultOpen} onOpenChange={setImportResultOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>导入结果</DialogTitle>
+            </DialogHeader>
+            {importResultData && (
+              <div className="space-y-4">
+                {/* 统计概览 */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 text-center">
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">{importResultData.updated}</p>
+                    <p className="text-sm text-green-700 dark:text-green-300">成功更新</p>
+                  </div>
+                  <div className="rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 p-3 text-center">
+                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">{importResultData.skipped}</p>
+                    <p className="text-sm text-orange-700 dark:text-orange-300">跳过未处理</p>
+                  </div>
+                </div>
+
+                {/* 跳过原因列表 */}
+                {importResultData.notFoundErrors.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      跳过原因（{importResultData.notFoundErrors.length} 条）：
+                    </p>
+                    <div className="max-h-48 overflow-y-auto rounded-md border bg-muted/30 p-2 space-y-1">
+                      {importResultData.notFoundErrors.map((err: string, idx: number) => (
+                        <div key={idx} className="text-xs text-destructive flex gap-2">
+                          <span className="shrink-0 font-medium">{idx + 1}.</span>
+                          <span>{err}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      请先在「用户管理」中创建对应账号并分配老师角色，再重新导入。
+                    </p>
+                  </div>
+                )}
+
+                {importResultData.notFoundErrors.length === 0 && importResultData.updated > 0 && (
+                  <p className="text-sm text-green-600 dark:text-green-400">所有记录均已成功更新。</p>
+                )}
+              </div>
+            )}
+            <DialogFooter>
+              <Button onClick={() => setImportResultOpen(false)}>确定</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
