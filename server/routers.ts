@@ -1598,12 +1598,13 @@ export const appRouter = router({
         })),
       }))
       .mutation(async ({ input }) => {
-        const { results, stats } = await db.batchCreateTeachers(input.teachers);
+        const { results, stats, notFoundErrors } = await db.batchCreateTeachers(input.teachers);
         return { 
           success: true, 
           importedCount: results.length,
           teachers: results,
-          stats, // 添加统计信息
+          stats,
+          notFoundErrors, // 找不到对应账号的错误列表
         };
       }),
 

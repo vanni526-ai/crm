@@ -122,15 +122,27 @@ export default function Teachers() {
   const importMutation = trpc.teachers.importFromExcel.useMutation({
     onSuccess: (data) => {
       utils.teachers.list.invalidate();
-      // 显示详细的导入统计信息
-      const { stats } = data;
-      if (stats) {
+      const { stats, notFoundErrors } = data;
+      
+      // 如果有找不到账号的记录，显示详细错误信息
+      if (notFoundErrors && notFoundErrors.length > 0) {
+        // 先显示成功更新的统计
+        if (stats && stats.updated > 0) {
+          toast.success(`已更新 ${stats.updated} 位老师信息`, { duration: 4000 });
+        }
+        // 显示找不到账号的错误（每条单独弹出）
+        notFoundErrors.forEach((errMsg: string, idx: number) => {
+          setTimeout(() => {
+            toast.error(errMsg, { duration: 8000 });
+          }, idx * 300);
+        });
+      } else if (stats) {
         toast.success(
-          `导入完成！新增${stats.created}位，更新${stats.updated}位，跳过${stats.skipped}位`,
+          `导入完成！更新 ${stats.updated} 位老师信息`,
           { duration: 5000 }
         );
       } else {
-        toast.success(`成功导入${data.importedCount}位老师`);
+        toast.success(`成功导入 ${data.importedCount} 位老师`);
       }
       setImporting(false);
     },
@@ -695,6 +707,7 @@ export default function Teachers() {
       if (!categories[category]) {
         categories[category] = [];
       }
+      // 严格按照指定字段顺序：ID 姓名 昵称 电话号码 邮箱 微信号 活跃状态 老师属性 受众 客户类型 类别 时薪 银行账户 开户行 地区 合同到期时间 入职时间 别名 备注
       categories[category].push({
         'ID': teacher.id,
         '姓名': teacher.name,
@@ -702,15 +715,17 @@ export default function Teachers() {
         '电话号码': teacher.phone || '',
         '邮箱': teacher.email || '',
         '微信号': teacher.wechat || '',
-        '活跃状态': teacher.status || '活跃',
+        '活跃状态': teacher.isActive !== false ? '活跃' : '休息',
         '老师属性': teacher.teacherAttribute || '',
-        '受众客户类型': teacher.customerType || '',
+        '受众': teacher.customerType || '',
+        '客户类型': teacher.customerType || '',
         '类别': teacher.category || '',
         '时薪': teacher.hourlyRate || '',
         '银行账户': teacher.bankAccount || '',
         '开户行': teacher.bankName || '',
-        '合同到期时间': teacher.contractEndDate || '',
-        '入职时间': teacher.joinDate || '',
+        '地区': teacher.city || '',
+        '合同到期时间': teacher.contractEndDate ? new Date(teacher.contractEndDate).toISOString().split('T')[0] : '',
+        '入职时间': teacher.joinDate ? new Date(teacher.joinDate).toISOString().split('T')[0] : '',
         '别名': teacher.aliases || '',
         '备注': teacher.notes || '',
       });

@@ -1256,6 +1256,7 @@ export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: n
   if (!db) throw new Error("Database not available");
   const results = [];
   const stats = { created: 0, updated: 0, skipped: 0 };
+  const notFoundErrors: string[] = []; // 记录找不到对应账号的老师
   
   for (const teacher of teacherList) {
     let existingTeacher = null;
@@ -1267,33 +1268,17 @@ export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: n
         .limit(1);
     }
     
-    // 2. 如果没有ID或找不到，使用姓名+城市查重
+    // 2. 如果没有ID或找不到，使用姓名查找（在所有用户中查，不限于老师角色）
     if (!existingTeacher || existingTeacher.length === 0) {
-      const cityName = teacher.city ? teacher.city.split(';')[0].trim() : '';
-      
-      if (cityName) {
-        // 有城市信息,查找同名同城市的老师
-        existingTeacher = await db.select().from(users)
-          .where(and(
-            eq(users.name, teacher.name),
-            like(users.roles, '%老师%')
-          ))
-          .limit(1);
-      } else {
-        // 没有城市信息,只按姓名查找
-        existingTeacher = await db.select().from(users)
-          .where(and(
-            eq(users.name, teacher.name),
-            like(users.roles, '%老师%')
-          ))
-          .limit(1);
-      }
+      existingTeacher = await db.select().from(users)
+        .where(eq(users.name, teacher.name))
+        .limit(1);
     }
     
     let userId: number;
     
     if (existingTeacher && existingTeacher.length > 0) {
-      // 老师已存在,更新users表中的记录
+      // 老师已存在，更新users表中的记录
       userId = existingTeacher[0].id;
       
       // 准备更新数据
@@ -1301,7 +1286,7 @@ export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: n
         updatedAt: new Date(),
       };
       
-      // 只更新提供了值的字段
+      // 只更新提供了値的字段
       if (teacher.phone) updateData.phone = teacher.phone;
       if (teacher.nickname) updateData.nickname = teacher.nickname;
       if (teacher.email) updateData.email = teacher.email;
@@ -1315,40 +1300,17 @@ export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: n
       if (teacher.contractEndDate) updateData.contractEndDate = teacher.contractEndDate;
       if (teacher.joinDate) updateData.joinDate = teacher.joinDate;
       if (teacher.aliases) updateData.aliases = teacher.aliases;
-      if (teacher.notes !== undefined) updateData.teacherNotes = teacher.notes; // 备注字段映射到teacherNotes
+      if (teacher.notes !== undefined) updateData.teacherNotes = teacher.notes;
       if (teacher.isActive !== undefined) updateData.isActive = teacher.isActive;
       
       await db.update(users).set(updateData).where(eq(users.id, userId));
       stats.updated++;
     } else {
-      // 老师不存在,创建新用户
-      const openId = `teacher_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-      
-      const userResult = await db.insert(users).values({
-        openId,
-        name: teacher.name,
-        nickname: teacher.nickname || null,
-        phone: teacher.phone || null,
-        email: teacher.email || null,
-        wechat: teacher.wechat || null,
-        password: '123456', // 默认密码
-        roles: '老师', // 老师角色
-        teacherAttribute: teacher.teacherAttribute || null,
-        customerType: teacher.customerType || null,
-        category: teacher.category || null,
-        hourlyRate: teacher.hourlyRate || null,
-        bankAccount: teacher.bankAccount || null,
-        bankName: teacher.bankName || null,
-        contractEndDate: teacher.contractEndDate || null,
-        joinDate: teacher.joinDate || null,
-        aliases: teacher.aliases || null,
-        teacherNotes: teacher.notes || null,
-        isActive: teacher.isActive ?? true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-      userId = userResult[0].insertId;
-      stats.created++;
+      // 老师不存在，记录错误，不新建账号
+      const idHint = teacher.id ? `ID=${teacher.id}` : `姓名="${teacher.name}"`;
+      notFoundErrors.push(`${idHint}：该老师账号不存在，请先在「用户管理」中创建账号并分配老师角色，同步到老师列表后再导入更新`);
+      stats.skipped++;
+      continue; // 跳过该条记录，不处理城市关联
     }
     
     // 3. 如果有城市信息,创建userRoleCities关联记录
@@ -1386,7 +1348,7 @@ export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: n
     results.push({ id: userId, name: teacher.name, userId });
   }
   
-  return { results, stats };
+  return { results, stats, notFoundErrors };
 }
 
 // 获取所有老师名字(用于验证)
