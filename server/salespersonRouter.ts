@@ -189,4 +189,19 @@ export const salespersonRouter = router({
         message: `已更新销售人员 ${result.name} 的数据`
       };
     }),
+
+  // 批量导入更新销售人员（仅ID匹配，只更新提成比例/备注/在职状态）
+  batchImport: adminProcedure
+    .input(z.object({
+      rows: z.array(z.object({
+        id: z.number(),
+        commissionRate: z.number().min(0).max(100).optional(),
+        notes: z.string().optional(),
+        isActive: z.boolean().optional(),
+      }))
+    }))
+    .mutation(async ({ input }) => {
+      const result = await db.batchImportSalespersons(input.rows);
+      return result;
+    }),
 });

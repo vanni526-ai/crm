@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Trash2, Eye, Phone, Mail, Download, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, Key, UserPlus } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Eye, Phone, Mail, Download, Upload, ArrowUpDown, ArrowUp, ArrowDown, RefreshCw, Key, UserPlus, FileDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { formatDateBJ, formatDateTimeBJ } from "@/lib/timezone";
+import * as XLSX from "xlsx";
 
 const customerSchema = z.object({
   name: z.string().min(1, "客户姓名不能为空"),
@@ -125,6 +126,93 @@ export default function CustomersContent() {
       }
     }
   }, [progressData, utils]);
+
+  // 导入相关
+  const [importOpen, setImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importResult, setImportResult] = useState<{ updated: number; notFoundCount: number; notFoundIds: number[] } | null>(null);
+  const [importResultOpen, setImportResultOpen] = useState(false);
+
+  const batchImportMutation = trpc.customers.batchImport.useMutation({
+    onSuccess: (result) => {
+      utils.customers.list.invalidate();
+      setImportOpen(false);
+      setImportFile(null);
+      setImportResult(result);
+      setImportResultOpen(true);
+    },
+    onError: (error: any) => {
+      toast.error(`导入失败: ${error.message}`);
+    },
+  });
+
+  const handleDownloadTemplate = () => {
+    const headers = ["ID", "微信号", "电话", "流量来源", "备注"];
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    ws['!cols'] = headers.map(() => ({ wch: 20 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "客户导入模板");
+    XLSX.writeFile(wb, `客户导入模板_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  const handleExport = () => {
+    if (!customers || customers.length === 0) {
+      toast.error("没有数据可导出");
+      return;
+    }
+    const headers = ["ID", "名称", "微信号", "电话", "流量来源", "账户余额", "备注"];
+    const rows = customers.map((c: any) => [
+      c.id,
+      c.name || "",
+      c.wechatId || "",
+      c.phone || "",
+      c.trafficSource || "",
+      c.accountBalance || "0.00",
+      c.notes || "",
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    ws['!cols'] = headers.map(() => ({ wch: 20 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "客户信息");
+    XLSX.writeFile(wb, `客户列表_${new Date().toISOString().split('T')[0]}.xlsx`);
+    toast.success(`已导出 ${customers.length} 条记录`);
+  };
+
+  const handleImport = async () => {
+    if (!importFile) { toast.error("请选择文件"); return; }
+    try {
+      const buffer = await importFile.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      if (data.length < 2) { toast.error("文件无数据"); return; }
+      const [header, ...dataRows] = data;
+      const idIdx = header.findIndex((h: any) => String(h).trim() === "ID");
+      const wechatIdx = header.findIndex((h: any) => String(h).trim() === "微信号");
+      const phoneIdx = header.findIndex((h: any) => String(h).trim() === "电话");
+      const trafficIdx = header.findIndex((h: any) => String(h).trim() === "流量来源");
+      const notesIdx = header.findIndex((h: any) => String(h).trim() === "备注");
+      if (idIdx === -1) { toast.error("未找到ID列，请使用正确的导入模板"); return; }
+      const missingIdRows: number[] = [];
+      const rows: any[] = [];
+      dataRows.forEach((row: any[], i: number) => {
+        const id = row[idIdx];
+        if (!id || isNaN(Number(id))) { missingIdRows.push(i + 2); return; }
+        rows.push({
+          id: Number(id),
+          ...(wechatIdx >= 0 && row[wechatIdx] !== undefined ? { wechatId: String(row[wechatIdx] || "") } : {}),
+          ...(phoneIdx >= 0 && row[phoneIdx] !== undefined ? { phone: String(row[phoneIdx] || "") } : {}),
+          ...(trafficIdx >= 0 && row[trafficIdx] !== undefined ? { trafficSource: String(row[trafficIdx] || "") } : {}),
+          ...(notesIdx >= 0 && row[notesIdx] !== undefined ? { notes: String(row[notesIdx] || "") } : {}),
+        });
+      });
+      if (missingIdRows.length > 0) toast.warning(`第 ${missingIdRows.join(", ")} 行缺少ID，已跳过`);
+      if (rows.length === 0) { toast.error("没有有效数据可导入"); return; }
+      batchImportMutation.mutate({ rows });
+    } catch (e) {
+      toast.error("文件解析失败，请检查格式");
+    }
+  };
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -306,16 +394,17 @@ export default function CustomersContent() {
               <Trash2 className="mr-2 h-4 w-4" />
               {cleanupTeacherNames.isPending ? "清理中..." : "清理老师名"}
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (confirm("确定要从订单列表中自动导入客户吗？"))
-                  importFromOrders.mutate({});
-              }}
-              disabled={importFromOrders.isPending}
-            >
+            <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
+              <FileDown className="mr-2 h-4 w-4" />
+              模板下载
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+              <Upload className="mr-2 h-4 w-4" />
+              导入
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="mr-2 h-4 w-4" />
-              {importFromOrders.isPending ? "导入中..." : "自动导入客户"}
+              导出
             </Button>
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
@@ -721,6 +810,67 @@ export default function CustomersContent() {
           onOpenChange={setDetailOpen}
           customer={selectedCustomer}
         />
+
+        {/* 导入对话框 */}
+        <Dialog open={importOpen} onOpenChange={setImportOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>导入客户信息</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label>选择 Excel 文件</Label>
+                <Input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  仅支持更新已存在客户的：微信号、电话、流量来源、备注。必须包含 ID 列作为匹配键。
+                </p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => { setImportOpen(false); setImportFile(null); }}>取消</Button>
+              <Button onClick={handleImport} disabled={batchImportMutation.isPending}>
+                {batchImportMutation.isPending ? "导入中..." : "开始导入"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 导入结果汇总弹窗 */}
+        <Dialog open={importResultOpen} onOpenChange={setImportResultOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>导入结果</DialogTitle>
+            </DialogHeader>
+            {importResult && (
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-lg border p-4 text-center">
+                    <div className="text-2xl font-bold text-green-600">{importResult.updated}</div>
+                    <div className="text-sm text-muted-foreground">成功更新</div>
+                  </div>
+                  <div className="rounded-lg border p-4 text-center">
+                    <div className="text-2xl font-bold text-red-500">{importResult.notFoundCount}</div>
+                    <div className="text-sm text-muted-foreground">跳过（ID不存在）</div>
+                  </div>
+                </div>
+                {importResult.notFoundIds.length > 0 && (
+                  <div className="rounded-lg bg-muted p-3">
+                    <p className="text-sm font-medium mb-2">以下 ID 未找到对应客户，已跳过：</p>
+                    <p className="text-sm text-muted-foreground">{importResult.notFoundIds.join(", ")}</p>
+                    <p className="text-xs text-muted-foreground mt-2">请确认客户 ID 是否正确，客户必须已存在于系统中。</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <DialogFooter>
+              <Button onClick={() => setImportResultOpen(false)}>确定</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
   );
 }
@@ -1044,5 +1194,4 @@ function CustomerDetailDialog({
     </Dialog>
   );
 }
-
 

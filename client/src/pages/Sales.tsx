@@ -27,7 +27,8 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Search, Plus, Download, Upload, TrendingUp, Zap, BarChart3, Calendar, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Search, Plus, Download, Upload, TrendingUp, Zap, BarChart3, Calendar, ArrowUpDown, ArrowUp, ArrowDown, FileDown } from "lucide-react";
+import * as XLSX from "xlsx";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 
@@ -262,16 +263,42 @@ export default function Sales() {
 
   // handleDelete 函数已移除
 
-  // 导出CSV
+  // 导入结果状态
+  const [importResult, setImportResult] = useState<{ updated: number; notFoundIds: number[] } | null>(null);
+  const [importResultOpen, setImportResultOpen] = useState(false);
+
+  const batchImportMutation = trpc.salespersons.batchImport.useMutation({
+    onSuccess: (result) => {
+      refetch();
+      setIsImportDialogOpen(false);
+      setImportFile(null);
+      setImportResult(result);
+      setImportResultOpen(true);
+    },
+    onError: (error: any) => {
+      toast.error(`导入失败: ${error.message}`);
+    },
+  });
+
+  // 下载模板
+  const handleDownloadTemplate = () => {
+    const headers = ["ID", "提成比例(%)", "备注", "在职状态(在职/离职)"];
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    ws['!cols'] = headers.map(() => ({ wch: 20 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "销售导入模板");
+    XLSX.writeFile(wb, `销售导入模板_${new Date().toISOString().split('T')[0]}.xlsx`);
+  };
+
+  // 导出Excel
   const handleExport = () => {
     if (!salespersons || salespersons.length === 0) {
       toast.error("没有数据可导出");
       return;
     }
-
-    // 创建CSV内容
-    const headers = ["姓名", "花名", "电话", "邮箱", "微信号", "提成比例(%)", "状态", "备注"];
-    const rows = salespersons.map(sp => [
+    const headers = ["ID", "姓名", "花名", "电话", "邮筱", "微信号", "提成比例(%)", "在职状态", "备注"];
+    const rows = salespersons.map((sp: any) => [
+      sp.id,
       sp.name || "",
       sp.nickname || "",
       sp.phone || "",
@@ -281,94 +308,50 @@ export default function Sales() {
       sp.isActive ? "在职" : "离职",
       sp.notes || ""
     ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
-    ].join("\n");
-
-    // 下载文件
-    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `销售人员列表_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    ws['!cols'] = headers.map(() => ({ wch: 20 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "销售人员信息");
+    XLSX.writeFile(wb, `销售人员列表_${new Date().toISOString().split('T')[0]}.xlsx`);
     toast.success(`已导出 ${salespersons.length} 条记录`);
   };
 
   // 处理导入文件
   const handleImport = async () => {
     if (!importFile) {
-      toast.error("请选择要导入的CSV文件");
+      toast.error("请选择文件");
       return;
     }
-
     try {
-      const text = await importFile.text();
-      const lines = text.split("\n").filter(line => line.trim());
-      
-      if (lines.length < 2) {
-        toast.error("文件格式错误，至少需要表头和一条数据");
-        return;
-      }
-
-      // 跳过表头行
-      const dataLines = lines.slice(1);
-      const importData = [];
-
-      for (const line of dataLines) {
-        // 解析CSV行（处理引号）
-        const matches = line.match(/"([^"]*)"|([^,]+)/g);
-        if (!matches || matches.length < 1) continue;
-
-        const values = matches.map(v => v.replace(/^"|"$/g, "").trim());
-        const [name, nickname, phone, email, wechat, commissionRate, city, status, notes] = values;
-
-        if (!name) continue; // 姓名是必填项
-
-        importData.push({
-          name,
-          nickname: nickname || undefined,
-          phone: phone || undefined,
-          email: email || undefined,
-          wechat: wechat || undefined,
-          commissionRate: commissionRate ? parseFloat(commissionRate) : undefined,
-          city: city || undefined,
-          notes: notes || undefined,
+      const buffer = await importFile.arrayBuffer();
+      const wb = XLSX.read(buffer, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      if (data.length < 2) { toast.error("文件无数据"); return; }
+      const [header, ...dataRows] = data;
+      const idIdx = header.findIndex((h: any) => String(h).trim() === "ID");
+      const commissionIdx = header.findIndex((h: any) => String(h).trim().includes("提成比例"));
+      const notesIdx = header.findIndex((h: any) => String(h).trim() === "备注");
+      const activeIdx = header.findIndex((h: any) => String(h).trim().includes("在职状态"));
+      if (idIdx === -1) { toast.error("未找到ID列，请使用正确的导入模板"); return; }
+      const missingIdRows: number[] = [];
+      const rows: any[] = [];
+      dataRows.forEach((row: any[], i: number) => {
+        const id = row[idIdx];
+        if (!id || isNaN(Number(id))) { missingIdRows.push(i + 2); return; }
+        const activeRaw = activeIdx >= 0 ? String(row[activeIdx] || "").trim() : "";
+        rows.push({
+          id: Number(id),
+          ...(commissionIdx >= 0 && row[commissionIdx] !== undefined && row[commissionIdx] !== "" ? { commissionRate: Number(row[commissionIdx]) } : {}),
+          ...(notesIdx >= 0 && row[notesIdx] !== undefined ? { notes: String(row[notesIdx] || "") } : {}),
+          ...(activeRaw ? { isActive: activeRaw === "在职" } : {}),
         });
-      }
-
-      if (importData.length === 0) {
-        toast.error("没有有效的数据可导入");
-        return;
-      }
-
-      // 批量创建
-      let successCount = 0;
-      let failCount = 0;
-
-      for (const data of importData) {
-        try {
-          await createMutation.mutateAsync(data);
-          successCount++;
-        } catch (error) {
-          failCount++;
-          console.error("导入失败:", data, error);
-        }
-      }
-
-      toast.success(`导入完成！成功: ${successCount} 条，失败: ${failCount} 条`);
-      setIsImportDialogOpen(false);
-      setImportFile(null);
-      refetch();
-    } catch (error) {
-      toast.error("导入失败，请检查文件格式");
-      console.error(error);
+      });
+      if (missingIdRows.length > 0) toast.warning(`第 ${missingIdRows.join(", ")} 行缺少ID，已跳过`);
+      if (rows.length === 0) { toast.error("没有有效数据可导入"); return; }
+      batchImportMutation.mutate({ rows });
+    } catch (e) {
+      toast.error("文件解析失败，请检查格式");
     }
   };
 
@@ -398,6 +381,10 @@ export default function Sales() {
           <Button variant="outline" size="sm" onClick={() => setIsSmartRegisterOpen(true)}>
             <Zap className="w-4 h-4 mr-2" />
             智能登记
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
+            <FileDown className="w-4 h-4 mr-2" />
+            模板下载
           </Button>
           <Button variant="outline" size="sm" onClick={() => setIsImportDialogOpen(true)}>
             <Upload className="w-4 h-4 mr-2" />
@@ -675,34 +662,55 @@ export default function Sales() {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label>选择CSV文件</Label>
+              <Label>选择 Excel 文件</Label>
               <Input
                 type="file"
-                accept=".csv"
+                accept=".xlsx,.xls"
                 onChange={(e) => setImportFile(e.target.files?.[0] || null)}
               />
               <p className="text-sm text-muted-foreground">
-                CSV文件格式：姓名,花名,电话,邮箱,微信号,提成比例(%),城市,状态,备注
-              </p>
-              <p className="text-sm text-muted-foreground">
-                示例：张三,小张,13800138000,zhang@example.com,zhangsan_wx,10,北京,在职,优秀销售
+                仅支持更新已存在销售人员的：提成比例、备注、在职状态。必须包含 ID 列作为匹配键。
               </p>
             </div>
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setIsImportDialogOpen(false);
-                setImportFile(null);
-              }}
-            >
-              取消
+            <Button variant="outline" onClick={() => { setIsImportDialogOpen(false); setImportFile(null); }}>取消</Button>
+            <Button onClick={handleImport} disabled={batchImportMutation.isPending}>
+              {batchImportMutation.isPending ? "导入中..." : "开始导入"}
             </Button>
-            <Button onClick={handleImport}>
-              开始导入
-            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 导入结果汇总弹窗 */}
+      <Dialog open={importResultOpen} onOpenChange={setImportResultOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>导入结果</DialogTitle>
+          </DialogHeader>
+          {importResult && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-lg border p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600">{importResult.updated}</div>
+                  <div className="text-sm text-muted-foreground">成功更新</div>
+                </div>
+                <div className="rounded-lg border p-4 text-center">
+                  <div className="text-2xl font-bold text-red-500">{importResult.notFoundIds.length}</div>
+                  <div className="text-sm text-muted-foreground">跳过（ID不存在）</div>
+                </div>
+              </div>
+              {importResult.notFoundIds.length > 0 && (
+                <div className="rounded-lg bg-muted p-3">
+                  <p className="text-sm font-medium mb-2">以下 ID 未找到对应销售人员，已跳过：</p>
+                  <p className="text-sm text-muted-foreground">{importResult.notFoundIds.join(", ")}</p>
+                  <p className="text-xs text-muted-foreground mt-2">请先在系统中创建该销售人员账号后再导入。</p>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setImportResultOpen(false)}>确定</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

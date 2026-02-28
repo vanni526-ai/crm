@@ -5459,3 +5459,92 @@ export async function getOrdersByTeacher(teacherId: number) {
     .where(sql`${orders.deliveryTeacher} LIKE ${`%${teacherName}%`}`)
     .orderBy(desc(orders.createdAt));
 }
+
+/**
+ * 批量导入更新客户信息（仅ID匹配，只更新指定字段）
+ * 允许更新：微信号、电话、流量来源、备注
+ * 不允许更新：名称、账户余额、标签
+ */
+export async function batchImportCustomers(rows: Array<{
+  id: number;
+  wechatId?: string;
+  phone?: string;
+  trafficSource?: string;
+  notes?: string;
+}>): Promise<{ updated: number; notFoundCount: number; notFoundIds: number[] }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  let updated = 0;
+  const notFoundIds: number[] = [];
+
+  for (const row of rows) {
+    // 仅以 ID 精确匹配
+    const [existing] = await db
+      .select({ id: customers.id })
+      .from(customers)
+      .where(and(eq(customers.id, row.id), isNull(customers.deletedAt)))
+      .limit(1);
+
+    if (!existing) {
+      notFoundIds.push(row.id);
+      continue;
+    }
+
+    // 只更新允许的字段
+    const updateData: Record<string, any> = {};
+    if (row.wechatId !== undefined) updateData.wechatId = row.wechatId || null;
+    if (row.phone !== undefined) updateData.phone = row.phone || null;
+    if (row.trafficSource !== undefined) updateData.trafficSource = row.trafficSource || null;
+    if (row.notes !== undefined) updateData.notes = row.notes || null;
+
+    if (Object.keys(updateData).length > 0) {
+      await db.update(customers).set(updateData).where(eq(customers.id, row.id));
+      updated++;
+    }
+  }
+
+  return { updated, notFoundCount: notFoundIds.length, notFoundIds };
+}
+/**
+ * 批量导入更新销售人员信息息（仅ID匹配，只更新指定字段）
+ * 允许更新：提成比例、备注、在职状态
+ * 不允许更新：姓名/花名/电话/邮箱/微信号（来自users表，不在此处修改）
+ */
+export async function batchImportSalespersons(rows: Array<{
+  id: number;
+  commissionRate?: number;
+  notes?: string;
+  isActive?: boolean;
+}>): Promise<{ updated: number; notFoundIds: number[] }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  let updated = 0;
+  const notFoundIds: number[] = [];
+
+  for (const row of rows) {
+    const [existing] = await db
+      .select({ id: salespersons.id })
+      .from(salespersons)
+      .where(eq(salespersons.id, row.id))
+      .limit(1);
+
+    if (!existing) {
+      notFoundIds.push(row.id);
+      continue;
+    }
+
+    const updateData: Record<string, any> = {};
+    if (row.commissionRate !== undefined) updateData.commissionRate = row.commissionRate.toString();
+    if (row.notes !== undefined) updateData.notes = row.notes || null;
+    if (row.isActive !== undefined) updateData.isActive = row.isActive;
+
+    if (Object.keys(updateData).length > 0) {
+      await db.update(salespersons).set(updateData).where(eq(salespersons.id, row.id));
+      updated++;
+    }
+  }
+
+  return { updated, notFoundIds };
+}

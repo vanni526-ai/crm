@@ -168,4 +168,20 @@ export const customerRouter = router({
       }
       return { success: true, count: input.ids.length };
     }),
+
+  // 批量导入更新客户（仅ID匹配，只更新微信号/电话/流量来源/备注）
+  batchImport: protectedProcedure
+    .input(z.object({
+      rows: z.array(z.object({
+        id: z.number(),
+        wechatId: z.string().optional(),
+        phone: z.string().optional(),
+        trafficSource: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+    }))
+    .mutation(async ({ input }) => {
+      const result = await db.batchImportCustomers(input.rows);
+      return result;
+    }),
 });
