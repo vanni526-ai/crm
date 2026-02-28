@@ -365,33 +365,23 @@ export const appRouter = router({
       .input(z.object({
         text: z.string(),
       }))
-      .mutation(async ({ input }) => {
-        const { parseTransferNotes } = await import("./transferNoteParser");
-        const results = await parseTransferNotes(input.text);
-        return results;
+      .mutation(async () => {
+        throw new TRPCError({
+          code: "METHOD_NOT_SUPPORTED",
+          message: "转账备注解析功能暂时不可用（系统维护中）",
+        });
       }),
     
     parseWechatBill: salesOrAdminProcedure
       .input(z.object({
-        rows: z.array(z.object({
-          transactionTime: z.string(),
-          transactionType: z.string(),
-          counterparty: z.string(),
-          goods: z.string(),
-          incomeExpense: z.string(),
-          amount: z.string(),
-          paymentMethod: z.string(),
-          status: z.string(),
-          transactionNo: z.string(),
-          merchantNo: z.string(),
-          notes: z.string(),
-        })),
+        rows: z.array(z.any()),
         template: z.enum(["wechat", "alipay", "custom"]).optional(),
       }))
-      .mutation(async ({ input }) => {
-        const { parseWechatBillBatch } = await import("./wechatBillParser");
-        const results = await parseWechatBillBatch(input.rows, input.template || "wechat");
-        return { success: true, data: results };
+      .mutation(async () => {
+        throw new TRPCError({
+          code: "METHOD_NOT_SUPPORTED",
+          message: "微信账单解析功能暂时不可用（系统维护中）",
+        });
       }),
     
     // 用户下单接口 - 允许所有登录用户创建订单

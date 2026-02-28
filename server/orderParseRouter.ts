@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
-import { invokeLLM } from "./_core/llm";
-import * as db from "./db";
 import { TRPCError } from "@trpc/server";
+
+// LLM智能解析功能已在迁移阿里云阶段暂时禁用
+// 迁移稳定后可接入通义千问API重新启用
 
 /**
  * 订单智能解析路由
@@ -18,6 +19,16 @@ export const orderParseRouter = router({
     .input(z.object({
       text: z.string().min(1, "订单文本不能为空"),
     }))
+    .mutation(async () => {
+      throw new TRPCError({
+        code: "METHOD_NOT_SUPPORTED",
+        message: "智能解析功能暂时不可用（系统维护中），请手动填写订单信息",
+      });
+    }),
+});
+
+// 以下为已禁用的LLM解析实现，保留供后续接入通义千问时参考
+/*
     .mutation(async ({ input }) => {
       const { text } = input;
 
@@ -250,3 +261,4 @@ ${text}
       }
     }),
 });
+*/

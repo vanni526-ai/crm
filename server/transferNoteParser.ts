@@ -1,4 +1,4 @@
-import { invokeLLM } from "./_core/llm";
+// LLM功能已在迁移阿里云阶段暂时禁用
 import { extractNotesInfo } from "./notesExtractor";
 
 /**
@@ -288,109 +288,6 @@ ${lines.join('\n')}
 
 请直接返回JSON数组,不要包含任何其他说明文字。`;
 
-  try {
-    const response = await invokeLLM({
-      messages: [
-        { role: "system", content: "你是一个数据解析专家,擅长从非结构化文本中提取结构化信息。" },
-        { role: "user", content: prompt }
-      ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "transfer_notes",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              orders: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    salesperson: { type: "string" },
-                    classDate: { type: "string" },
-                    classTime: { type: "string" },
-                    deliveryCourse: { type: "string" },
-                    deliveryTeacher: { type: "string" },
-                    customerName: { type: "string" },
-                    paymentAmount: { type: "string" },
-                    paymentMethod: { type: "string" },
-                    courseAmount: { type: "string" },
-                    channelOrderNo: { type: "string" },
-                    teacherFee: { type: "string" },
-                    transportFee: { type: "string" },
-                    deliveryCity: { type: "string" },
-                    deliveryRoom: { type: "string" },
-                    trafficSource: { type: "string" },
-                    notes: { type: "string" },
-                    isVoided: { type: "boolean", description: "是否作废(如果记录以'作废'开头则为true,否则为false)" }
-                  },
-                  required: ["paymentAmount"],
-                  additionalProperties: false
-                }
-              }
-            },
-            required: ["orders"],
-            additionalProperties: false
-          }
-        }
-      }
-    });
-
-    const content = response.choices[0].message.content;
-    if (!content || typeof content !== 'string') {
-      throw new Error("LLM返回空内容或格式错误");
-    }
-
-    const parsed = JSON.parse(content);
-    const orders = parsed.orders || [];
-    
-    // 将别名/真实姓名转换为花名(或真实姓名),并提取结构化备注信息
-    const { getClassroomsByCityName } = await import("./db");
-    
-    for (const order of orders) {
-      if (order.salesperson && salespersonMapping.has(order.salesperson)) {
-        // 优先使用花名显示
-        order.salesperson = salespersonMapping.get(order.salesperson);
-      }
-      
-      // 智能纠错功能
-      Object.assign(order, smartCorrection(order));
-      
-      // 教室自动填充逻辑：如果城市只有一个教室且订单未指定教室，则自动填充
-      if (order.deliveryCity && !order.deliveryRoom) {
-        try {
-          const classrooms = await getClassroomsByCityName(order.deliveryCity);
-          if (classrooms.length === 1) {
-            // 单教室城市，自动填充教室
-            order.deliveryRoom = classrooms[0].name;
-            console.log(`[智能登记] 自动填充教室: ${order.deliveryCity} -> ${order.deliveryRoom}`);
-          } else if (classrooms.length > 1) {
-            // 多教室城市，默认填充第一个教室（按sortOrder排序）
-            order.deliveryRoom = classrooms[0].name;
-            console.log(`[智能登记] 多教室城市默认填充第一个教室: ${order.deliveryCity} -> ${order.deliveryRoom}`);
-          }
-        } catch (error) {
-          // 如果查询教室失败，忽略错误，不影响解析结果
-          console.warn(`[智能登记] 查询教室失败: ${order.deliveryCity}`, error);
-        }
-      }
-      
-      // 提取结构化备注信息
-      if (order.notes) {
-        const extracted = extractNotesInfo(order.notes);
-        order.noteTags = extracted.tags.length > 0 ? JSON.stringify(extracted.tags) : null;
-        order.discountInfo = extracted.discountInfo ? JSON.stringify(extracted.discountInfo) : null;
-        order.couponInfo = extracted.couponInfo ? JSON.stringify(extracted.couponInfo) : null;
-        order.membershipInfo = extracted.membershipInfo ? JSON.stringify(extracted.membershipInfo) : null;
-        order.paymentStatus = extracted.paymentStatus || null;
-        order.specialNotes = extracted.specialNotes || null;
-      }
-    }
-    
-    return orders;
-  } catch (error: any) {
-    console.error("解析转账备注失败:", error);
-    throw new Error(`解析失败: ${error.message}`);
-  }
+  // LLM解析已禁用
+  throw new Error("转账备注LLM解析功能暂时不可用（系统维护中）");
 }

@@ -5365,3 +5365,19 @@
 - [x] 会员状态统一存users表（方案A）
 - [x] 生成完整接口文档（docs/membership-api-documentation.md）
 - [x] 保存检查点并发布
+
+### 迁移阿里云-1. 清理所有残留invokeLLM调用
+- [ ] 清理 orderParseRouter.ts 中的 invokeLLM 调用，改为返回功能暂不可用
+- [ ] 清理 reconciliationRouter.ts 中的 intelligentMatch LLM 调用
+- [ ] 清理 routers.ts 中的 parseTransferNotes / parseWechatBill LLM 调用
+- [ ] 清理 wechatBillParser.ts 中的 invokeLLM 调用
+- [ ] 清理 transferNoteParser.ts 中的 invokeLLM 调用
+- [ ] 清理 promptOptimizer.ts 中的 invokeLLM 调用
+- [ ] 构建验证无 TypeScript 错误
+
+### 迁移阿里云-2. 替换 Manus Storage 为阿里云 OSS Node.js SDK
+- [ ] 安装 ali-oss Node.js SDK
+- [ ] 重写 server/storage.ts 使用阿里云 OSS
+- [ ] 更新默认头像 URL（manuscdn.com → OSS）
+- [ ] 构建验证无 TypeScript 错误
+- [ ] 保存 Checkpoint

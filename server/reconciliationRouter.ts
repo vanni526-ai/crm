@@ -3,7 +3,7 @@ import { protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as reconciliationDb from "./reconciliationDb";
 import * as db from "./db";
-import { invokeLLM } from "./_core/llm";
+// LLM智能匹配功能已在迁移阿里云阶段暂时禁用
 
 // 权限检查:管理员或财务可以访问对账功能
 const reconciliationProcedure = protectedProcedure.use(({ ctx, next }) => {
@@ -47,126 +47,11 @@ export const reconciliationRouter = router({
           };
         }
 
-        // 构建LLM提示词
-        const schedulesData = unmatchedSchedules.map(s => ({
-          id: s.id,
-          customerName: s.customerName,
-          deliveryTeacher: s.deliveryTeacher,
-          deliveryCourse: s.deliveryCourse,
-          classDate: s.classDate ? s.classDate.toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }) : null,
-          classTime: s.classTime,
-          courseAmount: s.courseAmount,
-          channelOrderNo: s.channelOrderNo,
-          location: s.location,
-        }));
-
-        const ordersData = unmatchedOrders.map(o => ({
-          id: o.id,
-          orderNo: o.orderNo,
-          customerName: o.customerName,
-          deliveryTeacher: o.deliveryTeacher,
-          deliveryCourse: o.deliveryCourse,
-          classDate: o.classDate ? o.classDate.toLocaleDateString('sv-SE', { timeZone: 'Asia/Shanghai' }) : null,
-          classTime: o.classTime,
-          courseAmount: o.courseAmount,
-          channelOrderNo: o.channelOrderNo,
-          deliveryCity: o.deliveryCity,
-        }));
-
-        const prompt = `你是一个财务对账专家。请根据以下课程日程和订单数据,找出匹配的记录。
-
-匹配规则(按优先级):
-1. 渠道订单号(channelOrderNo)完全匹配
-2. 客户名 + 上课日期 + 老师名 + 课程金额都匹配
-3. 客户名 + 上课日期 + 老师名匹配(允许金额有小幅差异)
-4. 客户名 + 上课日期匹配,且课程名称相似
-
-课程日程数据:
-${JSON.stringify(schedulesData, null, 2)}
-
-订单数据:
-${JSON.stringify(ordersData, null, 2)}
-
-请返回匹配结果,格式如下:
-{
-  "matches": [
-    {
-      "scheduleId": 课程日程ID,
-      "orderId": 订单ID,
-      "confidence": 置信度(0-100),
-      "reason": "匹配原因说明"
-    }
-  ]
-}
-
-注意:
-- 只返回置信度 >= 60 的匹配
-- 一个课程日程只能匹配一个订单
-- 置信度计算:渠道订单号匹配=100,完全匹配=95,部分匹配=70-90,模糊匹配=60-70
-`;
-
-        const response = await invokeLLM({
-          messages: [
-            { role: "system", content: "你是一个财务对账专家,擅长通过多维度信息匹配课程日程和订单。" },
-            { role: "user", content: prompt },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "match_result",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  matches: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        scheduleId: { type: "number" },
-                        orderId: { type: "number" },
-                        confidence: { type: "number" },
-                        reason: { type: "string" },
-                      },
-                      required: ["scheduleId", "orderId", "confidence", "reason"],
-                      additionalProperties: false,
-                    },
-                  },
-                },
-                required: ["matches"],
-                additionalProperties: false,
-              },
-            },
-          },
+        // LLM智能匹配已禁用，返回功能暂不可用提示
+        throw new TRPCError({
+          code: "METHOD_NOT_SUPPORTED",
+          message: "LLM智能匹配功能暂时不可用（系统维护中），请使用手动匹配功能",
         });
-
-        const content = response.choices[0].message.content;
-        const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
-        const result = JSON.parse(contentStr || "{}");
-        const matches = result.matches || [];
-
-        // 过滤掉置信度低于60的匹配
-        const validMatches = matches.filter((m: any) => m.confidence >= 60);
-
-        // 批量创建匹配关系
-        if (validMatches.length > 0) {
-          await reconciliationDb.batchCreateMatches(
-            validMatches.map((m: any) => ({
-              scheduleId: m.scheduleId,
-              orderId: m.orderId,
-              matchMethod: "llm_intelligent",
-              confidence: m.confidence,
-              matchDetails: JSON.stringify({ reason: m.reason }),
-            }))
-          );
-        }
-
-        return {
-          success: true,
-          matchedCount: validMatches.length,
-          matches: validMatches,
-          message: `成功匹配 ${validMatches.length} 条记录`,
-        };
       } catch (error: any) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
