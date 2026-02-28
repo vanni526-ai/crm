@@ -8,6 +8,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { handleWechatPaymentNotify, handleAlipayPaymentNotify } from "./paymentWebhook";
+import { handleMembershipWechatNotify, handleMembershipAlipayNotify } from "./membershipWebhook";
 import { serveStatic, setupVite } from "./vite";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -123,6 +124,9 @@ async function startServer() {
   // Payment webhook routes
   app.post("/api/webhook/wechat-payment-notify", handleWechatPaymentNotify);
   app.post("/api/webhook/alipay-payment-notify", handleAlipayPaymentNotify);
+  // Membership payment webhook routes
+  app.post("/api/webhook/membership-wechat-notify", handleMembershipWechatNotify);
+  app.post("/api/webhook/membership-alipay-notify", handleMembershipAlipayNotify);
   // tRPC API
   app.use(
     "/api/trpc",

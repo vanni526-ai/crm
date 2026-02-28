@@ -1205,3 +1205,54 @@ export const orderItems = mysqlTable("order_items", {
 
 export type OrderItem = typeof orderItems.$inferSelect;
 export type InsertOrderItem = typeof orderItems.$inferInsert;
+
+
+/**
+ * 会员套餐表 - 定义不同的会员类型、价格和权益
+ */
+export const membershipPlans = mysqlTable("membershipPlans", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(), // 套餐名称
+  description: text("description"), // 套餐描述
+  duration: int("duration").notNull(), // 有效期（天数）
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(), // 价格（元）
+  originalPrice: decimal("originalPrice", { precision: 10, scale: 2 }), // 原价（元）
+  benefits: json("benefits"), // 会员权益列表（JSON数组）
+  isActive: boolean("isActive").default(true).notNull(), // 是否启用
+  sortOrder: int("sortOrder").default(0).notNull(), // 排序顺序
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  isActiveIdx: index("membership_plan_active_idx").on(table.isActive),
+  sortOrderIdx: index("membership_plan_sort_idx").on(table.sortOrder),
+}));
+
+export type MembershipPlan = typeof membershipPlans.$inferSelect;
+export type InsertMembershipPlan = typeof membershipPlans.$inferInsert;
+
+/**
+ * 会员订单表 - 记录用户购买会员的订单信息
+ */
+export const membershipOrders = mysqlTable("membershipOrders", {
+  id: int("id").autoincrement().primaryKey(),
+  orderNo: varchar("orderNo", { length: 50 }).notNull().unique(), // 订单号
+  userId: int("userId").notNull(), // 用户ID（关联users表）
+  planId: int("planId").notNull(), // 套餐ID
+  planName: varchar("planName", { length: 100 }).notNull(), // 套餐名称（冗余）
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(), // 支付金额
+  status: mysqlEnum("status", ["pending", "paid", "cancelled", "refunded"]).default("pending").notNull(), // 订单状态
+  paymentChannel: mysqlEnum("paymentChannel", ["wechat", "alipay", "balance"]), // 支付渠道
+  channelOrderNo: varchar("channelOrderNo", { length: 100 }), // 支付渠道订单号
+  paymentDate: timestamp("paymentDate"), // 支付时间
+  activatedAt: timestamp("activatedAt"), // 激活时间
+  expiresAt: timestamp("expiresAt"), // 到期时间
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  userIdIdx: index("membership_order_user_idx").on(table.userId),
+  statusIdx: index("membership_order_status_idx").on(table.status),
+  orderNoIdx: index("membership_order_no_idx").on(table.orderNo),
+}));
+
+export type MembershipOrder = typeof membershipOrders.$inferSelect;
+export type InsertMembershipOrder = typeof membershipOrders.$inferInsert;

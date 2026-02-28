@@ -1,0 +1,9 @@
+{
+  "query": "\nINSERT IGNORE INTO `membershipPlans` (`name`, `description`, `duration`, `price`, `originalPrice`, `benefits`, `isActive`, `sortOrder`) VALUES\n('月度会员', '享受30天专属会员权益', 30, 99.00, 129.00, '[\"课程8折优惠\", \"优先预约老师\", \"专属客服支持\", \"会员专属活动\"]', true, 1),\n('季度会员', '享受90天专属会员权益，超值之选', 90, 268.00, 387.00, '[\"课程8折优惠\", \"优先预约老师\", \"专属客服支持\", \"会员专属活动\", \"免费参加线下沙龙\"]', true, 2),\n('年度会员', '享受365天专属会员权益，最划算', 365, 888.00, 1548.00, '[\"课程7折优惠\", \"优先预约老师\", \"专属客服支持\", \"会员专属活动\", \"免费参加线下沙龙\", \"生日专属礼物\"]', true, 3);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nINSERT IGNORE INTO `membershipPlans` (`name`, `description`, `duration`, `price`, `originalPrice`, `benefits`, `isActive`, `sortOrder`) VALUES\n('月度会员', '享受30天专属会员权益', 30, 99.00, 129.00, '[\"课程8折优惠\", \"优先预约老师\", \"专属客服支持\", \"会员专属活动\"]', true, 1),\n('季度会员', '享受90天专属会员权益，超值之选', 90, 268.00, 387.00, '[\"课程8折优惠\", \"优先预约老师\", \"专属客服支持\", \"会员专属活动\", \"免费参加线下沙龙\"]', true, 2),\n('年度会员', '享受365天专属会员权益，最划算', 365, 888.00, 1548.00, '[\"课程7折优惠\", \"优先预约老师\", \"专属客服支持\", \"会员专属活动\", \"免费参加线下沙龙\", \"生日专属礼物\"]', true, 3);\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1539
+}
