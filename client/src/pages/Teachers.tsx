@@ -22,7 +22,7 @@ import { ImageCropDialog } from "@/components/ImageCropDialog";
 import AvatarEditDialog from "@/components/AvatarEditDialog";
 
 // 默认头像URL
-const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/HXEdLrUBRLbZoGqS.png";
+const DEFAULT_AVATAR_URL = "/avatars/default-avatar.png";
 
 const teacherSchema = z.object({
   name: z.string().optional(), // 编辑时disabled，不参与validation

@@ -1118,7 +1118,7 @@ export async function getTeacherById(id: number) {
 export async function getAllTeachers() {
   const db = await getDb();
   if (!db) return [];
-  const DEFAULT_AVATAR_URL = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663214896586/JopHWzeEmqAYxCyT.png";
+  const DEFAULT_AVATAR_URL = "/avatars/default-teacher-avatar.png";
   
   // 1. 从users表读取角色包含teacher的用户（以users表为准，一一对应）
   const results = await db.select({
