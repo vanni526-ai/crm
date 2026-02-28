@@ -1,4 +1,3 @@
-import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { TRPCClientError } from "@trpc/client";
 import { useCallback, useEffect, useMemo } from "react";
@@ -9,7 +8,7 @@ type UseAuthOptions = {
 };
 
 export function useAuth(options?: UseAuthOptions) {
-  const { redirectOnUnauthenticated = false, redirectPath = getLoginUrl() } =
+  const { redirectOnUnauthenticated = false, redirectPath = "/login" } =
     options ?? {};
   const utils = trpc.useUtils();
 
@@ -33,7 +32,7 @@ export function useAuth(options?: UseAuthOptions) {
         error.data?.code === "UNAUTHORIZED"
       ) {
         // Already logged out, just redirect
-        window.location.href = getLoginUrl();
+        window.location.href = "/login";
         return;
       }
       throw error;
@@ -41,7 +40,7 @@ export function useAuth(options?: UseAuthOptions) {
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
       // Redirect to login page after logout
-      window.location.href = getLoginUrl();
+      window.location.href = "/login";
     }
   }, [logoutMutation, utils]);
 
@@ -70,8 +69,10 @@ export function useAuth(options?: UseAuthOptions) {
     if (state.user) return;
     if (typeof window === "undefined") return;
     if (window.location.pathname === redirectPath) return;
+    // Don't redirect from /membership (public page)
+    if (window.location.pathname.startsWith("/membership")) return;
 
-    window.location.href = redirectPath
+    window.location.href = redirectPath;
   }, [
     redirectOnUnauthenticated,
     redirectPath,

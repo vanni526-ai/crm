@@ -117,7 +117,18 @@ export const authRouter = router({
   }),
 
   // 登出
-  logout: publicProcedure.mutation(async () => {
+  logout: publicProcedure.mutation(async ({ ctx }) => {
+    // 清除 session cookie
+    ctx.res?.clearCookie("session", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    });
+    // 兼容旧的 Manus OAuth cookie
+    ctx.res?.clearCookie("manus-session", {
+      httpOnly: true,
+      sameSite: "lax",
+    });
     return { success: true };
   }),
 

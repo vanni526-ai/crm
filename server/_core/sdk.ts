@@ -342,8 +342,46 @@ class SDKServer {
       }
     }
     
-    // Strategy 2: Try Session Cookie (for Manus OAuth)
+    // Strategy 3: Try local "session" cookie (written by loginWithUserAccount)
     const cookies = this.parseCookies(req.headers.cookie);
+    const localSessionCookie = cookies.get("session");
+    if (localSessionCookie) {
+      try {
+        const secretKey = this.getSessionSecret();
+        const { payload } = await jwtVerify(localSessionCookie, secretKey, {
+          algorithms: ["HS256"],
+        });
+        // Local JWT contains user id
+        const userId = payload.id;
+        if (typeof userId === "number") {
+          const user = await db.getUserById(userId);
+          if (user) {
+            if (user.isDeleted === 1) {
+              const deletedAt = user.deletedAt ? new Date(user.deletedAt) : new Date();
+              const recoveryDeadline = new Date(deletedAt);
+              recoveryDeadline.setDate(recoveryDeadline.getDate() + 30);
+              const daysRemaining = Math.ceil((recoveryDeadline.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+              if (daysRemaining > 0) {
+                const maskedPhone = user.phone ? user.phone.substring(0, 3) + '****' + user.phone.substring(7) : 'N/A';
+                throw new Error(JSON.stringify({ error: 'ACCOUNT_PENDING_DELETION', userId: user.id, phone: maskedPhone, daysRemaining, message: `账号处于注销缓冲期，还有${daysRemaining}天可恢复` }));
+              }
+            }
+            if (user.isDeleted === 2) throw ForbiddenError("账号已永久删除，无法登录");
+            await db.upsertUser({ openId: user.openId, lastSignedIn: signedInAt });
+            console.log('[Auth] Authenticated via local session cookie:', user.name);
+            return user;
+          }
+        }
+      } catch (error) {
+        // If it's a structured error (account deletion), rethrow
+        const msg = String(error);
+        if (msg.includes('ACCOUNT_PENDING_DELETION') || msg.includes('永久删除')) throw error;
+        console.warn('[Auth] Local session cookie verification failed:', msg);
+        // Fall through to Manus OAuth cookie
+      }
+    }
+
+    // Strategy 4: Try Manus OAuth session cookie (legacy)
     const sessionCookie = cookies.get(COOKIE_NAME);
     const session = await this.verifySession(sessionCookie);
 

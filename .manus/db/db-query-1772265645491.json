@@ -1,0 +1,170 @@
+{
+  "query": "SELECT id, name, phone, email, role, CASE WHEN password IS NOT NULL AND password != '' THEN 'has_password' ELSE 'no_password' END as pwd_status FROM users LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, phone, email, role, CASE WHEN password IS NOT NULL AND password != '' THEN 'has_password' ELSE 'no_password' END as pwd_status FROM users LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "顗杰 韩",
+      "phone": "NULL",
+      "email": "aneh001@gmail.com",
+      "role": "admin",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "1470017",
+      "name": "韩顗杰",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "1680001",
+      "name": "系统管理员",
+      "phone": "NULL",
+      "email": "NULL",
+      "role": "admin",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "1770004",
+      "name": "碳 咪",
+      "phone": "NULL",
+      "email": "mitanbobo@gmail.com",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "11040019",
+      "name": "yi han",
+      "phone": "NULL",
+      "email": "vanni526@gmail.com",
+      "role": "admin",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "13200003",
+      "name": "林雨欣",
+      "phone": "18705988654",
+      "email": "linlinyx0111@gmail.com",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "13860030",
+      "name": "admin",
+      "phone": "99999999999",
+      "email": "admin@example.com",
+      "role": "admin",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790104",
+      "name": "13880017383",
+      "phone": "13880017383",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790105",
+      "name": "13880019690",
+      "phone": "13880019690",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790106",
+      "name": "13880045415",
+      "phone": "13880045415",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790107",
+      "name": "13880063985",
+      "phone": "13880063985",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790108",
+      "name": "13880085854",
+      "phone": "13880085854",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790117",
+      "name": "15921456877",
+      "phone": "15921456877",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790154",
+      "name": "13800199998",
+      "phone": "13800199998",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790174",
+      "name": "13800199999",
+      "phone": "13800199999",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790183",
+      "name": "13886188164",
+      "phone": "13886188164",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790184",
+      "name": "13886190602",
+      "phone": "13886190602",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "14790185",
+      "name": "13886201838",
+      "phone": "13886201838",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "15362121",
+      "name": "安雅",
+      "phone": "15300822780",
+      "email": "NULL",
+      "role": "user",
+      "pwd_status": "has_password"
+    },
+    {
+      "id": "15362122",
+      "name": "姜一",
+      "phone": "13936258496",
+      "email": "NULL",
+      "role": "teacher",
+      "pwd_status": "has_password"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tphone\temail\trole\tpwd_status\n1\t顗杰 韩\tNULL\taneh001@gmail.com\tadmin\thas_password\n1470017\t韩顗杰\tNULL\tNULL\tuser\thas_password\n1680001\t系统管理员\tNULL\tNULL\tadmin\thas_password\n1770004\t碳 咪\tNULL\tmitanbobo@gmail.com\tuser\thas_password\n11040019\tyi han\tNULL\tvanni526@gmail.com\tadmin\thas_password\n13200003\t林雨欣\t18705988654\tlinlinyx0111@gmail.com\tuser\thas_password\n13860030\tadmin\t99999999999\tadmin@example.com\tadmin\thas_password\n14790104\t13880017383\t13880017383\tNULL\tuser\thas_password\n14790105\t13880019690\t13880019690\tNULL\tuser\thas_password\n14790106\t13880045415\t13880045415\tNULL\tuser\thas_password\n14790107\t13880063985\t13880063985\tNULL\tuser\thas_password\n14790108\t13880085854\t13880085854\tNULL\tuser\thas_password\n14790117\t15921456877\t15921456877\tNULL\tuser\thas_password\n14790154\t13800199998\t13800199998\tNULL\tuser\thas_password\n14790174\t13800199999\t13800199999\tNULL\tuser\thas_password\n14790183\t13886188164\t13886188164\tNULL\tuser\thas_password\n14790184\t13886190602\t13886190602\tNULL\tuser\thas_password\n14790185\t13886201838\t13886201838\tNULL\tuser\thas_password\n15362121\t安雅\t15300822780\tNULL\tuser\thas_password\n15362122\t姜一\t13936258496\tNULL\tteacher\thas_password\n",
+  "stderr": "",
+  "execution_time_ms": 1592
+}

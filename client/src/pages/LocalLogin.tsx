@@ -7,32 +7,27 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { LogIn, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { LogIn, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function LocalLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
 
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: (data) => {
-      // 保存token到localStorage
-      localStorage.setItem("auth-token", data.token);
-      localStorage.setItem("auth-user", JSON.stringify(data.user));
-      
-      toast.success("登录成功!");
-      
-      // 延迟导航,让用户看到成功提示
+  const loginMutation = trpc.auth.loginWithUserAccount.useMutation({
+    onSuccess: () => {
+      toast.success("登录成功！");
+      // Cookie 已由后端写入，直接跳转首页并刷新页面以重新加载认证状态
       setTimeout(() => {
-        setLocation("/");
-      }, 500);
+        window.location.href = "/";
+      }, 300);
     },
     onError: (error) => {
-      const errorMessage = error.message || "登录失败,请检查用户名和密码";
+      const errorMessage = error.message || "登录失败，请检查账号和密码";
       setError(errorMessage);
-      toast.error(errorMessage);
       setIsLoading(false);
     },
   });
@@ -42,9 +37,8 @@ export default function LocalLogin() {
     setError(null);
     setIsLoading(true);
 
-    // 基本验证
     if (!username.trim()) {
-      setError("请输入用户名");
+      setError("请输入手机号或用户名");
       setIsLoading(false);
       return;
     }
@@ -60,8 +54,8 @@ export default function LocalLogin() {
         username: username.trim(),
         password,
       });
-    } catch (err) {
-      // 错误已在onError中处理
+    } catch {
+      // 错误已在 onError 中处理
     }
   };
 
@@ -77,24 +71,24 @@ export default function LocalLogin() {
         {/* 标题区域 */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-lg">
+            <div className="bg-blue-600 p-3 rounded-xl shadow-lg">
               <LogIn className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">课程交付CRM</h1>
-          <p className="text-slate-400">本地账户登录</p>
+          <h1 className="text-3xl font-bold text-white mb-2">课程交付 CRM</h1>
+          <p className="text-slate-400 text-sm">内部管理系统，请使用账号密码登录</p>
         </div>
 
         {/* 登录卡片 */}
-        <Card className="bg-slate-800 border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-white">登录您的账户</CardTitle>
+        <Card className="bg-slate-800 border-slate-700 shadow-2xl">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-white text-xl">账号登录</CardTitle>
             <CardDescription className="text-slate-400">
-              使用您的用户名和密码登录系统
+              使用手机号 / 用户名 / 邮箱 + 密码登录
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* 错误提示 */}
               {error && (
                 <Alert className="bg-red-950 border-red-800">
@@ -105,15 +99,15 @@ export default function LocalLogin() {
                 </Alert>
               )}
 
-              {/* 用户名输入 */}
+              {/* 账号输入 */}
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-slate-200">
-                  用户名
+                <Label htmlFor="username" className="text-slate-200 text-sm font-medium">
+                  手机号 / 用户名 / 邮箱
                 </Label>
                 <Input
                   id="username"
                   type="text"
-                  placeholder="请输入用户名"
+                  placeholder="请输入手机号、用户名或邮箱"
                   value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
@@ -121,37 +115,49 @@ export default function LocalLogin() {
                   }}
                   onKeyPress={handleKeyPress}
                   disabled={isLoading}
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500 h-11"
                   autoComplete="username"
+                  autoFocus
                 />
               </div>
 
               {/* 密码输入 */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-200">
+                <Label htmlFor="password" className="text-slate-200 text-sm font-medium">
                   密码
                 </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="请输入密码"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError(null);
-                  }}
-                  onKeyPress={handleKeyPress}
-                  disabled={isLoading}
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500"
-                  autoComplete="current-password"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="请输入密码"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError(null);
+                    }}
+                    onKeyPress={handleKeyPress}
+                    disabled={isLoading}
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500 h-11 pr-10"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-slate-500">初始密码为 123456，登录后请及时修改</p>
               </div>
 
               {/* 登录按钮 */}
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 h-10"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 mt-2"
               >
                 {isLoading ? (
                   <>
@@ -166,40 +172,12 @@ export default function LocalLogin() {
                 )}
               </Button>
             </form>
-
-            {/* 测试账号提示 */}
-            <div className="mt-6 p-4 bg-slate-700 rounded-lg border border-slate-600">
-              <p className="text-sm text-slate-300 font-semibold mb-3">
-                <CheckCircle className="w-4 h-4 inline mr-2 text-green-500" />
-                测试账号
-              </p>
-              <div className="space-y-2 text-xs text-slate-400">
-                <div>
-                  <span className="font-mono bg-slate-800 px-2 py-1 rounded">admin_test</span>
-                  <span className="mx-2">/</span>
-                  <span className="font-mono bg-slate-800 px-2 py-1 rounded">Test123456</span>
-                </div>
-                <div>
-                  <span className="font-mono bg-slate-800 px-2 py-1 rounded">sales_test</span>
-                  <span className="mx-2">/</span>
-                  <span className="font-mono bg-slate-800 px-2 py-1 rounded">Test123456</span>
-                </div>
-                <div>
-                  <span className="font-mono bg-slate-800 px-2 py-1 rounded">finance_test</span>
-                  <span className="mx-2">/</span>
-                  <span className="font-mono bg-slate-800 px-2 py-1 rounded">Test123456</span>
-                </div>
-                <div className="text-slate-500 mt-2">
-                  还有: teacher_test, customer_test, partner_test
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
-        {/* 底部信息 */}
-        <div className="mt-6 text-center text-slate-400 text-sm">
-          <p>系统支持本地账户和Manus OAuth两种登录方式</p>
+        {/* 底部提示 */}
+        <div className="mt-6 text-center text-slate-500 text-xs">
+          <p>如需创建账号，请联系系统管理员</p>
         </div>
       </div>
     </div>

@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(CASE WHEN password IS NOT NULL AND password != '' THEN 1 ELSE 0 END) as with_password, SUM(CASE WHEN password IS NULL OR password = '' THEN 1 ELSE 0 END) as without_password FROM users WHERE isDeleted = 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as total, SUM(CASE WHEN password IS NOT NULL AND password != '' THEN 1 ELSE 0 END) as with_password, SUM(CASE WHEN password IS NULL OR password = '' THEN 1 ELSE 0 END) as without_password FROM users WHERE isDeleted = 0;",
+  "rows": [
+    {
+      "total": "134",
+      "with_password": "134",
+      "without_password": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\twith_password\twithout_password\n134\t134\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1529
+}

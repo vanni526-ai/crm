@@ -1,0 +1,19 @@
+{
+  "query": "SELECT COUNT(*) as total_users FROM users; SELECT COUNT(*) as has_password FROM users WHERE password IS NOT NULL AND password != '';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as total_users FROM users; SELECT COUNT(*) as has_password FROM users WHERE password IS NOT NULL AND password != '';",
+  "rows": [
+    {
+      "total_users": "134"
+    },
+    {
+      "total_users": "has_password"
+    },
+    {
+      "total_users": "134"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_users\n134\nhas_password\n134\n",
+  "stderr": "",
+  "execution_time_ms": 1786
+}
