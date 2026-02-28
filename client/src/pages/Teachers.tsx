@@ -531,26 +531,24 @@ export default function Teachers() {
       return;
     }
 
-    // 定义字段顺序，严格按照指定顺序
-    const headers = ['ID', '姓名', '昵称', '电话号码', '邮箱', '微信号', '活跃状态', '老师属性', '受众', '客户类型', '类别', '时薪', '银行账户', '开户行', '地区', '合同到期时间', '入职时间', '别名', '备注'];
+    // 字段顺序与导入模板一致：ID + 15个可更新字段（无姓名列）
+    const headers = ['ID', '昵称', '电话号码', '邮箱', '微信号', '活跃状态', '老师属性', '受众', '客户类型', '类别', '时薪', '银行账户', '开户行', '合同到期时间', '入职时间', '别名', '备注'];
 
     // 所有老师数据放入同一个Sheet
     const rows = teachers.map((teacher: any) => [
       teacher.id,
-      teacher.name,
       teacher.nickname || '',
       teacher.phone || '',
       teacher.email || '',
       teacher.wechat || '',
       teacher.isActive !== false ? '活跃' : '休息',
       teacher.teacherAttribute || '',
-      teacher.customerType || '',
-      teacher.customerType || '',
+      teacher.customerType || '',  // 受众
+      '',                           // 客户类型（备用字段）
       teacher.category || '',
       teacher.hourlyRate || '',
       teacher.bankAccount || '',
       teacher.bankName || '',
-      teacher.city || '',
       teacher.contractEndDate ? new Date(teacher.contractEndDate).toISOString().split('T')[0] : '',
       teacher.joinDate ? new Date(teacher.joinDate).toISOString().split('T')[0] : '',
       teacher.aliases || '',
