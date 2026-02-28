@@ -410,106 +410,75 @@ export default function Teachers() {
       workbook.SheetNames.forEach((sheetName) => {
         const worksheet = workbook.Sheets[sheetName];
         
-        // 智能识别格式:检查第一行是否是标题行(非列名)
-        const allRows: any[] = XLSX.utils.sheet_to_json(worksheet, { range: 0, header: 1 });
-        const firstRow: any[] = allRows[0] || [];
-        
-        // 定义所有可能的列名(中英文)
-        const validColumnNames = [
-          'ID', 'id',
-          '姓名', '老师', 'name',
-          '昵称', 'nickname',
-          '电话号码', '手机号', 'phone',
-          '邮箱', 'email',
-          '微信号', 'wechat',
-          '活跃状态', 'status',
-          '老师属性', 'teacherAttribute',
-          '受众客户类型', '客户类型', 'customerType',
-          '类别', 'category',
-          '时薪', 'hourlyRate',
-          '银行账户', 'bankAccount',
-          '开户行', 'bankName',
-          '地区', '城市', 'city',
-          '合同到期时间', 'contractEndDate',
-          '入职时间', 'joinDate',
-          '别名', 'aliases',
-          '备注', 'notes'
-        ];
-        
-        // 检查第一行是否包含任何有效列名(过滤null/undefined/空值)
-        const isHeaderRow = firstRow.some(cell => {
-          // 过滤null/undefined/空值
-          if (!cell || cell === null || cell === undefined) return false;
-          const cellStr = cell.toString().trim();
-          // 过滤字符串"null"和"undefined"
-          if (!cellStr || cellStr === 'null' || cellStr === 'undefined') return false;
-          return validColumnNames.includes(cellStr);
-        });
-        
-        // 如果第一行是标题行,则从第2行开始读取数据;  否则检查是否有额外标题行
-        const hasExtraTitle = !isHeaderRow && firstRow.length > 0 &&
-          (firstRow[0]?.toString().includes('老师信息') || firstRow[0]?.toString().includes('合伙'));
-        
-        // 根据是否有额外标题行决定跳过的行数
-        // 如果第一行是表头，则从第2行开始读取（range=1）
-        // 如果有额外标题行，则从第3行开始读取（range=2）
-        const skipRows = isHeaderRow ? 1 : (hasExtraTitle ? 2 : 1);
-        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { range: skipRows });
+        // 使用 sheet_to_json 解析，自动识别表头行
+        const jsonData: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
         
         jsonData.forEach((row: any) => {
-          console.log('解析行数据:', row);
-          const teacher: any = {
-            name: row['老师'] || row['姓名'] || row['name'] || '',
-            nickname: row['昵称'] || row['nickname'] || '',
-            phone: row['电话号码'] || row['手机号'] || row['phone'] ? String(row['电话号码'] || row['手机号'] || row['phone']) : '',
-            email: row['邮箱'] || row['email'] || '',
-            wechat: row['微信号'] || row['wechat'] || '',
-            status: row['活跃状态'] || row['status'] || '活跃',
-            teacherAttribute: row['老师属性'] || row['teacherAttribute'] || undefined,
-            customerType: row['受众客户类型'] || row['customerType'] || '',
-            category: row['类别'] || row['category'] || (sheetName.includes('本部') ? '本部老师' : sheetName.includes('合伙店') ? '合伙店老师' : '其他'),
-            hourlyRate: row['时薪'] || row['hourlyRate'] || '',
-            bankAccount: row['银行账户'] || row['bankAccount'] || '',
-            bankName: row['开户行'] || row['bankName'] || '',
-            aliases: row['别名'] || row['aliases'] || '',
-            notes: row['备注'] || row['notes'] || '',
-            city: row['城市'] || row['地区'] || (sheetName.includes('天津') ? '天津' : sheetName.includes('上海') ? '上海' : ''),
-          };
-          
-          // 如果Excel中有ID字段，添加到teacher对象中用于更新
+          // 必须有 ID 字段，且必须是有效数字
           const idValue = row['ID'] || row['id'];
-          if (idValue) {
-            teacher.id = Number(idValue);
+          if (!idValue || isNaN(Number(idValue))) {
+            // ID 缺失或无效，记录错误
+            const rowName = row['姓名'] || row['昵称'] || JSON.stringify(row).slice(0, 30);
+            allTeachers.push({ __missingId: true, __rowHint: rowName });
+            return;
           }
-          
-          // 处理日期字段，将字符串转换为Date对象
-          const contractEndDateStr = row['合同到期时间'] || row['contractEndDate'];
-          if (contractEndDateStr) {
-            teacher.contractEndDate = new Date(contractEndDateStr);
+
+          // 只提取 15 个允许更新的字段 + ID
+          const teacher: any = {
+            id: Number(idValue),
+            nickname: row['昵称'] !== undefined ? String(row['昵称']) : undefined,
+            phone: row['电话号码'] !== undefined && row['电话号码'] !== '' ? String(row['电话号码']) : undefined,
+            email: row['邮箱'] !== undefined ? String(row['邮箱']) : undefined,
+            wechat: row['微信号'] !== undefined ? String(row['微信号']) : undefined,
+            isActive: row['活跃状态'] !== undefined && row['活跃状态'] !== ''
+              ? (String(row['活跃状态']).trim() !== '休息')
+              : undefined,
+            teacherAttribute: row['老师属性'] !== undefined ? String(row['老师属性']) : undefined,
+            customerType: row['受众'] !== undefined && row['受众'] !== ''
+              ? String(row['受众'])
+              : (row['客户类型'] !== undefined ? String(row['客户类型']) : undefined),
+            category: row['类别'] !== undefined ? String(row['类别']) : undefined,
+            hourlyRate: row['时薪'] !== undefined && row['时薪'] !== '' ? String(row['时薪']) : undefined,
+            bankAccount: row['银行账户'] !== undefined ? String(row['银行账户']) : undefined,
+            bankName: row['开户行'] !== undefined ? String(row['开户行']) : undefined,
+            aliases: row['别名'] !== undefined ? String(row['别名']) : undefined,
+            notes: row['备注'] !== undefined ? String(row['备注']) : undefined,
+          };
+
+          // 处理日期字段
+          const contractEndDateStr = row['合同到期时间'];
+          if (contractEndDateStr && contractEndDateStr !== '') {
+            const d = new Date(contractEndDateStr);
+            if (!isNaN(d.getTime())) teacher.contractEndDate = d;
           }
-          
-          const joinDateStr = row['入职时间'] || row['joinDate'];
-          if (joinDateStr) {
-            teacher.joinDate = new Date(joinDateStr);
+          const joinDateStr = row['入职时间'];
+          if (joinDateStr && joinDateStr !== '') {
+            const d = new Date(joinDateStr);
+            if (!isNaN(d.getTime())) teacher.joinDate = d;
           }
-          
-          console.log('解析后的老师数据:', teacher);
-          
-          // 只添加有姓名的记录
-          if (teacher.name && teacher.name.trim()) {
-            allTeachers.push(teacher);
-          }
+
+          allTeachers.push(teacher);
         });
       });
       
-      if (allTeachers.length === 0) {
-        toast.error("未找到有效的老师数据");
+      // 分离 ID 缺失的记录
+      const missingIdRows = allTeachers.filter((t: any) => t.__missingId);
+      const validTeachers = allTeachers.filter((t: any) => !t.__missingId);
+
+      if (missingIdRows.length > 0) {
+        missingIdRows.forEach((t: any) => {
+          toast.error(`行「${t.__rowHint}」缺少 ID 字段，已跳过。请在 ID 列填入系统用户ID`);
+        });
+      }
+
+      if (validTeachers.length === 0) {
+        toast.error("未找到含有效 ID 的老师数据，请确保 Excel 中包含 ID 列并填入用户ID");
         setImporting(false);
         return;
       }
       
-      toast.info(`已解析${allTeachers.length}条老师记录,正在导入...`);
-      importMutation.mutate({ teachers: allTeachers });
+      toast.info(`已解析 ${validTeachers.length} 条有效记录，正在导入...`);
+      importMutation.mutate({ teachers: validTeachers });
       
     } catch (error: any) {
       console.error('导入错误:', error);
@@ -523,40 +492,36 @@ export default function Teachers() {
     }
   };
 
-  // Excel模板下载（单Sheet空字段表头）
+  // Excel模板下载（单Sheet，仅ID+15个可更新字段，无地区列）
   const handleDownloadTemplate = () => {
-    // 仅包含一行空字段表头，不含示例数据
-    const emptyRow = {
-      'ID': '',
-      '姓名': '',
-      '昵称': '',
-      '电话号码': '',
-      '邮箱': '',
-      '微信号': '',
-      '活跃状态': '',
-      '老师属性': '',
-      '受众': '',
-      '客户类型': '',
-      '类别': '',
-      '时薪': '',
-      '银行账户': '',
-      '开户行': '',
-      '地区': '',
-      '合同到期时间': '',
-      '入职时间': '',
-      '别名': '',
-      '备注': '',
-    };
+    // 字段顺序：ID（必填，匹配键）+ 15个可更新字段
+    const headers = [
+      'ID',         // 必填，系统匹配键
+      '昵称',
+      '电话号码',
+      '邮箱',
+      '微信号',
+      '活跃状态',   // 活跃 或 休息
+      '老师属性',   // S / M / Switch
+      '受众',         // 成人 / 青少年 / 儿童
+      '客户类型',
+      '类别',
+      '时薪',
+      '银行账户',
+      '开户行',
+      '合同到期时间', // YYYY-MM-DD
+      '入职时间',     // YYYY-MM-DD
+      '别名',
+      '备注',
+    ];
 
     const wb = XLSX.utils.book_new();
-    // 使用 aoa_to_sheet 确保字段顺序固定
-    const headers = Object.keys(emptyRow);
     const ws = XLSX.utils.aoa_to_sheet([headers]);
     XLSX.utils.book_append_sheet(wb, ws, '老师信息');
 
     const fileName = `老师导入模板_${new Date().toISOString().split('T')[0]}.xlsx`;
     XLSX.writeFile(wb, fileName);
-    toast.success('模板下载成功');
+    toast.success('模板下载成功，请在 ID 列填入系统用户ID，其他字段按需填写');
   };
 
   // Excel导出（单Sheet全部数据）

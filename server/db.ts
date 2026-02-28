@@ -1259,93 +1259,45 @@ export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: n
   const notFoundErrors: string[] = []; // 记录找不到对应账号的老师
   
   for (const teacher of teacherList) {
-    let existingTeacher = null;
-    
-    // 1. 优先通过ID查找现有老师
-    if (teacher.id) {
-      existingTeacher = await db.select().from(users)
-        .where(eq(users.id, teacher.id))
-        .limit(1);
-    }
-    
-    // 2. 如果没有ID或找不到，使用姓名查找（在所有用户中查，不限于老师角色）
-    if (!existingTeacher || existingTeacher.length === 0) {
-      existingTeacher = await db.select().from(users)
-        .where(eq(users.name, teacher.name))
-        .limit(1);
-    }
-    
-    let userId: number;
-    
-    if (existingTeacher && existingTeacher.length > 0) {
-      // 老师已存在，更新users表中的记录
-      userId = existingTeacher[0].id;
-      
-      // 准备更新数据
-      const updateData: any = {
-        updatedAt: new Date(),
-      };
-      
-      // 只更新提供了値的字段
-      if (teacher.phone) updateData.phone = teacher.phone;
-      if (teacher.nickname) updateData.nickname = teacher.nickname;
-      if (teacher.email) updateData.email = teacher.email;
-      if (teacher.wechat) updateData.wechat = teacher.wechat;
-      if (teacher.teacherAttribute) updateData.teacherAttribute = teacher.teacherAttribute;
-      if (teacher.customerType) updateData.customerType = teacher.customerType;
-      if (teacher.category) updateData.category = teacher.category;
-      if (teacher.hourlyRate) updateData.hourlyRate = teacher.hourlyRate;
-      if (teacher.bankAccount) updateData.bankAccount = teacher.bankAccount;
-      if (teacher.bankName) updateData.bankName = teacher.bankName;
-      if (teacher.contractEndDate) updateData.contractEndDate = teacher.contractEndDate;
-      if (teacher.joinDate) updateData.joinDate = teacher.joinDate;
-      if (teacher.aliases) updateData.aliases = teacher.aliases;
-      if (teacher.notes !== undefined) updateData.teacherNotes = teacher.notes;
-      if (teacher.isActive !== undefined) updateData.isActive = teacher.isActive;
-      
-      await db.update(users).set(updateData).where(eq(users.id, userId));
-      stats.updated++;
-    } else {
-      // 老师不存在，记录错误，不新建账号
-      const idHint = teacher.id ? `ID=${teacher.id}` : `姓名="${teacher.name}"`;
-      notFoundErrors.push(`${idHint}：该老师账号不存在，请先在「用户管理」中创建账号并分配老师角色，同步到老师列表后再导入更新`);
+    // 仅以 ID 匹配，ID 必须存在
+    if (!teacher.id) {
+      notFoundErrors.push(`缺少ID字段，已跳过`);
       stats.skipped++;
-      continue; // 跳过该条记录，不处理城市关联
+      continue;
     }
-    
-    // 3. 如果有城市信息,创建userRoleCities关联记录
-    if (teacher.city) {
-      const cityNames = teacher.city.split(';').map(c => c.trim()).filter(c => c !== '');
-      
-      if (cityNames.length > 0) {
-        // 检查是否已存在teacher角色的城市关联
-        const existingRoleCity = await db.select().from(userRoleCities)
-          .where(and(
-            eq(userRoleCities.userId, userId),
-            eq(userRoleCities.role, 'teacher')
-          ))
-          .limit(1);
-        
-        if (existingRoleCity.length > 0) {
-          // 已存在,合并城市列表
-          const existingCities = JSON.parse(existingRoleCity[0].cities);
-          const mergedCities = Array.from(new Set([...existingCities, ...cityNames]));
-          await db.update(userRoleCities)
-            .set({ cities: JSON.stringify(mergedCities) })
-            .where(eq(userRoleCities.id, existingRoleCity[0].id));
-        } else {
-          // 不存在,创建新关联
-          await db.insert(userRoleCities).values({
-            userId,
-            role: 'teacher',
-            cities: JSON.stringify(cityNames),
-            createdAt: new Date(),
-          });
-        }
-      }
+
+    const existingUser = await db.select().from(users)
+      .where(eq(users.id, teacher.id))
+      .limit(1);
+
+    if (!existingUser || existingUser.length === 0) {
+      // ID 匹配不到，报错提示，不新建账号
+      notFoundErrors.push(`ID=${teacher.id}：找不到对应用户账号，请先在「用户管理」中新建该ID的账号并分配老师角色，再重新导入`);
+      stats.skipped++;
+      continue;
     }
-    
-    results.push({ id: userId, name: teacher.name, userId });
+
+    // 只更新 15 个允许的字段，其他字段一律不动
+    const updateData: any = { updatedAt: new Date() };
+    if (teacher.nickname !== undefined) updateData.nickname = teacher.nickname;
+    if (teacher.phone !== undefined) updateData.phone = teacher.phone;
+    if (teacher.email !== undefined) updateData.email = teacher.email;
+    if (teacher.wechat !== undefined) updateData.wechat = teacher.wechat;
+    if (teacher.isActive !== undefined) updateData.isActive = teacher.isActive;
+    if (teacher.teacherAttribute !== undefined) updateData.teacherAttribute = teacher.teacherAttribute;
+    if (teacher.customerType !== undefined) updateData.customerType = teacher.customerType;
+    if (teacher.category !== undefined) updateData.category = teacher.category;
+    if (teacher.hourlyRate !== undefined) updateData.hourlyRate = teacher.hourlyRate;
+    if (teacher.bankAccount !== undefined) updateData.bankAccount = teacher.bankAccount;
+    if (teacher.bankName !== undefined) updateData.bankName = teacher.bankName;
+    if (teacher.contractEndDate !== undefined) updateData.contractEndDate = teacher.contractEndDate;
+    if (teacher.joinDate !== undefined) updateData.joinDate = teacher.joinDate;
+    if (teacher.aliases !== undefined) updateData.aliases = teacher.aliases;
+    if (teacher.notes !== undefined) updateData.teacherNotes = teacher.notes;
+
+    await db.update(users).set(updateData).where(eq(users.id, teacher.id));
+    stats.updated++;
+    results.push({ id: teacher.id, userId: teacher.id });
   }
   
   return { results, stats, notFoundErrors };
