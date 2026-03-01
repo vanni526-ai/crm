@@ -42,14 +42,17 @@ export const analyticsRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
 
-      // 构建查询条件
+      // 构建查询条件（使用 paymentDate 付款日期过滤，排除已取消订单）
       let whereConditions = [];
       
+      // 排除已取消订单
+      whereConditions.push(sql`${orders.status} != 'cancelled'`);
+      
       if (input?.startDate) {
-        whereConditions.push(sql`${orders.classDate} >= ${input.startDate}`);
+        whereConditions.push(sql`${orders.paymentDate} >= ${input.startDate}`);
       }
       if (input?.endDate) {
-        whereConditions.push(sql`${orders.classDate} <= ${input.endDate}`);
+        whereConditions.push(sql`${orders.paymentDate} <= ${input.endDate}`);
       }
 
       // 查询订单统计数据
