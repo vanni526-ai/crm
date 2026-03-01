@@ -1560,7 +1560,7 @@ export const appRouter = router({
       .input(z.object({
         teachers: z.array(z.object({
           id: z.number().optional(), // 支持ID字段用于更新
-          name: z.string(),
+          name: z.string().optional(),
           nickname: z.string().optional(),
           phone: z.string().optional(),
           email: z.string().optional(),

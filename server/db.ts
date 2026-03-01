@@ -1251,7 +1251,7 @@ export async function batchUpdateTeacherStatus(ids: number[], status: string) {
 }
 
 // 批量创建老师
-export async function batchCreateTeachers(teacherList: (InsertTeacher & { id?: number })[]) {
+export async function batchCreateTeachers(teacherList: (Partial<InsertTeacher> & { id?: number })[]) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const results = [];

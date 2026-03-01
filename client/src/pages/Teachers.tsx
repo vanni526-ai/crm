@@ -433,7 +433,7 @@ export default function Teachers() {
             isActive: row['活跃状态'] !== undefined && row['活跃状态'] !== ''
               ? (String(row['活跃状态']).trim() !== '休息')
               : undefined,
-            teacherAttribute: row['老师属性'] !== undefined ? String(row['老师属性']) : undefined,
+            teacherAttribute: row['老师属性'] !== undefined && row['老师属性'] !== '' ? String(row['老师属性']).trim() : undefined,
             customerType: row['受众'] !== undefined && row['受众'] !== ''
               ? String(row['受众'])
               : (row['客户类型'] !== undefined ? String(row['客户类型']) : undefined),
