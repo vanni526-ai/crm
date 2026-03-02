@@ -3,8 +3,8 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "../_core/hooks/useAuth";
 
 // ========== 类型定义 ==========
-type PaymentChannel = "wechat" | "alipay" | "balance";
-type Step = "landing" | "confirm" | "paying" | "success";
+type PaymentChannel = "wechat" | "alipay" | "balance" | "recharge";
+type Step = "landing" | "payment" | "paying" | "success";
 
 interface Plan {
   id: number;
@@ -28,31 +28,25 @@ function formatDate(iso: string | null) {
 
 // ========== 特性列表 ==========
 const FEATURES = [
-  {
-    emoji: "🎯",
-    title: "专属约课权限",
-    desc: "解锁全平台课程预约功能，随时随地约课",
-  },
-  {
-    emoji: "👩‍🏫",
-    title: "优质教师资源",
-    desc: "匹配全国各城市专业教师，一对一精品教学",
-  },
-  {
-    emoji: "📅",
-    title: "灵活时间安排",
-    desc: "根据您的时间自由选择上课时段，弹性安排",
-  },
-  {
-    emoji: "🏆",
-    title: "会员专属服务",
-    desc: "享受会员专属客服支持，优先处理您的需求",
-  },
-  {
-    emoji: "🔄",
-    title: "一年有效期",
-    desc: "购买后立即生效，365天内无限次约课",
-  },
+  { emoji: "🎯", title: "专属约课权限", desc: "解锁全平台课程预约功能，随时随地约课" },
+  { emoji: "👩‍🏫", title: "优质教师资源", desc: "匹配全国各城市专业教师，一对一精品教学" },
+  { emoji: "📅", title: "灵活时间安排", desc: "根据您的时间自由选择上课时段，弹性安排" },
+  { emoji: "🏆", title: "会员专属服务", desc: "享受会员专属客服支持，优先处理您的需求" },
+  { emoji: "🔄", title: "一年有效期", desc: "购买后立即生效，365天内无限次约课" },
+];
+
+// ========== 支付方式配置 ==========
+const PAYMENT_CHANNELS: {
+  key: PaymentChannel;
+  label: string;
+  desc: string;
+  bg: string;
+  emoji: string;
+}[] = [
+  { key: "wechat", label: "微信支付", desc: "使用微信完成支付", bg: "#E8F5E9", emoji: "💚" },
+  { key: "alipay", label: "支付宝支付", desc: "使用支付宝完成支付", bg: "#E3F2FD", emoji: "💙" },
+  { key: "balance", label: "账户余额支付", desc: "使用账户余额支付", bg: "#FFF3E0", emoji: "💰" },
+  { key: "recharge", label: "账户充值", desc: "充值后使用余额支付", bg: "#EDE7F6", emoji: "➕" },
 ];
 
 // ========== 主页面 ==========
@@ -63,32 +57,60 @@ export default function MembershipH5() {
   const [paymentChannel, setPaymentChannel] = useState<PaymentChannel>("wechat");
   const [orderId, setOrderId] = useState<number | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [tokenLoginDone, setTokenLoginDone] = useState(false);
 
-  // 查询套餐列表
+  // ---- URL token 自动登录 ----
+  const loginWithToken = trpc.auth.loginWithToken.useMutation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("token");
+    if (urlToken && !user && !authLoading && !tokenLoginDone) {
+      setTokenLoginDone(true);
+      loginWithToken.mutate(
+        { token: urlToken },
+        {
+          onSuccess: () => {
+            // 登录成功后移除 URL 中的 token 参数，避免泄露
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, "", newUrl);
+            // 刷新页面让 auth 状态更新
+            window.location.reload();
+          },
+          onError: () => {
+            // token 无效，跳转登录页
+            window.location.href = "/login?redirect=/membership";
+          },
+        }
+      );
+    }
+  }, [user, authLoading, tokenLoginDone]);
+
+  // ---- 查询套餐列表 ----
   const { data: plansData, isLoading: plansLoading } =
     trpc.membership.listPlans.useQuery();
 
-  // 查询会员状态
+  // ---- 查询会员状态 ----
   const { data: statusData, refetch: refetchStatus } =
-    trpc.membership.getStatus.useQuery(undefined, {
-      enabled: !!user,
-    });
+    trpc.membership.getStatus.useQuery(undefined, { enabled: !!user });
 
-  // 查询订单状态（支付中轮询）
+  // ---- 查询账户余额 ----
+  const { data: balanceData } =
+    trpc.account.getMyBalance.useQuery(undefined, { enabled: !!user });
+
+  // ---- 查询订单状态（支付中轮询）----
   const { data: orderStatusData } =
     trpc.membership.getOrderStatus.useQuery(
       { orderId: orderId! },
       { enabled: step === "paying" && !!orderId, refetchInterval: 3000 }
     );
 
-  // 创建订单
+  // ---- Mutations ----
   const createOrder = trpc.membership.createOrder.useMutation();
-  // 预下单
   const prepay = trpc.membership.prepay.useMutation();
-  // 取消订单
   const cancelOrder = trpc.membership.cancelOrder.useMutation();
 
-  // 监听订单状态变化
+  // ---- 监听订单状态变化 ----
   useEffect(() => {
     if (step === "paying" && orderStatusData?.status === "paid") {
       refetchStatus();
@@ -96,15 +118,16 @@ export default function MembershipH5() {
     }
   }, [orderStatusData, step, refetchStatus]);
 
-  // 取年度套餐（durationDays >= 365 或第一个）
+  // ---- 取年度套餐 ----
   const yearPlan: Plan | null =
     plansData?.plans?.find((p: Plan) => p.duration >= 365) ??
     plansData?.plans?.[0] ??
     null;
 
   const displayPrice = yearPlan?.price ?? 39;
+  const accountBalance = balanceData?.data?.balance ?? "0.00";
 
-  // 处理立即开通
+  // ---- 处理立即开通 ----
   const handleOpenMembership = () => {
     if (!user) {
       window.location.href = "/login?redirect=/membership";
@@ -114,19 +137,24 @@ export default function MembershipH5() {
     if (!plan) return;
     setSelectedPlan(plan);
     setErrorMsg("");
-    setStep("confirm");
+    setStep("payment");
   };
 
-  // 处理确认支付
+  // ---- 处理确认支付 ----
   const handleConfirmPay = async () => {
     if (!selectedPlan) return;
+    if (paymentChannel === "recharge") {
+      // 充值跳转逻辑（可由 App 端拦截）
+      window.location.href = "/recharge?redirect=/membership";
+      return;
+    }
     setErrorMsg("");
     try {
       const orderResult = await createOrder.mutateAsync({ planId: selectedPlan.id });
       setOrderId(orderResult.orderId);
       const prepayResult = await prepay.mutateAsync({
         orderId: orderResult.orderId,
-        paymentChannel,
+        paymentChannel: paymentChannel === "balance" ? "balance" : paymentChannel,
       });
       if (prepayResult.channel === "balance" && prepayResult.success) {
         await refetchStatus();
@@ -151,7 +179,24 @@ export default function MembershipH5() {
     }
   };
 
-  // 处理取消
+  // ---- 处理「我已完成支付」----
+  const handlePaymentDone = async () => {
+    await refetchStatus();
+    // 重新查询订单状态
+    if (orderId) {
+      setStep("paying");
+    } else {
+      // 直接刷新会员状态
+      const result = await refetchStatus();
+      if (result.data?.isMember) {
+        setStep("success");
+      } else {
+        setErrorMsg("暂未检测到支付成功，请稍后再试");
+      }
+    }
+  };
+
+  // ---- 处理取消 ----
   const handleCancel = async () => {
     if (orderId) {
       try { await cancelOrder.mutateAsync({ orderId }); } catch { /* ignore */ }
@@ -159,12 +204,13 @@ export default function MembershipH5() {
     setStep("landing");
     setOrderId(null);
     setSelectedPlan(null);
+    setErrorMsg("");
   };
 
   // ---- 加载中 ----
-  if (authLoading || plansLoading) {
+  if (authLoading || plansLoading || loginWithToken.isPending) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-gray-400 text-base">加载中…</div>
       </div>
     );
@@ -173,7 +219,7 @@ export default function MembershipH5() {
   // ---- 支付成功页 ----
   if (step === "success") {
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-6">
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6">
         <div className="text-6xl mb-6">🎉</div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">开通成功！</h2>
         <p className="text-gray-500 text-center mb-8">欢迎成为瀛姬年度会员，立即开始约课吧</p>
@@ -188,10 +234,10 @@ export default function MembershipH5() {
     );
   }
 
-  // ---- 支付中页 ----
+  // ---- 支付中页（等待确认）----
   if (step === "paying") {
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <div
           className="w-full flex flex-col items-center justify-center py-10 px-6"
           style={{ background: "linear-gradient(160deg, #FF8C00 0%, #FF6B00 100%)" }}
@@ -201,103 +247,121 @@ export default function MembershipH5() {
         </div>
         <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
           <div className="text-4xl animate-spin">⏳</div>
-          <p className="text-gray-500">正在等待支付结果…</p>
+          <p className="text-gray-500 text-center">正在等待支付结果…</p>
+          <p className="text-gray-400 text-sm text-center">支付完成后请点击下方按钮</p>
         </div>
-        <div className="px-5 pb-8">
+        {errorMsg && (
+          <p className="text-red-500 text-sm text-center px-6">{errorMsg}</p>
+        )}
+        <div className="px-5 pb-8 flex flex-col gap-3">
+          <button
+            onClick={handlePaymentDone}
+            className="w-full py-4 rounded-2xl font-bold text-lg text-white"
+            style={{ background: "linear-gradient(135deg, #FF8C00, #FF6B00)" }}
+          >
+            我已完成支付
+          </button>
           <button
             onClick={handleCancel}
-            className="w-full py-3 rounded-2xl font-medium text-gray-500 bg-white shadow-sm"
+            className="w-full py-3 rounded-2xl font-medium border border-orange-300 text-orange-500 bg-white"
           >
-            取消支付
+            返回修改
           </button>
         </div>
       </div>
     );
   }
 
-  // ---- 确认支付页 ----
-  if (step === "confirm" && selectedPlan) {
+  // ---- 支付页（参考图示重新设计）----
+  if (step === "payment" && selectedPlan) {
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* 顶部 Banner */}
-        <div
-          className="w-full flex flex-col items-center justify-center py-10 px-6"
-          style={{ background: "linear-gradient(160deg, #FF8C00 0%, #FF6B00 100%)" }}
-        >
-          <h1 className="text-2xl font-bold text-white">开通年度会员</h1>
-          <p className="text-white/80 text-sm mt-1">确认订单信息</p>
+      <div className="min-h-screen bg-white flex flex-col">
+        {/* 顶部订单信息 */}
+        <div className="px-5 pt-8 pb-4 border-b border-gray-100">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-gray-500 text-sm">订单信息</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-800 font-semibold text-base">{selectedPlan.name}</p>
+              <p className="text-gray-400 text-sm mt-0.5">有效期 {selectedPlan.duration} 天</p>
+            </div>
+            <span className="text-2xl font-bold" style={{ color: "#FF6B00" }}>
+              ¥{selectedPlan.price}
+            </span>
+          </div>
         </div>
 
-        {/* 订单详情 */}
-        <div className="flex-1 px-5 py-6 flex flex-col gap-4">
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
-              <span className="text-gray-500">套餐</span>
-              <span className="text-gray-800 font-medium">{selectedPlan.name}</span>
-            </div>
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
-              <span className="text-gray-500">有效期</span>
-              <span className="text-gray-800 font-medium">{selectedPlan.duration} 天</span>
-            </div>
-            <div className="flex justify-between items-center py-3">
-              <span className="text-gray-500">价格</span>
-              <span className="text-2xl font-bold" style={{ color: "#FF6B00" }}>
-                ¥{selectedPlan.price}
-              </span>
-            </div>
+        {/* 账户余额展示 */}
+        <div className="px-5 py-4 flex items-center justify-between border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">💰</span>
+            <span className="text-gray-700 font-medium">账户余额</span>
           </div>
+          <span className="text-green-500 font-bold text-lg">¥{accountBalance}</span>
+        </div>
 
-          {/* 支付方式 */}
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <p className="text-gray-700 font-semibold mb-3">选择支付方式</p>
-            {(
-              [
-                { key: "wechat", label: "微信支付", emoji: "💚" },
-                { key: "alipay", label: "支付宝", emoji: "💙" },
-                { key: "balance", label: "账户余额", emoji: "💰" },
-              ] as { key: PaymentChannel; label: string; emoji: string }[]
-            ).map((ch) => (
-              <label
-                key={ch.key}
-                className="flex items-center gap-3 py-3 border-b last:border-b-0 cursor-pointer"
+        {/* 支付方式列表 */}
+        <div className="flex-1 px-5 py-4 flex flex-col gap-3">
+          {PAYMENT_CHANNELS.map((ch) => (
+            <label
+              key={ch.key}
+              className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer border-2 transition-all"
+              style={{
+                borderColor: paymentChannel === ch.key ? "#FF6B00" : "transparent",
+                backgroundColor: paymentChannel === ch.key ? "#FFF8F0" : "#F7F7F7",
+              }}
+              onClick={() => setPaymentChannel(ch.key)}
+            >
+              {/* 图标 */}
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                style={{ backgroundColor: ch.bg }}
               >
-                <input
-                  type="radio"
-                  name="channel"
-                  value={ch.key}
-                  checked={paymentChannel === ch.key}
-                  onChange={() => setPaymentChannel(ch.key)}
-                  className="w-4 h-4"
-                  style={{ accentColor: "#FF6B00" }}
-                />
-                <span className="text-xl">{ch.emoji}</span>
-                <span className="text-gray-700">{ch.label}</span>
-              </label>
-            ))}
-          </div>
-
-          {errorMsg && (
-            <p className="text-red-500 text-sm text-center">{errorMsg}</p>
-          )}
+                {ch.emoji}
+              </div>
+              {/* 文字 */}
+              <div className="flex-1">
+                <p className="text-gray-800 font-semibold text-base">{ch.label}</p>
+                <p className="text-gray-400 text-sm mt-0.5">{ch.desc}</p>
+              </div>
+              {/* 单选按钮 */}
+              <div
+                className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+                style={{
+                  borderColor: paymentChannel === ch.key ? "#FF6B00" : "#D1D5DB",
+                  backgroundColor: paymentChannel === ch.key ? "#FF6B00" : "white",
+                }}
+              >
+                {paymentChannel === ch.key && (
+                  <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                )}
+              </div>
+            </label>
+          ))}
         </div>
+
+        {errorMsg && (
+          <p className="text-red-500 text-sm text-center px-6 pb-2">{errorMsg}</p>
+        )}
 
         {/* 底部按钮 */}
         <div className="px-5 pb-8 pt-2 flex flex-col gap-3">
           <button
             onClick={handleConfirmPay}
             disabled={createOrder.isPending || prepay.isPending}
-            className="w-full py-4 rounded-2xl font-bold text-lg text-white disabled:opacity-60"
+            className="w-full py-4 rounded-2xl font-bold text-xl text-white disabled:opacity-60"
             style={{ background: "linear-gradient(135deg, #FF8C00, #FF6B00)" }}
           >
             {createOrder.isPending || prepay.isPending
               ? "处理中..."
-              : `立即支付 ¥${selectedPlan.price}`}
+              : `确认支付 ¥${selectedPlan.price}`}
           </button>
           <button
             onClick={handleCancel}
-            className="w-full py-3 rounded-2xl font-medium text-gray-500 bg-white shadow-sm"
+            className="w-full py-3 rounded-2xl font-medium border border-orange-300 text-orange-500 bg-white"
           >
-            返回
+            返回修改
           </button>
         </div>
       </div>
@@ -307,8 +371,7 @@ export default function MembershipH5() {
   // ---- 已是会员 — 展示状态 ----
   if (user && statusData?.isMember) {
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* 橙色 Banner */}
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <div
           className="w-full flex flex-col items-center justify-center pt-14 pb-16 px-6"
           style={{ background: "linear-gradient(160deg, #FF8C00 0%, #FF6B00 100%)" }}
@@ -316,7 +379,6 @@ export default function MembershipH5() {
           <h1 className="text-4xl font-bold text-white mb-4 tracking-wide">瀛姬年度会员</h1>
           <p className="text-white/90 text-base text-center">您已是尊贵会员</p>
         </div>
-
         <div className="flex-1 px-4 py-6 flex flex-col gap-4">
           <div className="bg-white rounded-2xl p-6 shadow-sm text-center">
             <div className="text-5xl mb-4">🏆</div>
@@ -325,13 +387,11 @@ export default function MembershipH5() {
               {formatDate(statusData.expiresAt ?? null)}
             </p>
             {statusData.daysRemaining != null && (
-              <p className="font-medium mt-2" style={{ color: "#FF6B00" }}>
-                还剩 {statusData.daysRemaining} 天
+              <p className="text-orange-500 text-sm mt-2">
+                剩余 {statusData.daysRemaining} 天
               </p>
             )}
           </div>
-
-          {/* 特性卡片 */}
           {FEATURES.map((f) => (
             <div key={f.title} className="bg-white rounded-2xl px-5 py-5 flex items-center gap-4 shadow-sm">
               <span className="text-4xl flex-shrink-0">{f.emoji}</span>
@@ -342,8 +402,6 @@ export default function MembershipH5() {
             </div>
           ))}
         </div>
-
-        {/* 续费按钮 */}
         <div className="px-4 pb-8 pt-2">
           <button
             onClick={handleOpenMembership}
@@ -361,10 +419,9 @@ export default function MembershipH5() {
   // ---- 主落地页（landing）----
   return (
     <div
-      className="min-h-screen bg-gray-100 flex flex-col"
+      className="min-h-screen bg-gray-50 flex flex-col"
       style={{ fontFamily: "'PingFang SC', 'Helvetica Neue', sans-serif" }}
     >
-      {/* 橙色顶部 Banner */}
       <div
         className="w-full flex flex-col items-center justify-center pt-14 pb-16 px-6"
         style={{ background: "linear-gradient(160deg, #FF8C00 0%, #FF6B00 100%)" }}
@@ -382,8 +439,6 @@ export default function MembershipH5() {
           专业教师 · 灵活时间 · 优质体验
         </p>
       </div>
-
-      {/* 特性卡片列表 */}
       <div className="flex-1 px-4 py-6 flex flex-col gap-4">
         {FEATURES.map((f) => (
           <div
@@ -398,8 +453,6 @@ export default function MembershipH5() {
           </div>
         ))}
       </div>
-
-      {/* 底部固定立即开通按钮 */}
       <div className="px-4 pb-8 pt-2">
         <button
           onClick={handleOpenMembership}

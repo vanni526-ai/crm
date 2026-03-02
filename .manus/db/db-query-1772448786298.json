@@ -1,0 +1,31 @@
+{
+  "query": "UPDATE membershipPlans SET price = 39.00, originalPrice = 888.00 WHERE duration >= 365;\nSELECT id, name, price, originalPrice, duration FROM membershipPlans;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute UPDATE membershipPlans SET price = 39.00, originalPrice = 888.00 WHERE duration >= 365;\nSELECT id, name, price, originalPrice, duration FROM membershipPlans;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "月度会员",
+      "price": "99.00",
+      "originalPrice": "129.00",
+      "duration": "30"
+    },
+    {
+      "id": "2",
+      "name": "季度会员",
+      "price": "268.00",
+      "originalPrice": "387.00",
+      "duration": "90"
+    },
+    {
+      "id": "3",
+      "name": "年度会员",
+      "price": "39.00",
+      "originalPrice": "888.00",
+      "duration": "365"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprice\toriginalPrice\tduration\n1\t月度会员\t99.00\t129.00\t30\n2\t季度会员\t268.00\t387.00\t90\n3\t年度会员\t39.00\t888.00\t365\n",
+  "stderr": "",
+  "execution_time_ms": 1764
+}

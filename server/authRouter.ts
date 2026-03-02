@@ -759,12 +759,92 @@ export const authRouter = router({
         anonymizedAt: anonymizedAt.toISOString(),
         message: "账号已永久删除",
       };
-    }
-
-    return {
+    }    return {
       isDeleted: user.isDeleted,
       status: "unknown",
       message: "未知状态",
     };
   }),
+
+  // App 传 JWT token 免登录建立 H5 session
+  loginWithToken: publicProcedure
+    .input(
+      z.object({
+        token: z.string().min(1, "token 不能为空"),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+      // 1. 验证 App 传来的 JWT
+      let decoded: any;
+      try {
+        decoded = jwt.verify(input.token, JWT_SECRET) as any;
+      } catch {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "token 无效或已过期，请重新登录",
+        });
+      }
+      // 2. 查询用户是否存在且未被禁用
+      const userList = await drizzle
+        .select()
+        .from(users)
+        .where(eq(users.id, decoded.id))
+        .limit(1);
+      if (userList.length === 0) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "用户不存在",
+        });
+      }
+      const user = userList[0];
+      if (!user.isActive) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "账号已被禁用，请联系管理员",
+        });
+      }
+      // 3. 签发新的 session cookie（H5 使用）
+      const sessionToken = jwt.sign(
+        {
+          id: user.id,
+          openId: user.openId,
+          name: user.name,
+          role: user.role,
+          roles: user.roles || user.role,
+        },
+        JWT_SECRET,
+        { expiresIn: TOKEN_EXPIRY }
+      );
+      ctx.res?.cookie("session", sessionToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+      // 4. 更新最后登录时间
+      await drizzle
+        .update(users)
+        .set({ lastSignedIn: new Date() })
+        .where(eq(users.id, user.id));
+      return {
+        success: true,
+        message: "登录成功",
+        user: {
+          id: user.id,
+          name: user.name,
+          phone: user.phone,
+          role: user.role,
+          isMember: user.isMember,
+          membershipStatus: user.membershipStatus,
+          membershipExpiresAt: user.membershipExpiresAt,
+        },
+      };
+    }),
 });
