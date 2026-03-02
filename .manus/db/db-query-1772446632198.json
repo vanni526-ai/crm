@@ -1,0 +1,9 @@
+{
+  "query": "\nALTER TABLE `courses` ADD COLUMN `teacherFee` decimal(10,2) DEFAULT '0.00' COMMENT '老师费用(元/节)';\nALTER TABLE `order_items` ADD COLUMN `teacherFeePerSession` decimal(10,2) DEFAULT '0.00' COMMENT '老师费用单价(元/节，冗余自课程表)';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nALTER TABLE `courses` ADD COLUMN `teacherFee` decimal(10,2) DEFAULT '0.00' COMMENT '老师费用(元/节)';\nALTER TABLE `order_items` ADD COLUMN `teacherFeePerSession` decimal(10,2) DEFAULT '0.00' COMMENT '老师费用单价(元/节，冗余自课程表)';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2456
+}

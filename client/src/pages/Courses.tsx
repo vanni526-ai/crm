@@ -45,6 +45,7 @@ type Course = {
   level: string | null;
   isActive: boolean;
   isHot: number;
+  teacherFee: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -64,6 +65,7 @@ export default function Courses() {
     duration: "",
     level: "入门",
     isHot: 0,
+    teacherFee: "",
   });
 
   // 查询课程列表
@@ -130,6 +132,7 @@ export default function Courses() {
       duration: "",
       level: "入门",
       isHot: 0,
+      teacherFee: "",
     });
     setIsDialogOpen(true);
   };
@@ -146,6 +149,7 @@ export default function Courses() {
       duration: course.duration || "",
       level: course.level || "入门",
       isHot: course.isHot || 0,
+      teacherFee: course.teacherFee || "",
     });
     setIsDialogOpen(true);
   };
@@ -163,6 +167,7 @@ export default function Courses() {
       duration: "",
       level: "入门",
       isHot: 0,
+      teacherFee: "",
     });
   };
 
@@ -190,6 +195,7 @@ export default function Courses() {
         price: formData.price ? parseFloat(formData.price) : undefined,
         duration: formData.duration ? parseFloat(formData.duration) : undefined,
         level: formData.level as "入门" | "深度" | "订制" | "剧本" | undefined,
+        teacherFee: formData.teacherFee ? parseFloat(formData.teacherFee) : undefined,
       });
     } else {
       // 创建操作:price、duration、level必填
@@ -202,6 +208,7 @@ export default function Courses() {
         price: parseFloat(formData.price),
         duration: parseFloat(formData.duration),
         level: formData.level as "入门" | "深度" | "订制" | "剧本",
+        teacherFee: formData.teacherFee ? parseFloat(formData.teacherFee) : 0,
       });
     }
   };
@@ -435,6 +442,7 @@ export default function Courses() {
               <TableHead>课程别名</TableHead>
               <TableHead>课程程度</TableHead>
               <TableHead>价格(元)</TableHead>
+              <TableHead>老师费(元/节)</TableHead>
               <TableHead>时长(小时)</TableHead>
               <TableHead>热门</TableHead>
               <TableHead>状态</TableHead>
@@ -461,6 +469,11 @@ export default function Courses() {
                   </TableCell>
                   <TableCell>
                     {course.price !== null ? `¥${parseFloat(course.price).toFixed(2)}` : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {course.teacherFee && parseFloat(course.teacherFee) > 0
+                      ? `¥${parseFloat(course.teacherFee).toFixed(2)}`
+                      : "-"}
                   </TableCell>
                   <TableCell>{course.duration !== null ? `${parseFloat(course.duration)}h` : "-"}</TableCell>
                   <TableCell>
@@ -596,6 +609,22 @@ export default function Courses() {
                     placeholder="0.0"
                   />
                 </div>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="teacherFee">
+                  老师费用 (元/节)
+                  <span className="ml-1 text-xs text-muted-foreground">完成每节课程老师可获得的费用</span>
+                </Label>
+                <Input
+                  id="teacherFee"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.teacherFee}
+                  onChange={(e) => setFormData({ ...formData, teacherFee: e.target.value })}
+                  placeholder="0.00"
+                />
               </div>
 
               <div className="grid gap-2">

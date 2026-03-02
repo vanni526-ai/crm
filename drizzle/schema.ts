@@ -1010,6 +1010,7 @@ export const courses = mysqlTable("courses", {
   isBookable: boolean("isBookable").default(true).notNull(), // 是否可预约(false表示不在前端App显示)
   alias: varchar("alias", { length: 100 }), // 课程别名(供前端App显示使用)
   isHot: tinyint("isHot").default(0).notNull(), // 是否热门: 0=不热门, 1=热门
+  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }).default("0.00"), // 老师费用(元/节)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
@@ -1017,7 +1018,6 @@ export const courses = mysqlTable("courses", {
   levelIdx: index("level_idx").on(table.level),
   isActiveIdx: index("is_active_idx").on(table.isActive),
 }));
-
 export type Course = typeof courses.$inferSelect;
 export type InsertCourse = typeof courses.$inferInsert;
 
@@ -1196,6 +1196,7 @@ export const orderItems = mysqlTable("order_items", {
   duration: decimal("duration", { precision: 4, scale: 2 }).notNull(), // 课程时长(小时)
   price: decimal("price", { precision: 10, scale: 2 }).notNull(), // 课程单价
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(), // 小计金额
+  teacherFeePerSession: decimal("teacherFeePerSession", { precision: 10, scale: 2 }).default("0.00"), // 老师费用单价(元/节，冗余自课程表)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
