@@ -1181,7 +1181,7 @@ export async function getAllTeachers() {
     ...teacher,
     avatarUrl: teacher.avatarUrl || DEFAULT_AVATAR_URL,
     city: userCitiesMap.get(teacher.id) || null,
-     notes: teacherNotesMap.get(teacher.id) || teacher.teacherNotes || null, // 合并notes字段
+     notes: teacher.teacherNotes || teacherNotesMap.get(teacher.id) || null, // 合并notes字段：优先使用users.teacherNotes（Excel导入写入此处），兜底使用旧teachers.notes
     teacherNotes: undefined, // 移除teacherNotes字段，避免混淆
   }));
 }
