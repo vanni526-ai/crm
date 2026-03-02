@@ -7,16 +7,17 @@ import { eq } from "drizzle-orm";
 
 describe("auth.loginWithUserAccount", () => {
   let testUserId: number;
+  const TEST_PHONE = "13800138001";
 
   beforeAll(async () => {
-    // 确保测试用户存在
+    // 确保测试用户存在（手机号唯一）
     const drizzle = await getDb();
     if (!drizzle) throw new Error("数据库连接失败");
 
     const existing = await drizzle
       .select()
       .from(users)
-      .where(eq(users.name, "test"))
+      .where(eq(users.phone, TEST_PHONE))
       .limit(1);
 
     if (existing.length > 0) {
@@ -35,33 +36,13 @@ describe("auth.loginWithUserAccount", () => {
         name: "test",
         nickname: "测试用户",
         email: "test@example.com",
-        phone: "13800138001",
+        phone: TEST_PHONE,
         password: hashedPassword,
         role: "user",
         isActive: true,
       });
       testUserId = Number(result.insertId);
     }
-  });
-
-  it("应该能够使用用户名登录", async () => {
-    const caller = appRouter.createCaller({
-      user: null,
-      res: {
-        cookie: () => {},
-      } as any,
-    });
-
-    const result = await caller.auth.loginWithUserAccount({
-      username: "test",
-      password: "123456",
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.token).toBeDefined();
-    expect(result.user).toBeDefined();
-    expect(result.user?.name).toBe("test");
-    expect(result.user?.role).toBe("user");
   });
 
   it("应该能够使用手机号登录", async () => {
@@ -73,31 +54,13 @@ describe("auth.loginWithUserAccount", () => {
     });
 
     const result = await caller.auth.loginWithUserAccount({
-      username: "13800138001",
+      phone: TEST_PHONE,
       password: "123456",
     });
 
     expect(result.success).toBe(true);
     expect(result.token).toBeDefined();
-    expect(result.user?.name).toBe("test");
-  });
-
-  it("应该能够使用邮箱登录", async () => {
-    const caller = appRouter.createCaller({
-      user: null,
-      res: {
-        cookie: () => {},
-      } as any,
-    });
-
-    const result = await caller.auth.loginWithUserAccount({
-      username: "test@example.com",
-      password: "123456",
-    });
-
-    expect(result.success).toBe(true);
-    expect(result.token).toBeDefined();
-    expect(result.user?.name).toBe("test");
+    expect(result.user).toBeDefined();
   });
 
   it("密码错误时应该抛出错误", async () => {
@@ -110,13 +73,13 @@ describe("auth.loginWithUserAccount", () => {
 
     await expect(
       caller.auth.loginWithUserAccount({
-        username: "test",
+        phone: TEST_PHONE,
         password: "wrongpassword",
       })
     ).rejects.toThrow("密码错误");
   });
 
-  it("用户不存在时应该抛出错误", async () => {
+  it("手机号不存在时应该抛出错误", async () => {
     const caller = appRouter.createCaller({
       user: null,
       res: {
@@ -126,10 +89,10 @@ describe("auth.loginWithUserAccount", () => {
 
     await expect(
       caller.auth.loginWithUserAccount({
-        username: "nonexistent",
+        phone: "19999999999",
         password: "123456",
       })
-    ).rejects.toThrow("用户不存在");
+    ).rejects.toThrow("手机号不存在，请确认后重试");
   });
 
   it("禁用的账号不能登录", async () => {
@@ -151,7 +114,7 @@ describe("auth.loginWithUserAccount", () => {
 
     await expect(
       caller.auth.loginWithUserAccount({
-        username: "test",
+        phone: TEST_PHONE,
         password: "123456",
       })
     ).rejects.toThrow("账号已被禁用");
@@ -167,10 +130,13 @@ describe("auth.loginWithUserAccount", () => {
     const drizzle = await getDb();
     if (!drizzle) throw new Error("数据库连接失败");
 
+    const TEST_PHONE_NOPASS = "13800138099";
+
     // 创建没有密码的测试用户
     const result = await drizzle.insert(users).values({
       openId: `nopass_${Date.now()}`,
-      name: "nopassword",
+      name: `nopassword_${Date.now()}`,
+      phone: TEST_PHONE_NOPASS,
       password: null,
       role: "user",
       isActive: true,
@@ -185,11 +151,15 @@ describe("auth.loginWithUserAccount", () => {
 
     await expect(
       caller.auth.loginWithUserAccount({
-        username: "nopassword",
+        phone: TEST_PHONE_NOPASS,
         password: "123456",
-      })    ).rejects.toThrow("该账号未设u7f6e密码，请联系管理员");    // 清理测试数据
-    const insertId = typeof result.insertId === 'bigint' ? Number(result.insertId) : result.insertId;
+      })
+    ).rejects.toThrow("该账号未设置密码，请联系管理员");
+
+    // 清理测试数据
+    const insertId = typeof result.insertId === "bigint" ? Number(result.insertId) : result.insertId;
     if (insertId) {
       await drizzle.delete(users).where(eq(users.id, insertId));
-    }  });
+    }
+  });
 });

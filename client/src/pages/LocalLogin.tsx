@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { LogIn, AlertCircle, Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function LocalLogin() {
-  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,8 +37,8 @@ export default function LocalLogin() {
     setError(null);
     setIsLoading(true);
 
-    if (!username.trim()) {
-      setError("请输入手机号或用户名");
+    if (!phone.trim()) {
+      setError("请输入手机号");
       setIsLoading(false);
       return;
     }
@@ -51,7 +51,7 @@ export default function LocalLogin() {
 
     try {
       await loginMutation.mutateAsync({
-        username: username.trim(),
+        phone: phone.trim(),
         password,
       });
     } catch {
@@ -84,7 +84,7 @@ export default function LocalLogin() {
           <CardHeader className="pb-4">
             <CardTitle className="text-white text-xl">账号登录</CardTitle>
             <CardDescription className="text-slate-400">
-              使用手机号 / 用户名 / 邮箱 + 密码登录
+              使用手机号 + 密码登录
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -99,24 +99,24 @@ export default function LocalLogin() {
                 </Alert>
               )}
 
-              {/* 账号输入 */}
+              {/* 手机号输入 */}
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-slate-200 text-sm font-medium">
-                  手机号 / 用户名 / 邮箱
+                <Label htmlFor="phone" className="text-slate-200 text-sm font-medium">
+                  手机号
                 </Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="请输入手机号、用户名或邮箱"
-                  value={username}
+                  id="phone"
+                  type="tel"
+                  placeholder="请输入手机号"
+                  value={phone}
                   onChange={(e) => {
-                    setUsername(e.target.value);
+                    setPhone(e.target.value);
                     setError(null);
                   }}
                   onKeyPress={handleKeyPress}
                   disabled={isLoading}
                   className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-blue-500 h-11"
-                  autoComplete="username"
+                  autoComplete="tel"
                   autoFocus
                 />
               </div>

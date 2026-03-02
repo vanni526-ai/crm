@@ -17,7 +17,7 @@ describe("App Authentication Integration", () => {
     });
 
     const loginResult = await loginCaller.auth.loginWithUserAccount({
-      username: "appuser",
+      phone: "13800138001",
       password: "123456",
     });
 

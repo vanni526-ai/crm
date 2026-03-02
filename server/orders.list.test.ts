@@ -17,7 +17,7 @@ describe("orders.list Token Authentication", () => {
     });
 
     const loginResult = await loginCaller.auth.loginWithUserAccount({
-      username: "appuser",
+      phone: "13800138001",
       password: "123456",
     });
 

@@ -6,7 +6,6 @@ import { systemAccounts, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { hashPassword, verifyPassword } from "./passwordUtils";
-import { or } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 
@@ -233,11 +232,11 @@ export const authRouter = router({
       }
     }),
 
-  // 用户账号登录(支u6301用户名/手u673au53f7/邮u7bb1登u5f55)
+  // 用户账号登录（仅支持手机号+密码）
   loginWithUserAccount: publicProcedure
     .input(
       z.object({
-        username: z.string().min(1, "请输入用户名"),
+        phone: z.string().min(1, "请输入手机号"),
         password: z.string().min(1, "请输入密码"),
       })
     )
@@ -246,37 +245,33 @@ export const authRouter = router({
       if (!drizzle) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "数据u5e93连u63a5失败",
+          message: "数据库连接失败",
         });
       }
 
-      // 1. 查找u7528户(支u6301用户名/手u673au53f7/邮u7bb1登u5f55)
+      // 1. 通过手机号查找用户
       const userList = await drizzle
         .select()
         .from(users)
         .where(
-          or(
-            eq(users.name, input.username),
-            eq(users.phone, input.username),
-            eq(users.email, input.username)
-          )
+          eq(users.phone, input.phone)
         )
         .limit(1);
 
       if (userList.length === 0) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "用户不存在",
+          message: "手机号不存在，请确认后重试",
         });
       }
 
       const user = userList[0];
 
-      // 2. 验u8bc1密码
+      // 2. 验证密码
       if (!user.password) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "该账号未设u7f6e密码，请联系管理员",
+          message: "该账号未设置密码，请联系管理员",
         });
       }
 
@@ -296,7 +291,7 @@ export const authRouter = router({
         });
       }
 
-      // 4. 生u6210token
+      // 4. 生成token
       const token = jwt.sign(
         {
           id: user.id,
