@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { membershipPlans, membershipOrders, users } from "../drizzle/schema";
+import { membershipPlans, membershipOrders, users, customers } from "../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -182,6 +182,17 @@ export const membershipRouter = router({
       }
     }
 
+    // 查询关联客户的账户余额
+    let accountBalance = 0;
+    const [customer] = await db
+      .select({ accountBalance: customers.accountBalance })
+      .from(customers)
+      .where(eq(customers.userId, user.id))
+      .limit(1);
+    if (customer?.accountBalance) {
+      accountBalance = parseFloat(String(customer.accountBalance));
+    }
+
     return {
       isMember: membershipStatus === "active",
       membershipStatus,
@@ -189,6 +200,7 @@ export const membershipRouter = router({
       expiresAt: user.membershipExpiresAt?.toISOString() || null,
       daysRemaining,
       currentPlan,
+      accountBalance,
     };
   }),
 

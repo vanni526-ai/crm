@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, name, price, duration FROM membershipPlans;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT id, name, price, duration FROM membershipPlans;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "月度会员",
+      "price": "99.00",
+      "duration": "30"
+    },
+    {
+      "id": "2",
+      "name": "季度会员",
+      "price": "268.00",
+      "duration": "90"
+    },
+    {
+      "id": "3",
+      "name": "年度会员",
+      "price": "39.00",
+      "duration": "365"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tprice\tduration\n1\t月度会员\t99.00\t30\n2\t季度会员\t268.00\t90\n3\t年度会员\t39.00\t365\n",
+  "stderr": "",
+  "execution_time_ms": 1634
+}

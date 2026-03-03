@@ -1950,7 +1950,6 @@ export const appRouter = router({
           duration: z.number().min(0, "课程时长不能为负数"),
           level: z.enum(["入门", "深度", "订制", "剧本"]),
           isHot: z.number().min(0).max(1).optional(),
-          teacherFee: z.number().min(0, "老师费用不能为负数").optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -1965,7 +1964,6 @@ export const appRouter = router({
             level: input.level,
             isActive: true,
             isHot: input.isHot !== undefined ? input.isHot : 0,
-            teacherFee: input.teacherFee !== undefined ? input.teacherFee.toString() : "0.00",
           });
           return {
             success: true,
@@ -1994,7 +1992,6 @@ export const appRouter = router({
           duration: z.number().min(0, "课程时长不能为负数").optional(),
           level: z.enum(["入门", "深度", "订制", "剧本"]).optional(),
           isHot: z.number().min(0).max(1).optional(),
-          teacherFee: z.number().min(0, "老师费用不能为负数").optional(),
         })
       )
       .mutation(async ({ input, ctx }) => {
@@ -2010,7 +2007,7 @@ export const appRouter = router({
           if (updateData.duration !== undefined) dataToUpdate.duration = updateData.duration.toString();
           if (updateData.level !== undefined) dataToUpdate.level = updateData.level;
           if (updateData.isHot !== undefined) dataToUpdate.isHot = updateData.isHot;
-          if (updateData.teacherFee !== undefined) dataToUpdate.teacherFee = updateData.teacherFee.toString();
+
           await db.updateCourse(id, dataToUpdate);
           return {
             success: true,
