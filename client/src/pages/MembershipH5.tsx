@@ -493,6 +493,55 @@ export default function MembershipH5() {
           <span className="text-white/90 text-base mt-1">¥{displayPrice} / 年</span>
         </button>
       </div>
+
+      {/* 备案信息区域 */}
+      <div className="w-full bg-gray-100 border-t border-gray-200 px-4 pt-4 pb-6 flex flex-col items-center gap-3">
+        {/* 第一行：ICP 备案 + 公网安备 */}
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-500 text-xs hover:text-gray-700 transition-colors"
+          >
+            沪ICP备2022034742号-2
+          </a>
+          <span className="text-gray-300 text-xs">|</span>
+          <a
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010502006970"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-gray-500 text-xs hover:text-gray-700 transition-colors"
+          >
+            <img
+              src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png"
+              alt="公安备案"
+              className="w-4 h-4 inline-block"
+            />
+            沪公网安备31010502006970号
+          </a>
+        </div>
+
+        {/* 第二行：阿里云 + IPv6 */}
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <svg viewBox="0 0 40 40" className="w-5 h-5 flex-shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="40" rx="8" fill="#FF6A00"/>
+              <path d="M8 20C8 13.373 13.373 8 20 8s12 5.373 12 12-5.373 12-12 12S8 26.627 8 20z" fill="white" fillOpacity="0.15"/>
+              <path d="M13 20h14M20 13v14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+            </svg>
+            <span className="text-gray-500 text-xs">阿里云</span>
+            <span className="text-gray-500 text-xs">本网站由阿里云提供云计算及安全服务</span>
+          </div>
+          <span className="text-gray-300 text-xs">|</span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-gray-500 text-xs">本网站支持</span>
+            <span
+              className="inline-flex items-center px-1.5 py-0.5 rounded border border-gray-400 text-gray-500 text-xs font-medium"
+            >IPv6</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
