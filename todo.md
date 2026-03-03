@@ -5401,3 +5401,11 @@
 ### MembershipH5 底部添加备案信息
 - [x] 在 MembershipH5 页面底部添加备案信息和网站支持，1:1 还原图示样式
 - [x] 保存检查点
+
+### 修复 H5 /membership 页面 token 自动登录逻辑
+- [x] 分析问题根因：loginWithToken 成功后调用 window.location.reload() 会重新加载页面，但在 handleOpenMembership 中仍然检查 user 状态导致重定向到 /login
+- [x] 修复方案：loginWithToken 成功后改用 utils.auth.me.invalidate() 刷新用户状态，不再 reload 页面
+- [x] 添加 tokenLoginPending 状态，在 token 登录进行中时显示 loading spinner
+- [x] handleOpenMembership 在 tokenLoginPending 时直接 return，不跳转 /login
+- [x] 立即开通按钮在 tokenLoginPending 时显示"验证身份中…"并禁用
+- [x] 保存检查点

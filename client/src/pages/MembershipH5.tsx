@@ -52,12 +52,16 @@ const PAYMENT_CHANNELS: {
 // ========== 主页面 ==========
 export default function MembershipH5() {
   const { user, loading: authLoading } = useAuth();
+  const utils = trpc.useUtils();
   const [step, setStep] = useState<Step>("landing");
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [paymentChannel, setPaymentChannel] = useState<PaymentChannel>("wechat");
   const [orderId, setOrderId] = useState<number | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  // tokenLoginDone: true 表示 token 登录流程已完成（无论成功失败）
   const [tokenLoginDone, setTokenLoginDone] = useState(false);
+  // tokenLoginPending: true 表示 token 登录正在进行中
+  const [tokenLoginPending, setTokenLoginPending] = useState(false);
   const loginWithTokenMutation = trpc.auth.loginWithToken.useMutation();
   const tokenProcessed = useRef(false);
 
@@ -67,24 +71,34 @@ export default function MembershipH5() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
     if (!token) {
+      // 没有 token，直接标记完成
       setTokenLoginDone(true);
       return;
     }
+    // 有 token，开始自动登录
     tokenProcessed.current = true;
+    setTokenLoginPending(true);
+
     loginWithTokenMutation
       .mutateAsync({ token })
-      .then(() => {
+      .then(async () => {
         // 清除 URL 中的 token 参数，避免泄露
         const url = new URL(window.location.href);
         url.searchParams.delete("token");
         window.history.replaceState({}, "", url.toString());
-        setTokenLoginDone(true);
-        // 刷新页面以让 useAuth 重新读取 session
-        window.location.reload();
+
+        // 不 reload，直接 invalidate auth.me，让 useAuth 重新拉取用户状态
+        // 这样页面不会重新加载，用户体验更流畅
+        await utils.auth.me.invalidate();
       })
       .catch(() => {
+        // token 无效或过期，静默失败，让用户看到未登录状态
+      })
+      .finally(() => {
+        setTokenLoginPending(false);
         setTokenLoginDone(true);
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 查询套餐列表
@@ -129,6 +143,9 @@ export default function MembershipH5() {
 
   // 处理立即开通
   const handleOpenMembership = () => {
+    // 如果 token 登录还在进行中，等待完成
+    if (tokenLoginPending) return;
+
     if (!user) {
       window.location.href = "/login?redirect=/membership";
       return;
@@ -207,16 +224,19 @@ export default function MembershipH5() {
     }
   };
 
-  // ---- Token 登录中 ----
-  if (!tokenLoginDone && !user) {
+  // ---- Token 登录中（有 token 参数且正在处理）----
+  if (tokenLoginPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-gray-400 text-base">正在验证身份…</div>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
+          <div className="text-gray-400 text-base">正在验证身份…</div>
+        </div>
       </div>
     );
   }
 
-  // ---- 加载中 ----
+  // ---- 加载中（auth 或套餐数据未就绪）----
   if (authLoading || plansLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -486,11 +506,18 @@ export default function MembershipH5() {
       <div className="px-4 pb-8 pt-2">
         <button
           onClick={handleOpenMembership}
-          className="w-full rounded-2xl py-5 flex flex-col items-center justify-center shadow-lg active:opacity-90 transition-opacity"
+          disabled={tokenLoginPending}
+          className="w-full rounded-2xl py-5 flex flex-col items-center justify-center shadow-lg active:opacity-90 transition-opacity disabled:opacity-70"
           style={{ background: "linear-gradient(135deg, #FF8C00, #FF6B00)" }}
         >
-          <span className="text-white font-bold text-2xl">立即开通会员</span>
-          <span className="text-white/90 text-base mt-1">¥{displayPrice} / 年</span>
+          {tokenLoginPending ? (
+            <span className="text-white font-bold text-2xl">验证身份中…</span>
+          ) : (
+            <>
+              <span className="text-white font-bold text-2xl">立即开通会员</span>
+              <span className="text-white/90 text-base mt-1">¥{displayPrice} / 年</span>
+            </>
+          )}
         </button>
       </div>
 

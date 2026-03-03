@@ -9,7 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { handleWechatPaymentNotify, handleAlipayPaymentNotify } from "./paymentWebhook";
 import { handleMembershipWechatNotify, handleMembershipAlipayNotify } from "./membershipWebhook";
-import { serveStatic, setupVite } from "./vite";
+// vite is dynamically imported only in development to avoid bundling it in production
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -152,8 +152,10 @@ async function startServer() {
   });
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
+    const { setupVite } = await import("./vite");
     await setupVite(app, server);
   } else {
+    const { serveStatic } = await import("./serve-static");
     serveStatic(app);
   }
 
