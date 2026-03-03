@@ -1518,6 +1518,7 @@ export const appRouter = router({
           aliases: z.string().optional(), // 别名(逗号分隔)
           avatarUrl: z.string().optional(), // 头像 URL（通过头像编辑对话框更新）
           teacherAttribute: z.enum(["S", "M", "Switch"]).optional(), // 老师属性
+          hourlyRate: z.string().optional(), // 老师费用（课时费标准）
         }),
       }))
       .mutation(async ({ input }) => {

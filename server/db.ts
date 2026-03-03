@@ -1132,6 +1132,7 @@ export async function getAllTeachers() {
     teacherAttribute: users.teacherAttribute,
     status: users.teacherStatus, // 添加teacherStatus字段，映射为status
     teacherNotes: users.teacherNotes, // users表的teacherNotes（多角色用户）
+    hourlyRate: users.hourlyRate, // 课时费标准
   }).from(users)
   .where(
     and(
@@ -1193,7 +1194,7 @@ export async function getAllTeachersForParser() {
   return db.select().from(teachers).where(eq(teachers.isActive, true)).orderBy(desc(teachers.createdAt));
 }
 
-export async function updateTeacher(id: number, data: Partial<InsertTeacher> & { aliases?: string }) {
+export async function updateTeacher(id: number, data: Partial<InsertTeacher> & { aliases?: string; hourlyRate?: string }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -1209,7 +1210,29 @@ export async function updateTeacher(id: number, data: Partial<InsertTeacher> & {
     }
   }
   
-  await db.update(teachers).set(updateData).where(eq(teachers.id, id));
+  // 如果有 hourlyRate，更新 users 表（老师列表从 users 表读取）
+  // id 在老师列表中对应的是 users.id
+  if (data.hourlyRate !== undefined) {
+    const hourlyRateValue = data.hourlyRate && data.hourlyRate.trim() !== '' ? data.hourlyRate : null;
+    await db.update(users).set({ hourlyRate: hourlyRateValue as any }).where(eq(users.id, id));
+    delete updateData.hourlyRate; // 不写入 teachers 表
+  }
+  
+  // 过滤掉 hourlyRate 后再检查是否有其他字段需要更新 teachers 表
+  const teachersUpdateData = { ...updateData };
+  delete teachersUpdateData.hourlyRate;
+  
+  // 只有当有 teachers 表字段需要更新时才操作 teachers 表
+  const teachersFields = ['category', 'customerType', 'notes', 'contractEndDate', 'joinDate', 'aliases', 'avatarUrl', 'teacherAttribute'];
+  const hasTeachersUpdate = teachersFields.some(f => teachersUpdateData[f] !== undefined);
+  if (hasTeachersUpdate) {
+    // teachers 表的 id 字段是自增主键，但老师列表用的是 users.id
+    // 需要通过 userId 关联查找 teachers 表记录
+    const teacherRecord = await db.select({ id: teachers.id }).from(teachers).where(eq(teachers.userId, id)).limit(1);
+    if (teacherRecord.length > 0) {
+      await db.update(teachers).set(teachersUpdateData).where(eq(teachers.id, teacherRecord[0].id));
+    }
+  }
 }
 
 // 批量删除老师（软删除users表记录）

@@ -166,6 +166,21 @@ export default function Teachers() {
   const [avatarEditOpen, setAvatarEditOpen] = useState(false);
   const [avatarEditTeacher, setAvatarEditTeacher] = useState<any>(null);
   
+  // 老师费用内联编辑状态
+  const [editingFeeId, setEditingFeeId] = useState<number | null>(null);
+  const [editingFeeValue, setEditingFeeValue] = useState<string>("");
+
+  const updateHourlyRateMutation = trpc.teachers.update.useMutation({
+    onSuccess: () => {
+      utils.teachers.list.invalidate();
+      setEditingFeeId(null);
+      toast.success("老师费用更新成功");
+    },
+    onError: (error) => {
+      toast.error(error.message || "更新失败");
+    },
+  });
+  
   // 处理时间范围切换
   const handleDateRangeChange = (range: 'all' | 'month' | 'quarter' | 'year') => {
     setDateRange(range);
@@ -881,6 +896,7 @@ export default function Teachers() {
                         {sortField !== 'totalIncome' && <ArrowUpDown className="ml-1 w-3 h-3 opacity-30" />}
                       </Button>
                     </TableHead>
+                    <TableHead>老师费用</TableHead>
                     <TableHead>操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -951,7 +967,65 @@ export default function Teachers() {
                         {allStats?.find(s => s.teacherId === teacher.id)?.totalHours || 0}h
                       </TableCell>
                       <TableCell>
-                        ￥{(allStats?.find(s => s.teacherId === teacher.id)?.totalIncome || 0).toFixed(2)}
+                        ･{(allStats?.find(s => s.teacherId === teacher.id)?.totalIncome || 0).toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        {editingFeeId === teacher.id ? (
+                          <div className="flex items-center gap-1">
+                            <Input
+                              type="number"
+                              value={editingFeeValue}
+                              onChange={(e) => setEditingFeeValue(e.target.value)}
+                              className="w-24 h-7 text-sm"
+                              placeholder="费用"
+                              autoFocus
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  updateHourlyRateMutation.mutate({
+                                    id: teacher.id,
+                                    data: { hourlyRate: editingFeeValue },
+                                  });
+                                } else if (e.key === 'Escape') {
+                                  setEditingFeeId(null);
+                                }
+                              }}
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0 text-green-600"
+                              onClick={() => {
+                                updateHourlyRateMutation.mutate({
+                                  id: teacher.id,
+                                  data: { hourlyRate: editingFeeValue },
+                                });
+                              }}
+                            >
+                              ✓
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 w-7 p-0 text-red-500"
+                              onClick={() => setEditingFeeId(null)}
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div
+                            className="flex items-center gap-1 cursor-pointer group"
+                            onClick={() => {
+                              setEditingFeeId(teacher.id);
+                              setEditingFeeValue(teacher.hourlyRate ? String(teacher.hourlyRate) : "");
+                            }}
+                          >
+                            <span className="text-sm">
+                              {teacher.hourlyRate ? `･${Number(teacher.hourlyRate).toFixed(0)}` : <span className="text-muted-foreground">-</span>}
+                            </span>
+                            <Edit className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
