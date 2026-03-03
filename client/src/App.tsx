@@ -42,6 +42,7 @@ import PartnerManagement from "./pages/PartnerManagement";
 import CityExpenseManagement from "@/pages/CityExpenseManagement";
 import DataCleaning from "@/pages/DataCleaning";
 import MembershipH5 from "@/pages/MembershipH5";
+import Recharge from "@/pages/Recharge";
 
 
 function Router() {
@@ -85,6 +86,7 @@ function Router() {
       <Route path={"/city-expense-management"} component={CityExpenseManagement} />
       <Route path={"/data-cleaning"} component={DataCleaning} />
       <Route path={"/membership"} component={MembershipH5} />
+      <Route path={"/recharge"} component={Recharge} />
 
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />

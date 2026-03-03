@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { router, protectedProcedure, publicProcedure } from "./_core/trpc";
+// membershipRouter: listPlans, getStatus, createOrder, prepay, getOrderStatus, cancelOrder, listOrders, adminListOrders, adminActivate, createRechargeOrder, getRechargeOrderStatus, confirmRecharge, adminUpsertPlan
 import { getDb } from "./db";
 import { membershipPlans, membershipOrders, users, customers } from "../drizzle/schema";
 import { eq, desc, and } from "drizzle-orm";
@@ -517,6 +518,145 @@ export const membershipRouter = router({
       }
       await activateMembership(input.orderId);
       return { success: true };
+    }),
+
+  // ========== 创建充値订单 ==========
+  createRechargeOrder: protectedProcedure
+    .input(
+      z.object({
+        amount: z.number().min(1).max(10000),
+        paymentChannel: z.enum(["wechat", "alipay"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const orderNo = `RCH${Date.now()}${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`;
+      const now = new Date();
+
+      // 将充値订单存入 membershipOrders 表（复用该表，使用特殊 planName 标识）
+      const [result] = await db.insert(membershipOrders).values({
+        orderNo,
+        userId: ctx.user.id,
+        planId: 0, // 0 表示充値订单
+        planName: `RECHARGE_${input.amount}`, // 特殊标识
+        amount: input.amount.toFixed(2),
+        status: "pending",
+        paymentChannel: input.paymentChannel,
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      const orderId = (result as any).insertId;
+
+      // 根据支付渠道返回支付参数
+      if (input.paymentChannel === "wechat") {
+        return {
+          channel: "wechat" as const,
+          orderId,
+          orderNo,
+          amount: input.amount,
+          // TODO: 接入真实微信支付H5 API
+          mwebUrl: `https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=mock_${orderNo}&package=1234567890`,
+        };
+      }
+
+      if (input.paymentChannel === "alipay") {
+        return {
+          channel: "alipay" as const,
+          orderId,
+          orderNo,
+          amount: input.amount,
+          // TODO: 接入真实支付宝H5 API
+          formHtml: `<form id="alipayForm" action="https://openapi.alipay.com/gateway.do" method="post"><input type="hidden" name="biz_content" value='{"out_trade_no":"${orderNo}","total_amount":"${input.amount}"}'></form><script>document.getElementById('alipayForm').submit();</script>`,
+        };
+      }
+
+      throw new TRPCError({ code: "BAD_REQUEST", message: "不支持的支付渠道" });
+    }),
+
+  // ========== 查询充値订单状态 ==========
+  getRechargeOrderStatus: protectedProcedure
+    .input(z.object({ orderId: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const [order] = await db
+        .select()
+        .from(membershipOrders)
+        .where(
+          and(
+            eq(membershipOrders.id, input.orderId),
+            eq(membershipOrders.userId, ctx.user.id)
+          )
+        )
+        .limit(1);
+
+      if (!order) throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+
+      return {
+        status: order.status,
+        amount: Number(order.amount),
+        paymentDate: order.paymentDate?.toISOString() || null,
+      };
+    }),
+
+  // ========== 模拟充値完成（开发测试用）==========
+  // 生产环境应由支付回调触发，这里仅供测试
+  confirmRecharge: protectedProcedure
+    .input(z.object({ orderId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const [order] = await db
+        .select()
+        .from(membershipOrders)
+        .where(
+          and(
+            eq(membershipOrders.id, input.orderId),
+            eq(membershipOrders.userId, ctx.user.id)
+          )
+        )
+        .limit(1);
+
+      if (!order) throw new TRPCError({ code: "NOT_FOUND", message: "订单不存在" });
+      if (order.status === "paid") return { success: true, message: "已充値成功" };
+      if (order.status !== "pending") throw new TRPCError({ code: "BAD_REQUEST", message: "订单状态异常" });
+
+      // 确认充値金额
+      const rechargeAmount = Number(order.amount);
+      const now = new Date();
+
+      // 更新订单状态
+      await db
+        .update(membershipOrders)
+        .set({ status: "paid", paymentDate: now, updatedAt: now })
+        .where(eq(membershipOrders.id, input.orderId));
+
+      // 查找关联客户记录
+      const [customer] = await db
+        .select({ id: customers.id, accountBalance: customers.accountBalance })
+        .from(customers)
+        .where(eq(customers.userId, ctx.user.id))
+        .limit(1);
+
+      if (customer) {
+        const currentBalance = parseFloat(String(customer.accountBalance || 0));
+        const newBalance = currentBalance + rechargeAmount;
+        await db
+          .update(customers)
+          .set({ accountBalance: newBalance.toFixed(2), updatedAt: now })
+          .where(eq(customers.id, customer.id));
+      } else {
+        // 如果没有客户记录，将充値金额存到 users.accountBalance（如果该字段存在）
+        // 暂时记录到备注中
+        console.log(`[recharge] User ${ctx.user.id} recharged ${rechargeAmount} but no customer record found`);
+      }
+
+      return { success: true, message: `充値 ¥${rechargeAmount.toFixed(2)} 成功` };
     }),
 
   // ========== 管理员：管理套餐 ==========

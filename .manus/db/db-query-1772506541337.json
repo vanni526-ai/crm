@@ -1,0 +1,26 @@
+{
+  "query": "\nSELECT \n  'paymentDate NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE paymentDate IS NULL AND status != 'cancelled'\nUNION ALL\nSELECT \n  'paymentDate NOT NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE paymentDate IS NOT NULL AND status != 'cancelled'\nUNION ALL\nSELECT \n  'classDate NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE classDate IS NULL AND status != 'cancelled'\nUNION ALL\nSELECT \n  'classDate NOT NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE classDate IS NOT NULL AND status != 'cancelled';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  'paymentDate NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE paymentDate IS NULL AND status != 'cancelled'\nUNION ALL\nSELECT \n  'paymentDate NOT NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE paymentDate IS NOT NULL AND status != 'cancelled'\nUNION ALL\nSELECT \n  'classDate NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE classDate IS NULL AND status != 'cancelled'\nUNION ALL\nSELECT \n  'classDate NOT NULL' as type,\n  COUNT(*) as count\nFROM orders WHERE classDate IS NOT NULL AND status != 'cancelled';\n",
+  "rows": [
+    {
+      "type": "paymentDate NULL",
+      "count": "40"
+    },
+    {
+      "type": "paymentDate NOT NULL",
+      "count": "423"
+    },
+    {
+      "type": "classDate NULL",
+      "count": "43"
+    },
+    {
+      "type": "classDate NOT NULL",
+      "count": "420"
+    }
+  ],
+  "messages": [],
+  "stdout": "type\tcount\npaymentDate NULL\t40\npaymentDate NOT NULL\t423\nclassDate NULL\t43\nclassDate NOT NULL\t420\n",
+  "stderr": "",
+  "execution_time_ms": 1524
+}

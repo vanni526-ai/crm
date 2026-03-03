@@ -140,12 +140,20 @@ export default function MembershipH5() {
     setStep("confirm");
   };
 
+  // 判断余额是否充足
+  const isBalanceSufficient = accountBalance >= (selectedPlan?.price ?? 0);
+
   // 处理确认支付
   const handleConfirmPay = async () => {
     if (!selectedPlan) return;
-    // 充值跳转
+    // 充値跳转
     if (paymentChannel === "recharge") {
       window.location.href = `/recharge?redirect=/membership`;
+      return;
+    }
+    // 余额不足时防止提交
+    if (paymentChannel === "balance" && !isBalanceSufficient) {
+      setErrorMsg(`余额不足，当前余额 ¥${accountBalance.toFixed(2)}，请充値后再使用`);
       return;
     }
     setErrorMsg("");
@@ -305,45 +313,62 @@ export default function MembershipH5() {
 
         {/* 支付方式列表 */}
         <div className="flex-1 px-4 mt-4 flex flex-col gap-3">
-          {PAYMENT_CHANNELS.map((ch) => (
-            <button
-              key={ch.key}
-              onClick={() => setPaymentChannel(ch.key)}
-              className="w-full bg-white rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm transition-all"
-              style={{
-                border: paymentChannel === ch.key ? "2px solid #FF6B00" : "2px solid transparent",
-              }}
-            >
-              {/* 图标 */}
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                style={{ background: ch.bgColor }}
-              >
-                {ch.emoji}
-              </div>
-              {/* 文字 */}
-              <div className="flex-1 text-left">
-                <p className="text-gray-800 font-semibold text-base">{ch.label}</p>
-                <p className="text-gray-400 text-sm mt-0.5">
-                  {ch.key === "balance"
-                    ? `当前余额 ¥${accountBalance.toFixed(2)}`
-                    : ch.desc}
-                </p>
-              </div>
-              {/* 单选圆圈 */}
-              <div
-                className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+        {PAYMENT_CHANNELS.map((ch) => {
+            // 余额不足时禁用余额支付选项
+            const isDisabled = ch.key === "balance" && !isBalanceSufficient;
+            const isSelected = paymentChannel === ch.key && !isDisabled;
+            return (
+              <button
+                key={ch.key}
+                onClick={() => {
+                  if (isDisabled) {
+                    setErrorMsg("余额不足，请先充値");
+                    return;
+                  }
+                  setErrorMsg("");
+                  setPaymentChannel(ch.key);
+                }}
+                disabled={isDisabled}
+                className="w-full bg-white rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm transition-all"
                 style={{
-                  borderColor: paymentChannel === ch.key ? "#FF6B00" : "#D1D5DB",
-                  background: paymentChannel === ch.key ? "#FF6B00" : "white",
+                  border: isSelected ? "2px solid #FF6B00" : "2px solid transparent",
+                  opacity: isDisabled ? 0.5 : 1,
+                  cursor: isDisabled ? "not-allowed" : "pointer",
                 }}
               >
-                {paymentChannel === ch.key && (
-                  <div className="w-2.5 h-2.5 rounded-full bg-white" />
-                )}
-              </div>
-            </button>
-          ))}
+                {/* 图标 */}
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+                  style={{ background: ch.bgColor }}
+                >
+                  {ch.emoji}
+                </div>
+                {/* 文字 */}
+                <div className="flex-1 text-left">
+                  <p className="text-gray-800 font-semibold text-base">{ch.label}</p>
+                  <p className="text-sm mt-0.5" style={{ color: isDisabled ? "#EF4444" : "#9CA3AF" }}>
+                    {ch.key === "balance"
+                      ? isBalanceSufficient
+                        ? `当前余额 ¥${accountBalance.toFixed(2)}`
+                        : `余额不足（当前 ¥${accountBalance.toFixed(2)}），请充値`
+                      : ch.desc}
+                  </p>
+                </div>
+                {/* 单选圆圈 */}
+                <div
+                  className="w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0"
+                  style={{
+                    borderColor: isSelected ? "#FF6B00" : "#D1D5DB",
+                    background: isSelected ? "#FF6B00" : "white",
+                  }}
+                >
+                  {isSelected && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {errorMsg && (

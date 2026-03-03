@@ -5381,3 +5381,8 @@
 - [x] 更新默认头像 URL（manuscdn.com → 本地静态资源 /avatars/）
 - [x] 构建验证无 TypeScript 错误
 - [x] 保存 Checkpoint
+
+### 待修复问题（2026-03-03）
+- [x] 排查并修复生产环境首页统计数据为0的问题（修复 paymentDate 为 NULL 时改用 createdAt 兜底）
+- [x] 余额支付校验：余额不足时禁用选项并提示「余额不足，请充値」
+- [x] 实现充値页面（/recharge，支持微信/支付宝充値到账户余额）

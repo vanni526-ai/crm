@@ -1,0 +1,19 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_orders,\n  COUNT(paymentDate) as orders_with_payment_date,\n  COUNT(classDate) as orders_with_class_date,\n  MIN(paymentDate) as min_payment_date,\n  MAX(paymentDate) as max_payment_date,\n  MIN(classDate) as min_class_date,\n  MAX(classDate) as max_class_date\nFROM orders WHERE status != 'cancelled';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute \nSELECT \n  COUNT(*) as total_orders,\n  COUNT(paymentDate) as orders_with_payment_date,\n  COUNT(classDate) as orders_with_class_date,\n  MIN(paymentDate) as min_payment_date,\n  MAX(paymentDate) as max_payment_date,\n  MIN(classDate) as min_class_date,\n  MAX(classDate) as max_class_date\nFROM orders WHERE status != 'cancelled';\n",
+  "rows": [
+    {
+      "total_orders": "463",
+      "orders_with_payment_date": "423",
+      "orders_with_class_date": "420",
+      "min_payment_date": "2025-12-16",
+      "max_payment_date": "2026-03-01",
+      "min_class_date": "2025-01-14",
+      "max_class_date": "2026-03-02"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_orders\torders_with_payment_date\torders_with_class_date\tmin_payment_date\tmax_payment_date\tmin_class_date\tmax_class_date\n463\t423\t420\t2025-12-16\t2026-03-01\t2025-01-14\t2026-03-02\n",
+  "stderr": "",
+  "execution_time_ms": 1605
+}
