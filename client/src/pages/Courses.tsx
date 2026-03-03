@@ -45,6 +45,7 @@ type Course = {
   level: string | null;
   isActive: boolean;
   isHot: number;
+  teacherFee: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -53,6 +54,9 @@ export default function Courses() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  // 内联编辑老师费用
+  const [editingTeacherFeeId, setEditingTeacherFeeId] = useState<number | null>(null);
+  const [teacherFeeInput, setTeacherFeeInput] = useState("");
 
   // 表单状态
   const [formData, setFormData] = useState({
@@ -64,6 +68,7 @@ export default function Courses() {
     duration: "",
     level: "入门",
     isHot: 0,
+    teacherFee: "",
   });
 
   // 查询课程列表
@@ -130,6 +135,7 @@ export default function Courses() {
       duration: "",
       level: "入门",
       isHot: 0,
+      teacherFee: "",
     });
     setIsDialogOpen(true);
   };
@@ -146,6 +152,7 @@ export default function Courses() {
       duration: course.duration || "",
       level: course.level || "入门",
       isHot: course.isHot || 0,
+      teacherFee: course.teacherFee ? parseFloat(course.teacherFee).toString() : "",
     });
     setIsDialogOpen(true);
   };
@@ -163,6 +170,7 @@ export default function Courses() {
       duration: "",
       level: "入门",
       isHot: 0,
+      teacherFee: "",
     });
   };
 
@@ -190,6 +198,7 @@ export default function Courses() {
         price: formData.price ? parseFloat(formData.price) : undefined,
         duration: formData.duration ? parseFloat(formData.duration) : undefined,
         level: formData.level as "入门" | "深度" | "订制" | "剧本" | undefined,
+        teacherFee: formData.teacherFee !== "" ? parseFloat(formData.teacherFee) : null,
       });
     } else {
       // 创建操作:price、duration、level必填
@@ -211,6 +220,29 @@ export default function Courses() {
     if (confirm(`确定要删除课程"${name}"吗?`)) {
       deleteMutation.mutate({ id });
     }
+  };
+
+  // 保存老师费用内联编辑
+  const handleSaveTeacherFee = (courseId: number) => {
+    const val = teacherFeeInput.trim();
+    const fee = val === "" ? null : parseFloat(val);
+    if (val !== "" && (isNaN(fee!) || fee! < 0)) {
+      toast.error("输入错误", { description: "老师费用必须为非负数" });
+      return;
+    }
+    updateMutation.mutate(
+      { id: courseId, teacherFee: fee },
+      {
+        onSuccess: () => {
+          toast.success("已保存", { description: "老师费用已更新" });
+          setEditingTeacherFeeId(null);
+          refetch();
+        },
+        onError: (err) => {
+          toast.error("保存失败", { description: err.message });
+        },
+      }
+    );
   };
 
   // 切换启用状态
@@ -435,6 +467,7 @@ export default function Courses() {
               <TableHead>课程别名</TableHead>
               <TableHead>课程程度</TableHead>
               <TableHead>价格(元)</TableHead>
+              <TableHead>老师费用(元)</TableHead>
               <TableHead>时长(小时)</TableHead>
               <TableHead>热门</TableHead>
               <TableHead>状态</TableHead>
@@ -445,7 +478,7 @@ export default function Courses() {
           <TableBody>
             {courses.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground">
+                <TableCell colSpan={9} className="text-center text-muted-foreground">
                   暂无课程数据
                 </TableCell>
               </TableRow>
@@ -461,6 +494,49 @@ export default function Courses() {
                   </TableCell>
                   <TableCell>
                     {course.price !== null ? `¥${parseFloat(course.price).toFixed(2)}` : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {editingTeacherFeeId === course.id ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          className="h-7 w-24 text-sm"
+                          value={teacherFeeInput}
+                          onChange={(e) => setTeacherFeeInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleSaveTeacherFee(course.id);
+                            if (e.key === "Escape") setEditingTeacherFeeId(null);
+                          }}
+                          autoFocus
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-green-600"
+                          onClick={() => handleSaveTeacherFee(course.id)}
+                        >✓</Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-muted-foreground"
+                          onClick={() => setEditingTeacherFeeId(null)}
+                        >×</Button>
+                      </div>
+                    ) : (
+                      <span
+                        className="cursor-pointer hover:text-primary hover:underline"
+                        onClick={() => {
+                          setEditingTeacherFeeId(course.id);
+                          setTeacherFeeInput(course.teacherFee ? parseFloat(course.teacherFee).toString() : "");
+                        }}
+                      >
+                        {course.teacherFee !== null && course.teacherFee !== undefined
+                          ? `¥${parseFloat(course.teacherFee).toFixed(2)}`
+                          : <span className="text-muted-foreground text-xs">点击设置</span>}
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell>{course.duration !== null ? `${parseFloat(course.duration)}h` : "-"}</TableCell>
                   <TableCell>
@@ -585,6 +661,21 @@ export default function Courses() {
                   />
                 </div>
 
+                <div className="grid gap-2">
+                  <Label htmlFor="teacherFee">老师费用(元)</Label>
+                  <Input
+                    id="teacherFee"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.teacherFee}
+                    onChange={(e) => setFormData({ ...formData, teacherFee: e.target.value })}
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="duration">时长(小时)</Label>
                   <Input

@@ -1010,6 +1010,7 @@ export const courses = mysqlTable("courses", {
   isBookable: boolean("isBookable").default(true).notNull(), // 是否可预约(false表示不在前端App显示)
   alias: varchar("alias", { length: 100 }), // 课程别名(供前端App显示使用)
   isHot: tinyint("isHot").default(0).notNull(), // 是否热门: 0=不热门, 1=热门
+  teacherFee: decimal("teacherFee", { precision: 10, scale: 2 }), // 老师费用(单节课老师所得费用)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
