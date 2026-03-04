@@ -2,9 +2,12 @@
  * 阿里云短信服务
  * 使用 @alicloud/dysmsapi20170525 SDK 发送短信验证码
  */
-import Dysmsapi, * as $dysmsapi from "@alicloud/dysmsapi20170525";
+import * as $dysmsapi from "@alicloud/dysmsapi20170525";
 import * as $OpenApi from "@alicloud/openapi-client";
 import * as $Util from "@alicloud/tea-util";
+
+// 兼容 ESM/CJS 混合导出
+const Dysmsapi = ($dysmsapi as any).default ?? $dysmsapi;
 
 // 内存缓存：手机号 -> { code, expiresAt }
 const smsCodeCache = new Map<string, { code: string; expiresAt: number }>();
