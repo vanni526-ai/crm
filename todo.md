@@ -5433,3 +5433,8 @@
 - [x] 创建 ForgotPassword.tsx 三步流程页面（手机号→验证码→新密码）
 - [x] App.tsx 注册 /forgot-password 路由
 - [x] 编写 smsService.test.ts 单元测试（5 个用例全部通过）
+
+### 136. 修复两个生产环境问题
+- [ ] 修复首页未登录时显示 "Sign in to continue" 中间页，改为直接跳转 /login
+- [ ] 修复登录页面没有"忘记密码"入口（生产环境加载旧版 JS 缓存问题）
+- [ ] 部署到生产环境并验证
