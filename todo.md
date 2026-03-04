@@ -5422,3 +5422,14 @@
 - [x] 确认 server/storage.ts 已完全替换为阿里云 OSS（读取 OSS_ACCESS_KEY_ID/OSS_BUCKET/OSS_REGION 环境变量）
 - [x] TypeScript 编译零错误验证通过（npx tsc --noEmit 无输出）
 - [x] 推送至 GitHub vanni526-ai/yingji-crm
+
+### 忘记密码/短信验证码重置密码功能（2026-03-04）
+- [x] 安装 @alicloud/dysmsapi20170525 SDK
+- [x] 配置阿里云短信环境变量（ALIYUN_SMS_ACCESS_KEY_ID、ALIYUN_SMS_ACCESS_KEY_SECRET）
+- [x] 创建 server/smsService.ts（发送验证码、内存缓存、60s 防刷、5min 过期）
+- [x] authRouter 新增 sendSmsCode 接口（验证手机号已注册再发送）
+- [x] authRouter resetPassword 接口替换为真实短信验证码校验
+- [x] 前端登录页面增加"忘记密码？"链接
+- [x] 创建 ForgotPassword.tsx 三步流程页面（手机号→验证码→新密码）
+- [x] App.tsx 注册 /forgot-password 路由
+- [x] 编写 smsService.test.ts 单元测试（5 个用例全部通过）

@@ -150,7 +150,16 @@ export default function LocalLogin() {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500">初始密码为 123456，登录后请及时修改</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-slate-500">初始密码为 123456，登录后请及时修改</p>
+                  <button
+                    type="button"
+                    onClick={() => setLocation("/forgot-password")}
+                    className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    忘记密码？
+                  </button>
+                </div>
               </div>
 
               {/* 登录按钮 */}

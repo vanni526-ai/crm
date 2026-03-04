@@ -1,0 +1,40 @@
+{
+  "query": "SELECT isBookable, COUNT(*) as count FROM courses GROUP BY isBookable; SELECT id, name, isBookable, isActive FROM courses LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT isBookable, COUNT(*) as count FROM courses GROUP BY isBookable; SELECT id, name, isBookable, isActive FROM courses LIMIT 20;",
+  "rows": [
+    {
+      "isBookable": "0",
+      "count": "1"
+    },
+    {
+      "isBookable": "1",
+      "count": "30"
+    }
+  ],
+  "messages": [
+    "id\tname\tisBookable\tisActive",
+    "2\t1V1 女王深度局\t1\t1",
+    "4\t1V1 情趣变装课\t1\t1",
+    "5\tTK 挠痒体验课 1V1\t1\t1",
+    "6\t1V1 埃及 Y 后木乃伊主题课\t1\t1",
+    "7\t1V1 RU首开发课\t1\t1",
+    "8\t1V1 裸 ZU 丝 WA 体验课\t1\t1",
+    "9\t1V1 SP 实践课\t1\t1",
+    "10\t1V1 理论课\t1\t1",
+    "11\t1V1 女王实践课\t1\t1",
+    "12\t《问罪》1V1 剧本课\t1\t1",
+    "13\t《流放》1V1 剧本课\t1\t1",
+    "14\t《臣服》1V1 剧本课\t1\t1",
+    "15\t《医生》1V1 剧本课\t1\t1",
+    "16\t《校园霸凌》1V1 剧本课\t1\t1",
+    "17\t《深渊》1V1 剧本课\t1\t1",
+    "18\t《下坠》1V1 剧本课\t1\t1",
+    "19\t《痛与罚》1V1 剧本课\t1\t1",
+    "20\t《师生》1V1 剧本课\t1\t1",
+    "21\t《上下级》1V1 剧本课\t1\t1",
+    "22\t《背德》1V1 剧本\t1\t1"
+  ],
+  "stdout": "isBookable\tcount\n0\t1\n1\t30\nid\tname\tisBookable\tisActive\n2\t1V1 女王深度局\t1\t1\n4\t1V1 情趣变装课\t1\t1\n5\tTK 挠痒体验课 1V1\t1\t1\n6\t1V1 埃及 Y 后木乃伊主题课\t1\t1\n7\t1V1 RU首开发课\t1\t1\n8\t1V1 裸 ZU 丝 WA 体验课\t1\t1\n9\t1V1 SP 实践课\t1\t1\n10\t1V1 理论课\t1\t1\n11\t1V1 女王实践课\t1\t1\n12\t《问罪》1V1 剧本课\t1\t1\n13\t《流放》1V1 剧本课\t1\t1\n14\t《臣服》1V1 剧本课\t1\t1\n15\t《医生》1V1 剧本课\t1\t1\n16\t《校园霸凌》1V1 剧本课\t1\t1\n17\t《深渊》1V1 剧本课\t1\t1\n18\t《下坠》1V1 剧本课\t1\t1\n19\t《痛与罚》1V1 剧本课\t1\t1\n20\t《师生》1V1 剧本课\t1\t1\n21\t《上下级》1V1 剧本课\t1\t1\n22\t《背德》1V1 剧本\t1\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1864
+}

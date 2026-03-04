@@ -6,6 +6,7 @@ import { systemAccounts, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { hashPassword, verifyPassword } from "./passwordUtils";
+import { sendSmsVerificationCode, verifySmsCode } from "./smsService";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 
@@ -432,6 +433,44 @@ export const authRouter = router({
       };
     }),
 
+  // 发送短信验证码（用于重置密码）
+  sendSmsCode: publicProcedure
+    .input(
+      z.object({
+        phone: z.string()
+          .min(11, "手机号格式错误")
+          .max(11, "手机号格式错误")
+          .regex(/^1[3-9]\d{9}$/, "请输入正确的手机号"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+      // 验证手机号是否已注册
+      const userList = await drizzle
+        .select()
+        .from(users)
+        .where(eq(users.phone, input.phone))
+        .limit(1);
+      if (userList.length === 0) {
+        return { success: false, error: "该手机号未注册" };
+      }
+      if (!userList[0].isActive) {
+        return { success: false, error: "账号已被禁用，请联系管理员" };
+      }
+      // 发送短信验证码
+      const result = await sendSmsVerificationCode(input.phone);
+      if (!result.success) {
+        return { success: false, error: result.message };
+      }
+      return { success: true };
+    }),
+
   // 忘记密码 - 通过手机号+验证码重置密码
   resetPassword: publicProcedure
     .input(
@@ -479,14 +518,12 @@ export const authRouter = router({
         };
       }
 
-      // 3. 验证短信验证码
-      // 测试环境固定验证码为 123456
-      // TODO: 生产环境接入真实短信服务
-      const isValidCode = input.code === "123456";
-      if (!isValidCode) {
+      // 3. 验证短信验证码（阿里云短信）
+      const codeCheck = verifySmsCode(input.phone, input.code);
+      if (!codeCheck.valid) {
         return {
           success: false,
-          error: "验证码错误",
+          error: codeCheck.message,
         };
       }
 

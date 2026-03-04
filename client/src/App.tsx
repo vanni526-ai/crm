@@ -32,6 +32,7 @@ import ReconciliationMatch from "./pages/ReconciliationMatch";
 import ReconciliationReport from "./pages/ReconciliationReport";
 
 import LocalLogin from "./pages/LocalLogin";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import CustomerManagement from "./pages/CustomerManagement";
 import Courses from "./pages/Courses";
@@ -77,6 +78,7 @@ function Router() {
       <Route path={"/reconciliation-report"} component={ReconciliationReport} />
 
       <Route path={"/login"} component={LocalLogin} />
+      <Route path={"/forgot-password"} component={ForgotPassword} />
 
       <Route path={"/courses"} component={Courses} />
       <Route path={"/notifications"} component={Notifications} />

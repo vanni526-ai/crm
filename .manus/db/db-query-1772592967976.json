@@ -1,0 +1,28 @@
+{
+  "query": "SELECT COUNT(*) as total FROM courses; SELECT isBookable, COUNT(*) as count FROM courses GROUP BY isBookable; SHOW COLUMNS FROM courses LIKE 'isBookable';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT COUNT(*) as total FROM courses; SELECT isBookable, COUNT(*) as count FROM courses GROUP BY isBookable; SHOW COLUMNS FROM courses LIKE 'isBookable';",
+  "rows": [
+    {
+      "total": "31"
+    },
+    {
+      "total": "isBookable\tcount"
+    },
+    {
+      "total": "0\t1"
+    },
+    {
+      "total": "1\t30"
+    },
+    {
+      "total": "Field\tType\tNull\tKey\tDefault\tExtra"
+    },
+    {
+      "total": "isBookable\ttinyint(1)\tNO\t\t1\t"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n31\nisBookable\tcount\n0\t1\n1\t30\nField\tType\tNull\tKey\tDefault\tExtra\nisBookable\ttinyint(1)\tNO\t\t1\t\n",
+  "stderr": "",
+  "execution_time_ms": 1999
+}
