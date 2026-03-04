@@ -1,4 +1,3 @@
-// LLM功能已在迁移阿里云阶段暂时禁用
 
 /**
  * 微信账单行数据
@@ -36,13 +35,13 @@ export interface ParsedOrderInfo {
 }
 
 /**
- * 使用LLM解析微信账单中的商品信息
+ * 解析微信账单中的商品信息（已停用）
  */
 export async function parseWechatBillWithLLM(
   rows: WechatBillRow[],
   template: string = "wechat"
 ): Promise<ParsedOrderInfo[]> {
-  throw new Error("微信账单LLM解析功能暂时不可用（系统维护中）");
+  throw new Error("微信账单解析功能已停用");
 }
 
 /**

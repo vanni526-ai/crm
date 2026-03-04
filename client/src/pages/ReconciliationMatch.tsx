@@ -28,16 +28,8 @@ export default function ReconciliationMatch() {
 
   // Mutations
   const intelligentMatch = trpc.reconciliation.intelligentMatch.useMutation({
-    onSuccess: (data) => {
-      toast.success("智能匹配完成", {
-        description: data.message,
-      });
-      refetchMatches();
-      refetchSchedules();
-      refetchOrders();
-    },
     onError: (error) => {
-      toast.error("匹配失败", {
+      toast.error("智能匹配已停用", {
         description: error.message,
       });
     },

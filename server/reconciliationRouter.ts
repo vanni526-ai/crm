@@ -3,8 +3,6 @@ import { protectedProcedure, router } from "./_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as reconciliationDb from "./reconciliationDb";
 import * as db from "./db";
-// LLM智能匹配功能已在迁移阿里云阶段暂时禁用
-
 // 权限检查:管理员或财务可以访问对账功能
 const reconciliationProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "admin" && ctx.user.role !== "finance") {
@@ -15,49 +13,20 @@ const reconciliationProcedure = protectedProcedure.use(({ ctx, next }) => {
 
 export const reconciliationRouter = router({
   /**
-   * 智能匹配课程日程与订单
+   * 智能匹配（已停用）
    */
   intelligentMatch: reconciliationProcedure
     .input(
       z.object({
-        scheduleIds: z.array(z.number()).optional(), // 可选:指定要匹配的课程日程ID
-        orderIds: z.array(z.number()).optional(), // 可选:指定要匹配的订单ID
+        scheduleIds: z.array(z.number()).optional(),
+        orderIds: z.array(z.number()).optional(),
       })
     )
-    .mutation(async ({ input, ctx }) => {
-      try {
-        // 获取未匹配的课程日程和订单
-        let unmatchedSchedules = await reconciliationDb.getUnmatchedSchedules();
-        let unmatchedOrders = await reconciliationDb.getUnmatchedOrders();
-
-        // 如果指定了ID,则只匹配指定的记录
-        if (input.scheduleIds && input.scheduleIds.length > 0) {
-          unmatchedSchedules = unmatchedSchedules.filter(s => input.scheduleIds!.includes(s.id));
-        }
-        if (input.orderIds && input.orderIds.length > 0) {
-          unmatchedOrders = unmatchedOrders.filter(o => input.orderIds!.includes(o.id));
-        }
-
-        if (unmatchedSchedules.length === 0 || unmatchedOrders.length === 0) {
-          return {
-            success: true,
-            matchedCount: 0,
-            matches: [],
-            message: "没有需要匹配的记录",
-          };
-        }
-
-        // LLM智能匹配已禁用，返回功能暂不可用提示
-        throw new TRPCError({
-          code: "METHOD_NOT_SUPPORTED",
-          message: "LLM智能匹配功能暂时不可用（系统维护中），请使用手动匹配功能",
-        });
-      } catch (error: any) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `智能匹配失败: ${error.message}`,
-        });
-      }
+    .mutation(async () => {
+      throw new TRPCError({
+        code: "METHOD_NOT_SUPPORTED",
+        message: "智能匹配功能已停用，请使用手动匹配功能",
+      });
     }),
 
   /**

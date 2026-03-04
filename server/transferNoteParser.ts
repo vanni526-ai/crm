@@ -1,4 +1,3 @@
-// LLM功能已在迁移阿里云阶段暂时禁用
 import { extractNotesInfo } from "./notesExtractor";
 
 /**
@@ -288,6 +287,6 @@ ${lines.join('\n')}
 
 请直接返回JSON数组,不要包含任何其他说明文字。`;
 
-  // LLM解析已禁用
-  throw new Error("转账备注LLM解析功能暂时不可用（系统维护中）");
+  // 已停用
+  throw new Error("转账备注解析功能已停用");
 }

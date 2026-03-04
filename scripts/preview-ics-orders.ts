@@ -76,7 +76,7 @@ const formattedEvents = events.map((event: any) => ({
   attendees: event.attendee ? (Array.isArray(event.attendee) ? event.attendee.map((a: any) => a.val || '') : [event.attendee.val || '']) : []
 }));
 
-console.log('\n\n开始使用LLM解析订单信息...');
+console.log('\n\n开始解析订单信息...');
 parseICSOrderContent(formattedEvents).then(parsedOrders => {
   console.log(`\n成功解析出 ${parsedOrders.length} 个订单\n`);
 

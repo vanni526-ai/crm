@@ -5409,3 +5409,16 @@
 - [x] handleOpenMembership 在 tokenLoginPending 时直接 return，不跳转 /login
 - [x] 立即开通按钮在 tokenLoginPending 时显示"验证身份中…"并禁用
 - [x] 保存检查点
+
+### LLM 代码全盘清理 & OSS 替换验证（2026-03-04）
+- [x] 全盘扫描所有 LLM 相关引用（invokeLLM、_core/llm、LLM功能等关键词）
+- [x] 清理 orderParseRouter.ts：移除 263 行 LLM 注释代码，保留停用提示接口
+- [x] 清理 reconciliationRouter.ts：简化 intelligentMatch 为停用提示，修复 onSuccess 类型错误（never.message）
+- [x] 清理 transferNoteParser.ts：移除 LLM 注释行，更新错误提示文案
+- [x] 清理 wechatBillParser.ts：移除 LLM 注释行，更新错误提示文案
+- [x] 清理 promptOptimizer.ts：移除 LLM 注释行，更新函数注释
+- [x] 清理 scripts/preview-ics-orders.ts：移除 LLM 相关日志
+- [x] 确认 ali-oss SDK 已安装（node -e "require('ali-oss')" 通过）
+- [x] 确认 server/storage.ts 已完全替换为阿里云 OSS（读取 OSS_ACCESS_KEY_ID/OSS_BUCKET/OSS_REGION 环境变量）
+- [x] TypeScript 编译零错误验证通过（npx tsc --noEmit 无输出）
+- [x] 推送至 GitHub vanni526-ai/yingji-crm
