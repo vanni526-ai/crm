@@ -9458,9 +9458,10 @@ import { eq as eq6 } from "drizzle-orm";
 import bcrypt2 from "bcryptjs";
 
 // server/smsService.ts
-import Dysmsapi, * as $dysmsapi from "@alicloud/dysmsapi20170525";
+import * as $dysmsapi from "@alicloud/dysmsapi20170525";
 import * as $OpenApi from "@alicloud/openapi-client";
 import * as $Util from "@alicloud/tea-util";
+var Dysmsapi = $dysmsapi.default ?? $dysmsapi;
 var smsCodeCache = /* @__PURE__ */ new Map();
 function createSmsClient() {
   const config = new $OpenApi.Config({
