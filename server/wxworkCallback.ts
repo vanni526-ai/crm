@@ -7,7 +7,7 @@ import { Request, Response } from "express";
 import crypto from "crypto";
 
 // 从环境变量读取 Token（用于验证签名）
-const WXWORK_TOKEN = process.env.WXWORK_TOKEN || "wxwork_token_2026";
+const WXWORK_TOKEN = process.env.WXWORK_TOKEN || "wxworktoken2026";
 
 /**
  * GET 请求：企业微信服务器验证

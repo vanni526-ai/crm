@@ -9872,6 +9872,13 @@ var authRouter = router({
         error: "\u8D26\u53F7\u5DF2\u88AB\u7981\u7528\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458"
       };
     }
+    if (input.code !== process.env.INTERNAL_RESET_TOKEN) {
+      console.warn(`[AUTH] resetPassword: \u65E0\u6548\u7684\u5185\u90E8\u4EE4\u724C\uFF0C\u7591\u4F3C\u7ED5\u8FC7\u4EE3\u7406\u5C42\u8C03\u7528, phone=${input.phone}`);
+      return {
+        success: false,
+        error: "\u65E0\u6548\u7684\u8BF7\u6C42\uFF0C\u8BF7\u901A\u8FC7\u5B98\u65B9 App \u64CD\u4F5C"
+      };
+    }
     const hashedNewPassword = await hashPassword(input.newPassword);
     await drizzle2.update(users).set({ password: hashedNewPassword }).where(eq6(users.id, user.id));
     return {
@@ -19528,6 +19535,37 @@ async function verifyAlipaySignature2(req) {
   return true;
 }
 
+// server/wxworkCallback.ts
+import crypto3 from "crypto";
+var WXWORK_TOKEN = process.env.WXWORK_TOKEN || "wxworktoken2026";
+function handleWxworkCallbackVerify(req, res) {
+  const { msg_signature, timestamp: timestamp2, nonce, echostr } = req.query;
+  console.log("[WxWork Callback] Verify request:", { msg_signature, timestamp: timestamp2, nonce, echostr: echostr?.substring(0, 20) + "..." });
+  if (!msg_signature || !timestamp2 || !nonce || !echostr) {
+    res.status(200).send("OK - WxWork callback endpoint is ready");
+    return;
+  }
+  try {
+    const arr = [WXWORK_TOKEN, timestamp2, nonce].sort();
+    const str = arr.join("");
+    const signature = crypto3.createHash("sha1").update(str).digest("hex");
+    if (signature === msg_signature) {
+      console.log("[WxWork Callback] Signature verified OK, returning echostr");
+      res.status(200).send(echostr);
+    } else {
+      console.error("[WxWork Callback] Signature mismatch:", { expected: signature, got: msg_signature });
+      res.status(403).send("Signature mismatch");
+    }
+  } catch (err) {
+    console.error("[WxWork Callback] Error:", err);
+    res.status(500).send("Internal error");
+  }
+}
+function handleWxworkCallbackPost(req, res) {
+  console.log("[WxWork Callback] Received POST message:", JSON.stringify(req.body).substring(0, 200));
+  res.status(200).send("success");
+}
+
 // server/_core/index.ts
 function isPortAvailable(port) {
   return new Promise((resolve) => {
@@ -19604,6 +19642,8 @@ async function startServer() {
   app.post("/api/webhook/alipay-payment-notify", handleAlipayPaymentNotify);
   app.post("/api/webhook/membership-wechat-notify", handleMembershipWechatNotify);
   app.post("/api/webhook/membership-alipay-notify", handleMembershipAlipayNotify);
+  app.get("/api/wxwork/callback", handleWxworkCallbackVerify);
+  app.post("/api/wxwork/callback", handleWxworkCallbackPost);
   app.use(
     "/api/trpc",
     createExpressMiddleware({
