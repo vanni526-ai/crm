@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc.js";
 import { getDb } from "./db.js";
-import { classrooms, schedules, orders, orderItems, courses } from "../drizzle/schema.js";
+import { classrooms, schedules, orders, orderItems, courses, teachers } from "../drizzle/schema.js";
 import { eq, and, or, sql, inArray, asc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { generateOrderNo } from "./orderNoGenerator.js";
@@ -352,7 +352,15 @@ export const bookingRouter = router({
 
       // 结束时间允许超过23:00，不需要校验
 
-      // 3. 自动分配教室（如果未指定）
+      // 3. 查询老师名称
+      const teacherResult = await db
+        .select({ name: teachers.name })
+        .from(teachers)
+        .where(eq(teachers.id, teacherId))
+        .limit(1);
+      const teacherName = teacherResult[0]?.name || '';
+
+      // 3.5 自动分配教室（如果未指定）
       let finalClassroomId = classroomId;
       if (!finalClassroomId) {
         const availableClassrooms = await db
@@ -392,6 +400,8 @@ export const bookingRouter = router({
           .for('update');
         
         const classroom = classroomResult[0];
+        // 从教室记录获取城市名（classrooms 表有 cityName 冗余字段）
+        const cityName = classroom?.cityName || '';
         
         if (!classroom) {
           throw new TRPCError({
@@ -472,6 +482,12 @@ export const bookingRouter = router({
         classTime: `${startTime}-${endTime}`,
         status: 'pending',
         notes: customerNote || null,
+        // 补全交付信息字段
+        deliveryCity: cityName,
+        deliveryRoom: classroom?.name || '',
+        deliveryClassroomId: finalClassroomId,
+        deliveryTeacher: teacherName,
+        paymentStatus: 'unpaid',
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -533,7 +549,7 @@ export const bookingRouter = router({
             classTime: `${currentStartTime.getHours().toString().padStart(2, '0')}:${currentStartTime.getMinutes().toString().padStart(2, '0')}-${currentEndTime.getHours().toString().padStart(2, '0')}:${currentEndTime.getMinutes().toString().padStart(2, '0')}`,
             startTime: currentStartTime,
             endTime: currentEndTime,
-            city: '', // TODO: 从 cityId查询城市名称
+            city: cityName, // 从教室记录获取城市名
             status: 'scheduled',
             createdAt: new Date(),
             updatedAt: new Date(),

@@ -5445,3 +5445,11 @@
 - [ ] 前端新增"企业微信日历"页面，展示日程原始文本列表，支持日期筛选
 - [ ] 将环境变量 WXWORK_CORPID / WXWORK_AGENT_SECRET 写入 secrets
 - [ ] 构建并推送到 GitHub vanni526-ai/crm
+
+### 143. 修复 booking.create 缺失字段
+- [x] 修复 orders 表写入时补全 deliveryCity（从教室记录的 cityName 冗余字段获取）
+- [x] 修复 orders 表写入时补全 deliveryRoom（教室名）
+- [x] 修复 orders 表写入时补全 deliveryClassroomId
+- [x] 修复 orders 表写入时补全 deliveryTeacher（查询 teachers 表获取老师名）
+- [x] 修复 orders 表写入时补全 paymentStatus: 'unpaid'
+- [x] 修复 schedules 表 city 字段从空字符串改为从教室记录获取城市名
