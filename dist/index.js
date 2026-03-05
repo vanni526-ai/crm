@@ -16638,7 +16638,7 @@ var bookingRouter = router({
     }
     const dateStart = `${date2} 00:00:00`;
     const dateEnd = `${date2} 23:59:59`;
-    const existingBookings = await db.select({
+    const existingBookingsRaw = await db.select({
       classroomId: schedules.classroomId,
       startTime: schedules.startTime,
       endTime: schedules.endTime,
@@ -16647,6 +16647,16 @@ var bookingRouter = router({
       sql11`${schedules.startTime} >= ${dateStart}`,
       sql11`${schedules.startTime} < ${dateEnd}`
     ));
+    const toLocalTimestamp = (d) => {
+      if (!d) return "";
+      if (typeof d === "string") return d;
+      return d.toISOString().replace("T", " ").replace(/\.\d{3}Z$/, "");
+    };
+    const existingBookings = existingBookingsRaw.map((b) => ({
+      ...b,
+      startTimeStr: toLocalTimestamp(b.startTime),
+      endTimeStr: toLocalTimestamp(b.endTime)
+    }));
     const availableSlots = [];
     const now = /* @__PURE__ */ new Date();
     const nowInBeijing = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));
@@ -16685,8 +16695,8 @@ var bookingRouter = router({
         for (const classroom of cityClassrooms) {
           const conflictingBookings = existingBookings.filter((booking) => {
             if (booking.classroomId !== classroom.id) return false;
-            const bookingStart = new Date(booking.startTime).getTime();
-            const bookingEnd = new Date(booking.endTime).getTime();
+            const bookingStart = new Date(booking.startTimeStr).getTime();
+            const bookingEnd = new Date(booking.endTimeStr).getTime();
             const slotStart = new Date(startTimestamp).getTime();
             const slotEnd = new Date(endTimestamp).getTime();
             return bookingStart <= slotStart && bookingEnd > slotStart || bookingStart < slotEnd && bookingEnd >= slotEnd || bookingStart >= slotStart && bookingEnd <= slotEnd;
@@ -16695,8 +16705,8 @@ var bookingRouter = router({
             if (teacherId) {
               const teacherConflict = existingBookings.some((booking) => {
                 if (booking.teacherId !== teacherId) return false;
-                const bookingStart = new Date(booking.startTime).getTime();
-                const bookingEnd = new Date(booking.endTime).getTime();
+                const bookingStart = new Date(booking.startTimeStr).getTime();
+                const bookingEnd = new Date(booking.endTimeStr).getTime();
                 const slotStart = new Date(startTimestamp).getTime();
                 const slotEnd = new Date(endTimestamp).getTime();
                 return bookingStart <= slotStart && bookingEnd > slotStart || bookingStart < slotEnd && bookingEnd >= slotEnd || bookingStart >= slotStart && bookingEnd <= slotEnd;
