@@ -16861,6 +16861,8 @@ var bookingRouter = router({
     const totalPrice = courseItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const endDateTime = new Date(bookingDateTime.getTime() + totalDuration * 60 * 60 * 1e3);
     const endTime = `${String(endDateTime.getHours()).padStart(2, "0")}:${String(endDateTime.getMinutes()).padStart(2, "0")}`;
+    const teacherResult = await db.select({ name: teachers.name }).from(teachers).where(eq22(teachers.id, teacherId)).limit(1);
+    const teacherName = teacherResult[0]?.name || "";
     let finalClassroomId = classroomId;
     if (!finalClassroomId) {
       const availableClassrooms = await db.select().from(classrooms).where(and17(
@@ -16881,6 +16883,7 @@ var bookingRouter = router({
     return await db.transaction(async (tx) => {
       const classroomResult = await tx.select().from(classrooms).where(eq22(classrooms.id, finalClassroomId)).limit(1).for("update");
       const classroom = classroomResult[0];
+      const cityName = classroom?.cityName || "";
       if (!classroom) {
         throw new TRPCError22({
           code: "BAD_REQUEST",
@@ -16947,6 +16950,12 @@ var bookingRouter = router({
         classTime: `${startTime}-${endTime}`,
         status: "pending",
         notes: customerNote || null,
+        // 补全交付信息字段
+        deliveryCity: cityName,
+        deliveryRoom: classroom?.name || "",
+        deliveryClassroomId: finalClassroomId,
+        deliveryTeacher: teacherName,
+        paymentStatus: "unpaid",
         createdAt: /* @__PURE__ */ new Date(),
         updatedAt: /* @__PURE__ */ new Date()
       });
@@ -16994,8 +17003,8 @@ var bookingRouter = router({
             classTime: `${currentStartTime.getHours().toString().padStart(2, "0")}:${currentStartTime.getMinutes().toString().padStart(2, "0")}-${currentEndTime.getHours().toString().padStart(2, "0")}:${currentEndTime.getMinutes().toString().padStart(2, "0")}`,
             startTime: currentStartTime,
             endTime: currentEndTime,
-            city: "",
-            // TODO: 从 cityId查询城市名称
+            city: cityName,
+            // 从教室记录获取城市名
             status: "scheduled",
             createdAt: /* @__PURE__ */ new Date(),
             updatedAt: /* @__PURE__ */ new Date()
