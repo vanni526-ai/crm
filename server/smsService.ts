@@ -13,7 +13,7 @@ const Dysmsapi = ($dysmsapi as any).default ?? $dysmsapi;
 const smsCodeCache = new Map<string, { code: string; expiresAt: number }>();
 
 // 创建阿里云短信客户端
-function createSmsClient(): Dysmsapi {
+function createSmsClient(): any {
   const config = new $OpenApi.Config({
     accessKeyId: process.env.ALIYUN_SMS_ACCESS_KEY_ID,
     accessKeySecret: process.env.ALIYUN_SMS_ACCESS_KEY_SECRET,

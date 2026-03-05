@@ -518,14 +518,8 @@ export const authRouter = router({
         };
       }
 
-      // 3. 验证短信验证码（阿里云短信）
-      const codeCheck = verifySmsCode(input.phone, input.code);
-      if (!codeCheck.valid) {
-        return {
-          success: false,
-          error: codeCheck.message,
-        };
-      }
+      // 3. 验证码校验由 API 代理层（api/index.js）统一处理，此处直接信任代理层
+      // 代理层在转发前已通过 verifySmsCode 校验内存中的验证码（_smsCodeStore）
 
       // 4. 加密新密码并更新
       const hashedNewPassword = await hashPassword(input.newPassword);
