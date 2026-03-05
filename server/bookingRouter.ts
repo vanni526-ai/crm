@@ -51,7 +51,7 @@ export const bookingRouter = router({
       const dateStart = `${date} 00:00:00`;
       const dateEnd = `${date} 23:59:59`;
       
-      const existingBookings = await db
+      const existingBookingsRaw = await db
         .select({
           classroomId: schedules.classroomId,
           startTime: schedules.startTime,
@@ -63,6 +63,22 @@ export const bookingRouter = router({
           sql`${schedules.startTime} >= ${dateStart}`,
           sql`${schedules.startTime} < ${dateEnd}`
         ));
+
+      // Drizzle ORM 的 datetime 字段返回 Date 对象时，不做时区转换，直接把数据库中
+      // 存储的无时区时间（如 13:30）当作 UTC 返回（即 2026-03-05T13:30:00.000Z）。
+      // 修复：用 toISOString() 提取时间部分，拼成无时区字符串，与 slot 时间戳统一比较。
+      const toLocalTimestamp = (d: Date | string | null): string => {
+        if (!d) return '';
+        if (typeof d === 'string') return d;
+        // toISOString() 返回 "2026-03-05T13:30:00.000Z"，直接提取日期和时间部分
+        return d.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+      };
+
+      const existingBookings = existingBookingsRaw.map(b => ({
+        ...b,
+        startTimeStr: toLocalTimestamp(b.startTime as Date | string | null),
+        endTimeStr: toLocalTimestamp(b.endTime as Date | string | null),
+      }));
 
       // 3. 生成所有可能的时间段（从09:00到23:00，每30分钟一个时间点）
       const availableSlots: string[] = [];
@@ -125,9 +141,9 @@ export const bookingRouter = router({
             const conflictingBookings = existingBookings.filter(booking => {
               if (booking.classroomId !== classroom.id) return false;
               
-              // 检查时间冲突
-              const bookingStart = new Date(booking.startTime).getTime();
-              const bookingEnd = new Date(booking.endTime).getTime();
+              // 检查时间冲突（统一使用北京时间字符串比较，避免 Drizzle Date 对象时区问题）
+              const bookingStart = new Date(booking.startTimeStr).getTime();
+              const bookingEnd = new Date(booking.endTimeStr).getTime();
               const slotStart = new Date(startTimestamp).getTime();
               const slotEnd = new Date(endTimestamp).getTime();
               
@@ -145,8 +161,8 @@ export const bookingRouter = router({
                 const teacherConflict = existingBookings.some(booking => {
                   if (booking.teacherId !== teacherId) return false;
                   
-                  const bookingStart = new Date(booking.startTime).getTime();
-                  const bookingEnd = new Date(booking.endTime).getTime();
+                  const bookingStart = new Date(booking.startTimeStr).getTime();
+                  const bookingEnd = new Date(booking.endTimeStr).getTime();
                   const slotStart = new Date(startTimestamp).getTime();
                   const slotEnd = new Date(endTimestamp).getTime();
                   
