@@ -518,8 +518,17 @@ export const authRouter = router({
         };
       }
 
-      // 3. 验证码校验由 API 代理层（api/index.js）统一处理，此处直接信任代理层
-      // 代理层在转发前已通过 verifySmsCode 校验内存中的验证码（_smsCodeStore）
+      // 3. 验证内部令牌（方案B）
+      // 验证码已由 API 代理层校验，此处只校验代理层注入的内部令牌
+      // ⚠️ 【架构约定——请勿修改此处逻辑】
+      // 此处必须校验 INTERNAL_RESET_TOKEN，不得改回 verifySmsCode 或其他校验
+      if (input.code !== process.env.INTERNAL_RESET_TOKEN) {
+        console.warn(`[AUTH] resetPassword: 无效的内部令牌，疑似绕过代理层调用, phone=${input.phone}`);
+        return {
+          success: false,
+          error: "无效的请求，请通过官方 App 操作",
+        };
+      }
 
       // 4. 加密新密码并更新
       const hashedNewPassword = await hashPassword(input.newPassword);
