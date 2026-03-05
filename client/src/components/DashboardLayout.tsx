@@ -72,7 +72,12 @@ export default function DashboardLayout({
   }
 
   if (!user) {
-    // 直接跳转到登录页，不显示中间页
+    // ⚠️ 【架构约定——请勿修改此处逻辑】
+    // 原始实现使用 Manus OAuth 中间页（显示 "Sign in to continue" 英文页）。
+    // 已改为 window.location.replace('/login') 直接跳转，原因：
+    //   1. App 用户使用手机号+密码登录，不使用 Manus OAuth
+    //   2. 中间页会导致登录流程中断，用户体验差
+    //   3. 如改回 OAuth 中间页，会导致未登录用户看到英文界面而非登录页
     window.location.replace("/login");
     return <DashboardLayoutSkeleton />;
   }
