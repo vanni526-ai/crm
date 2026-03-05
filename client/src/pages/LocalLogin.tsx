@@ -188,6 +188,30 @@ export default function LocalLogin() {
         <div className="mt-6 text-center text-slate-500 text-xs">
           <p>如需创建账号，请联系系统管理员</p>
         </div>
+        {/* 备案信息 */}
+        <div className="mt-4 flex flex-col items-center gap-1.5">
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-slate-600 text-xs hover:text-slate-400 transition-colors"
+          >
+            沪ICP备2022034742号-2
+          </a>
+          <a
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=31010502006970"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-slate-600 text-xs hover:text-slate-400 transition-colors"
+          >
+            <img
+              src="https://beian.mps.gov.cn/img/logo01.dd7ff50e.png"
+              alt="公安备案"
+              className="w-3.5 h-3.5 inline-block"
+            />
+            沪公网安备31010502006970号
+          </a>
+        </div>
       </div>
     </div>
   );
