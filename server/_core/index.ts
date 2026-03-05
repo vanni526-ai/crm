@@ -9,6 +9,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { handleWechatPaymentNotify, handleAlipayPaymentNotify } from "./paymentWebhook";
 import { handleMembershipWechatNotify, handleMembershipAlipayNotify } from "./membershipWebhook";
+import { handleWxworkCallbackVerify, handleWxworkCallbackPost } from "../wxworkCallback";
 // vite is dynamically imported only in development to avoid bundling it in production
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -127,6 +128,9 @@ async function startServer() {
   // Membership payment webhook routes
   app.post("/api/webhook/membership-wechat-notify", handleMembershipWechatNotify);
   app.post("/api/webhook/membership-alipay-notify", handleMembershipAlipayNotify);
+  // 企业微信回调验证（用于配置可信IP）
+  app.get("/api/wxwork/callback", handleWxworkCallbackVerify);
+  app.post("/api/wxwork/callback", handleWxworkCallbackPost);
   // tRPC API
   app.use(
     "/api/trpc",

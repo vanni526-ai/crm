@@ -5438,3 +5438,10 @@
 - [x] 修复首页未登录时显示 "Sign in to continue" 中间页，改为直接跳转 /login
 - [x] 修复登录页面没有"忘记密码"入口（生产环境加载旧版 JS 缓存问题）
 - [ ] 部署到生产环境并验证
+
+### 142. 企业微信日历列表功能
+- [ ] 测试企业微信 API 连通性（获取 access_token）
+- [ ] 后端新增 wxworkCalendar router：获取日程列表接口
+- [ ] 前端新增"企业微信日历"页面，展示日程原始文本列表，支持日期筛选
+- [ ] 将环境变量 WXWORK_CORPID / WXWORK_AGENT_SECRET 写入 secrets
+- [ ] 构建并推送到 GitHub vanni526-ai/crm
