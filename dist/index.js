@@ -9502,21 +9502,6 @@ async function sendSmsVerificationCode(phone) {
     return { success: false, message: "\u77ED\u4FE1\u670D\u52A1\u6682\u65F6\u4E0D\u53EF\u7528\uFF0C\u8BF7\u7A0D\u540E\u518D\u8BD5" };
   }
 }
-function verifySmsCode(phone, code) {
-  const cached = smsCodeCache.get(phone);
-  if (!cached) {
-    return { valid: false, message: "\u9A8C\u8BC1\u7801\u4E0D\u5B58\u5728\u6216\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u91CD\u65B0\u83B7\u53D6" };
-  }
-  if (Date.now() > cached.expiresAt) {
-    smsCodeCache.delete(phone);
-    return { valid: false, message: "\u9A8C\u8BC1\u7801\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u91CD\u65B0\u83B7\u53D6" };
-  }
-  if (cached.code !== code) {
-    return { valid: false, message: "\u9A8C\u8BC1\u7801\u9519\u8BEF\uFF0C\u8BF7\u91CD\u65B0\u8F93\u5165" };
-  }
-  smsCodeCache.delete(phone);
-  return { valid: true, message: "\u9A8C\u8BC1\u7801\u6B63\u786E" };
-}
 
 // server/authRouter.ts
 import jwt from "jsonwebtoken";
@@ -9885,13 +9870,6 @@ var authRouter = router({
       return {
         success: false,
         error: "\u8D26\u53F7\u5DF2\u88AB\u7981\u7528\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458"
-      };
-    }
-    const codeCheck = verifySmsCode(input.phone, input.code);
-    if (!codeCheck.valid) {
-      return {
-        success: false,
-        error: codeCheck.message
       };
     }
     const hashedNewPassword = await hashPassword(input.newPassword);
