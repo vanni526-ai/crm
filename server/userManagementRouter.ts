@@ -252,6 +252,15 @@ export const userManagementRouter = router({
           isActive: true,
         } as any);
       }
+
+      // 如果角色包含sales，在salespersons表创建关联记录
+      if (rolesStr.includes('sales')) {
+        const { salespersons } = await import('../drizzle/schema');
+        await drizzle.insert(salespersons).values({
+          userId: newUserId,
+          isActive: true,
+        } as any);
+      }
       
       // 如果角色包含cityPartner，在partners表创建关联记录
       if (rolesStr.includes('cityPartner')) {
@@ -681,6 +690,31 @@ export const userManagementRouter = router({
             phone: usersBefore?.phone || null,
             profitRatio: '0.30', // 默认30%
             createdBy: 1, // 管理员创建
+            isActive: true,
+          } as any);
+        }
+      }
+
+      // 处理销售角色变更
+      const hadSalesRole = oldRoles.includes('sales');
+      const hasSalesRole = input.roles.includes('sales');
+      const { salespersons } = await import('../drizzle/schema');
+      const [salespersonRecord] = await drizzle.select().from(salespersons).where(eq(salespersons.userId, input.id)).limit(1);
+
+      if (hadSalesRole && !hasSalesRole) {
+        // 移除销售角色：停用 salespersons 记录
+        if (salespersonRecord) {
+          await drizzle.update(salespersons).set({ isActive: false } as any).where(eq(salespersons.userId, input.id));
+        }
+      } else if (!hadSalesRole && hasSalesRole) {
+        // 添加销售角色
+        if (salespersonRecord) {
+          // 已存在记录，恢复激活
+          await drizzle.update(salespersons).set({ isActive: true } as any).where(eq(salespersons.userId, input.id));
+        } else {
+          // 不存在记录，创建新记录
+          await drizzle.insert(salespersons).values({
+            userId: input.id,
             isActive: true,
           } as any);
         }

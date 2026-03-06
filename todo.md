@@ -5453,3 +5453,8 @@
 - [x] 修复 orders 表写入时补全 deliveryTeacher（查询 teachers 表获取老师名）
 - [x] 修复 orders 表写入时补全 paymentStatus: 'unpaid'
 - [x] 修复 schedules 表 city 字段从空字符串改为从教室记录获取城市名
+
+### 144. 修复销售管理列表不显示销售角色用户问题
+- [ ] 找到用户角色更新接口，在设置销售角色时自动同步 salespersons 表
+- [ ] 角色移除时自动停用 salespersons 记录
+- [ ] 处理已存在的销售角色用户（觅知音 24158733）
