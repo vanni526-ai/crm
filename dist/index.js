@@ -10352,6 +10352,13 @@ var userManagementRouter = router({
         isActive: true
       });
     }
+    if (rolesStr.includes("sales")) {
+      const { salespersons: salespersons2 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+      await drizzle2.insert(salespersons2).values({
+        userId: newUserId,
+        isActive: true
+      });
+    }
     if (rolesStr.includes("cityPartner")) {
       const { partners: partners2, partnerCities: partnerCities3, cities: cities3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
       const [partnerResult] = await drizzle2.insert(partners2).values({
@@ -10677,6 +10684,24 @@ var userManagementRouter = router({
           // 默认30%
           createdBy: 1,
           // 管理员创建
+          isActive: true
+        });
+      }
+    }
+    const hadSalesRole = oldRoles.includes("sales");
+    const hasSalesRole = input.roles.includes("sales");
+    const { salespersons: salespersons2 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+    const [salespersonRecord] = await drizzle2.select().from(salespersons2).where(eq8(salespersons2.userId, input.id)).limit(1);
+    if (hadSalesRole && !hasSalesRole) {
+      if (salespersonRecord) {
+        await drizzle2.update(salespersons2).set({ isActive: false }).where(eq8(salespersons2.userId, input.id));
+      }
+    } else if (!hadSalesRole && hasSalesRole) {
+      if (salespersonRecord) {
+        await drizzle2.update(salespersons2).set({ isActive: true }).where(eq8(salespersons2.userId, input.id));
+      } else {
+        await drizzle2.insert(salespersons2).values({
+          userId: input.id,
           isActive: true
         });
       }
