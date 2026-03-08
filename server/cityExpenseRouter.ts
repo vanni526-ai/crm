@@ -573,6 +573,25 @@ export const cityExpenseRouter = router({
       fileData: z.string(), // base64编码的文件数据
     }))
     .mutation(async ({ input, ctx }) => {
+      /**
+       * 安全读取单元格数值：
+       * - 普通数字直接返回
+       * - 公式单元格（{formula, result}）取 result
+       * - 字符串尝试 parseFloat
+       * - 其余返回 0
+       * 支持负数（退款场景）
+       */
+      function getCellNumber(cell: ExcelJS.Cell): number {
+        const v = cell.value;
+        if (v === null || v === undefined) return 0;
+        if (typeof v === 'number') return v;
+        if (typeof v === 'object' && 'result' in (v as any)) {
+          const r = (v as any).result;
+          return typeof r === 'number' ? r : parseFloat(String(r)) || 0;
+        }
+        const n = parseFloat(String(v).replace(/,/g, ''));
+        return isNaN(n) ? 0 : n;
+      }
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
       
@@ -622,16 +641,16 @@ export const cityExpenseRouter = router({
         }
         
         try {
-          const rentFee = row.getCell(3).value?.toString() || "0";
-          const propertyFee = row.getCell(4).value?.toString() || "0";
-          const utilityFee = row.getCell(5).value?.toString() || "0";
-          const consumablesFee = row.getCell(6).value?.toString() || "0";
-          const cleaningFee = row.getCell(7).value?.toString() || "0";
-          const phoneFee = row.getCell(8).value?.toString() || "0";
-          const deferredPayment = row.getCell(9).value?.toString() || "0";
-          const expressFee = row.getCell(10).value?.toString() || "0";
-          const promotionFee = row.getCell(11).value?.toString() || "0";
-          const otherFee = row.getCell(12).value?.toString() || "0";
+          const rentFee = getCellNumber(row.getCell(3)).toFixed(2);
+          const propertyFee = getCellNumber(row.getCell(4)).toFixed(2);
+          const utilityFee = getCellNumber(row.getCell(5)).toFixed(2);
+          const consumablesFee = getCellNumber(row.getCell(6)).toFixed(2);
+          const cleaningFee = getCellNumber(row.getCell(7)).toFixed(2);
+          const phoneFee = getCellNumber(row.getCell(8)).toFixed(2);
+          const deferredPayment = getCellNumber(row.getCell(9)).toFixed(2);
+          const expressFee = getCellNumber(row.getCell(10)).toFixed(2);
+          const promotionFee = getCellNumber(row.getCell(11)).toFixed(2);
+          const otherFee = getCellNumber(row.getCell(12)).toFixed(2);
           const notes = row.getCell(13).value?.toString() || "";
           
           // 自动计算老师费用和车费（从订单数据汇总）
