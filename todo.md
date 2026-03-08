@@ -5464,3 +5464,9 @@
 - [ ] 修复 Drizzle ORM 时区问题根治：数据库连接设置 timezone: "+08:00"，移除 toLocalTimestamp 辅助函数
 - [ ] 优化 membership.getStatus 接口性能：引入内存缓存，P95 响应时间 < 1 秒
 - [ ] 部署流程优化：确保 GitHub push 后 5 分钟内 ECS 自动完成部署
+
+### 146. 重构财务对账匹配页面
+- [ ] 后端：新增 parseStatement 接口（解析微信/支付宝流水文件）
+- [ ] 后端：新增 matchOrders 接口（智能匹配订单，支持多笔收款合并）
+- [ ] 后端：新增 exportMatchResult 接口（导出三卡片数据为Excel）
+- [ ] 前端：重构 ReconciliationMatch.tsx（上传流水+三卡片展示+导出）

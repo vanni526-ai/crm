@@ -9,6 +9,7 @@ import { trafficSourceConfigRouter } from "./trafficSourceConfigRouter";
 import { transportFeeFixRouter } from "./transportFeeFixRouter";
 import { parsingLearningRouter } from "./parsingLearningRouter";
 import { reconciliationRouter } from "./reconciliationRouter";
+import { statementMatchRouter } from "./statementMatchRouter";
 import { customerRouter } from "./customerRouter";
 import { financeRouter } from "./financeRouter";
 import { cityRouter } from "./cityRouter";
@@ -102,6 +103,7 @@ export const appRouter = router({
   transportFeeFix: transportFeeFixRouter,
   parsingLearning: parsingLearningRouter,
   reconciliation: reconciliationRouter,
+  statementMatch: statementMatchRouter,
   salesCityPerformance: salesCityPerformanceRouter,
   teacherPayments: teacherPaymentRouter,
   partnerManagement: partnerManagementRouter,

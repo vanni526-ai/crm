@@ -79,6 +79,7 @@
     "express": "^4.21.2",
     "framer-motion": "^12.23.22",
     "ical": "^0.8.0",
+    "iconv-lite": "^0.7.2",
     "input-otp": "^1.4.2",
     "jose": "6.1.0",
     "jsonwebtoken": "^9.0.3",
