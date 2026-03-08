@@ -1908,10 +1908,15 @@ __export(db_exports, {
 });
 import { eq, and, gte, lte, desc, asc, sql, isNotNull, isNull, ne, like, or, inArray, count, not } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2";
 async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      const pool = mysql.createPool({
+        uri: process.env.DATABASE_URL,
+        timezone: "+08:00"
+      });
+      _db = drizzle(pool);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -15343,6 +15348,11 @@ init_schema();
 import { z as z23 } from "zod";
 import { eq as eq19, desc as desc6, and as and14 } from "drizzle-orm";
 import { TRPCError as TRPCError19 } from "@trpc/server";
+var MEMBERSHIP_CACHE_TTL_MS = 5 * 60 * 1e3;
+var membershipStatusCache = /* @__PURE__ */ new Map();
+function invalidateMembershipCache(userId) {
+  membershipStatusCache.delete(userId);
+}
 function generateMembershipOrderNo() {
   const timestamp2 = Date.now().toString();
   const random = Math.floor(Math.random() * 1e4).toString().padStart(4, "0");
@@ -15385,6 +15395,7 @@ async function activateMembership(orderId, channelOrderNo) {
     membershipExpiresAt: expiresAt,
     updatedAt: now
   }).where(eq19(users.id, order.userId));
+  invalidateMembershipCache(order.userId);
 }
 var membershipRouter = router({
   // ========== 查询会员套餐列表（公开）==========
@@ -15407,10 +15418,15 @@ var membershipRouter = router({
   }),
   // ========== 查询当前用户会员状态 ==========
   getStatus: protectedProcedure.query(async ({ ctx }) => {
+    const cached = membershipStatusCache.get(ctx.user.id);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.data;
+    }
     const db = await getDb();
     if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
     const [user] = await db.select().from(users).where(eq19(users.id, ctx.user.id)).limit(1);
     if (!user) throw new TRPCError19({ code: "NOT_FOUND" });
+    ;
     const now = /* @__PURE__ */ new Date();
     let membershipStatus = user.membershipStatus;
     if (membershipStatus === "active" && user.membershipExpiresAt && user.membershipExpiresAt < now) {
@@ -15442,7 +15458,7 @@ var membershipRouter = router({
     if (customer?.accountBalance) {
       accountBalance = parseFloat(String(customer.accountBalance));
     }
-    return {
+    const result = {
       isMember: membershipStatus === "active",
       membershipStatus,
       activatedAt: user.membershipActivatedAt?.toISOString() || null,
@@ -15451,8 +15467,13 @@ var membershipRouter = router({
       currentPlan,
       accountBalance
     };
+    membershipStatusCache.set(ctx.user.id, {
+      data: result,
+      expiresAt: Date.now() + MEMBERSHIP_CACHE_TTL_MS
+    });
+    return result;
   }),
-  // ========== 创建会员订单 ==========
+  // ========== 创建会员订单 ===========
   createOrder: protectedProcedure.input(z23.object({ planId: z23.number() })).mutation(async ({ ctx, input }) => {
     const db = await getDb();
     if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
@@ -16672,15 +16693,16 @@ var bookingRouter = router({
       sql11`${schedules.startTime} >= ${dateStart}`,
       sql11`${schedules.startTime} < ${dateEnd}`
     ));
-    const toLocalTimestamp = (d) => {
+    const formatLocalTime = (d) => {
       if (!d) return "";
       if (typeof d === "string") return d;
-      return d.toISOString().replace("T", " ").replace(/\.\d{3}Z$/, "");
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
     };
     const existingBookings = existingBookingsRaw.map((b) => ({
       ...b,
-      startTimeStr: toLocalTimestamp(b.startTime),
-      endTimeStr: toLocalTimestamp(b.endTime)
+      startTimeStr: formatLocalTime(b.startTime),
+      endTimeStr: formatLocalTime(b.endTime)
     }));
     const availableSlots = [];
     const now = /* @__PURE__ */ new Date();
