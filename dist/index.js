@@ -1,5 +1,11 @@
 var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined") return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
 var __esm = (fn, res) => function __init() {
   return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
 };
@@ -5508,7 +5514,7 @@ var phoneValidator_exports = {};
 __export(phoneValidator_exports, {
   checkPhoneUnique: () => checkPhoneUnique
 });
-import { eq as eq7, and as and4, ne as ne2 } from "drizzle-orm";
+import { eq as eq8, and as and5, ne as ne2 } from "drizzle-orm";
 async function checkPhoneUnique(phone, excludeUserId) {
   if (!phone || phone.trim() === "") {
     return { isUnique: true, conflictType: null, conflictId: null };
@@ -5517,11 +5523,11 @@ async function checkPhoneUnique(phone, excludeUserId) {
   if (!db) {
     throw new Error("\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25");
   }
-  const userConditions = [eq7(users.phone, phone)];
+  const userConditions = [eq8(users.phone, phone)];
   if (excludeUserId) {
     userConditions.push(ne2(users.id, excludeUserId));
   }
-  const existingUsers = await db.select().from(users).where(and4(...userConditions)).limit(1);
+  const existingUsers = await db.select().from(users).where(and5(...userConditions)).limit(1);
   if (existingUsers.length > 0) {
     return {
       isUnique: false,
@@ -5541,7 +5547,7 @@ var init_phoneValidator = __esm({
 });
 
 // server/orderAggregation.ts
-import { eq as eq14, and as and10, sql as sql6 } from "drizzle-orm";
+import { eq as eq15, and as and11, sql as sql6 } from "drizzle-orm";
 async function aggregateOrderSalesByMonthAndCity(month, cityName) {
   const db = await getDb();
   if (!db) {
@@ -5556,8 +5562,8 @@ async function aggregateOrderSalesByMonthAndCity(month, cityName) {
     totalSalesAmount: sql6`COALESCE(SUM(${orders.paymentAmount}), 0)`,
     orderCount: sql6`COUNT(*)`
   }).from(orders).where(
-    and10(
-      eq14(orders.deliveryCity, cityName),
+    and11(
+      eq15(orders.deliveryCity, cityName),
       sql6`${orders.classDate} >= ${startDateStr}`,
       sql6`${orders.classDate} <= ${endDateStr}`
     )
@@ -5587,8 +5593,8 @@ async function aggregateOrderFeesByMonthAndCity(month, cityName) {
     totalTeacherFee: sql6`COALESCE(SUM(${orders.teacherFee}), 0)`,
     totalTransportFee: sql6`COALESCE(SUM(${orders.transportFee}), 0)`
   }).from(orders).where(
-    and10(
-      eq14(orders.deliveryCity, cityName),
+    and11(
+      eq15(orders.deliveryCity, cityName),
       sql6`${orders.classDate} >= ${startDateStr}`,
       sql6`${orders.classDate} <= ${endDateStr}`
     )
@@ -5617,9 +5623,9 @@ var cityExpenseRouter_exports = {};
 __export(cityExpenseRouter_exports, {
   cityExpenseRouter: () => cityExpenseRouter
 });
-import { z as z19 } from "zod";
-import { eq as eq15, and as and11, desc as desc4, sql as sql7 } from "drizzle-orm";
-import { TRPCError as TRPCError15 } from "@trpc/server";
+import { z as z20 } from "zod";
+import { eq as eq16, and as and12, desc as desc4, sql as sql7 } from "drizzle-orm";
+import { TRPCError as TRPCError16 } from "@trpc/server";
 import ExcelJS4 from "exceljs";
 var cityExpenseRouter;
 var init_cityExpenseRouter = __esm({
@@ -5635,27 +5641,27 @@ var init_cityExpenseRouter = __esm({
        * 合伙人端接口：强制使用JWT中的userId，忽略前端传入的cityName
        */
       getStats: protectedProcedure.input(
-        z19.object({
-          cityName: z19.string().optional(),
+        z20.object({
+          cityName: z20.string().optional(),
           // 忽略此参数
-          startMonth: z19.string().optional(),
-          endMonth: z19.string().optional()
+          startMonth: z20.string().optional(),
+          endMonth: z20.string().optional()
         }).optional()
       ).query(async ({ ctx, input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         const userRoles = ctx.user.roles ? ctx.user.roles.split(",") : [];
         const isCityPartner = userRoles.includes("cityPartner");
         if (!isCityPartner) {
-          throw new TRPCError15({
+          throw new TRPCError16({
             code: "FORBIDDEN",
             message: "Only city partners can access this endpoint"
           });
         }
         const userId = ctx.user.id;
-        const partnerRecord = await db.select({ id: partners.id }).from(partners).where(eq15(partners.userId, userId)).limit(1);
+        const partnerRecord = await db.select({ id: partners.id }).from(partners).where(eq16(partners.userId, userId)).limit(1);
         if (partnerRecord.length === 0) {
-          throw new TRPCError15({
+          throw new TRPCError16({
             code: "NOT_FOUND",
             message: "Partner not found for current user"
           });
@@ -5664,9 +5670,9 @@ var init_cityExpenseRouter = __esm({
         const partnerCitiesRecords = await db.select({
           cityId: partnerCities.cityId,
           cityName: cities.name
-        }).from(partnerCities).leftJoin(cities, eq15(partnerCities.cityId, cities.id)).where(and11(
-          eq15(partnerCities.partnerId, partnerId),
-          eq15(partnerCities.contractStatus, "active")
+        }).from(partnerCities).leftJoin(cities, eq16(partnerCities.cityId, cities.id)).where(and12(
+          eq16(partnerCities.partnerId, partnerId),
+          eq16(partnerCities.contractStatus, "active")
         ));
         const managedCityIds = partnerCitiesRecords.map((pc) => pc.cityId);
         console.log("[cityExpense.getStats] Partner ID:", partnerId);
@@ -5700,28 +5706,28 @@ var init_cityExpenseRouter = __esm({
       /**
        * 获取城市月度费用账单列表
        */
-      list: protectedProcedure.input(z19.object({
-        cityId: z19.number().optional(),
-        month: z19.string().optional(),
+      list: protectedProcedure.input(z20.object({
+        cityId: z20.number().optional(),
+        month: z20.string().optional(),
         // 格式: YYYY-MM
-        startMonth: z19.string().optional(),
-        endMonth: z19.string().optional()
+        startMonth: z20.string().optional(),
+        endMonth: z20.string().optional()
       }).default({})).query(async ({ input = {}, ctx }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         const conditions = [];
         const userRoles = ctx.user.roles ? ctx.user.roles.split(",") : [];
         const isCityPartner = userRoles.includes("cityPartner");
         const isAdminOrFinance = userRoles.includes("admin") || userRoles.includes("finance");
         if (isCityPartner && !isAdminOrFinance) {
-          const partnerRecord = await db.select({ id: partners.id }).from(partners).where(eq15(partners.userId, ctx.user.id)).limit(1);
+          const partnerRecord = await db.select({ id: partners.id }).from(partners).where(eq16(partners.userId, ctx.user.id)).limit(1);
           if (partnerRecord.length === 0) {
             return [];
           }
           const partnerId = partnerRecord[0].id;
-          const partnerCitiesRecords = await db.select({ cityId: partnerCities.cityId }).from(partnerCities).where(and11(
-            eq15(partnerCities.partnerId, partnerId),
-            eq15(partnerCities.contractStatus, "active")
+          const partnerCitiesRecords = await db.select({ cityId: partnerCities.cityId }).from(partnerCities).where(and12(
+            eq16(partnerCities.partnerId, partnerId),
+            eq16(partnerCities.contractStatus, "active")
           ));
           const managedCityIds = partnerCitiesRecords.map((pc) => pc.cityId);
           if (managedCityIds.length === 0) {
@@ -5732,10 +5738,10 @@ var init_cityExpenseRouter = __esm({
           }
         }
         if (input?.cityId) {
-          conditions.push(eq15(cityMonthlyExpenses.cityId, input.cityId));
+          conditions.push(eq16(cityMonthlyExpenses.cityId, input.cityId));
         }
         if (input?.month) {
-          conditions.push(eq15(cityMonthlyExpenses.month, input.month));
+          conditions.push(eq16(cityMonthlyExpenses.month, input.month));
         }
         if (input?.startMonth) {
           conditions.push(sql7`${cityMonthlyExpenses.month} >= ${input.startMonth}`);
@@ -5765,7 +5771,7 @@ var init_cityExpenseRouter = __esm({
           notes: cityMonthlyExpenses.notes,
           createdAt: cityMonthlyExpenses.createdAt,
           updatedAt: cityMonthlyExpenses.updatedAt
-        }).from(cityMonthlyExpenses).leftJoin(cities, eq15(cityMonthlyExpenses.cityId, cities.id)).where(conditions.length > 0 ? and11(...conditions) : void 0).orderBy(desc4(cityMonthlyExpenses.month), desc4(cityMonthlyExpenses.cityId));
+        }).from(cityMonthlyExpenses).leftJoin(cities, eq16(cityMonthlyExpenses.cityId, cities.id)).where(conditions.length > 0 ? and12(...conditions) : void 0).orderBy(desc4(cityMonthlyExpenses.month), desc4(cityMonthlyExpenses.cityId));
         const expensesWithPartnerInfo = await Promise.all(
           expenses.map(async (expense) => {
             const partnerInfo = await db.select({
@@ -5778,9 +5784,9 @@ var init_cityExpenseRouter = __esm({
                   ELSE NULL
                 END
               `.as("costShareRatio")
-            }).from(partnerCities).leftJoin(partners, eq15(partnerCities.partnerId, partners.id)).where(and11(
-              eq15(partnerCities.cityId, expense.cityId),
-              eq15(partnerCities.contractStatus, "active")
+            }).from(partnerCities).leftJoin(partners, eq16(partnerCities.partnerId, partners.id)).where(and12(
+              eq16(partnerCities.cityId, expense.cityId),
+              eq16(partnerCities.contractStatus, "active")
             )).orderBy(desc4(partnerCities.createdAt)).limit(1);
             return {
               ...expense,
@@ -5815,14 +5821,14 @@ var init_cityExpenseRouter = __esm({
       /**
        * 获取单个费用账单详情
        */
-      getById: protectedProcedure.input(z19.object({
-        id: z19.number()
+      getById: protectedProcedure.input(z20.object({
+        id: z20.number()
       })).query(async ({ input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-        const result = await db.select().from(cityMonthlyExpenses).where(eq15(cityMonthlyExpenses.id, input.id)).limit(1);
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        const result = await db.select().from(cityMonthlyExpenses).where(eq16(cityMonthlyExpenses.id, input.id)).limit(1);
         if (result.length === 0) {
-          throw new TRPCError15({
+          throw new TRPCError16({
             code: "NOT_FOUND",
             message: "\u8D39\u7528\u8D26\u5355\u4E0D\u5B58\u5728"
           });
@@ -5832,41 +5838,41 @@ var init_cityExpenseRouter = __esm({
       /**
        * 获取指定城市和月份的费用账单
        */
-      getByCityAndMonth: protectedProcedure.input(z19.object({
-        cityId: z19.number(),
-        month: z19.string()
+      getByCityAndMonth: protectedProcedure.input(z20.object({
+        cityId: z20.number(),
+        month: z20.string()
         // 格式: YYYY-MM
       })).query(async ({ input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-        const result = await db.select().from(cityMonthlyExpenses).where(and11(
-          eq15(cityMonthlyExpenses.cityId, input.cityId),
-          eq15(cityMonthlyExpenses.month, input.month)
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        const result = await db.select().from(cityMonthlyExpenses).where(and12(
+          eq16(cityMonthlyExpenses.cityId, input.cityId),
+          eq16(cityMonthlyExpenses.month, input.month)
         )).limit(1);
         return result.length > 0 ? result[0] : null;
       }),
       /**
        * 创建或更新费用账单
        */
-      upsert: protectedProcedure.input(z19.object({
-        cityId: z19.number(),
-        cityName: z19.string(),
-        month: z19.string(),
+      upsert: protectedProcedure.input(z20.object({
+        cityId: z20.number(),
+        cityName: z20.string(),
+        month: z20.string(),
         // 格式: YYYY-MM
-        rentFee: z19.string().optional(),
-        propertyFee: z19.string().optional(),
-        utilityFee: z19.string().optional(),
-        consumablesFee: z19.string().optional(),
-        cleaningFee: z19.string().optional(),
-        phoneFee: z19.string().optional(),
-        deferredPayment: z19.string().optional(),
-        expressFee: z19.string().optional(),
-        promotionFee: z19.string().optional(),
-        otherFee: z19.string().optional(),
-        notes: z19.string().optional()
+        rentFee: z20.string().optional(),
+        propertyFee: z20.string().optional(),
+        utilityFee: z20.string().optional(),
+        consumablesFee: z20.string().optional(),
+        cleaningFee: z20.string().optional(),
+        phoneFee: z20.string().optional(),
+        deferredPayment: z20.string().optional(),
+        expressFee: z20.string().optional(),
+        promotionFee: z20.string().optional(),
+        otherFee: z20.string().optional(),
+        notes: z20.string().optional()
       })).mutation(async ({ input, ctx }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         const { teacherFee, transportFee } = await aggregateOrderFeesByMonthAndCity(
           input.month,
           input.cityName
@@ -5883,9 +5889,9 @@ var init_cityExpenseRouter = __esm({
             END
           `.as("costShareRatio"),
           expenseCoverage: partnerCities.expenseCoverage
-        }).from(partnerCities).where(and11(
-          eq15(partnerCities.cityId, input.cityId),
-          eq15(partnerCities.contractStatus, "active")
+        }).from(partnerCities).where(and12(
+          eq16(partnerCities.cityId, input.cityId),
+          eq16(partnerCities.contractStatus, "active")
         )).limit(1);
         const costShareRatio = partnerCityInfo[0]?.costShareRatio ? parseFloat(partnerCityInfo[0].costShareRatio) : 0;
         const expenseCoverage = partnerCityInfo[0]?.expenseCoverage || {};
@@ -5902,9 +5908,9 @@ var init_cityExpenseRouter = __esm({
         if (expenseCoverage.teacherFee) coveredExpenseTotal += parseFloat(teacherFee);
         if (expenseCoverage.transportFee) coveredExpenseTotal += parseFloat(transportFee);
         const partnerShare = (coveredExpenseTotal * costShareRatio / 100).toFixed(2);
-        const existing = await db.select().from(cityMonthlyExpenses).where(and11(
-          eq15(cityMonthlyExpenses.cityId, input.cityId),
-          eq15(cityMonthlyExpenses.month, input.month)
+        const existing = await db.select().from(cityMonthlyExpenses).where(and12(
+          eq16(cityMonthlyExpenses.cityId, input.cityId),
+          eq16(cityMonthlyExpenses.month, input.month)
         )).limit(1);
         if (existing.length > 0) {
           await db.update(cityMonthlyExpenses).set({
@@ -5924,7 +5930,7 @@ var init_cityExpenseRouter = __esm({
             partnerShare,
             notes: input.notes,
             uploadedBy: ctx.user.id
-          }).where(eq15(cityMonthlyExpenses.id, existing[0].id));
+          }).where(eq16(cityMonthlyExpenses.id, existing[0].id));
           return { id: existing[0].id, isNew: false };
         } else {
           const result = await db.insert(cityMonthlyExpenses).values({
@@ -5954,12 +5960,12 @@ var init_cityExpenseRouter = __esm({
       /**
        * 删除费用账单
        */
-      delete: protectedProcedure.input(z19.object({
-        id: z19.number()
+      delete: protectedProcedure.input(z20.object({
+        id: z20.number()
       })).mutation(async ({ input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-        await db.delete(cityMonthlyExpenses).where(eq15(cityMonthlyExpenses.id, input.id));
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        await db.delete(cityMonthlyExpenses).where(eq16(cityMonthlyExpenses.id, input.id));
         return { success: true };
       }),
       /**
@@ -5967,11 +5973,11 @@ var init_cityExpenseRouter = __esm({
        */
       getCities: protectedProcedure.query(async () => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         const result = await db.select({
           id: cities.id,
           name: cities.name
-        }).from(cities).where(eq15(cities.isActive, true)).orderBy(cities.sortOrder, cities.name);
+        }).from(cities).where(eq16(cities.isActive, true)).orderBy(cities.sortOrder, cities.name);
         return result;
       }),
       /**
@@ -6025,23 +6031,23 @@ var init_cityExpenseRouter = __esm({
       /**
        * 批量导入Excel数据
        */
-      batchImport: protectedProcedure.input(z19.object({
-        fileData: z19.string()
+      batchImport: protectedProcedure.input(z20.object({
+        fileData: z20.string()
         // base64编码的文件数据
       })).mutation(async ({ input, ctx }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         const workbook = new ExcelJS4.Workbook();
         const buffer = Buffer.from(input.fileData, "base64");
         await workbook.xlsx.load(buffer);
         const worksheet = workbook.getWorksheet(1);
         if (!worksheet) {
-          throw new TRPCError15({ code: "BAD_REQUEST", message: "Excel\u6587\u4EF6\u683C\u5F0F\u9519\u8BEF" });
+          throw new TRPCError16({ code: "BAD_REQUEST", message: "Excel\u6587\u4EF6\u683C\u5F0F\u9519\u8BEF" });
         }
         const allCities = await db.select({
           id: cities.id,
           name: cities.name
-        }).from(cities).where(eq15(cities.isActive, true));
+        }).from(cities).where(eq16(cities.isActive, true));
         const cityMap = new Map(allCities.map((c) => [c.name, c.id]));
         const successRecords = [];
         const failedRecords = [];
@@ -6076,9 +6082,9 @@ var init_cityExpenseRouter = __esm({
               cityName
             );
             const totalExpense = (parseFloat(rentFee) + parseFloat(propertyFee) + parseFloat(utilityFee) + parseFloat(consumablesFee) + parseFloat(cleaningFee) + parseFloat(phoneFee) + parseFloat(expressFee) + parseFloat(promotionFee) + parseFloat(otherFee) + parseFloat(teacherFee) + parseFloat(transportFee)).toFixed(2);
-            const existing = await db.select().from(cityMonthlyExpenses).where(and11(
-              eq15(cityMonthlyExpenses.cityId, cityId),
-              eq15(cityMonthlyExpenses.month, month)
+            const existing = await db.select().from(cityMonthlyExpenses).where(and12(
+              eq16(cityMonthlyExpenses.cityId, cityId),
+              eq16(cityMonthlyExpenses.month, month)
             )).limit(1);
             if (existing.length > 0) {
               await db.update(cityMonthlyExpenses).set({
@@ -6097,7 +6103,7 @@ var init_cityExpenseRouter = __esm({
                 totalExpense,
                 notes,
                 uploadedBy: ctx.user.id
-              }).where(eq15(cityMonthlyExpenses.id, existing[0].id));
+              }).where(eq16(cityMonthlyExpenses.id, existing[0].id));
             } else {
               await db.insert(cityMonthlyExpenses).values({
                 cityId,
@@ -6134,20 +6140,20 @@ var init_cityExpenseRouter = __esm({
       /**
        * 导出Excel数据
        */
-      exportData: protectedProcedure.input(z19.object({
-        cityId: z19.number().optional(),
-        month: z19.string().optional(),
-        startMonth: z19.string().optional(),
-        endMonth: z19.string().optional()
+      exportData: protectedProcedure.input(z20.object({
+        cityId: z20.number().optional(),
+        month: z20.string().optional(),
+        startMonth: z20.string().optional(),
+        endMonth: z20.string().optional()
       }).optional()).mutation(async ({ input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         const conditions = [];
         if (input?.cityId) {
-          conditions.push(eq15(cityMonthlyExpenses.cityId, input.cityId));
+          conditions.push(eq16(cityMonthlyExpenses.cityId, input.cityId));
         }
         if (input?.month) {
-          conditions.push(eq15(cityMonthlyExpenses.month, input.month));
+          conditions.push(eq16(cityMonthlyExpenses.month, input.month));
         }
         if (input?.startMonth) {
           conditions.push(sql7`${cityMonthlyExpenses.month} >= ${input.startMonth}`);
@@ -6155,7 +6161,7 @@ var init_cityExpenseRouter = __esm({
         if (input?.endMonth) {
           conditions.push(sql7`${cityMonthlyExpenses.month} <= ${input.endMonth}`);
         }
-        const result = await db.select().from(cityMonthlyExpenses).where(conditions.length > 0 ? and11(...conditions) : void 0).orderBy(desc4(cityMonthlyExpenses.month), desc4(cityMonthlyExpenses.cityId));
+        const result = await db.select().from(cityMonthlyExpenses).where(conditions.length > 0 ? and12(...conditions) : void 0).orderBy(desc4(cityMonthlyExpenses.month), desc4(cityMonthlyExpenses.cityId));
         const workbook = new ExcelJS4.Workbook();
         const worksheet = workbook.addWorksheet("\u57CE\u5E02\u8D39\u7528\u8D26\u5355");
         worksheet.columns = [
@@ -6208,17 +6214,17 @@ var init_cityExpenseRouter = __esm({
        * 重新计算合伙人承担费用
        * 用于在费用覆盖配置变更后,自动更新已存在的账单记录
        */
-      recalculatePartnerShare: protectedProcedure.input(z19.object({
-        cityId: z19.number(),
-        month: z19.string()
+      recalculatePartnerShare: protectedProcedure.input(z20.object({
+        cityId: z20.number(),
+        month: z20.string()
         // 格式: YYYY-MM
       })).mutation(async ({ input, ctx }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         try {
-          const existing = await db.select().from(cityMonthlyExpenses).where(and11(
-            eq15(cityMonthlyExpenses.cityId, input.cityId),
-            eq15(cityMonthlyExpenses.month, input.month)
+          const existing = await db.select().from(cityMonthlyExpenses).where(and12(
+            eq16(cityMonthlyExpenses.cityId, input.cityId),
+            eq16(cityMonthlyExpenses.month, input.month)
           )).limit(1);
           if (existing.length === 0) {
             return { success: true, message: "\u8D26\u5355\u4E0D\u5B58\u5728,\u65E0\u9700\u91CD\u65B0\u8BA1\u7B97" };
@@ -6235,14 +6241,14 @@ var init_cityExpenseRouter = __esm({
               END
             `.as("costShareRatio"),
             expenseCoverage: partnerCities.expenseCoverage
-          }).from(partnerCities).where(and11(
-            eq15(partnerCities.cityId, input.cityId),
-            eq15(partnerCities.contractStatus, "active")
+          }).from(partnerCities).where(and12(
+            eq16(partnerCities.cityId, input.cityId),
+            eq16(partnerCities.contractStatus, "active")
           )).limit(1);
           if (partnerCityInfo.length === 0) {
             await db.update(cityMonthlyExpenses).set({
               partnerShare: "0.00"
-            }).where(eq15(cityMonthlyExpenses.id, record.id));
+            }).where(eq16(cityMonthlyExpenses.id, record.id));
             return { success: true, message: "\u672A\u627E\u5230\u5408\u4F19\u4EBA\u914D\u7F6E,\u5408\u4F19\u4EBA\u627F\u62C5\u8BBE\u4E3A0" };
           }
           const costShareRatio = partnerCityInfo[0]?.costShareRatio ? parseFloat(partnerCityInfo[0].costShareRatio) : 0;
@@ -6262,7 +6268,7 @@ var init_cityExpenseRouter = __esm({
           const partnerShare = (coveredExpenseTotal * costShareRatio / 100).toFixed(2);
           await db.update(cityMonthlyExpenses).set({
             partnerShare
-          }).where(eq15(cityMonthlyExpenses.id, record.id));
+          }).where(eq16(cityMonthlyExpenses.id, record.id));
           return {
             success: true,
             message: `\u91CD\u65B0\u8BA1\u7B97\u6210\u529F,\u5408\u4F19\u4EBA\u627F\u62C5\u8D39\u7528: \uFFE5${partnerShare}`,
@@ -6270,7 +6276,7 @@ var init_cityExpenseRouter = __esm({
           };
         } catch (error) {
           console.error("\u91CD\u65B0\u8BA1\u7B97\u5408\u4F19\u4EBA\u627F\u62C5\u8D39\u7528\u5931\u8D25:", error);
-          throw new TRPCError15({
+          throw new TRPCError16({
             code: "INTERNAL_SERVER_ERROR",
             message: `\u91CD\u65B0\u8BA1\u7B97\u5931\u8D25: ${error.message}`
           });
@@ -6280,23 +6286,23 @@ var init_cityExpenseRouter = __esm({
        * 批量重新计算合伙人承担费用
        * 根据筛选条件批量更新账单的合伙人承担费用
        */
-      batchRecalculate: protectedProcedure.input(z19.object({
-        cityId: z19.number().optional(),
+      batchRecalculate: protectedProcedure.input(z20.object({
+        cityId: z20.number().optional(),
         // 可选:指定城市ID,不指定则刷新所有城市
-        month: z19.string().optional()
+        month: z20.string().optional()
         // 可选:指定月份,不指定则刷新所有月份
       })).mutation(async ({ ctx, input }) => {
         const db = await getDb();
-        if (!db) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
         try {
           const conditions = [];
           if (input.cityId) {
-            conditions.push(eq15(cityMonthlyExpenses.cityId, input.cityId));
+            conditions.push(eq16(cityMonthlyExpenses.cityId, input.cityId));
           }
           if (input.month) {
-            conditions.push(eq15(cityMonthlyExpenses.month, input.month));
+            conditions.push(eq16(cityMonthlyExpenses.month, input.month));
           }
-          const expenses = await db.select().from(cityMonthlyExpenses).where(conditions.length > 0 ? and11(...conditions) : void 0);
+          const expenses = await db.select().from(cityMonthlyExpenses).where(conditions.length > 0 ? and12(...conditions) : void 0);
           if (expenses.length === 0) {
             return {
               success: true,
@@ -6309,12 +6315,12 @@ var init_cityExpenseRouter = __esm({
           const errors = [];
           for (const expense of expenses) {
             try {
-              const partnerCityInfo = await db.select().from(partnerCities).where(and11(
-                eq15(partnerCities.cityId, expense.cityId),
-                eq15(partnerCities.contractStatus, "active")
+              const partnerCityInfo = await db.select().from(partnerCities).where(and12(
+                eq16(partnerCities.cityId, expense.cityId),
+                eq16(partnerCities.contractStatus, "active")
               )).limit(1);
               if (partnerCityInfo.length === 0) {
-                await db.update(cityMonthlyExpenses).set({ partnerShare: "0.00" }).where(eq15(cityMonthlyExpenses.id, expense.id));
+                await db.update(cityMonthlyExpenses).set({ partnerShare: "0.00" }).where(eq16(cityMonthlyExpenses.id, expense.id));
                 updatedCount++;
                 continue;
               }
@@ -6341,7 +6347,7 @@ var init_cityExpenseRouter = __esm({
               if (expenseCoverage.teacherFee) coveredExpenseTotal += parseFloat(expense.teacherFee || "0");
               if (expenseCoverage.transportFee) coveredExpenseTotal += parseFloat(expense.transportFee || "0");
               const partnerShare = (coveredExpenseTotal * costShareRatio / 100).toFixed(2);
-              await db.update(cityMonthlyExpenses).set({ partnerShare }).where(eq15(cityMonthlyExpenses.id, expense.id));
+              await db.update(cityMonthlyExpenses).set({ partnerShare }).where(eq16(cityMonthlyExpenses.id, expense.id));
               updatedCount++;
             } catch (error) {
               errors.push(`${expense.cityName} ${expense.month}: ${error.message}`);
@@ -6356,7 +6362,7 @@ var init_cityExpenseRouter = __esm({
           };
         } catch (error) {
           console.error("\u6279\u91CF\u91CD\u65B0\u8BA1\u7B97\u5931\u8D25:", error);
-          throw new TRPCError15({
+          throw new TRPCError16({
             code: "INTERNAL_SERVER_ERROR",
             message: `\u6279\u91CF\u5237\u65B0\u5931\u8D25: ${error.message}`
           });
@@ -6484,11 +6490,11 @@ __export(permissions_exports, {
   teacherProcedure: () => teacherProcedure2,
   userProcedure: () => userProcedure
 });
-import { TRPCError as TRPCError24 } from "@trpc/server";
+import { TRPCError as TRPCError25 } from "@trpc/server";
 function requireRoles(allowedRoles, errorMessage) {
   return protectedProcedure.use(({ ctx, next }) => {
     if (!ctx.user) {
-      throw new TRPCError24({
+      throw new TRPCError25({
         code: "UNAUTHORIZED",
         message: "\u8BF7\u5148\u767B\u5F55"
       });
@@ -6497,7 +6503,7 @@ function requireRoles(allowedRoles, errorMessage) {
       return next({ ctx });
     }
     if (!hasAnyRole(ctx.user.roles, allowedRoles)) {
-      throw new TRPCError24({
+      throw new TRPCError25({
         code: "FORBIDDEN",
         message: errorMessage || `\u9700\u8981\u4EE5\u4E0B\u89D2\u8272\u4E4B\u4E00: ${allowedRoles.join(", ")}`
       });
@@ -6524,7 +6530,7 @@ function checkResourceOwnership(ctx, resourceOwnerId, errorMessage = "\u65E0\u67
     return true;
   }
   if (resourceOwnerId !== ctx.user.id) {
-    throw new TRPCError24({
+    throw new TRPCError25({
       code: "FORBIDDEN",
       message: errorMessage
     });
@@ -6545,14 +6551,14 @@ async function checkCityAccess(ctx, targetCity) {
   if (scope.isCityPartner) {
     const userCity = await getUserCity(ctx.user.id);
     if (userCity !== targetCity) {
-      throw new TRPCError24({
+      throw new TRPCError25({
         code: "FORBIDDEN",
         message: "\u65E0\u6743\u8BBF\u95EE\u5176\u4ED6\u57CE\u5E02\u7684\u6570\u636E"
       });
     }
     return true;
   }
-  throw new TRPCError24({
+  throw new TRPCError25({
     code: "FORBIDDEN",
     message: "\u65E0\u6743\u8BBF\u95EE\u57CE\u5E02\u6570\u636E"
   });
@@ -7342,7 +7348,7 @@ function registerOAuthRoutes(app) {
 }
 
 // server/routers.ts
-import { z as z28 } from "zod";
+import { z as z29 } from "zod";
 
 // server/_core/systemRouter.ts
 import { z } from "zod";
@@ -8729,10 +8735,268 @@ var reconciliationRouter = router({
   })
 });
 
+// server/statementMatchRouter.ts
+init_trpc();
+init_db();
+init_schema();
+import { z as z8 } from "zod";
+import { TRPCError as TRPCError6 } from "@trpc/server";
+import { eq as eq5, and as and4, gte as gte3, lte as lte3, or as or2 } from "drizzle-orm";
+function parseWechatCSV(content) {
+  const lines = content.split("\n").map((l) => l.replace(/\r/g, "").trim());
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(10, lines.length); i++) {
+    if (lines[i].includes("\u4EA4\u6613\u65F6\u95F4")) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx === -1) return [];
+  const headers = lines[headerIdx].split(",").map((h) => h.replace(/"/g, "").trim());
+  const colIdx = (name) => headers.findIndex((h) => h.includes(name));
+  const timeCol = colIdx("\u4EA4\u6613\u65F6\u95F4");
+  const typeCol = colIdx("\u6536/\u652F");
+  const amountCol = colIdx("\u91D1\u989D");
+  const tradeNoCol = colIdx("\u4EA4\u6613\u5355\u53F7");
+  const remarkCol = colIdx("\u5907\u6CE8");
+  const rows = [];
+  for (let i = headerIdx + 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line || line.startsWith("\u5408\u8BA1")) continue;
+    const cols = parseCsvLine(line);
+    if (cols.length < Math.max(timeCol, typeCol, amountCol) + 1) continue;
+    const direction = (cols[typeCol] || "").replace(/"/g, "").trim();
+    if (direction !== "\u6536\u5165") continue;
+    const amountStr = (cols[amountCol] || "").replace(/"/g, "").replace(/¥|,/g, "").trim();
+    const amount = parseFloat(amountStr);
+    if (isNaN(amount) || amount <= 0) continue;
+    const tradeTime = (cols[timeCol] || "").replace(/"/g, "").trim();
+    const tradeDate = tradeTime.substring(0, 10);
+    const tradeNo = (cols[tradeNoCol] || "").replace(/"/g, "").trim();
+    const remark = (cols[remarkCol] || "").replace(/"/g, "").trim();
+    rows.push({ tradeTime, tradeDate, amount, channel: "wechat", tradeNo, remark, raw: line });
+  }
+  return rows;
+}
+function parseAlipayExcel(rows) {
+  if (!rows || rows.length < 2) return [];
+  let headerIdx = -1;
+  for (let i = 0; i < Math.min(10, rows.length); i++) {
+    const row = rows[i];
+    if (row && row.some((c) => String(c || "").includes("\u652F\u4ED8\u65F6\u95F4") || String(c || "").includes("\u4ED8\u6B3E\u65F6\u95F4"))) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx === -1) {
+    for (let i = 0; i < Math.min(10, rows.length); i++) {
+      const row = rows[i];
+      if (row && row.some((c) => String(c || "").includes("\u5BA2\u6237\u5B9E\u4ED8"))) {
+        headerIdx = i;
+        break;
+      }
+    }
+  }
+  if (headerIdx === -1) return [];
+  const headers = rows[headerIdx].map((h) => String(h || "").trim());
+  const colIdx = (name) => headers.findIndex((h) => h.includes(name));
+  const timeCol = colIdx("\u652F\u4ED8\u65F6\u95F4") !== -1 ? colIdx("\u652F\u4ED8\u65F6\u95F4") : colIdx("\u4ED8\u6B3E\u65F6\u95F4");
+  const amountCol = colIdx("\u5BA2\u6237\u5B9E\u4ED8") !== -1 ? colIdx("\u5BA2\u6237\u5B9E\u4ED8") : colIdx("\u5B9E\u6536\u91D1\u989D");
+  const tradeNoCol = colIdx("\u5546\u6237\u8BA2\u5355\u53F7") !== -1 ? colIdx("\u5546\u6237\u8BA2\u5355\u53F7") : colIdx("\u4EA4\u6613\u53F7");
+  const remarkCol = colIdx("\u6536\u6B3E\u7801\u540D\u79F0") !== -1 ? colIdx("\u6536\u6B3E\u7801\u540D\u79F0") : colIdx("\u5907\u6CE8");
+  const result = [];
+  for (let i = headerIdx + 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || !row[timeCol]) continue;
+    const amountRaw = String(row[amountCol] || "").replace(/,/g, "").trim();
+    const amount = parseFloat(amountRaw);
+    if (isNaN(amount) || amount <= 0) continue;
+    const tradeTime = String(row[timeCol] || "").trim();
+    const tradeDate = tradeTime.substring(0, 10).replace(/\//g, "-");
+    const tradeNo = String(row[tradeNoCol] || "").trim();
+    const remark = String(row[remarkCol] || "").trim();
+    result.push({ tradeTime, tradeDate, amount, channel: "alipay", tradeNo, remark });
+  }
+  return result;
+}
+function parseCsvLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+  for (const ch of line) {
+    if (ch === '"') {
+      inQuotes = !inQuotes;
+    } else if (ch === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
+}
+async function matchStatementToOrders(statementRows, year, month) {
+  const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
+  const endDate = `${year}-${String(month).padStart(2, "0")}-${new Date(year, month, 0).getDate()}`;
+  const db = await getDb();
+  if (!db) throw new Error("\u6570\u636E\u5E93\u8FDE\u63A5\u4E0D\u53EF\u7528");
+  const monthOrders = await db.select().from(orders).where(
+    and4(
+      eq5(orders.isVoided, false),
+      or2(
+        and4(gte3(orders.classDate, startDate), lte3(orders.classDate, endDate)),
+        and4(gte3(orders.paymentDate, startDate), lte3(orders.paymentDate, endDate))
+      )
+    )
+  );
+  const orderMatchMap = /* @__PURE__ */ new Map();
+  const usedRows = /* @__PURE__ */ new Set();
+  for (const row of statementRows) {
+    if (!row.tradeNo) continue;
+    for (const order of monthOrders) {
+      if (!order.channelOrderNo) continue;
+      const channelNos = order.channelOrderNo.split(/[;,\s]+/).map((s) => s.trim());
+      if (channelNos.some((no) => no && row.tradeNo.includes(no))) {
+        if (!orderMatchMap.has(order.id)) orderMatchMap.set(order.id, []);
+        orderMatchMap.get(order.id).push(row);
+        usedRows.add(row.tradeNo);
+        break;
+      }
+    }
+  }
+  for (const row of statementRows) {
+    if (usedRows.has(row.tradeNo)) continue;
+    const rowDate = new Date(row.tradeDate);
+    const candidates = [];
+    for (const order of monthOrders) {
+      const courseAmt = parseFloat(String(order.courseAmount || 0));
+      const balanceAmt = parseFloat(String(order.balanceAmount || 0));
+      const alreadyReceived = (orderMatchMap.get(order.id) || []).reduce((s, r) => s + r.amount, 0);
+      const amountMatches = Math.abs(row.amount - courseAmt) < 0.01 || balanceAmt > 0 && Math.abs(row.amount - balanceAmt) < 0.01 || Math.abs(row.amount - (courseAmt - alreadyReceived)) < 0.01;
+      if (!amountMatches) continue;
+      const refDate = order.paymentDate ? new Date(String(order.paymentDate)) : order.classDate ? new Date(String(order.classDate)) : null;
+      if (!refDate) continue;
+      const dayDiff = Math.abs((rowDate.getTime() - refDate.getTime()) / 864e5);
+      if (dayDiff > 3) continue;
+      candidates.push({ order, score: 10 - dayDiff });
+    }
+    if (candidates.length === 1) {
+      const { order } = candidates[0];
+      if (!orderMatchMap.has(order.id)) orderMatchMap.set(order.id, []);
+      orderMatchMap.get(order.id).push(row);
+      usedRows.add(row.tradeNo);
+    }
+  }
+  const result = monthOrders.map((order) => {
+    const matched = orderMatchMap.get(order.id) || [];
+    const receivedAmount = matched.reduce((s, r) => s + r.amount, 0);
+    const courseAmount = parseFloat(String(order.courseAmount || 0));
+    const gap = courseAmount - receivedAmount;
+    let matchStatus;
+    if (matched.length === 0) {
+      matchStatus = "unpaid";
+    } else if (Math.abs(gap) < 0.01) {
+      matchStatus = "paid";
+    } else {
+      matchStatus = "partial";
+    }
+    return {
+      orderId: order.id,
+      orderNo: order.orderNo,
+      customerName: order.customerName,
+      salesPerson: order.salesPerson,
+      deliveryCourse: order.deliveryCourse,
+      deliveryCity: order.deliveryCity,
+      deliveryTeacher: order.deliveryTeacher,
+      classDate: order.classDate ? String(order.classDate) : null,
+      courseAmount,
+      matchedRows: matched,
+      receivedAmount,
+      gap,
+      matchStatus,
+      notes: order.notes,
+      paymentChannel: order.paymentChannel,
+      channelOrderNo: order.channelOrderNo,
+      paymentDate: order.paymentDate ? String(order.paymentDate) : null
+    };
+  });
+  return result;
+}
+var statementMatchRouter = router({
+  /**
+   * 解析并匹配流水文件
+   * 前端将文件内容以 base64 传入，后端解析后与当月订单匹配
+   */
+  parseAndMatch: protectedProcedure.input(
+    z8.object({
+      /** 文件内容 base64 */
+      fileContent: z8.string(),
+      /** 文件类型：wechat_csv | alipay_xlsx */
+      fileType: z8.enum(["wechat_csv", "alipay_xlsx"]),
+      /** 对账年份 */
+      year: z8.number().int().min(2020).max(2030),
+      /** 对账月份 1-12 */
+      month: z8.number().int().min(1).max(12)
+    })
+  ).mutation(async ({ input }) => {
+    try {
+      let statementRows = [];
+      if (input.fileType === "wechat_csv") {
+        const buf = Buffer.from(input.fileContent, "base64");
+        let content;
+        try {
+          const iconv = __require("iconv-lite");
+          content = iconv.decode(buf, "gbk");
+        } catch {
+          content = buf.toString("utf-8");
+        }
+        statementRows = parseWechatCSV(content);
+      } else {
+        const XLSX2 = await import("xlsx");
+        const buf = Buffer.from(input.fileContent, "base64");
+        const wb = XLSX2.read(buf, { type: "buffer", cellDates: true });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rawRows = XLSX2.utils.sheet_to_json(ws, { header: 1, defval: "" });
+        statementRows = parseAlipayExcel(rawRows);
+      }
+      if (statementRows.length === 0) {
+        throw new TRPCError6({
+          code: "BAD_REQUEST",
+          message: "\u672A\u80FD\u4ECE\u6587\u4EF6\u4E2D\u89E3\u6790\u51FA\u6709\u6548\u6536\u6B3E\u8BB0\u5F55\uFF0C\u8BF7\u68C0\u67E5\u6587\u4EF6\u683C\u5F0F"
+        });
+      }
+      const matchResult = await matchStatementToOrders(statementRows, input.year, input.month);
+      const paid = matchResult.filter((r) => r.matchStatus === "paid");
+      const partial = matchResult.filter((r) => r.matchStatus === "partial");
+      const unpaid = matchResult.filter((r) => r.matchStatus === "unpaid");
+      return {
+        statementCount: statementRows.length,
+        orderCount: matchResult.length,
+        paid,
+        partial,
+        unpaid,
+        /** 未匹配到任何订单的流水行 */
+        unmatchedRows: statementRows.filter(
+          (row) => !matchResult.some(
+            (r) => r.matchedRows.some((mr) => mr.tradeNo === row.tradeNo)
+          )
+        )
+      };
+    } catch (error) {
+      if (error instanceof TRPCError6) throw error;
+      throw new TRPCError6({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `\u89E3\u6790\u5339\u914D\u5931\u8D25: ${error.message}`
+      });
+    }
+  })
+});
+
 // server/customerRouter.ts
 init_trpc();
 init_db();
-import { z as z8 } from "zod";
+import { z as z9 } from "zod";
 
 // server/progressTracker.ts
 var progressStore = /* @__PURE__ */ new Map();
@@ -8792,28 +9056,28 @@ function generateTaskId() {
 var customerRouter = router({
   // 获取客户列表(支持筛选和排序)
   list: protectedProcedure.input(
-    z8.object({
+    z9.object({
       // 筛选条件
-      minSpent: z8.number().optional(),
+      minSpent: z9.number().optional(),
       // 最小累计消费
-      maxSpent: z8.number().optional(),
+      maxSpent: z9.number().optional(),
       // 最大累计消费
-      minClassCount: z8.number().optional(),
+      minClassCount: z9.number().optional(),
       // 最小上课次数
-      maxClassCount: z8.number().optional(),
+      maxClassCount: z9.number().optional(),
       // 最大上课次数
-      lastConsumptionDays: z8.number().optional(),
+      lastConsumptionDays: z9.number().optional(),
       // 最后消费天数(例如30表示30天内)
-      trafficSource: z8.string().optional(),
+      trafficSource: z9.string().optional(),
       // 流量来源
       // 快捷筛选
-      highValue: z8.boolean().optional(),
+      highValue: z9.boolean().optional(),
       // 高价值客户(累计消费>5000或上课次数>5)
-      churned: z8.boolean().optional(),
+      churned: z9.boolean().optional(),
       // 流失客户(最后消费>30天且累计消费>0)
       // 排序
-      sortBy: z8.enum(["totalSpent", "classCount", "lastOrderDate", "firstOrderDate", "createdAt"]).optional(),
-      sortOrder: z8.enum(["asc", "desc"]).optional()
+      sortBy: z9.enum(["totalSpent", "classCount", "lastOrderDate", "firstOrderDate", "createdAt"]).optional(),
+      sortOrder: z9.enum(["asc", "desc"]).optional()
     }).optional()
   ).query(async ({ input }) => {
     let customers3 = await getAllCustomers();
@@ -8912,30 +9176,30 @@ var customerRouter = router({
     return { taskId };
   }),
   // 获取任务进度
-  getProgress: protectedProcedure.input(z8.object({ taskId: z8.string() })).query(async ({ input }) => {
+  getProgress: protectedProcedure.input(z9.object({ taskId: z9.string() })).query(async ({ input }) => {
     const progress = getProgress(input.taskId);
     return progress;
   }),
   // 删除客户
-  delete: protectedProcedure.input(z8.object({ id: z8.number() })).mutation(async ({ input }) => {
+  delete: protectedProcedure.input(z9.object({ id: z9.number() })).mutation(async ({ input }) => {
     await deleteCustomer(input.id);
     return { success: true };
   }),
   // 批量删除客户
-  batchDelete: protectedProcedure.input(z8.object({ ids: z8.array(z8.number()) })).mutation(async ({ input }) => {
+  batchDelete: protectedProcedure.input(z9.object({ ids: z9.array(z9.number()) })).mutation(async ({ input }) => {
     for (const id of input.ids) {
       await deleteCustomer(id);
     }
     return { success: true, count: input.ids.length };
   }),
   // 批量导入更新客户（仅ID匹配，只更新微信号/电话/流量来源/备注）
-  batchImport: protectedProcedure.input(z8.object({
-    rows: z8.array(z8.object({
-      id: z8.number(),
-      wechatId: z8.string().optional(),
-      phone: z8.string().optional(),
-      trafficSource: z8.string().optional(),
-      notes: z8.string().optional()
+  batchImport: protectedProcedure.input(z9.object({
+    rows: z9.array(z9.object({
+      id: z9.number(),
+      wechatId: z9.string().optional(),
+      phone: z9.string().optional(),
+      trafficSource: z9.string().optional(),
+      notes: z9.string().optional()
     }))
   })).mutation(async ({ input }) => {
     const result = await batchImportCustomers(input.rows);
@@ -8947,12 +9211,12 @@ var customerRouter = router({
 init_trpc();
 init_timezone();
 init_db();
-import { z as z9 } from "zod";
-import { TRPCError as TRPCError6 } from "@trpc/server";
+import { z as z10 } from "zod";
+import { TRPCError as TRPCError7 } from "@trpc/server";
 import ExcelJS from "exceljs";
 var financeOrAdminProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "admin" && ctx.user.role !== "finance") {
-    throw new TRPCError6({ code: "FORBIDDEN", message: "\u9700\u8981\u8D22\u52A1\u6216\u7BA1\u7406\u5458\u6743\u9650" });
+    throw new TRPCError7({ code: "FORBIDDEN", message: "\u9700\u8981\u8D22\u52A1\u6216\u7BA1\u7406\u5458\u6743\u9650" });
   }
   return next({ ctx });
 });
@@ -8961,18 +9225,18 @@ var financeRouter = router({
    * 获取合伙人分红统计数据
    */
   getPartnerDividends: financeOrAdminProcedure.input(
-    z9.object({
-      startDate: z9.string().optional(),
-      endDate: z9.string().optional(),
-      partnerId: z9.number().optional()
+    z10.object({
+      startDate: z10.string().optional(),
+      endDate: z10.string().optional(),
+      partnerId: z10.number().optional()
     })
   ).query(async ({ input }) => {
     try {
       const { startDate, endDate, partnerId } = input;
       const dbInstance = await getDb();
-      if (!dbInstance) throw new TRPCError6({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+      if (!dbInstance) throw new TRPCError7({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
       const { partners: partnersTable, partnerCities: partnerCitiesTable, cities: citiesTable, orders: ordersTable } = await Promise.resolve().then(() => (init_schema(), schema_exports));
-      const { eq: eq27, and: and18, sql: sql12 } = await import("drizzle-orm");
+      const { eq: eq28, and: and19, sql: sql12 } = await import("drizzle-orm");
       const allPartners = await dbInstance.select().from(partnersTable);
       const result = [];
       for (const partner of allPartners) {
@@ -8988,7 +9252,7 @@ var financeRouter = router({
           profitRatioStage2APartner: partnerCitiesTable.profitRatioStage2APartner,
           profitRatioStage2BPartner: partnerCitiesTable.profitRatioStage2BPartner,
           profitRatioStage3Partner: partnerCitiesTable.profitRatioStage3Partner
-        }).from(partnerCitiesTable).leftJoin(citiesTable, eq27(partnerCitiesTable.cityId, citiesTable.id)).where(eq27(partnerCitiesTable.partnerId, partner.id));
+        }).from(partnerCitiesTable).leftJoin(citiesTable, eq28(partnerCitiesTable.cityId, citiesTable.id)).where(eq28(partnerCitiesTable.partnerId, partner.id));
         if (partnerCities3.length === 0) continue;
         const cityNames = partnerCities3.map((pc) => pc.cityName).filter(Boolean);
         const conditions = [
@@ -9000,7 +9264,7 @@ var financeRouter = router({
         if (endDate) {
           conditions.push(sql12`${ordersTable.classDate} <= ${endDate}`);
         }
-        const orders2 = cityNames.length > 0 ? await dbInstance.select().from(ordersTable).where(and18(...conditions)) : [];
+        const orders2 = cityNames.length > 0 ? await dbInstance.select().from(ordersTable).where(and19(...conditions)) : [];
         let totalRevenue = 0;
         let totalCost = 0;
         orders2.forEach((order) => {
@@ -9051,7 +9315,7 @@ var financeRouter = router({
       return result;
     } catch (error) {
       console.error("\u83B7\u53D6\u5408\u4F19\u4EBA\u5206\u7EA2\u7EDF\u8BA1\u5931\u8D25:", error);
-      throw new TRPCError6({
+      throw new TRPCError7({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u83B7\u53D6\u5408\u4F19\u4EBA\u5206\u7EA2\u7EDF\u8BA1\u5931\u8D25"
       });
@@ -9059,9 +9323,9 @@ var financeRouter = router({
   }),
   // 导出财务报表为Excel
   exportExcel: financeOrAdminProcedure.input(
-    z9.object({
-      startDate: z9.string().optional(),
-      endDate: z9.string().optional()
+    z10.object({
+      startDate: z10.string().optional(),
+      endDate: z10.string().optional()
     })
   ).mutation(async ({ input }) => {
     try {
@@ -9205,7 +9469,7 @@ var financeRouter = router({
       };
     } catch (error) {
       console.error("\u5BFC\u51FAExcel\u5931\u8D25:", error);
-      throw new TRPCError6({
+      throw new TRPCError7({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u5BFC\u51FAExcel\u5931\u8D25"
       });
@@ -9301,33 +9565,33 @@ var cityRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z10 } from "zod";
-import { eq as eq5 } from "drizzle-orm";
-import { TRPCError as TRPCError7 } from "@trpc/server";
+import { z as z11 } from "zod";
+import { eq as eq6 } from "drizzle-orm";
+import { TRPCError as TRPCError8 } from "@trpc/server";
 var permissionRouter = router({
   // 获取账号权限
-  getPermissions: protectedProcedure.input(z10.object({ accountId: z10.number() })).query(async ({ ctx, input }) => {
+  getPermissions: protectedProcedure.input(z11.object({ accountId: z11.number() })).query(async ({ ctx, input }) => {
     const drizzle2 = await getDb();
-    if (!drizzle2) throw new TRPCError7({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const permissions = await drizzle2.select().from(accountPermissions).where(eq5(accountPermissions.accountId, input.accountId));
+    if (!drizzle2) throw new TRPCError8({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const permissions = await drizzle2.select().from(accountPermissions).where(eq6(accountPermissions.accountId, input.accountId));
     return permissions;
   }),
   // 更新账号权限
   updatePermissions: protectedProcedure.input(
-    z10.object({
-      accountId: z10.number(),
-      permissions: z10.array(
-        z10.object({
-          permissionKey: z10.string(),
-          permissionName: z10.string(),
-          isGranted: z10.boolean()
+    z11.object({
+      accountId: z11.number(),
+      permissions: z11.array(
+        z11.object({
+          permissionKey: z11.string(),
+          permissionName: z11.string(),
+          isGranted: z11.boolean()
         })
       )
     })
   ).mutation(async ({ ctx, input }) => {
     const drizzle2 = await getDb();
-    if (!drizzle2) throw new TRPCError7({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    await drizzle2.delete(accountPermissions).where(eq5(accountPermissions.accountId, input.accountId));
+    if (!drizzle2) throw new TRPCError8({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    await drizzle2.delete(accountPermissions).where(eq6(accountPermissions.accountId, input.accountId));
     if (input.permissions.length > 0) {
       await drizzle2.insert(accountPermissions).values(
         input.permissions.map((p) => ({
@@ -9457,9 +9721,9 @@ init_trpc();
 init_db();
 init_schema();
 init_passwordUtils();
-import { z as z11 } from "zod";
-import { TRPCError as TRPCError8 } from "@trpc/server";
-import { eq as eq6 } from "drizzle-orm";
+import { z as z12 } from "zod";
+import { TRPCError as TRPCError9 } from "@trpc/server";
+import { eq as eq7 } from "drizzle-orm";
 import bcrypt2 from "bcryptjs";
 
 // server/smsService.ts
@@ -9516,26 +9780,26 @@ var TOKEN_EXPIRY = "24h";
 var authRouter = router({
   // 本地账户登录
   login: publicProcedure.input(
-    z11.object({
-      username: z11.string().min(1, "\u7528\u6237\u540D\u4E0D\u80FD\u4E3A\u7A7A"),
-      password: z11.string().min(1, "\u5BC6\u7801\u4E0D\u80FD\u4E3A\u7A7A")
+    z12.object({
+      username: z12.string().min(1, "\u7528\u6237\u540D\u4E0D\u80FD\u4E3A\u7A7A"),
+      password: z12.string().min(1, "\u5BC6\u7801\u4E0D\u80FD\u4E3A\u7A7A")
     })
   ).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
-    if (!drizzle2) throw new TRPCError8({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const account = await drizzle2.select().from(systemAccounts).where(eq6(systemAccounts.username, input.username)).limit(1);
+    if (!drizzle2) throw new TRPCError9({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const account = await drizzle2.select().from(systemAccounts).where(eq7(systemAccounts.username, input.username)).limit(1);
     if (account.length === 0) {
-      throw new TRPCError8({ code: "UNAUTHORIZED", message: "\u7528\u6237\u540D\u6216\u5BC6\u7801\u9519\u8BEF" });
+      throw new TRPCError9({ code: "UNAUTHORIZED", message: "\u7528\u6237\u540D\u6216\u5BC6\u7801\u9519\u8BEF" });
     }
     const user = account[0];
     if (!user.isActive) {
-      throw new TRPCError8({ code: "UNAUTHORIZED", message: "\u8D26\u53F7\u5DF2\u88AB\u505C\u7528" });
+      throw new TRPCError9({ code: "UNAUTHORIZED", message: "\u8D26\u53F7\u5DF2\u88AB\u505C\u7528" });
     }
     const passwordMatch = await bcrypt2.compare(input.password, user.passwordHash);
     if (!passwordMatch) {
-      throw new TRPCError8({ code: "UNAUTHORIZED", message: "\u7528\u6237\u540D\u6216\u5BC6\u7801\u9519\u8BEF" });
+      throw new TRPCError9({ code: "UNAUTHORIZED", message: "\u7528\u6237\u540D\u6216\u5BC6\u7801\u9519\u8BEF" });
     }
-    await drizzle2.update(systemAccounts).set({ lastLoginAt: /* @__PURE__ */ new Date() }).where(eq6(systemAccounts.id, user.id));
+    await drizzle2.update(systemAccounts).set({ lastLoginAt: /* @__PURE__ */ new Date() }).where(eq7(systemAccounts.id, user.id));
     const token = jwt.sign(
       {
         id: user.id,
@@ -9560,21 +9824,21 @@ var authRouter = router({
     };
   }),
   // 验证token
-  verifyToken: publicProcedure.input(z11.object({ token: z11.string() })).query(async ({ input }) => {
+  verifyToken: publicProcedure.input(z12.object({ token: z12.string() })).query(async ({ input }) => {
     try {
       const decoded = jwt.verify(input.token, JWT_SECRET);
       const drizzle2 = await getDb();
-      if (!drizzle2) throw new TRPCError8({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-      const account = await drizzle2.select().from(systemAccounts).where(eq6(systemAccounts.id, decoded.id)).limit(1);
+      if (!drizzle2) throw new TRPCError9({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+      const account = await drizzle2.select().from(systemAccounts).where(eq7(systemAccounts.id, decoded.id)).limit(1);
       if (account.length === 0 || !account[0].isActive) {
-        throw new TRPCError8({ code: "UNAUTHORIZED", message: "\u8D26\u53F7\u4E0D\u5B58\u5728\u6216\u5DF2\u88AB\u505C\u7528" });
+        throw new TRPCError9({ code: "UNAUTHORIZED", message: "\u8D26\u53F7\u4E0D\u5B58\u5728\u6216\u5DF2\u88AB\u505C\u7528" });
       }
       return {
         valid: true,
         user: decoded
       };
     } catch (error) {
-      throw new TRPCError8({ code: "UNAUTHORIZED", message: "Token\u65E0\u6548\u6216\u5DF2\u8FC7\u671F" });
+      throw new TRPCError9({ code: "UNAUTHORIZED", message: "Token\u65E0\u6548\u6216\u5DF2\u8FC7\u671F" });
     }
   }),
   // 获取当前登录用户信息
@@ -9596,8 +9860,8 @@ var authRouter = router({
   }),
   // 刷新Token
   refreshToken: publicProcedure.input(
-    z11.object({
-      token: z11.string().min(1, "\u8BF7\u63D0\u4F9B\u5F53\u524DToken")
+    z12.object({
+      token: z12.string().min(1, "\u8BF7\u63D0\u4F9B\u5F53\u524DToken")
     })
   ).mutation(async ({ input, ctx }) => {
     try {
@@ -9607,21 +9871,21 @@ var authRouter = router({
       });
       const drizzle2 = await getDb();
       if (!drizzle2) {
-        throw new TRPCError8({
+        throw new TRPCError9({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
         });
       }
-      const userList = await drizzle2.select().from(users).where(eq6(users.id, decoded.id)).limit(1);
+      const userList = await drizzle2.select().from(users).where(eq7(users.id, decoded.id)).limit(1);
       if (userList.length === 0) {
-        throw new TRPCError8({
+        throw new TRPCError9({
           code: "UNAUTHORIZED",
           message: "\u7528\u6237\u4E0D\u5B58\u5728"
         });
       }
       const user = userList[0];
       if (!user.isActive) {
-        throw new TRPCError8({
+        throw new TRPCError9({
           code: "UNAUTHORIZED",
           message: "\u8D26\u53F7\u5DF2\u88AB\u7981\u7528"
         });
@@ -9630,7 +9894,7 @@ var authRouter = router({
       const now = Date.now();
       const maxRefreshWindow = 7 * 24 * 60 * 60 * 1e3;
       if (now - tokenExp > maxRefreshWindow) {
-        throw new TRPCError8({
+        throw new TRPCError9({
           code: "UNAUTHORIZED",
           message: "Token\u5DF2\u8FC7\u671F\u592A\u4E45,\u8BF7\u91CD\u65B0\u767B\u5F55"
         });
@@ -9667,10 +9931,10 @@ var authRouter = router({
         }
       };
     } catch (error) {
-      if (error instanceof TRPCError8) {
+      if (error instanceof TRPCError9) {
         throw error;
       }
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "Token\u65E0\u6548,\u8BF7\u91CD\u65B0\u767B\u5F55"
       });
@@ -9678,43 +9942,43 @@ var authRouter = router({
   }),
   // 用户账号登录（仅支持手机号+密码）
   loginWithUserAccount: publicProcedure.input(
-    z11.object({
-      phone: z11.string().min(1, "\u8BF7\u8F93\u5165\u624B\u673A\u53F7"),
-      password: z11.string().min(1, "\u8BF7\u8F93\u5165\u5BC6\u7801")
+    z12.object({
+      phone: z12.string().min(1, "\u8BF7\u8F93\u5165\u624B\u673A\u53F7"),
+      password: z12.string().min(1, "\u8BF7\u8F93\u5165\u5BC6\u7801")
     })
   ).mutation(async ({ input, ctx }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
     const userList = await drizzle2.select().from(users).where(
-      eq6(users.phone, input.phone)
+      eq7(users.phone, input.phone)
     ).limit(1);
     if (userList.length === 0) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "\u624B\u673A\u53F7\u4E0D\u5B58\u5728\uFF0C\u8BF7\u786E\u8BA4\u540E\u91CD\u8BD5"
       });
     }
     const user = userList[0];
     if (!user.password) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "\u8BE5\u8D26\u53F7\u672A\u8BBE\u7F6E\u5BC6\u7801\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458"
       });
     }
     const isValidPassword = await verifyPassword(input.password, user.password);
     if (!isValidPassword) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "\u5BC6\u7801\u9519\u8BEF"
       });
     }
     if (!user.isActive) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "\u8D26\u53F7\u5DF2\u88AB\u7981\u7528\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458"
       });
@@ -9737,7 +10001,7 @@ var authRouter = router({
       maxAge: 7 * 24 * 60 * 60 * 1e3
       // 7天
     });
-    await drizzle2.update(users).set({ lastSignedIn: /* @__PURE__ */ new Date() }).where(eq6(users.id, user.id));
+    await drizzle2.update(users).set({ lastSignedIn: /* @__PURE__ */ new Date() }).where(eq7(users.id, user.id));
     const userRoles = (user.roles || user.role || "").split(",");
     if (userRoles.includes("user") && user.phone) {
       try {
@@ -9769,9 +10033,9 @@ var authRouter = router({
   }),
   // 修改密码(需要登录状态，通过Token获取用户)
   changePassword: protectedProcedure.input(
-    z11.object({
-      oldPassword: z11.string().min(1, "\u8BF7\u8F93\u5165\u65E7\u5BC6\u7801"),
-      newPassword: z11.string().min(6, "\u5BC6\u7801\u957F\u5EA6\u81F3\u5C116\u4F4D").max(20, "\u5BC6\u7801\u6700\u591A20\u4F4D")
+    z12.object({
+      oldPassword: z12.string().min(1, "\u8BF7\u8F93\u5165\u65E7\u5BC6\u7801"),
+      newPassword: z12.string().min(6, "\u5BC6\u7801\u957F\u5EA6\u81F3\u5C116\u4F4D").max(20, "\u5BC6\u7801\u6700\u591A20\u4F4D")
     })
   ).mutation(async ({ input, ctx }) => {
     const drizzle2 = await getDb();
@@ -9782,7 +10046,7 @@ var authRouter = router({
       };
     }
     const userId = ctx.user.id;
-    const userList = await drizzle2.select().from(users).where(eq6(users.id, userId)).limit(1);
+    const userList = await drizzle2.select().from(users).where(eq7(users.id, userId)).limit(1);
     if (userList.length === 0) {
       return {
         success: false,
@@ -9817,25 +10081,25 @@ var authRouter = router({
       };
     }
     const hashedNewPassword = await hashPassword(input.newPassword);
-    await drizzle2.update(users).set({ password: hashedNewPassword }).where(eq6(users.id, userId));
+    await drizzle2.update(users).set({ password: hashedNewPassword }).where(eq7(users.id, userId));
     return {
       success: true
     };
   }),
   // 发送短信验证码（用于重置密码）
   sendSmsCode: publicProcedure.input(
-    z11.object({
-      phone: z11.string().min(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").max(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").regex(/^1[3-9]\d{9}$/, "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u624B\u673A\u53F7")
+    z12.object({
+      phone: z12.string().min(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").max(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").regex(/^1[3-9]\d{9}$/, "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u624B\u673A\u53F7")
     })
   ).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const userList = await drizzle2.select().from(users).where(eq6(users.phone, input.phone)).limit(1);
+    const userList = await drizzle2.select().from(users).where(eq7(users.phone, input.phone)).limit(1);
     if (userList.length === 0) {
       return { success: false, error: "\u8BE5\u624B\u673A\u53F7\u672A\u6CE8\u518C" };
     }
@@ -9850,20 +10114,20 @@ var authRouter = router({
   }),
   // 忘记密码 - 通过手机号+验证码重置密码
   resetPassword: publicProcedure.input(
-    z11.object({
-      phone: z11.string().min(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").max(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").regex(/^1[3-9]\d{9}$/, "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u624B\u673A\u53F7"),
-      code: z11.string().min(1, "\u8BF7\u8F93\u5165\u9A8C\u8BC1\u7801"),
-      newPassword: z11.string().min(6, "\u5BC6\u7801\u957F\u5EA6\u81F3\u5C116\u4F4D").max(20, "\u5BC6\u7801\u6700\u591A20\u4F4D")
+    z12.object({
+      phone: z12.string().min(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").max(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").regex(/^1[3-9]\d{9}$/, "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u624B\u673A\u53F7"),
+      code: z12.string().min(1, "\u8BF7\u8F93\u5165\u9A8C\u8BC1\u7801"),
+      newPassword: z12.string().min(6, "\u5BC6\u7801\u957F\u5EA6\u81F3\u5C116\u4F4D").max(20, "\u5BC6\u7801\u6700\u591A20\u4F4D")
     })
   ).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const userList = await drizzle2.select().from(users).where(eq6(users.phone, input.phone)).limit(1);
+    const userList = await drizzle2.select().from(users).where(eq7(users.phone, input.phone)).limit(1);
     if (userList.length === 0) {
       return {
         success: false,
@@ -9885,30 +10149,30 @@ var authRouter = router({
       };
     }
     const hashedNewPassword = await hashPassword(input.newPassword);
-    await drizzle2.update(users).set({ password: hashedNewPassword }).where(eq6(users.id, user.id));
+    await drizzle2.update(users).set({ password: hashedNewPassword }).where(eq7(users.id, user.id));
     return {
       success: true
     };
   }),
   // 新用户注册(手机号+密码)
   register: publicProcedure.input(
-    z11.object({
-      phone: z11.string().min(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").max(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").regex(/^1[3-9]\d{9}$/, "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u624B\u673A\u53F7"),
-      password: z11.string().min(6, "\u5BC6\u7801\u81F3\u5C116\u4F4D").max(20, "\u5BC6\u7801\u6700\u591A20\u4F4D"),
-      name: z11.string().optional(),
-      nickname: z11.string().optional()
+    z12.object({
+      phone: z12.string().min(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").max(11, "\u624B\u673A\u53F7\u683C\u5F0F\u9519\u8BEF").regex(/^1[3-9]\d{9}$/, "\u8BF7\u8F93\u5165\u6B63\u786E\u7684\u624B\u673A\u53F7"),
+      password: z12.string().min(6, "\u5BC6\u7801\u81F3\u5C116\u4F4D").max(20, "\u5BC6\u7801\u6700\u591A20\u4F4D"),
+      name: z12.string().optional(),
+      nickname: z12.string().optional()
     })
   ).mutation(async ({ input, ctx }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const existingUser = await drizzle2.select().from(users).where(eq6(users.phone, input.phone)).limit(1);
+    const existingUser = await drizzle2.select().from(users).where(eq7(users.phone, input.phone)).limit(1);
     if (existingUser.length > 0) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "CONFLICT",
         message: "\u8BE5\u624B\u673A\u53F7\u5DF2\u88AB\u6CE8\u518C"
       });
@@ -9971,35 +10235,35 @@ var authRouter = router({
   }),
   // 账号恢复接口
   restoreAccount: publicProcedure.input(
-    z11.object({
-      userId: z11.number(),
-      phone: z11.string(),
-      verificationCode: z11.string()
+    z12.object({
+      userId: z12.number(),
+      phone: z12.string(),
+      verificationCode: z12.string()
     })
   ).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const userList = await drizzle2.select().from(users).where(eq6(users.id, input.userId)).limit(1);
+    const userList = await drizzle2.select().from(users).where(eq7(users.id, input.userId)).limit(1);
     if (userList.length === 0) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "NOT_FOUND",
         message: "\u7528\u6237\u4E0D\u5B58\u5728"
       });
     }
     const user = userList[0];
     if (user.phone !== input.phone) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "BAD_REQUEST",
         message: "\u624B\u673A\u53F7\u4E0D\u5339\u914D"
       });
     }
     if (user.isDeleted !== 1) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "BAD_REQUEST",
         message: "\u8D26\u53F7\u672A\u5904\u4E8E\u6CE8\u9500\u72B6\u6001"
       });
@@ -10009,7 +10273,7 @@ var authRouter = router({
     recoveryDeadline.setDate(recoveryDeadline.getDate() + 30);
     const now = /* @__PURE__ */ new Date();
     if (now > recoveryDeadline) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "BAD_REQUEST",
         message: "\u6062\u590D\u671F\u9650\u5DF2\u8FC7\uFF0C\u8D26\u53F7\u5DF2\u6C38\u4E45\u5220\u9664"
       });
@@ -10018,7 +10282,7 @@ var authRouter = router({
       isDeleted: 0,
       deletedAt: null,
       deletionReason: null
-    }).where(eq6(users.id, user.id));
+    }).where(eq7(users.id, user.id));
     return {
       success: true,
       message: "\u8D26\u53F7\u5DF2\u6210\u529F\u6062\u590D",
@@ -10035,7 +10299,7 @@ var authRouter = router({
   getDeletionStatus: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.user;
     if (!user) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "\u672A\u767B\u5F55"
       });
@@ -10081,36 +10345,36 @@ var authRouter = router({
   }),
   // App 传 JWT 免登录建立 H5 session
   loginWithToken: publicProcedure.input(
-    z11.object({
-      token: z11.string().min(1, "token \u4E0D\u80FD\u4E3A\u7A7A")
+    z12.object({
+      token: z12.string().min(1, "token \u4E0D\u80FD\u4E3A\u7A7A")
     })
   ).mutation(async ({ input, ctx }) => {
     let decoded;
     try {
       decoded = jwt.verify(input.token, JWT_SECRET);
     } catch (err) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "token \u65E0\u6548\u6216\u5DF2\u8FC7\u671F"
       });
     }
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const userList = await drizzle2.select().from(users).where(eq6(users.id, decoded.id)).limit(1);
+    const userList = await drizzle2.select().from(users).where(eq7(users.id, decoded.id)).limit(1);
     if (userList.length === 0) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "\u7528\u6237\u4E0D\u5B58\u5728"
       });
     }
     const user = userList[0];
     if (!user.isActive) {
-      throw new TRPCError8({
+      throw new TRPCError9({
         code: "UNAUTHORIZED",
         message: "\u8D26\u53F7\u5DF2\u88AB\u7981\u7528\uFF0C\u8BF7\u8054\u7CFB\u7BA1\u7406\u5458"
       });
@@ -10156,30 +10420,30 @@ init_db();
 init_schema();
 init_passwordUtils();
 init_roles();
-import { z as z12 } from "zod";
-import { TRPCError as TRPCError9 } from "@trpc/server";
-import { eq as eq8, and as and5 } from "drizzle-orm";
+import { z as z13 } from "zod";
+import { TRPCError as TRPCError10 } from "@trpc/server";
+import { eq as eq9, and as and6 } from "drizzle-orm";
 var adminProcedure3 = protectedProcedure.use(({ ctx, next }) => {
   const userRoles = ctx.user.roles || ctx.user.role || "";
   const hasAdmin = userRoles.split(",").map((r) => r.trim()).includes("admin");
   if (!hasAdmin) {
-    throw new TRPCError9({ code: "FORBIDDEN", message: "\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650" });
+    throw new TRPCError10({ code: "FORBIDDEN", message: "\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650" });
   }
   return next({ ctx });
 });
 var userManagementRouter = router({
   // 获取所有用户列表（支持筛选）
-  list: adminProcedure3.input(z12.object({
-    city: z12.string().optional(),
+  list: adminProcedure3.input(z13.object({
+    city: z13.string().optional(),
     // 城市筛选
-    role: z12.string().optional(),
+    role: z13.string().optional(),
     // 角色筛选
-    isActive: z12.boolean().optional()
+    isActive: z13.boolean().optional()
     // 状态筛选
   }).optional()).query(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
@@ -10249,17 +10513,17 @@ var userManagementRouter = router({
     return usersWithRoleCities;
   }),
   // 获取单个用户详情
-  getById: adminProcedure3.input(z12.object({ id: z12.number() })).query(async ({ input }) => {
+  getById: adminProcedure3.input(z13.object({ id: z13.number() })).query(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const userList = await drizzle2.select().from(users).where(eq8(users.id, input.id)).limit(1);
+    const userList = await drizzle2.select().from(users).where(eq9(users.id, input.id)).limit(1);
     if (userList.length === 0) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "NOT_FOUND",
         message: "\u7528\u6237\u4E0D\u5B58\u5728"
       });
@@ -10292,25 +10556,25 @@ var userManagementRouter = router({
   }),
   // 创建新用户
   create: adminProcedure3.input(
-    z12.object({
-      name: z12.string().min(1, "\u7528\u6237\u540D\u4E0D\u80FD\u4E3A\u7A7A"),
-      nickname: z12.string().optional(),
-      email: z12.union([z12.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"), z12.literal("")]).optional(),
-      phone: z12.string().optional(),
-      password: z12.string().min(6, "\u5BC6\u7801\u81F3\u5C116\u4F4D"),
-      role: z12.enum(USER_ROLE_VALUES).optional(),
-      roles: z12.string().optional(),
+    z13.object({
+      name: z13.string().min(1, "\u7528\u6237\u540D\u4E0D\u80FD\u4E3A\u7A7A"),
+      nickname: z13.string().optional(),
+      email: z13.union([z13.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"), z13.literal("")]).optional(),
+      phone: z13.string().optional(),
+      password: z13.string().min(6, "\u5BC6\u7801\u81F3\u5C116\u4F4D"),
+      role: z13.enum(USER_ROLE_VALUES).optional(),
+      roles: z13.string().optional(),
       // 多角色，逗号分隔
-      roleCities: z12.array(z12.object({
-        role: z12.string(),
-        cities: z12.array(z12.string())
+      roleCities: z13.array(z13.object({
+        role: z13.string(),
+        cities: z13.array(z13.string())
       })).optional()
       // 角色-城市关联
     })
   ).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
@@ -10319,7 +10583,7 @@ var userManagementRouter = router({
       const { checkPhoneUnique: checkPhoneUnique2 } = await Promise.resolve().then(() => (init_phoneValidator(), phoneValidator_exports));
       const phoneCheck = await checkPhoneUnique2(input.phone);
       if (!phoneCheck.isUnique) {
-        throw new TRPCError9({
+        throw new TRPCError10({
           code: "BAD_REQUEST",
           message: `\u624B\u673A\u53F7\u5DF2\u88AB\u4F7F\u7528\uFF08${phoneCheck.conflictType === "user" ? "\u7528\u6237\u7BA1\u7406" : "\u8001\u5E08\u7BA1\u7406"}\u4E2D\u7684 ${phoneCheck.conflictName}\uFF09`
         });
@@ -10330,7 +10594,7 @@ var userManagementRouter = router({
     const rolesStr = input.roles || input.role || "user";
     const rolesArray = rolesStr.split(",").map((r) => r.trim());
     if (rolesArray.length === 0 || rolesArray.every((r) => !r)) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "BAD_REQUEST",
         message: "\u6BCF\u4E2A\u8D26\u53F7\u5FC5\u987B\u6700\u5C111\u79CD\u89D2\u8272"
       });
@@ -10380,7 +10644,7 @@ var userManagementRouter = router({
         const cityPartnerData = input.roleCities.find((rc) => rc.role === "cityPartner");
         if (cityPartnerData && cityPartnerData.cities.length > 0) {
           for (const cityName of cityPartnerData.cities) {
-            const [cityRecord] = await drizzle2.select().from(cities3).where(eq8(cities3.name, cityName)).limit(1);
+            const [cityRecord] = await drizzle2.select().from(cities3).where(eq9(cities3.name, cityName)).limit(1);
             if (cityRecord) {
               await drizzle2.insert(partnerCities3).values({
                 partnerId,
@@ -10403,16 +10667,16 @@ var userManagementRouter = router({
   }),
   // 更新用户信息
   update: adminProcedure3.input(
-    z12.object({
-      id: z12.number(),
-      name: z12.string().min(1, "\u7528\u6237\u540D\u4E0D\u80FD\u4E3A\u7A7A").optional(),
-      nickname: z12.string().optional(),
-      email: z12.union([z12.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"), z12.literal("")]).optional(),
-      phone: z12.string().optional(),
-      role: z12.enum(USER_ROLE_VALUES).optional(),
-      roles: z12.string().optional(),
+    z13.object({
+      id: z13.number(),
+      name: z13.string().min(1, "\u7528\u6237\u540D\u4E0D\u80FD\u4E3A\u7A7A").optional(),
+      nickname: z13.string().optional(),
+      email: z13.union([z13.string().email("\u90AE\u7BB1\u683C\u5F0F\u4E0D\u6B63\u786E"), z13.literal("")]).optional(),
+      phone: z13.string().optional(),
+      role: z13.enum(USER_ROLE_VALUES).optional(),
+      roles: z13.string().optional(),
       // 多角色，逗号分隔
-      roleCities: z12.record(z12.string(), z12.array(z12.string())).optional()
+      roleCities: z13.record(z13.string(), z13.array(z13.string())).optional()
       // 角色-城市关联，如 { "teacher": ["深圳"], "cityPartner": ["天津"] }
     })
   ).mutation(async ({ input, ctx }) => {
@@ -10420,7 +10684,7 @@ var userManagementRouter = router({
       console.log("[UserManagement] \u66F4\u65B0\u8BF7\u6C42: userId=", input.id, "data=", JSON.stringify(input), "operator=", ctx.user.name);
       const drizzle2 = await getDb();
       if (!drizzle2) {
-        throw new TRPCError9({
+        throw new TRPCError10({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
         });
@@ -10430,20 +10694,20 @@ var userManagementRouter = router({
         const { checkPhoneUnique: checkPhoneUnique2 } = await Promise.resolve().then(() => (init_phoneValidator(), phoneValidator_exports));
         const phoneCheck = await checkPhoneUnique2(updateData.phone, id);
         if (!phoneCheck.isUnique) {
-          throw new TRPCError9({
+          throw new TRPCError10({
             code: "BAD_REQUEST",
             message: `\u624B\u673A\u53F7\u5DF2\u88AB\u4F7F\u7528\uFF08${phoneCheck.conflictType === "user" ? "\u7528\u6237\u7BA1\u7406" : "\u8001\u5E08\u7BA1\u7406"}\u4E2D\u7684 ${phoneCheck.conflictName}\uFF09`
           });
         }
       }
-      const [usersBefore] = await drizzle2.select().from(users).where(eq8(users.id, id)).limit(1);
+      const [usersBefore] = await drizzle2.select().from(users).where(eq9(users.id, id)).limit(1);
       const oldRoles = usersBefore?.roles || "";
       const hadTeacherRole = oldRoles.includes("teacher");
       const setData = { ...updateData };
       if (roles) {
         const rolesArray = roles.split(",").map((r) => r.trim());
         if (rolesArray.length === 0 || rolesArray.every((r) => !r)) {
-          throw new TRPCError9({
+          throw new TRPCError10({
             code: "BAD_REQUEST",
             message: "\u6BCF\u4E2A\u8D26\u53F7\u5FC5\u987B\u6700\u5C111\u79CD\u89D2\u8272"
           });
@@ -10453,7 +10717,7 @@ var userManagementRouter = router({
           for (const [role, cities3] of Object.entries(roleCities)) {
             if (role === "teacher" || role === "cityPartner") {
               if (!cities3 || cities3.length === 0) {
-                throw new TRPCError9({
+                throw new TRPCError10({
                   code: "BAD_REQUEST",
                   message: `\u9009\u62E9${role === "teacher" ? "\u8001\u5E08" : "\u5408\u4F19\u4EBA"}\u89D2\u8272\u65F6\uFF0C\u5FC5\u987B\u9009\u62E9\u5BF9\u5E94\u7684\u57CE\u5E02`
                 });
@@ -10467,7 +10731,7 @@ var userManagementRouter = router({
               const existingCities = await getUserRoleCities(id);
               const roleCity = existingCities.find((rc) => rc.role === role);
               if (!roleCity || !roleCity.cities || JSON.parse(roleCity.cities).length === 0) {
-                throw new TRPCError9({
+                throw new TRPCError10({
                   code: "BAD_REQUEST",
                   message: `\u9009\u62E9${role === "teacher" ? "\u8001\u5E08" : "\u5408\u4F19\u4EBA"}\u89D2\u8272\u65F6\uFF0C\u5FC5\u987B\u9009\u62E9\u5BF9\u5E94\u7684\u57CE\u5E02`
                 });
@@ -10478,7 +10742,7 @@ var userManagementRouter = router({
         setData.roles = roles;
         setData.role = rolesArray[0];
       }
-      await drizzle2.update(users).set(setData).where(eq8(users.id, id));
+      await drizzle2.update(users).set(setData).where(eq9(users.id, id));
       const hasRoleCities = roleCities && Object.keys(roleCities).length > 0;
       if (hasRoleCities) {
         for (const [role, cities3] of Object.entries(roleCities)) {
@@ -10489,16 +10753,16 @@ var userManagementRouter = router({
       }
       if (roles) {
         const hasTeacherRole = roles.includes("teacher");
-        const [teacherRecords] = await drizzle2.select().from(teachers).where(eq8(teachers.userId, id)).limit(1);
+        const [teacherRecords] = await drizzle2.select().from(teachers).where(eq9(teachers.userId, id)).limit(1);
         if (hadTeacherRole && !hasTeacherRole) {
           if (teacherRecords) {
-            await drizzle2.update(teachers).set({ isActive: false, status: "\u4E0D\u6D3B\u8DC3" }).where(eq8(teachers.userId, id));
+            await drizzle2.update(teachers).set({ isActive: false, status: "\u4E0D\u6D3B\u8DC3" }).where(eq9(teachers.userId, id));
           }
         } else if (!hadTeacherRole && hasTeacherRole) {
           if (teacherRecords) {
-            await drizzle2.update(teachers).set({ isActive: true, status: "\u6D3B\u8DC3" }).where(eq8(teachers.userId, id));
+            await drizzle2.update(teachers).set({ isActive: true, status: "\u6D3B\u8DC3" }).where(eq9(teachers.userId, id));
           } else {
-            const [currentUser] = await drizzle2.select().from(users).where(eq8(users.id, id)).limit(1);
+            const [currentUser] = await drizzle2.select().from(users).where(eq9(users.id, id)).limit(1);
             await drizzle2.insert(teachers).values({
               userId: id,
               name: currentUser?.name || "\u672A\u77E5",
@@ -10513,11 +10777,11 @@ var userManagementRouter = router({
         const hasCityPartnerRole = roles.includes("cityPartner");
         const hadCityPartnerRole = oldRoles.includes("cityPartner");
         const { partners: partners2, partnerCities: partnerCities3, cities: cities3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
-        const [partnerRecords] = await drizzle2.select().from(partners2).where(eq8(partners2.userId, id)).limit(1);
+        const [partnerRecords] = await drizzle2.select().from(partners2).where(eq9(partners2.userId, id)).limit(1);
         if (hadCityPartnerRole && !hasCityPartnerRole) {
           if (partnerRecords) {
-            await drizzle2.delete(partnerCities3).where(eq8(partnerCities3.partnerId, partnerRecords.id));
-            await drizzle2.update(partners2).set({ isActive: false }).where(eq8(partners2.userId, id));
+            await drizzle2.delete(partnerCities3).where(eq9(partnerCities3.partnerId, partnerRecords.id));
+            await drizzle2.update(partners2).set({ isActive: false }).where(eq9(partners2.userId, id));
           }
         } else if (!hadCityPartnerRole && hasCityPartnerRole) {
           if (partnerRecords) {
@@ -10525,16 +10789,16 @@ var userManagementRouter = router({
               isActive: true,
               name: updateData.name || partnerRecords.name,
               phone: updateData.phone || partnerRecords.phone
-            }).where(eq8(partners2.userId, id));
+            }).where(eq9(partners2.userId, id));
             if (roleCities && roleCities.cityPartner && roleCities.cityPartner.length > 0) {
               const partnerId = partnerRecords.id;
               for (const cityName of roleCities.cityPartner) {
-                const [cityRecord] = await drizzle2.select().from(cities3).where(eq8(cities3.name, cityName)).limit(1);
+                const [cityRecord] = await drizzle2.select().from(cities3).where(eq9(cities3.name, cityName)).limit(1);
                 if (cityRecord) {
                   const [existingPartnerCity] = await drizzle2.select().from(partnerCities3).where(
-                    and5(
-                      eq8(partnerCities3.partnerId, partnerId),
-                      eq8(partnerCities3.cityId, cityRecord.id)
+                    and6(
+                      eq9(partnerCities3.partnerId, partnerId),
+                      eq9(partnerCities3.cityId, cityRecord.id)
                     )
                   ).limit(1);
                   if (!existingPartnerCity) {
@@ -10565,7 +10829,7 @@ var userManagementRouter = router({
             if (roleCities && roleCities.cityPartner && roleCities.cityPartner.length > 0) {
               const partnerId = newPartner.insertId;
               for (const cityName of roleCities.cityPartner) {
-                const [cityRecord] = await drizzle2.select().from(cities3).where(eq8(cities3.name, cityName)).limit(1);
+                const [cityRecord] = await drizzle2.select().from(cities3).where(eq9(cities3.name, cityName)).limit(1);
                 if (cityRecord) {
                   await drizzle2.insert(partnerCities3).values({
                     partnerId,
@@ -10585,16 +10849,16 @@ var userManagementRouter = router({
           if (updateData.name) partnerUpdateData.name = updateData.name;
           if (updateData.phone) partnerUpdateData.phone = updateData.phone;
           if (Object.keys(partnerUpdateData).length > 0) {
-            await drizzle2.update(partners2).set(partnerUpdateData).where(eq8(partners2.userId, id));
+            await drizzle2.update(partners2).set(partnerUpdateData).where(eq9(partners2.userId, id));
           }
           if (roleCities && roleCities.cityPartner) {
             const partnerId = partnerRecords.id;
             const newCityNames = roleCities.cityPartner;
-            const existingPartnerCities = await drizzle2.select().from(partnerCities3).where(eq8(partnerCities3.partnerId, partnerId));
+            const existingPartnerCities = await drizzle2.select().from(partnerCities3).where(eq9(partnerCities3.partnerId, partnerId));
             const existingCityIds = existingPartnerCities.map((pc) => pc.cityId);
             const newCityIds = [];
             for (const cityName of newCityNames) {
-              const [cityRecord] = await drizzle2.select().from(cities3).where(eq8(cities3.name, cityName)).limit(1);
+              const [cityRecord] = await drizzle2.select().from(cities3).where(eq9(cities3.name, cityName)).limit(1);
               if (cityRecord) {
                 newCityIds.push(cityRecord.id);
               }
@@ -10622,7 +10886,7 @@ var userManagementRouter = router({
       };
     } catch (error) {
       console.error("[UserManagement] \u66F4\u65B0\u5931\u8D25: userId=", input.id, "error=", error);
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: error instanceof Error ? error.message : "\u66F4\u65B0\u7528\u6237\u4FE1\u606F\u5931\u8D25"
       });
@@ -10630,19 +10894,19 @@ var userManagementRouter = router({
   }),
   // 更新用户角色（多角色）
   updateRoles: adminProcedure3.input(
-    z12.object({
-      id: z12.number(),
-      roles: z12.string().min(1, "\u81F3\u5C11\u9700\u8981\u4E00\u4E2A\u89D2\u8272")
+    z13.object({
+      id: z13.number(),
+      roles: z13.string().min(1, "\u81F3\u5C11\u9700\u8981\u4E00\u4E2A\u89D2\u8272")
     })
   ).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const [usersBefore] = await drizzle2.select().from(users).where(eq8(users.id, input.id)).limit(1);
+    const [usersBefore] = await drizzle2.select().from(users).where(eq9(users.id, input.id)).limit(1);
     const oldRoles = usersBefore?.roles || "";
     const hadTeacherRole = oldRoles.includes("teacher");
     const hasTeacherRole = input.roles.includes("teacher");
@@ -10652,15 +10916,15 @@ var userManagementRouter = router({
     await drizzle2.update(users).set({
       role: primaryRole,
       roles: input.roles
-    }).where(eq8(users.id, input.id));
-    const [teacherRecords] = await drizzle2.select().from(teachers).where(eq8(teachers.userId, input.id)).limit(1);
+    }).where(eq9(users.id, input.id));
+    const [teacherRecords] = await drizzle2.select().from(teachers).where(eq9(teachers.userId, input.id)).limit(1);
     if (hadTeacherRole && !hasTeacherRole) {
       if (teacherRecords) {
-        await drizzle2.update(teachers).set({ isActive: false, status: "\u4E0D\u6D3B\u8DC3" }).where(eq8(teachers.userId, input.id));
+        await drizzle2.update(teachers).set({ isActive: false, status: "\u4E0D\u6D3B\u8DC3" }).where(eq9(teachers.userId, input.id));
       }
     } else if (!hadTeacherRole && hasTeacherRole) {
       if (teacherRecords) {
-        await drizzle2.update(teachers).set({ isActive: true, status: "\u6D3B\u8DC3" }).where(eq8(teachers.userId, input.id));
+        await drizzle2.update(teachers).set({ isActive: true, status: "\u6D3B\u8DC3" }).where(eq9(teachers.userId, input.id));
       } else {
         await drizzle2.insert(teachers).values({
           userId: input.id,
@@ -10672,14 +10936,14 @@ var userManagementRouter = router({
       }
     }
     const { partners: partners2 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
-    const [partnerRecords] = await drizzle2.select().from(partners2).where(eq8(partners2.userId, input.id)).limit(1);
+    const [partnerRecords] = await drizzle2.select().from(partners2).where(eq9(partners2.userId, input.id)).limit(1);
     if (hadCityPartnerRole && !hasCityPartnerRole) {
       if (partnerRecords) {
-        await drizzle2.update(partners2).set({ isActive: false }).where(eq8(partners2.userId, input.id));
+        await drizzle2.update(partners2).set({ isActive: false }).where(eq9(partners2.userId, input.id));
       }
     } else if (!hadCityPartnerRole && hasCityPartnerRole) {
       if (partnerRecords) {
-        await drizzle2.update(partners2).set({ isActive: true }).where(eq8(partners2.userId, input.id));
+        await drizzle2.update(partners2).set({ isActive: true }).where(eq9(partners2.userId, input.id));
       } else {
         await drizzle2.insert(partners2).values({
           userId: input.id,
@@ -10696,14 +10960,14 @@ var userManagementRouter = router({
     const hadSalesRole = oldRoles.includes("sales");
     const hasSalesRole = input.roles.includes("sales");
     const { salespersons: salespersons2 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
-    const [salespersonRecord] = await drizzle2.select().from(salespersons2).where(eq8(salespersons2.userId, input.id)).limit(1);
+    const [salespersonRecord] = await drizzle2.select().from(salespersons2).where(eq9(salespersons2.userId, input.id)).limit(1);
     if (hadSalesRole && !hasSalesRole) {
       if (salespersonRecord) {
-        await drizzle2.update(salespersons2).set({ isActive: false }).where(eq8(salespersons2.userId, input.id));
+        await drizzle2.update(salespersons2).set({ isActive: false }).where(eq9(salespersons2.userId, input.id));
       }
     } else if (!hadSalesRole && hasSalesRole) {
       if (salespersonRecord) {
-        await drizzle2.update(salespersons2).set({ isActive: true }).where(eq8(salespersons2.userId, input.id));
+        await drizzle2.update(salespersons2).set({ isActive: true }).where(eq9(salespersons2.userId, input.id));
       } else {
         await drizzle2.insert(salespersons2).values({
           userId: input.id,
@@ -10718,20 +10982,20 @@ var userManagementRouter = router({
   }),
   // 重置用户密码
   resetPassword: adminProcedure3.input(
-    z12.object({
-      id: z12.number(),
-      newPassword: z12.string().min(6, "\u5BC6\u7801\u81F3\u5C116\u4F4D")
+    z13.object({
+      id: z13.number(),
+      newPassword: z13.string().min(6, "\u5BC6\u7801\u81F3\u5C116\u4F4D")
     })
   ).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
     const hashedPassword = await hashPassword(input.newPassword);
-    await drizzle2.update(users).set({ password: hashedPassword }).where(eq8(users.id, input.id));
+    await drizzle2.update(users).set({ password: hashedPassword }).where(eq9(users.id, input.id));
     return {
       success: true,
       message: "\u5BC6\u7801\u91CD\u7F6E\u6210\u529F"
@@ -10739,24 +11003,24 @@ var userManagementRouter = router({
   }),
   // 启用/禁用用户账号
   toggleActive: adminProcedure3.input(
-    z12.object({
-      id: z12.number(),
-      isActive: z12.boolean()
+    z13.object({
+      id: z13.number(),
+      isActive: z13.boolean()
     })
   ).mutation(async ({ input, ctx }) => {
     try {
       console.log("[UserManagement] \u5207\u6362\u72B6\u6001\u8BF7\u6C42: userId=", input.id, "isActive=", input.isActive, "operator=", ctx.user.name);
       const drizzle2 = await getDb();
       if (!drizzle2) {
-        throw new TRPCError9({
+        throw new TRPCError10({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
         });
       }
-      await drizzle2.update(users).set({ isActive: input.isActive }).where(eq8(users.id, input.id));
-      const [partnerRecord] = await drizzle2.select().from(partners).where(eq8(partners.userId, input.id)).limit(1);
+      await drizzle2.update(users).set({ isActive: input.isActive }).where(eq9(users.id, input.id));
+      const [partnerRecord] = await drizzle2.select().from(partners).where(eq9(partners.userId, input.id)).limit(1);
       if (partnerRecord) {
-        await drizzle2.update(partners).set({ isActive: input.isActive }).where(eq8(partners.userId, input.id));
+        await drizzle2.update(partners).set({ isActive: input.isActive }).where(eq9(partners.userId, input.id));
       }
       console.log("[UserManagement] \u5207\u6362\u72B6\u6001\u6210\u529F: userId=", input.id);
       return {
@@ -10765,42 +11029,42 @@ var userManagementRouter = router({
       };
     } catch (error) {
       console.error("[UserManagement] \u5207\u6362\u72B6\u6001\u5931\u8D25: userId=", input.id, "error=", error);
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: error instanceof Error ? error.message : "\u5207\u6362\u7528\u6237\u72B6\u6001\u5931\u8D25"
       });
     }
   }),
   // 重置密码获取用户的角色-城市关联
-  getRoleCities: adminProcedure3.input(z12.object({ userId: z12.number() })).query(async ({ input }) => {
+  getRoleCities: adminProcedure3.input(z13.object({ userId: z13.number() })).query(async ({ input }) => {
     const roleCities = await getUserRoleCities(input.userId);
     return roleCities;
   }),
   // 删除用户
-  delete: adminProcedure3.input(z12.object({ id: z12.number() })).mutation(async ({ input, ctx }) => {
+  delete: adminProcedure3.input(z13.object({ id: z13.number() })).mutation(async ({ input, ctx }) => {
     try {
       console.log("[UserManagement] \u5220\u9664\u8BF7\u6C42: userId=", input.id, "operator=", ctx.user.name);
       const drizzle2 = await getDb();
       if (!drizzle2) {
-        throw new TRPCError9({
+        throw new TRPCError10({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
         });
       }
-      const [existingUser] = await drizzle2.select().from(users).where(eq8(users.id, input.id)).limit(1);
+      const [existingUser] = await drizzle2.select().from(users).where(eq9(users.id, input.id)).limit(1);
       if (!existingUser) {
-        throw new TRPCError9({
+        throw new TRPCError10({
           code: "NOT_FOUND",
           message: "\u7528\u6237\u4E0D\u5B58\u5728"
         });
       }
       const { partners: partners2, partnerCities: partnerCities3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
-      const [partnerRecord] = await drizzle2.select().from(partners2).where(eq8(partners2.userId, input.id)).limit(1);
+      const [partnerRecord] = await drizzle2.select().from(partners2).where(eq9(partners2.userId, input.id)).limit(1);
       if (partnerRecord) {
-        await drizzle2.delete(partnerCities3).where(eq8(partnerCities3.partnerId, partnerRecord.id));
-        await drizzle2.delete(partners2).where(eq8(partners2.userId, input.id));
+        await drizzle2.delete(partnerCities3).where(eq9(partnerCities3.partnerId, partnerRecord.id));
+        await drizzle2.delete(partners2).where(eq9(partners2.userId, input.id));
       }
-      await drizzle2.delete(users).where(eq8(users.id, input.id));
+      await drizzle2.delete(users).where(eq9(users.id, input.id));
       console.log("[UserManagement] \u5220\u9664\u6210\u529F: userId=", input.id);
       return {
         success: true,
@@ -10808,23 +11072,23 @@ var userManagementRouter = router({
       };
     } catch (error) {
       console.error("[UserManagement] \u5220\u9664\u5931\u8D25: userId=", input.id, "error=", error);
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: error instanceof Error ? error.message : "\u5220\u9664\u7528\u6237\u5931\u8D25"
       });
     }
   }),
   // 批量更新老师属性和备注
-  batchUpdateTeacherAttributes: adminProcedure3.input(z12.object({
-    updates: z12.array(z12.object({
-      userId: z12.number(),
-      teacherAttribute: z12.enum(["S", "M", "Switch"]).optional(),
-      teacherNotes: z12.string().optional()
+  batchUpdateTeacherAttributes: adminProcedure3.input(z13.object({
+    updates: z13.array(z13.object({
+      userId: z13.number(),
+      teacherAttribute: z13.enum(["S", "M", "Switch"]).optional(),
+      teacherNotes: z13.string().optional()
     }))
   })).mutation(async ({ input }) => {
     const drizzle2 = await getDb();
     if (!drizzle2) {
-      throw new TRPCError9({
+      throw new TRPCError10({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
@@ -10836,7 +11100,7 @@ var userManagementRouter = router({
     };
     for (const update of input.updates) {
       try {
-        const [existingUser] = await drizzle2.select().from(users).where(eq8(users.id, update.userId)).limit(1);
+        const [existingUser] = await drizzle2.select().from(users).where(eq9(users.id, update.userId)).limit(1);
         if (!existingUser) {
           results.failed++;
           results.errors.push({
@@ -10853,7 +11117,7 @@ var userManagementRouter = router({
           updateData.teacherNotes = update.teacherNotes;
         }
         if (Object.keys(updateData).length > 0) {
-          await drizzle2.update(users).set(updateData).where(eq8(users.id, update.userId));
+          await drizzle2.update(users).set(updateData).where(eq9(users.id, update.userId));
           results.success++;
           console.log(`[\u6279\u91CF\u66F4\u65B0] \u6210\u529F\u66F4\u65B0\u7528\u6237 ${update.userId}`);
         } else {
@@ -10880,13 +11144,13 @@ var userManagementRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z13 } from "zod";
-import { isNotNull as isNotNull3, or as or2, eq as eq10 } from "drizzle-orm";
+import { z as z14 } from "zod";
+import { isNotNull as isNotNull3, or as or3, eq as eq11 } from "drizzle-orm";
 
 // server/normalizeOrderData.ts
 init_db();
 init_schema();
-import { like as like2, and as and6, isNotNull as isNotNull2, ne as ne3, eq as eq9 } from "drizzle-orm";
+import { like as like2, and as and7, isNotNull as isNotNull2, ne as ne3, eq as eq10 } from "drizzle-orm";
 function calculateSimilarity(str1, str2) {
   if (!str1 || !str2) return 0;
   const s1 = str1.toLowerCase().trim();
@@ -10933,7 +11197,7 @@ async function matchTeacherNickname(teacherName) {
     nickname: users.nickname,
     aliases: users.aliases
   }).from(users).where(
-    and6(
+    and7(
       like2(users.roles, "%teacher%"),
       isNotNull2(users.nickname),
       ne3(users.nickname, "")
@@ -11026,7 +11290,7 @@ async function matchCourseName(courseName) {
     id: courses.id,
     courseName: courses.name,
     duration: courses.duration
-  }).from(courses).where(eq9(courses.isActive, true));
+  }).from(courses).where(eq10(courses.isActive, true));
   let bestMatch = null;
   for (const course of allCourses) {
     if (course.courseName?.toLowerCase().trim() === courseName.toLowerCase().trim()) {
@@ -11148,7 +11412,7 @@ async function matchClassroom(roomName, cityName) {
       id: classrooms.id,
       classroomName: classrooms.name,
       cityName: classrooms.cityName
-    }).from(classrooms).where(and6(eq9(classrooms.isActive, true), eq9(classrooms.cityName, cityName)));
+    }).from(classrooms).where(and7(eq10(classrooms.isActive, true), eq10(classrooms.cityName, cityName)));
     for (const classroom of cityClassrooms) {
       if (classroom.classroomName?.toLowerCase().trim() === roomName.toLowerCase().trim()) {
         return {
@@ -11166,7 +11430,7 @@ async function matchClassroom(roomName, cityName) {
     id: classrooms.id,
     classroomName: classrooms.name,
     cityName: classrooms.cityName
-  }).from(classrooms).where(eq9(classrooms.isActive, true));
+  }).from(classrooms).where(eq10(classrooms.isActive, true));
   let bestMatch = null;
   for (const classroom of allClassrooms) {
     if (classroom.classroomName?.toLowerCase().trim() === roomName.toLowerCase().trim()) {
@@ -11229,8 +11493,8 @@ var normalizeOrderRouter = router({
   /**
    * 生成数据规范化预览报告
    */
-  previewNormalization: protectedProcedure.input(z13.object({
-    limit: z13.number().optional().default(100)
+  previewNormalization: protectedProcedure.input(z14.object({
+    limit: z14.number().optional().default(100)
     // 限制预览数量
   })).query(async ({ input }) => {
     const db = await getDb();
@@ -11245,7 +11509,7 @@ var normalizeOrderRouter = router({
       deliveryCity: orders.deliveryCity,
       deliveryClassroomId: orders.deliveryClassroomId
     }).from(orders).where(
-      or2(
+      or3(
         isNotNull3(orders.deliveryTeacher),
         isNotNull3(orders.deliveryCourse),
         isNotNull3(orders.classTime),
@@ -11360,13 +11624,13 @@ var normalizeOrderRouter = router({
   /**
    * 执行数据规范化（批量更新）
    */
-  executeNormalization: protectedProcedure.input(z13.object({
-    orderIds: z13.array(z13.number()),
+  executeNormalization: protectedProcedure.input(z14.object({
+    orderIds: z14.array(z14.number()),
     // 要更新的订单ID列表
-    changes: z13.array(z13.object({
-      orderId: z13.number(),
-      field: z13.enum(["deliveryTeacher", "deliveryCourse", "classTime", "deliveryRoom", "deliveryClassroomId"]),
-      value: z13.string().or(z13.number()).nullable()
+    changes: z14.array(z14.object({
+      orderId: z14.number(),
+      field: z14.enum(["deliveryTeacher", "deliveryCourse", "classTime", "deliveryRoom", "deliveryClassroomId"]),
+      value: z14.string().or(z14.number()).nullable()
     }))
   })).mutation(async ({ input }) => {
     const db = await getDb();
@@ -11389,7 +11653,7 @@ var normalizeOrderRouter = router({
         for (const change of orderChanges) {
           updateData[change.field] = change.value;
         }
-        await db.update(orders).set(updateData).where(eq10(orders.id, orderId));
+        await db.update(orders).set(updateData).where(eq11(orders.id, orderId));
         successCount++;
       } catch (error) {
         failureCount++;
@@ -11407,7 +11671,7 @@ var normalizeOrderRouter = router({
 
 // server/uploadRouter.ts
 init_trpc();
-import { z as z14 } from "zod";
+import { z as z15 } from "zod";
 
 // server/storage.ts
 import OSS from "ali-oss";
@@ -11450,22 +11714,22 @@ async function storagePut(relKey, data, contentType = "application/octet-stream"
 }
 
 // server/uploadRouter.ts
-import { TRPCError as TRPCError10 } from "@trpc/server";
+import { TRPCError as TRPCError11 } from "@trpc/server";
 var uploadRouter = router({
   /**
    * 上传头像
    * 接收base64编码的图片数据,上传到S3并返回URL
    */
-  uploadAvatar: protectedProcedure.input(z14.object({
-    base64Data: z14.string(),
+  uploadAvatar: protectedProcedure.input(z15.object({
+    base64Data: z15.string(),
     // base64编码的图片数据(包含data:image/...前缀)
-    fileName: z14.string().optional()
+    fileName: z15.string().optional()
     // 原始文件名
   })).mutation(async ({ input }) => {
     try {
       const matches = input.base64Data.match(/^data:image\/(\w+);base64,(.+)$/);
       if (!matches) {
-        throw new TRPCError10({
+        throw new TRPCError11({
           code: "BAD_REQUEST",
           message: "\u65E0\u6548\u7684\u56FE\u7247\u6570\u636E\u683C\u5F0F"
         });
@@ -11485,7 +11749,7 @@ var uploadRouter = router({
       };
     } catch (error) {
       console.error("\u5934\u50CF\u4E0A\u4F20\u5931\u8D25:", error);
-      throw new TRPCError10({
+      throw new TRPCError11({
         code: "INTERNAL_SERVER_ERROR",
         message: error instanceof Error ? error.message : "\u5934\u50CF\u4E0A\u4F20\u5931\u8D25"
       });
@@ -11495,12 +11759,12 @@ var uploadRouter = router({
    * 上传文件(通用)
    * 接收base64编码的文件数据,上传到S3并返回URL
    */
-  uploadFile: protectedProcedure.input(z14.object({
-    base64Data: z14.string(),
+  uploadFile: protectedProcedure.input(z15.object({
+    base64Data: z15.string(),
     // base64编码的文件数据
-    fileName: z14.string(),
+    fileName: z15.string(),
     // 原始文件名
-    fileType: z14.string()
+    fileType: z15.string()
     // MIME类型
   })).mutation(async ({ input }) => {
     try {
@@ -11518,7 +11782,7 @@ var uploadRouter = router({
       };
     } catch (error) {
       console.error("\u6587\u4EF6\u4E0A\u4F20\u5931\u8D25:", error);
-      throw new TRPCError10({
+      throw new TRPCError11({
         code: "INTERNAL_SERVER_ERROR",
         message: error instanceof Error ? error.message : "\u6587\u4EF6\u4E0A\u4F20\u5931\u8D25"
       });
@@ -11528,16 +11792,16 @@ var uploadRouter = router({
    * 上传身份证照片并识别
    * 接收base64编码的图片数据,上传到S3并调用OCR识别姓名和身份证号
    */
-  uploadAndRecognizeIDCard: protectedProcedure.input(z14.object({
-    base64Data: z14.string(),
+  uploadAndRecognizeIDCard: protectedProcedure.input(z15.object({
+    base64Data: z15.string(),
     // base64编码的图片数据(包含data:image/...前缀)
-    side: z14.enum(["front", "back"])
+    side: z15.enum(["front", "back"])
     // 正面或反面
   })).mutation(async ({ input }) => {
     try {
       const matches = input.base64Data.match(/^data:image\/(\w+);base64,(.+)$/);
       if (!matches) {
-        throw new TRPCError10({
+        throw new TRPCError11({
           code: "BAD_REQUEST",
           message: "\u65E0\u6548\u7684\u56FE\u7247\u6570\u636E\u683C\u5F0F"
         });
@@ -11560,7 +11824,7 @@ var uploadRouter = router({
       };
     } catch (error) {
       console.error("\u8EAB\u4EFD\u8BC1\u4E0A\u4F20\u5931\u8D25:", error);
-      throw new TRPCError10({
+      throw new TRPCError11({
         code: "INTERNAL_SERVER_ERROR",
         message: error instanceof Error ? error.message : "\u8EAB\u4EFD\u8BC1\u4E0A\u4F20\u5931\u8D25"
       });
@@ -11570,8 +11834,8 @@ var uploadRouter = router({
 
 // server/excelReportRouter.ts
 init_trpc();
-import { z as z15 } from "zod";
-import { TRPCError as TRPCError11 } from "@trpc/server";
+import { z as z16 } from "zod";
+import { TRPCError as TRPCError12 } from "@trpc/server";
 
 // server/excelReportGenerator.ts
 init_db();
@@ -12430,7 +12694,7 @@ function generateInsights(stats, orders2) {
 // server/excelReportRouter.ts
 var financeOrAdminProcedure2 = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "admin" && ctx.user.role !== "finance") {
-    throw new TRPCError11({ code: "FORBIDDEN", message: "\u9700\u8981\u8D22\u52A1\u6216\u7BA1\u7406\u5458\u6743\u9650" });
+    throw new TRPCError12({ code: "FORBIDDEN", message: "\u9700\u8981\u8D22\u52A1\u6216\u7BA1\u7406\u5458\u6743\u9650" });
   }
   return next({ ctx });
 });
@@ -12440,9 +12704,9 @@ var excelReportRouter = router({
    * 包含:概览、城市统计、销售业绩、老师结算、收支明细
    */
   exportFinancialReport: financeOrAdminProcedure2.input(
-    z15.object({
-      startDate: z15.string().optional(),
-      endDate: z15.string().optional()
+    z16.object({
+      startDate: z16.string().optional(),
+      endDate: z16.string().optional()
     })
   ).mutation(async ({ input }) => {
     try {
@@ -12457,7 +12721,7 @@ var excelReportRouter = router({
       };
     } catch (error) {
       console.error("\u5BFC\u51FA\u8D22\u52A1\u62A5\u8868\u5931\u8D25:", error);
-      throw new TRPCError11({
+      throw new TRPCError12({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u5BFC\u51FA\u8D22\u52A1\u62A5\u8868\u5931\u8D25"
       });
@@ -12468,9 +12732,9 @@ var excelReportRouter = router({
    * 包含:概览、城市统计、月度趋势
    */
   exportCityReport: financeOrAdminProcedure2.input(
-    z15.object({
-      startDate: z15.string().optional(),
-      endDate: z15.string().optional()
+    z16.object({
+      startDate: z16.string().optional(),
+      endDate: z16.string().optional()
     })
   ).mutation(async ({ input }) => {
     try {
@@ -12485,7 +12749,7 @@ var excelReportRouter = router({
       };
     } catch (error) {
       console.error("\u5BFC\u51FA\u57CE\u5E02\u62A5\u8868\u5931\u8D25:", error);
-      throw new TRPCError11({
+      throw new TRPCError12({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u5BFC\u51FA\u57CE\u5E02\u62A5\u8868\u5931\u8D25"
       });
@@ -12496,9 +12760,9 @@ var excelReportRouter = router({
    * 包含:概览、结算明细、课时明细
    */
   exportTeacherSettlementReport: financeOrAdminProcedure2.input(
-    z15.object({
-      startDate: z15.string().optional(),
-      endDate: z15.string().optional()
+    z16.object({
+      startDate: z16.string().optional(),
+      endDate: z16.string().optional()
     })
   ).mutation(async ({ input }) => {
     try {
@@ -12513,7 +12777,7 @@ var excelReportRouter = router({
       };
     } catch (error) {
       console.error("\u5BFC\u51FA\u8001\u5E08\u7ED3\u7B97\u62A5\u8868\u5931\u8D25:", error);
-      throw new TRPCError11({
+      throw new TRPCError12({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u5BFC\u51FA\u8001\u5E08\u7ED3\u7B97\u62A5\u8868\u5931\u8D25"
       });
@@ -12524,9 +12788,9 @@ var excelReportRouter = router({
    * 完整的订单数据导出,支持筛选
    */
   exportOrderData: protectedProcedure.input(
-    z15.object({
-      startDate: z15.string().optional(),
-      endDate: z15.string().optional()
+    z16.object({
+      startDate: z16.string().optional(),
+      endDate: z16.string().optional()
     })
   ).mutation(async ({ input }) => {
     try {
@@ -12541,7 +12805,7 @@ var excelReportRouter = router({
       };
     } catch (error) {
       console.error("\u5BFC\u51FA\u8BA2\u5355\u6570\u636E\u5931\u8D25:", error);
-      throw new TRPCError11({
+      throw new TRPCError12({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u5BFC\u51FA\u8BA2\u5355\u6570\u636E\u5931\u8D25"
       });
@@ -12593,17 +12857,17 @@ var excelReportRouter = router({
 // server/notificationRouter.ts
 init_trpc();
 init_db();
-import { z as z16 } from "zod";
-import { TRPCError as TRPCError12 } from "@trpc/server";
+import { z as z17 } from "zod";
+import { TRPCError as TRPCError13 } from "@trpc/server";
 var notificationRouter = router({
   /** App用户提交留言/申请通知 */
-  submit: publicProcedure.input(z16.object({
-    userId: z16.number(),
-    userName: z16.string().optional(),
-    userPhone: z16.string().optional(),
-    type: z16.enum(["general", "complaint", "suggestion", "consultation", "application"]).optional().default("general"),
-    title: z16.string().max(200).optional(),
-    content: z16.string().min(1, "\u7559\u8A00\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A").max(5e3)
+  submit: publicProcedure.input(z17.object({
+    userId: z17.number(),
+    userName: z17.string().optional(),
+    userPhone: z17.string().optional(),
+    type: z17.enum(["general", "complaint", "suggestion", "consultation", "application"]).optional().default("general"),
+    title: z17.string().max(200).optional(),
+    content: z17.string().min(1, "\u7559\u8A00\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A").max(5e3)
   })).mutation(async ({ input }) => {
     try {
       const result = await createUserNotification({
@@ -12617,14 +12881,14 @@ var notificationRouter = router({
       return { success: true, id: result.id };
     } catch (error) {
       console.error("\u63D0\u4EA4\u7559\u8A00\u5931\u8D25:", error);
-      throw new TRPCError12({ code: "INTERNAL_SERVER_ERROR", message: "\u63D0\u4EA4\u7559\u8A00\u5931\u8D25" });
+      throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u63D0\u4EA4\u7559\u8A00\u5931\u8D25" });
     }
   }),
   /** App用户查询自己的留言列表 */
-  myList: publicProcedure.input(z16.object({
-    userId: z16.number(),
-    page: z16.number().min(1).optional().default(1),
-    pageSize: z16.number().min(1).max(50).optional().default(20)
+  myList: publicProcedure.input(z17.object({
+    userId: z17.number(),
+    page: z17.number().min(1).optional().default(1),
+    pageSize: z17.number().min(1).max(50).optional().default(20)
   })).query(async ({ input }) => {
     try {
       return await listMyNotifications(input.userId, {
@@ -12633,16 +12897,16 @@ var notificationRouter = router({
       });
     } catch (error) {
       console.error("\u67E5\u8BE2\u7559\u8A00\u5217\u8868\u5931\u8D25:", error);
-      throw new TRPCError12({ code: "INTERNAL_SERVER_ERROR", message: "\u67E5\u8BE2\u7559\u8A00\u5217\u8868\u5931\u8D25" });
+      throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u67E5\u8BE2\u7559\u8A00\u5217\u8868\u5931\u8D25" });
     }
   }),
   /** 管理员查询所有通知列表 */
-  list: protectedProcedure.input(z16.object({
-    status: z16.enum(["unread", "read", "replied", "archived"]).optional(),
-    type: z16.enum(["general", "complaint", "suggestion", "consultation", "application"]).optional(),
-    userId: z16.number().optional(),
-    page: z16.number().min(1).optional().default(1),
-    pageSize: z16.number().min(1).max(50).optional().default(20)
+  list: protectedProcedure.input(z17.object({
+    status: z17.enum(["unread", "read", "replied", "archived"]).optional(),
+    type: z17.enum(["general", "complaint", "suggestion", "consultation", "application"]).optional(),
+    userId: z17.number().optional(),
+    page: z17.number().min(1).optional().default(1),
+    pageSize: z17.number().min(1).max(50).optional().default(20)
   })).query(async ({ input }) => {
     try {
       return await listUserNotifications({
@@ -12654,35 +12918,35 @@ var notificationRouter = router({
       });
     } catch (error) {
       console.error("\u67E5\u8BE2\u901A\u77E5\u5217\u8868\u5931\u8D25:", error);
-      throw new TRPCError12({ code: "INTERNAL_SERVER_ERROR", message: "\u67E5\u8BE2\u901A\u77E5\u5217\u8868\u5931\u8D25" });
+      throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u67E5\u8BE2\u901A\u77E5\u5217\u8868\u5931\u8D25" });
     }
   }),
   /** 管理员获取单条通知详情 */
-  detail: protectedProcedure.input(z16.object({ id: z16.number() })).query(async ({ input }) => {
+  detail: protectedProcedure.input(z17.object({ id: z17.number() })).query(async ({ input }) => {
     const notification = await getUserNotificationById(input.id);
     if (!notification) {
-      throw new TRPCError12({ code: "NOT_FOUND", message: "\u901A\u77E5\u4E0D\u5B58\u5728" });
+      throw new TRPCError13({ code: "NOT_FOUND", message: "\u901A\u77E5\u4E0D\u5B58\u5728" });
     }
     return notification;
   }),
   /** 管理员标记通知为已读 */
-  markRead: protectedProcedure.input(z16.object({ id: z16.number() })).mutation(async ({ input }) => {
+  markRead: protectedProcedure.input(z17.object({ id: z17.number() })).mutation(async ({ input }) => {
     await markNotificationRead(input.id);
     return { success: true };
   }),
   /** 管理员批量标记通知为已读 */
-  batchMarkRead: protectedProcedure.input(z16.object({ ids: z16.array(z16.number()).min(1) })).mutation(async ({ input }) => {
+  batchMarkRead: protectedProcedure.input(z17.object({ ids: z17.array(z17.number()).min(1) })).mutation(async ({ input }) => {
     await batchMarkNotificationsRead(input.ids);
     return { success: true, count: input.ids.length };
   }),
   /** 管理员回复通知 */
-  reply: protectedProcedure.input(z16.object({
-    id: z16.number(),
-    adminReply: z16.string().min(1, "\u56DE\u590D\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A").max(5e3)
+  reply: protectedProcedure.input(z17.object({
+    id: z17.number(),
+    adminReply: z17.string().min(1, "\u56DE\u590D\u5185\u5BB9\u4E0D\u80FD\u4E3A\u7A7A").max(5e3)
   })).mutation(async ({ ctx, input }) => {
     const notification = await getUserNotificationById(input.id);
     if (!notification) {
-      throw new TRPCError12({ code: "NOT_FOUND", message: "\u901A\u77E5\u4E0D\u5B58\u5728" });
+      throw new TRPCError13({ code: "NOT_FOUND", message: "\u901A\u77E5\u4E0D\u5B58\u5728" });
     }
     await replyNotification(input.id, {
       adminReply: input.adminReply,
@@ -12691,12 +12955,12 @@ var notificationRouter = router({
     return { success: true };
   }),
   /** 管理员归档通知 */
-  archive: protectedProcedure.input(z16.object({ id: z16.number() })).mutation(async ({ input }) => {
+  archive: protectedProcedure.input(z17.object({ id: z17.number() })).mutation(async ({ input }) => {
     await archiveNotification(input.id);
     return { success: true };
   }),
   /** 管理员删除通知 */
-  delete: protectedProcedure.input(z16.object({ id: z16.number() })).mutation(async ({ input }) => {
+  delete: protectedProcedure.input(z17.object({ id: z17.number() })).mutation(async ({ input }) => {
     await deleteUserNotification(input.id);
     return { success: true };
   }),
@@ -12711,12 +12975,12 @@ var notificationRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z17 } from "zod";
-import { TRPCError as TRPCError13 } from "@trpc/server";
-import { eq as eq11, and as and7, sql as sql3, ne as ne5, or as or3 } from "drizzle-orm";
+import { z as z18 } from "zod";
+import { TRPCError as TRPCError14 } from "@trpc/server";
+import { eq as eq12, and as and8, sql as sql3, ne as ne5, or as or4 } from "drizzle-orm";
 var adminProcedure4 = protectedProcedure.use(({ ctx, next }) => {
   if (ctx.user.role !== "admin") {
-    throw new TRPCError13({ code: "FORBIDDEN", message: "\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650" });
+    throw new TRPCError14({ code: "FORBIDDEN", message: "\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650" });
   }
   return next({ ctx });
 });
@@ -12773,39 +13037,39 @@ var salesCityPerformanceRouter = router({
    * 获取销售x城市交叉统计数据
    * 核心修复：通过salesPerson文本匹配salespersons表，合并同一销售的数据
    */
-  getCrossStats: protectedProcedure.input(z17.object({
-    startDate: z17.string().optional(),
-    endDate: z17.string().optional(),
-    salespersonId: z17.number().optional(),
-    city: z17.string().optional()
+  getCrossStats: protectedProcedure.input(z18.object({
+    startDate: z18.string().optional(),
+    endDate: z18.string().optional(),
+    salespersonId: z18.number().optional(),
+    city: z18.string().optional()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
+    if (!db) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
     const allSalespersons = await db.select({
       id: salespersons.id,
       name: users.name,
       nickname: users.nickname,
       isActive: salespersons.isActive
-    }).from(salespersons).leftJoin(users, eq11(salespersons.userId, users.id));
+    }).from(salespersons).leftJoin(users, eq12(salespersons.userId, users.id));
     const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
     const conditions = [
       ne5(orders.status, "cancelled"),
-      eq11(orders.isVoided, false)
+      eq12(orders.isVoided, false)
     ];
     if (input.startDate) conditions.push(sql3`${orders.paymentDate} >= ${input.startDate}`);
     if (input.endDate) conditions.push(sql3`${orders.paymentDate} <= ${input.endDate}`);
-    if (input.city) conditions.push(eq11(orders.deliveryCity, input.city));
+    if (input.city) conditions.push(eq12(orders.deliveryCity, input.city));
     if (input.salespersonId) {
       const targetSp = allSalespersons.find((sp) => sp.id === input.salespersonId);
       if (targetSp) {
-        const spConditions = [eq11(orders.salespersonId, input.salespersonId)];
-        if (targetSp.name) spConditions.push(eq11(orders.salesPerson, targetSp.name));
+        const spConditions = [eq12(orders.salespersonId, input.salespersonId)];
+        if (targetSp.name) spConditions.push(eq12(orders.salesPerson, targetSp.name));
         if (targetSp.nickname && targetSp.nickname !== targetSp.name) {
-          spConditions.push(eq11(orders.salesPerson, targetSp.nickname));
+          spConditions.push(eq12(orders.salesPerson, targetSp.nickname));
         }
-        conditions.push(or3(...spConditions));
+        conditions.push(or4(...spConditions));
       } else {
-        conditions.push(eq11(orders.salespersonId, input.salespersonId));
+        conditions.push(eq12(orders.salespersonId, input.salespersonId));
       }
     }
     const rawStats = await db.select({
@@ -12815,14 +13079,14 @@ var salesCityPerformanceRouter = router({
       orderCount: sql3`COUNT(*)`.as("orderCount"),
       totalAmount: sql3`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalAmount"),
       totalCourseAmount: sql3`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalCourseAmount")
-    }).from(orders).where(and7(...conditions)).groupBy(orders.salespersonId, orders.salesPerson, orders.deliveryCity);
+    }).from(orders).where(and8(...conditions)).groupBy(orders.salespersonId, orders.salesPerson, orders.deliveryCity);
     const mergedStats = mergeStatsBySalesperson(rawStats, salesPersonMapping);
     const commissionConfigs = await db.select().from(salesCommissionConfigs);
     const commissionMap = /* @__PURE__ */ new Map();
     for (const config of commissionConfigs) {
       commissionMap.set(`${config.salespersonId}_${config.city}`, Number(config.commissionRate));
     }
-    const allCities = await db.select({ name: cities.name }).from(cities).where(eq11(cities.isActive, true));
+    const allCities = await db.select({ name: cities.name }).from(cities).where(eq12(cities.isActive, true));
     const orderCitiesSet = new Set(mergedStats.map((s) => s.city).filter(Boolean));
     const cityCityNames = allCities.map((c) => c.name);
     const allCityNamesSet = /* @__PURE__ */ new Set([...cityCityNames, ...Array.from(orderCitiesSet)]);
@@ -12857,36 +13121,36 @@ var salesCityPerformanceRouter = router({
   /**
    * 获取环比/同比对比数据
    */
-  getComparison: protectedProcedure.input(z17.object({
-    currentStartDate: z17.string(),
-    currentEndDate: z17.string(),
-    previousStartDate: z17.string(),
-    previousEndDate: z17.string(),
-    salespersonId: z17.number().optional(),
-    city: z17.string().optional()
+  getComparison: protectedProcedure.input(z18.object({
+    currentStartDate: z18.string(),
+    currentEndDate: z18.string(),
+    previousStartDate: z18.string(),
+    previousEndDate: z18.string(),
+    salespersonId: z18.number().optional(),
+    city: z18.string().optional()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
+    if (!db) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
     const allSalespersons = await db.select({
       id: salespersons.id,
       name: users.name,
       nickname: users.nickname
-    }).from(salespersons).leftJoin(users, eq11(salespersons.userId, users.id));
+    }).from(salespersons).leftJoin(users, eq12(salespersons.userId, users.id));
     const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
     const baseConditions = [
       ne5(orders.status, "cancelled"),
-      eq11(orders.isVoided, false)
+      eq12(orders.isVoided, false)
     ];
-    if (input.city) baseConditions.push(eq11(orders.deliveryCity, input.city));
+    if (input.city) baseConditions.push(eq12(orders.deliveryCity, input.city));
     if (input.salespersonId) {
       const targetSp = allSalespersons.find((sp) => sp.id === input.salespersonId);
       if (targetSp) {
-        const spConditions = [eq11(orders.salespersonId, input.salespersonId)];
-        if (targetSp.name) spConditions.push(eq11(orders.salesPerson, targetSp.name));
+        const spConditions = [eq12(orders.salespersonId, input.salespersonId)];
+        if (targetSp.name) spConditions.push(eq12(orders.salesPerson, targetSp.name));
         if (targetSp.nickname && targetSp.nickname !== targetSp.name) {
-          spConditions.push(eq11(orders.salesPerson, targetSp.nickname));
+          spConditions.push(eq12(orders.salesPerson, targetSp.nickname));
         }
-        baseConditions.push(or3(...spConditions));
+        baseConditions.push(or4(...spConditions));
       }
     }
     const fetchStats = async (startDate, endDate) => {
@@ -12897,7 +13161,7 @@ var salesCityPerformanceRouter = router({
         orderCount: sql3`COUNT(*)`.as("orderCount"),
         totalAmount: sql3`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalAmount"),
         totalCourseAmount: sql3`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalCourseAmount")
-      }).from(orders).where(and7(
+      }).from(orders).where(and8(
         ...baseConditions,
         sql3`${orders.paymentDate} >= ${startDate}`,
         sql3`${orders.paymentDate} <= ${endDate}`
@@ -12961,7 +13225,7 @@ var salesCityPerformanceRouter = router({
    */
   getCommissionConfigs: protectedProcedure.query(async () => {
     const db = await getDb();
-    if (!db) throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
+    if (!db) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
     const configs = await db.select().from(salesCommissionConfigs);
     return configs.map((c) => ({
       ...c,
@@ -12971,14 +13235,14 @@ var salesCityPerformanceRouter = router({
   /**
    * 设置单个提成配置
    */
-  setCommission: adminProcedure4.input(z17.object({
-    salespersonId: z17.number(),
-    city: z17.string().min(1),
-    commissionRate: z17.number().min(0).max(100),
-    notes: z17.string().optional()
+  setCommission: adminProcedure4.input(z18.object({
+    salespersonId: z18.number(),
+    city: z18.string().min(1),
+    commissionRate: z18.number().min(0).max(100),
+    notes: z18.string().optional()
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
+    if (!db) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
     await db.insert(salesCommissionConfigs).values({
       salespersonId: input.salespersonId,
       city: input.city,
@@ -12997,16 +13261,16 @@ var salesCityPerformanceRouter = router({
   /**
    * 批量设置提成配置
    */
-  batchSetCommission: adminProcedure4.input(z17.object({
-    configs: z17.array(z17.object({
-      salespersonId: z17.number(),
-      city: z17.string().min(1),
-      commissionRate: z17.number().min(0).max(100),
-      notes: z17.string().optional()
+  batchSetCommission: adminProcedure4.input(z18.object({
+    configs: z18.array(z18.object({
+      salespersonId: z18.number(),
+      city: z18.string().min(1),
+      commissionRate: z18.number().min(0).max(100),
+      notes: z18.string().optional()
     }))
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
+    if (!db) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
     let successCount = 0;
     let failCount = 0;
     for (const config of input.configs) {
@@ -13040,45 +13304,45 @@ var salesCityPerformanceRouter = router({
   /**
    * 删除提成配置
    */
-  deleteCommission: adminProcedure4.input(z17.object({ id: z17.number() })).mutation(async ({ input }) => {
+  deleteCommission: adminProcedure4.input(z18.object({ id: z18.number() })).mutation(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
-    await db.delete(salesCommissionConfigs).where(eq11(salesCommissionConfigs.id, input.id));
+    if (!db) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
+    await db.delete(salesCommissionConfigs).where(eq12(salesCommissionConfigs.id, input.id));
     return { success: true };
   }),
   /**
    * 导出Excel数据
    */
-  getExportData: protectedProcedure.input(z17.object({
-    startDate: z17.string().optional(),
-    endDate: z17.string().optional(),
-    salespersonId: z17.number().optional(),
-    city: z17.string().optional()
+  getExportData: protectedProcedure.input(z18.object({
+    startDate: z18.string().optional(),
+    endDate: z18.string().optional(),
+    salespersonId: z18.number().optional(),
+    city: z18.string().optional()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError13({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
+    if (!db) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u8FDE\u63A5" });
     const allSalespersons = await db.select({
       id: salespersons.id,
       name: users.name,
       nickname: users.nickname
-    }).from(salespersons).leftJoin(users, eq11(salespersons.userId, users.id));
+    }).from(salespersons).leftJoin(users, eq12(salespersons.userId, users.id));
     const salesPersonMapping = buildSalesPersonMapping(allSalespersons);
     const conditions = [
       ne5(orders.status, "cancelled"),
-      eq11(orders.isVoided, false)
+      eq12(orders.isVoided, false)
     ];
     if (input.startDate) conditions.push(sql3`${orders.paymentDate} >= ${input.startDate}`);
     if (input.endDate) conditions.push(sql3`${orders.paymentDate} <= ${input.endDate}`);
-    if (input.city) conditions.push(eq11(orders.deliveryCity, input.city));
+    if (input.city) conditions.push(eq12(orders.deliveryCity, input.city));
     if (input.salespersonId) {
       const targetSp = allSalespersons.find((sp) => sp.id === input.salespersonId);
       if (targetSp) {
-        const spConditions = [eq11(orders.salespersonId, input.salespersonId)];
-        if (targetSp.name) spConditions.push(eq11(orders.salesPerson, targetSp.name));
+        const spConditions = [eq12(orders.salespersonId, input.salespersonId)];
+        if (targetSp.name) spConditions.push(eq12(orders.salesPerson, targetSp.name));
         if (targetSp.nickname && targetSp.nickname !== targetSp.name) {
-          spConditions.push(eq11(orders.salesPerson, targetSp.nickname));
+          spConditions.push(eq12(orders.salesPerson, targetSp.nickname));
         }
-        conditions.push(or3(...spConditions));
+        conditions.push(or4(...spConditions));
       }
     }
     const rawStats = await db.select({
@@ -13088,7 +13352,7 @@ var salesCityPerformanceRouter = router({
       orderCount: sql3`COUNT(*)`.as("orderCount"),
       totalAmount: sql3`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalAmount"),
       totalCourseAmount: sql3`COALESCE(SUM(${orders.courseAmount}), 0)`.as("totalCourseAmount")
-    }).from(orders).where(and7(...conditions)).groupBy(orders.salespersonId, orders.salesPerson, orders.deliveryCity);
+    }).from(orders).where(and8(...conditions)).groupBy(orders.salespersonId, orders.salesPerson, orders.deliveryCity);
     const mergedStats = mergeStatsBySalesperson(rawStats, salesPersonMapping);
     const commissionConfigs = await db.select().from(salesCommissionConfigs);
     const commissionMap = /* @__PURE__ */ new Map();
@@ -13119,12 +13383,12 @@ init_trpc();
 init_schema();
 init_db();
 init_roles();
-import { z as z18 } from "zod";
-import { TRPCError as TRPCError14 } from "@trpc/server";
-import { eq as eq12, and as and8, gte as gte3, lte as lte3, desc as desc3, sql as sql4 } from "drizzle-orm";
+import { z as z19 } from "zod";
+import { TRPCError as TRPCError15 } from "@trpc/server";
+import { eq as eq13, and as and9, gte as gte4, lte as lte4, desc as desc3, sql as sql4 } from "drizzle-orm";
 var teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!ctx.user.roles?.includes(USER_ROLES.TEACHER)) {
-    throw new TRPCError14({
+    throw new TRPCError15({
       code: "FORBIDDEN",
       message: "\u9700\u8981\u8001\u5E08\u6743\u9650"
     });
@@ -13133,7 +13397,7 @@ var teacherProcedure = protectedProcedure.use(({ ctx, next }) => {
 });
 var financeProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!ctx.user.roles?.includes(USER_ROLES.FINANCE) && !ctx.user.roles?.includes(USER_ROLES.ADMIN)) {
-    throw new TRPCError14({
+    throw new TRPCError15({
       code: "FORBIDDEN",
       message: "\u9700\u8981\u8D22\u52A1\u6216\u7BA1\u7406\u5458\u6743\u9650"
     });
@@ -13145,28 +13409,28 @@ var teacherPaymentRouter = router({
    * 老师查询自己的收入记录
    */
   getMyPayments: teacherProcedure.input(
-    z18.object({
-      status: z18.enum(["pending", "approved", "paid"]).optional(),
-      startDate: z18.string().optional(),
-      endDate: z18.string().optional()
+    z19.object({
+      status: z19.enum(["pending", "approved", "paid"]).optional(),
+      startDate: z19.string().optional(),
+      endDate: z19.string().optional()
     })
   ).query(async ({ ctx, input }) => {
     const database = await getDb();
-    if (!database) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
-    const teacher = await database.select({ id: users.id }).from(users).where(eq12(users.id, ctx.user.id)).limit(1);
+    if (!database) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
+    const teacher = await database.select({ id: users.id }).from(users).where(eq13(users.id, ctx.user.id)).limit(1);
     if (!teacher.length) {
-      throw new TRPCError14({ code: "NOT_FOUND", message: "\u672A\u627E\u5230\u8001\u5E08\u4FE1\u606F" });
+      throw new TRPCError15({ code: "NOT_FOUND", message: "\u672A\u627E\u5230\u8001\u5E08\u4FE1\u606F" });
     }
     const teacherId = teacher[0].id;
-    const conditions = [eq12(teacherPayments.teacherId, teacherId)];
+    const conditions = [eq13(teacherPayments.teacherId, teacherId)];
     if (input.status) {
-      conditions.push(eq12(teacherPayments.status, input.status));
+      conditions.push(eq13(teacherPayments.status, input.status));
     }
     if (input.startDate) {
-      conditions.push(gte3(teacherPayments.createdAt, new Date(input.startDate)));
+      conditions.push(gte4(teacherPayments.createdAt, new Date(input.startDate)));
     }
     if (input.endDate) {
-      conditions.push(lte3(teacherPayments.createdAt, new Date(input.endDate)));
+      conditions.push(lte4(teacherPayments.createdAt, new Date(input.endDate)));
     }
     const payments = await database.select({
       id: teacherPayments.id,
@@ -13183,7 +13447,7 @@ var teacherPaymentRouter = router({
       customerName: orders.customerName,
       deliveryCourse: orders.deliveryCourse,
       classDate: orders.classDate
-    }).from(teacherPayments).leftJoin(orders, eq12(teacherPayments.orderId, orders.id)).where(and8(...conditions)).orderBy(desc3(teacherPayments.createdAt));
+    }).from(teacherPayments).leftJoin(orders, eq13(teacherPayments.orderId, orders.id)).where(and9(...conditions)).orderBy(desc3(teacherPayments.createdAt));
     return payments;
   }),
   /**
@@ -13191,13 +13455,13 @@ var teacherPaymentRouter = router({
    */
   getPaymentStats: teacherProcedure.query(async ({ ctx }) => {
     const database = await getDb();
-    if (!database) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
+    if (!database) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
     const teacherId = ctx.user.id;
     const stats = await database.select({
       status: teacherPayments.status,
       totalAmount: sql4`COALESCE(SUM(${teacherPayments.amount}), 0)`,
       count: sql4`COUNT(*)`
-    }).from(teacherPayments).where(eq12(teacherPayments.teacherId, teacherId)).groupBy(teacherPayments.status);
+    }).from(teacherPayments).where(eq13(teacherPayments.teacherId, teacherId)).groupBy(teacherPayments.status);
     const result = {
       pending: { amount: 0, count: 0 },
       approved: { amount: 0, count: 0 },
@@ -13217,50 +13481,50 @@ var teacherPaymentRouter = router({
    * 财务审批支付
    */
   approve: financeProcedure.input(
-    z18.object({
-      id: z18.number(),
-      approved: z18.boolean(),
+    z19.object({
+      id: z19.number(),
+      approved: z19.boolean(),
       // true=批准, false=拒绝
-      notes: z18.string().optional()
+      notes: z19.string().optional()
     })
   ).mutation(async ({ ctx, input }) => {
     const database = await getDb();
-    if (!database) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
-    const payment = await database.select().from(teacherPayments).where(eq12(teacherPayments.id, input.id)).limit(1);
+    if (!database) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
+    const payment = await database.select().from(teacherPayments).where(eq13(teacherPayments.id, input.id)).limit(1);
     if (!payment.length) {
-      throw new TRPCError14({ code: "NOT_FOUND", message: "\u652F\u4ED8\u8BB0\u5F55\u4E0D\u5B58\u5728" });
+      throw new TRPCError15({ code: "NOT_FOUND", message: "\u652F\u4ED8\u8BB0\u5F55\u4E0D\u5B58\u5728" });
     }
     if (payment[0].status !== "pending") {
-      throw new TRPCError14({ code: "BAD_REQUEST", message: "\u53EA\u80FD\u5BA1\u6279\u5F85\u5BA1\u6279\u72B6\u6001\u7684\u8BB0\u5F55" });
+      throw new TRPCError15({ code: "BAD_REQUEST", message: "\u53EA\u80FD\u5BA1\u6279\u5F85\u5BA1\u6279\u72B6\u6001\u7684\u8BB0\u5F55" });
     }
     await database.update(teacherPayments).set({
       status: input.approved ? "approved" : "pending",
       approvedBy: input.approved ? ctx.user.id : null,
       approvedAt: input.approved ? /* @__PURE__ */ new Date() : null,
       notes: input.notes || payment[0].notes
-    }).where(eq12(teacherPayments.id, input.id));
+    }).where(eq13(teacherPayments.id, input.id));
     return { success: true };
   }),
   /**
    * 财务标记为已支付
    */
   markAsPaid: financeProcedure.input(
-    z18.object({
-      id: z18.number(),
-      paymentMethod: z18.enum(["wechat", "alipay", "bank", "cash", "other"]),
-      transactionNo: z18.string().optional(),
-      paymentTime: z18.string().optional(),
-      notes: z18.string().optional()
+    z19.object({
+      id: z19.number(),
+      paymentMethod: z19.enum(["wechat", "alipay", "bank", "cash", "other"]),
+      transactionNo: z19.string().optional(),
+      paymentTime: z19.string().optional(),
+      notes: z19.string().optional()
     })
   ).mutation(async ({ ctx, input }) => {
     const database = await getDb();
-    if (!database) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
-    const payment = await database.select().from(teacherPayments).where(eq12(teacherPayments.id, input.id)).limit(1);
+    if (!database) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
+    const payment = await database.select().from(teacherPayments).where(eq13(teacherPayments.id, input.id)).limit(1);
     if (!payment.length) {
-      throw new TRPCError14({ code: "NOT_FOUND", message: "\u652F\u4ED8\u8BB0\u5F55\u4E0D\u5B58\u5728" });
+      throw new TRPCError15({ code: "NOT_FOUND", message: "\u652F\u4ED8\u8BB0\u5F55\u4E0D\u5B58\u5728" });
     }
     if (payment[0].status === "paid") {
-      throw new TRPCError14({ code: "BAD_REQUEST", message: "\u8BE5\u8BB0\u5F55\u5DF2\u652F\u4ED8" });
+      throw new TRPCError15({ code: "BAD_REQUEST", message: "\u8BE5\u8BB0\u5F55\u5DF2\u652F\u4ED8" });
     }
     await database.update(teacherPayments).set({
       status: "paid",
@@ -13268,20 +13532,20 @@ var teacherPaymentRouter = router({
       transactionNo: input.transactionNo,
       paymentTime: input.paymentTime ? new Date(input.paymentTime) : /* @__PURE__ */ new Date(),
       notes: input.notes || payment[0].notes
-    }).where(eq12(teacherPayments.id, input.id));
+    }).where(eq13(teacherPayments.id, input.id));
     return { success: true };
   }),
   /**
    * 按月统计报表
    */
   getMonthlyReport: financeProcedure.input(
-    z18.object({
-      year: z18.number(),
-      month: z18.number().min(1).max(12)
+    z19.object({
+      year: z19.number(),
+      month: z19.number().min(1).max(12)
     })
   ).query(async ({ input }) => {
     const database = await getDb();
-    if (!database) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
+    if (!database) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
     const startDate = new Date(input.year, input.month - 1, 1);
     const endDate = new Date(input.year, input.month, 0, 23, 59, 59);
     const teacherStats = await database.select({
@@ -13292,7 +13556,7 @@ var teacherPaymentRouter = router({
       approvedAmount: sql4`COALESCE(SUM(CASE WHEN ${teacherPayments.status} = 'approved' THEN ${teacherPayments.amount} ELSE 0 END), 0)`,
       pendingAmount: sql4`COALESCE(SUM(CASE WHEN ${teacherPayments.status} = 'pending' THEN ${teacherPayments.amount} ELSE 0 END), 0)`,
       count: sql4`COUNT(*)`
-    }).from(teacherPayments).leftJoin(users, eq12(teacherPayments.teacherId, users.id)).where(and8(gte3(teacherPayments.createdAt, startDate), lte3(teacherPayments.createdAt, endDate))).groupBy(teacherPayments.teacherId, users.name);
+    }).from(teacherPayments).leftJoin(users, eq13(teacherPayments.teacherId, users.id)).where(and9(gte4(teacherPayments.createdAt, startDate), lte4(teacherPayments.createdAt, endDate))).groupBy(teacherPayments.teacherId, users.name);
     const total = teacherStats.reduce(
       (acc, stat) => ({
         totalAmount: acc.totalAmount + parseFloat(stat.totalAmount.toString()),
@@ -13323,7 +13587,7 @@ var teacherPaymentRouter = router({
    */
   getPendingPayments: financeProcedure.query(async () => {
     const database = await getDb();
-    if (!database) throw new TRPCError14({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
+    if (!database) throw new TRPCError15({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u4E0D\u53EF\u7528" });
     const payments = await database.select({
       id: teacherPayments.id,
       teacherId: teacherPayments.teacherId,
@@ -13337,7 +13601,7 @@ var teacherPaymentRouter = router({
       customerName: orders.customerName,
       deliveryCourse: orders.deliveryCourse,
       classDate: orders.classDate
-    }).from(teacherPayments).leftJoin(users, eq12(teacherPayments.teacherId, users.id)).leftJoin(orders, eq12(teacherPayments.orderId, orders.id)).where(eq12(teacherPayments.status, "pending")).orderBy(desc3(teacherPayments.createdAt));
+    }).from(teacherPayments).leftJoin(users, eq13(teacherPayments.teacherId, users.id)).leftJoin(orders, eq13(teacherPayments.orderId, orders.id)).where(eq13(teacherPayments.status, "pending")).orderBy(desc3(teacherPayments.createdAt));
     return payments;
   })
 });
@@ -13346,14 +13610,14 @@ var teacherPaymentRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z20 } from "zod";
-import { eq as eq16, and as and12, desc as desc5, sql as sql8, inArray as inArray2, not as not2 } from "drizzle-orm";
-import { TRPCError as TRPCError16 } from "@trpc/server";
+import { z as z21 } from "zod";
+import { eq as eq17, and as and13, desc as desc5, sql as sql8, inArray as inArray2, not as not2 } from "drizzle-orm";
+import { TRPCError as TRPCError17 } from "@trpc/server";
 
 // server/profitCalculator.ts
 init_db();
 init_schema();
-import { eq as eq13, and as and9, sql as sql5 } from "drizzle-orm";
+import { eq as eq14, and as and10, sql as sql5 } from "drizzle-orm";
 function calculateMonthsSinceContract(contractSignDate) {
   const signDate = new Date(contractSignDate);
   const now = /* @__PURE__ */ new Date();
@@ -13376,15 +13640,15 @@ async function calculateFirst12MonthsRevenue(partnerId, cityId, contractSignDate
   const signDate = new Date(contractSignDate);
   const endDate = new Date(signDate);
   endDate.setMonth(endDate.getMonth() + 12);
-  const partnerCity = await db.select().from(partnerCities).where(and9(
-    eq13(partnerCities.partnerId, partnerId),
-    eq13(partnerCities.cityId, cityId),
-    eq13(partnerCities.contractStatus, "active")
+  const partnerCity = await db.select().from(partnerCities).where(and10(
+    eq14(partnerCities.partnerId, partnerId),
+    eq14(partnerCities.cityId, cityId),
+    eq14(partnerCities.contractStatus, "active")
   )).limit(1);
   if (partnerCity.length === 0) return 0;
   const result = await db.select({
     totalRevenue: sql5`COALESCE(SUM(${orders.courseAmount}), 0)`
-  }).from(orders).where(and9(
+  }).from(orders).where(and10(
     sql5`${orders.deliveryCity} = (SELECT name FROM cities WHERE id = ${cityId})`,
     sql5`${orders.classDate} >= ${signDate.toISOString().split("T")[0]}`,
     sql5`${orders.classDate} < ${endDate.toISOString().split("T")[0]}`
@@ -13427,10 +13691,10 @@ async function updateProfitStageAndRecoveryStatus(partnerId, cityId) {
   if (!db) {
     throw new Error("\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25");
   }
-  const partnerCity = await db.select().from(partnerCities).where(and9(
-    eq13(partnerCities.partnerId, partnerId),
-    eq13(partnerCities.cityId, cityId),
-    eq13(partnerCities.contractStatus, "active")
+  const partnerCity = await db.select().from(partnerCities).where(and10(
+    eq14(partnerCities.partnerId, partnerId),
+    eq14(partnerCities.cityId, cityId),
+    eq14(partnerCities.contractStatus, "active")
   )).limit(1);
   if (partnerCity.length === 0) {
     throw new Error("\u672A\u627E\u5230\u5408\u4F19\u4EBA-\u57CE\u5E02\u5173\u8054\u8BB0\u5F55");
@@ -13458,7 +13722,7 @@ async function updateProfitStageAndRecoveryStatus(partnerId, cityId) {
   await db.update(partnerCities).set({
     currentProfitStage,
     isInvestmentRecovered: isRecovered
-  }).where(eq13(partnerCities.id, data.id));
+  }).where(eq14(partnerCities.id, data.id));
   return {
     currentProfitStage,
     isInvestmentRecovered: isRecovered,
@@ -13475,27 +13739,27 @@ var partnerManagementRouter = router({
    * 合伙人端接口：强制使用JWT中的userId，忽略前端传入的partnerId
    */
   getCommissionStats: protectedProcedure.input(
-    z20.object({
-      partnerId: z20.number().optional(),
+    z21.object({
+      partnerId: z21.number().optional(),
       // 忽略此参数
-      cityName: z20.string().optional(),
+      cityName: z21.string().optional(),
       // 忽略此参数
-      startDate: z20.string().optional(),
-      endDate: z20.string().optional()
+      startDate: z21.string().optional(),
+      endDate: z21.string().optional()
     }).optional()
   ).query(async ({ ctx, input }) => {
     if (!ctx.user.roles.includes("cityPartner")) {
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "FORBIDDEN",
         message: "Only city partners can access this endpoint"
       });
     }
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const userId = ctx.user.id;
-    const partnerResult = await db.select().from(partners).where(eq16(partners.userId, userId)).limit(1);
+    const partnerResult = await db.select().from(partners).where(eq17(partners.userId, userId)).limit(1);
     if (partnerResult.length === 0) {
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "NOT_FOUND",
         message: "Partner not found for current user"
       });
@@ -13504,7 +13768,7 @@ var partnerManagementRouter = router({
     const partnerCitiesResult = await db.select({
       cityId: partnerCities.cityId,
       cityName: cities.name
-    }).from(partnerCities).leftJoin(cities, eq16(partnerCities.cityId, cities.id)).where(eq16(partnerCities.partnerId, partner.id));
+    }).from(partnerCities).leftJoin(cities, eq17(partnerCities.cityId, cities.id)).where(eq17(partnerCities.partnerId, partner.id));
     console.log("[partnerManagement.getCommissionStats] Partner ID:", partner.id);
     console.log("[partnerManagement.getCommissionStats] Cities:", partnerCitiesResult.map((c) => c.cityName));
     return {
@@ -13534,14 +13798,14 @@ var partnerManagementRouter = router({
   /**
    * 根据userId获取partnerId
    */
-  getPartnerIdByUserId: protectedProcedure.input(z20.object({
-    userId: z20.number()
+  getPartnerIdByUserId: protectedProcedure.input(z21.object({
+    userId: z21.number()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const result = await db.select({ id: partners.id }).from(partners).where(eq16(partners.userId, input.userId)).limit(1);
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const result = await db.select({ id: partners.id }).from(partners).where(eq17(partners.userId, input.userId)).limit(1);
     if (result.length === 0) {
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "NOT_FOUND",
         message: "\u672A\u627E\u5230\u5BF9\u5E94\u7684\u5408\u4F19\u4EBA\u8BB0\u5F55"
       });
@@ -13551,31 +13815,31 @@ var partnerManagementRouter = router({
   /**
    * 获取所有合伙人列表
    */
-  list: protectedProcedure.input(z20.object({
-    isActive: z20.boolean().optional()
+  list: protectedProcedure.input(z21.object({
+    isActive: z21.boolean().optional()
   }).optional()).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const conditions = [];
     if (input?.isActive !== void 0) {
-      conditions.push(eq16(partners.isActive, input.isActive));
+      conditions.push(eq17(partners.isActive, input.isActive));
     } else {
-      conditions.push(eq16(partners.isActive, true));
+      conditions.push(eq17(partners.isActive, true));
     }
-    const result = await db.select().from(partners).where(conditions.length > 0 ? and12(...conditions) : void 0).orderBy(desc5(partners.createdAt));
+    const result = await db.select().from(partners).where(conditions.length > 0 ? and13(...conditions) : void 0).orderBy(desc5(partners.createdAt));
     return result;
   }),
   /**
    * 获取单个合伙人详情
    */
-  getById: protectedProcedure.input(z20.object({
-    id: z20.number()
+  getById: protectedProcedure.input(z21.object({
+    id: z21.number()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const result = await db.select().from(partners).where(eq16(partners.id, input.id)).limit(1);
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const result = await db.select().from(partners).where(eq17(partners.id, input.id)).limit(1);
     if (result.length === 0) {
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "NOT_FOUND",
         message: "\u5408\u4F19\u4EBA\u4E0D\u5B58\u5728"
       });
@@ -13585,46 +13849,46 @@ var partnerManagementRouter = router({
   /**
    * 创建合伙人
    */
-  create: protectedProcedure.input(z20.object({
-    userId: z20.number().optional(),
+  create: protectedProcedure.input(z21.object({
+    userId: z21.number().optional(),
     // 可选，如果不提供则自动创建
-    name: z20.string(),
-    phone: z20.string().optional(),
-    idCardNumber: z20.string().optional(),
+    name: z21.string(),
+    phone: z21.string().optional(),
+    idCardNumber: z21.string().optional(),
     // 身份证号码
-    idCardFrontUrl: z20.string().optional(),
+    idCardFrontUrl: z21.string().optional(),
     // 身份证正面照片URL
-    idCardBackUrl: z20.string().optional(),
+    idCardBackUrl: z21.string().optional(),
     // 身份证反面照片URL
-    profitRatio: z20.string().optional().default("0.10"),
+    profitRatio: z21.string().optional().default("0.10"),
     // decimal类型需要字符串，默认10%
-    profitRule: z20.string().optional(),
-    brandFee: z20.string().optional(),
-    techServiceFee: z20.string().optional(),
-    deferredPaymentTotal: z20.string().optional(),
-    deferredPaymentRule: z20.string().optional(),
-    contractStartDate: z20.string().optional(),
-    contractEndDate: z20.string().optional(),
-    accountName: z20.string().optional(),
-    bankName: z20.string().optional(),
-    accountNumber: z20.string().optional(),
-    notes: z20.string().optional(),
-    cityIds: z20.array(z20.number()).optional()
+    profitRule: z21.string().optional(),
+    brandFee: z21.string().optional(),
+    techServiceFee: z21.string().optional(),
+    deferredPaymentTotal: z21.string().optional(),
+    deferredPaymentRule: z21.string().optional(),
+    contractStartDate: z21.string().optional(),
+    contractEndDate: z21.string().optional(),
+    accountName: z21.string().optional(),
+    bankName: z21.string().optional(),
+    accountNumber: z21.string().optional(),
+    notes: z21.string().optional(),
+    cityIds: z21.array(z21.number()).optional()
     // 关联的城市ID列表
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     let userId = input.userId;
     if (!userId) {
       if (!input.phone) {
-        throw new TRPCError16({
+        throw new TRPCError17({
           code: "BAD_REQUEST",
           message: "\u521B\u5EFA\u5408\u4F19\u4EBA\u65F6\u5FC5\u987B\u63D0\u4F9B\u624B\u673A\u53F7"
         });
       }
-      const existingUser = await db.select().from(users).where(eq16(users.phone, input.phone)).limit(1);
+      const existingUser = await db.select().from(users).where(eq17(users.phone, input.phone)).limit(1);
       if (existingUser.length > 0) {
-        throw new TRPCError16({
+        throw new TRPCError17({
           code: "BAD_REQUEST",
           message: "\u8BE5\u624B\u673A\u53F7\u5DF2\u88AB\u4F7F\u7528"
         });
@@ -13676,16 +13940,16 @@ var partnerManagementRouter = router({
       const cityNames = await db.select({ name: cities.name }).from(cities).where(inArray2(cities.id, input.cityIds));
       const cityNamesArray = cityNames.map((c) => c.name);
       const existingRoleCity = await db.select().from(userRoleCities).where(
-        and12(
-          eq16(userRoleCities.userId, userId),
-          eq16(userRoleCities.role, "cityPartner")
+        and13(
+          eq17(userRoleCities.userId, userId),
+          eq17(userRoleCities.role, "cityPartner")
         )
       ).limit(1);
       if (existingRoleCity.length > 0) {
         await db.update(userRoleCities).set({ cities: JSON.stringify(cityNamesArray) }).where(
-          and12(
-            eq16(userRoleCities.userId, userId),
-            eq16(userRoleCities.role, "cityPartner")
+          and13(
+            eq17(userRoleCities.userId, userId),
+            eq17(userRoleCities.role, "cityPartner")
           )
         );
       } else {
@@ -13706,73 +13970,73 @@ var partnerManagementRouter = router({
   /**
    * 更新合伙人信息
    */
-  update: protectedProcedure.input(z20.object({
-    id: z20.number(),
-    name: z20.string().optional(),
-    phone: z20.string().optional(),
-    idCardNumber: z20.string().optional(),
+  update: protectedProcedure.input(z21.object({
+    id: z21.number(),
+    name: z21.string().optional(),
+    phone: z21.string().optional(),
+    idCardNumber: z21.string().optional(),
     // 身份证号码
-    idCardFrontUrl: z20.string().optional(),
+    idCardFrontUrl: z21.string().optional(),
     // 身份证正面照片URL
-    idCardBackUrl: z20.string().optional(),
+    idCardBackUrl: z21.string().optional(),
     // 身份证反面照片URL
-    profitRatio: z20.string().optional(),
+    profitRatio: z21.string().optional(),
     // decimal类型需要字符串
-    profitRule: z20.string().optional(),
-    brandFee: z20.string().optional(),
-    techServiceFee: z20.string().optional(),
-    deferredPaymentTotal: z20.string().optional(),
-    deferredPaymentRule: z20.string().optional(),
-    contractStartDate: z20.string().optional(),
-    contractEndDate: z20.string().optional(),
-    contractHistory: z20.string().optional(),
-    accountName: z20.string().optional(),
-    bankName: z20.string().optional(),
-    accountNumber: z20.string().optional(),
-    profitPaymentDay: z20.number().optional(),
+    profitRule: z21.string().optional(),
+    brandFee: z21.string().optional(),
+    techServiceFee: z21.string().optional(),
+    deferredPaymentTotal: z21.string().optional(),
+    deferredPaymentRule: z21.string().optional(),
+    contractStartDate: z21.string().optional(),
+    contractEndDate: z21.string().optional(),
+    contractHistory: z21.string().optional(),
+    accountName: z21.string().optional(),
+    bankName: z21.string().optional(),
+    accountNumber: z21.string().optional(),
+    profitPaymentDay: z21.number().optional(),
     // 每月分红支付日(1-31)
-    isActive: z20.boolean().optional(),
-    notes: z20.string().optional()
+    isActive: z21.boolean().optional(),
+    notes: z21.string().optional()
   })).mutation(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const { id, contractStartDate, contractEndDate, phone, ...updateData } = input;
     if (phone !== void 0) {
-      const partner = await db.select().from(partners).where(eq16(partners.id, id)).limit(1);
+      const partner = await db.select().from(partners).where(eq17(partners.id, id)).limit(1);
       if (partner.length === 0) {
-        throw new TRPCError16({ code: "NOT_FOUND", message: "\u5408\u4F19\u4EBA\u4E0D\u5B58\u5728" });
+        throw new TRPCError17({ code: "NOT_FOUND", message: "\u5408\u4F19\u4EBA\u4E0D\u5B58\u5728" });
       }
       const userId = partner[0].userId;
       if (phone) {
-        const existingUser = await db.select().from(users).where(eq16(users.phone, phone)).limit(1);
+        const existingUser = await db.select().from(users).where(eq17(users.phone, phone)).limit(1);
         if (existingUser.length > 0 && existingUser[0].id !== userId) {
-          throw new TRPCError16({
+          throw new TRPCError17({
             code: "BAD_REQUEST",
             message: "\u8BE5\u624B\u673A\u53F7\u5DF2\u88AB\u5176\u4ED6\u7528\u6237\u4F7F\u7528"
           });
         }
       }
-      await db.update(users).set({ phone }).where(eq16(users.id, userId));
+      await db.update(users).set({ phone }).where(eq17(users.id, userId));
     }
     await db.update(partners).set({
       ...updateData,
       ...phone !== void 0 ? { phone } : {},
       ...contractStartDate ? { contractStartDate: new Date(contractStartDate) } : {},
       ...contractEndDate ? { contractEndDate: new Date(contractEndDate) } : {}
-    }).where(eq16(partners.id, id));
+    }).where(eq17(partners.id, id));
     return { success: true };
   }),
   /**
    * 获取合伙人的费用承担配置
    */
-  getExpenseCoverage: protectedProcedure.input(z20.object({
-    partnerId: z20.number()
+  getExpenseCoverage: protectedProcedure.input(z21.object({
+    partnerId: z21.number()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const result = await db.select({ expenseCoverage: partners.expenseCoverage }).from(partners).where(eq16(partners.id, input.partnerId)).limit(1);
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const result = await db.select({ expenseCoverage: partners.expenseCoverage }).from(partners).where(eq17(partners.id, input.partnerId)).limit(1);
     if (result.length === 0) {
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "NOT_FOUND",
         message: "\u5408\u4F19\u4EBA\u4E0D\u5B58\u5728"
       });
@@ -13795,54 +14059,54 @@ var partnerManagementRouter = router({
   /**
    * 更新合伙人的费用承担配置
    */
-  updateExpenseCoverage: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    expenseCoverage: z20.object({
-      rentFee: z20.boolean().optional(),
-      propertyFee: z20.boolean().optional(),
-      utilityFee: z20.boolean().optional(),
-      consumablesFee: z20.boolean().optional(),
-      cleaningFee: z20.boolean().optional(),
-      phoneFee: z20.boolean().optional(),
-      courierFee: z20.boolean().optional(),
-      promotionFee: z20.boolean().optional(),
-      teacherFee: z20.boolean().optional(),
-      transportFee: z20.boolean().optional(),
-      otherFee: z20.boolean().optional()
+  updateExpenseCoverage: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    expenseCoverage: z21.object({
+      rentFee: z21.boolean().optional(),
+      propertyFee: z21.boolean().optional(),
+      utilityFee: z21.boolean().optional(),
+      consumablesFee: z21.boolean().optional(),
+      cleaningFee: z21.boolean().optional(),
+      phoneFee: z21.boolean().optional(),
+      courierFee: z21.boolean().optional(),
+      promotionFee: z21.boolean().optional(),
+      teacherFee: z21.boolean().optional(),
+      transportFee: z21.boolean().optional(),
+      otherFee: z21.boolean().optional()
       // 注意: deferredPayment(合同后付款)永远100%由合伙人承担,不需要在此配置
     })
   })).mutation(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    await db.update(partners).set({ expenseCoverage: input.expenseCoverage }).where(eq16(partners.id, input.partnerId));
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    await db.update(partners).set({ expenseCoverage: input.expenseCoverage }).where(eq17(partners.id, input.partnerId));
     return { success: true };
   }),
   /**
    * 删除合伙人（软删除）
    */
-  delete: protectedProcedure.input(z20.object({
-    id: z20.number()
+  delete: protectedProcedure.input(z21.object({
+    id: z21.number()
   })).mutation(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    await db.delete(partnerCities).where(eq16(partnerCities.partnerId, input.id));
-    await db.update(partners).set({ isActive: false }).where(eq16(partners.id, input.id));
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    await db.delete(partnerCities).where(eq17(partnerCities.partnerId, input.id));
+    await db.update(partners).set({ isActive: false }).where(eq17(partners.id, input.id));
     return { success: true };
   }),
   /**
    * 获取合伙人的费用明细列表
    */
-  getExpenses: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number().optional(),
-    startMonth: z20.string().optional(),
-    endMonth: z20.string().optional()
+  getExpenses: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number().optional(),
+    startMonth: z21.string().optional(),
+    endMonth: z21.string().optional()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const conditions = [eq16(partnerExpenses.partnerId, input.partnerId)];
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const conditions = [eq17(partnerExpenses.partnerId, input.partnerId)];
     if (input.cityId) {
-      conditions.push(eq16(partnerExpenses.cityId, input.cityId));
+      conditions.push(eq17(partnerExpenses.cityId, input.cityId));
     }
     if (input.startMonth) {
       conditions.push(sql8`${partnerExpenses.month} >= ${input.startMonth}`);
@@ -13850,8 +14114,8 @@ var partnerManagementRouter = router({
     if (input.endMonth) {
       conditions.push(sql8`${partnerExpenses.month} <= ${input.endMonth}`);
     }
-    const expenses = await db.select().from(partnerExpenses).where(and12(...conditions)).orderBy(desc5(partnerExpenses.month));
-    const partnerResult = await db.select({ expenseCoverage: partners.expenseCoverage }).from(partners).where(eq16(partners.id, input.partnerId)).limit(1);
+    const expenses = await db.select().from(partnerExpenses).where(and13(...conditions)).orderBy(desc5(partnerExpenses.month));
+    const partnerResult = await db.select({ expenseCoverage: partners.expenseCoverage }).from(partners).where(eq17(partners.id, input.partnerId)).limit(1);
     const expenseCoverage = partnerResult[0]?.expenseCoverage || {};
     const result = expenses.map((expense) => {
       let partnerCoveredTotal = 0;
@@ -13879,35 +14143,35 @@ var partnerManagementRouter = router({
   /**
    * 创建或更新费用明细
    */
-  upsertExpense: protectedProcedure.input(z20.object({
-    id: z20.number().optional(),
-    partnerId: z20.number(),
-    cityId: z20.number(),
-    month: z20.string(),
-    rentFee: z20.string().optional(),
-    propertyFee: z20.string().optional(),
-    utilityFee: z20.string().optional(),
-    consumablesFee: z20.string().optional(),
-    teacherFee: z20.string().optional(),
-    transportFee: z20.string().optional(),
-    otherFee: z20.string().optional(),
-    totalFee: z20.string().optional(),
-    deferredPayment: z20.string().optional(),
-    deferredPaymentBalance: z20.string().optional(),
-    revenue: z20.string().optional(),
-    profit: z20.string().optional(),
-    profitAmount: z20.string().optional(),
-    notes: z20.string().optional()
+  upsertExpense: protectedProcedure.input(z21.object({
+    id: z21.number().optional(),
+    partnerId: z21.number(),
+    cityId: z21.number(),
+    month: z21.string(),
+    rentFee: z21.string().optional(),
+    propertyFee: z21.string().optional(),
+    utilityFee: z21.string().optional(),
+    consumablesFee: z21.string().optional(),
+    teacherFee: z21.string().optional(),
+    transportFee: z21.string().optional(),
+    otherFee: z21.string().optional(),
+    totalFee: z21.string().optional(),
+    deferredPayment: z21.string().optional(),
+    deferredPaymentBalance: z21.string().optional(),
+    revenue: z21.string().optional(),
+    profit: z21.string().optional(),
+    profitAmount: z21.string().optional(),
+    notes: z21.string().optional()
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const { id, ...data } = input;
     if (id) {
       const { month, ...updateData } = data;
       await db.update(partnerExpenses).set({
         ...updateData,
         ...month ? { month: new Date(month) } : {}
-      }).where(eq16(partnerExpenses.id, id));
+      }).where(eq17(partnerExpenses.id, id));
       return { id };
     } else {
       const { month, ...insertData } = data;
@@ -13922,17 +14186,17 @@ var partnerManagementRouter = router({
   /**
    * 获取合伙人的分红流水记录
    */
-  getProfitRecords: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    status: z20.enum(["pending", "completed", "failed"]).optional(),
-    startDate: z20.string().optional(),
-    endDate: z20.string().optional()
+  getProfitRecords: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    status: z21.enum(["pending", "completed", "failed"]).optional(),
+    startDate: z21.string().optional(),
+    endDate: z21.string().optional()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const conditions = [eq16(partnerProfitRecords.partnerId, input.partnerId)];
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const conditions = [eq17(partnerProfitRecords.partnerId, input.partnerId)];
     if (input.status) {
-      conditions.push(eq16(partnerProfitRecords.status, input.status));
+      conditions.push(eq17(partnerProfitRecords.status, input.status));
     }
     if (input.startDate) {
       conditions.push(sql8`${partnerProfitRecords.transferDate} >= ${input.startDate}`);
@@ -13940,21 +14204,21 @@ var partnerManagementRouter = router({
     if (input.endDate) {
       conditions.push(sql8`${partnerProfitRecords.transferDate} <= ${input.endDate}`);
     }
-    const result = await db.select().from(partnerProfitRecords).where(and12(...conditions)).orderBy(desc5(partnerProfitRecords.transferDate));
+    const result = await db.select().from(partnerProfitRecords).where(and13(...conditions)).orderBy(desc5(partnerProfitRecords.transferDate));
     return result;
   }),
   /**
    * 根据城市查询合伙人的分红记录（用于前端App）
    */
-  getProfitRecordsByCity: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number().optional(),
-    status: z20.enum(["pending", "completed", "failed"]).optional(),
-    startDate: z20.string().optional(),
-    endDate: z20.string().optional()
+  getProfitRecordsByCity: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number().optional(),
+    status: z21.enum(["pending", "completed", "failed"]).optional(),
+    startDate: z21.string().optional(),
+    endDate: z21.string().optional()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const query = db.select({
       id: partnerProfitRecords.id,
       partnerId: partnerProfitRecords.partnerId,
@@ -13970,13 +14234,13 @@ var partnerManagementRouter = router({
       updatedAt: partnerProfitRecords.updatedAt,
       cityId: partnerExpenses.cityId,
       cityName: cities.name
-    }).from(partnerProfitRecords).leftJoin(partnerExpenses, eq16(partnerProfitRecords.expenseId, partnerExpenses.id)).leftJoin(cities, eq16(partnerExpenses.cityId, cities.id));
-    const conditions = [eq16(partnerProfitRecords.partnerId, input.partnerId)];
+    }).from(partnerProfitRecords).leftJoin(partnerExpenses, eq17(partnerProfitRecords.expenseId, partnerExpenses.id)).leftJoin(cities, eq17(partnerExpenses.cityId, cities.id));
+    const conditions = [eq17(partnerProfitRecords.partnerId, input.partnerId)];
     if (input.cityId) {
-      conditions.push(eq16(partnerExpenses.cityId, input.cityId));
+      conditions.push(eq17(partnerExpenses.cityId, input.cityId));
     }
     if (input.status) {
-      conditions.push(eq16(partnerProfitRecords.status, input.status));
+      conditions.push(eq17(partnerProfitRecords.status, input.status));
     }
     if (input.startDate) {
       conditions.push(sql8`${partnerProfitRecords.transferDate} >= ${input.startDate}`);
@@ -13984,7 +14248,7 @@ var partnerManagementRouter = router({
     if (input.endDate) {
       conditions.push(sql8`${partnerProfitRecords.transferDate} <= ${input.endDate}`);
     }
-    const records = await query.where(and12(...conditions)).orderBy(desc5(partnerProfitRecords.transferDate));
+    const records = await query.where(and13(...conditions)).orderBy(desc5(partnerProfitRecords.transferDate));
     const totalAmount = records.reduce((sum, record) => {
       return sum + Number(record.amount || 0);
     }, 0);
@@ -13997,19 +14261,19 @@ var partnerManagementRouter = router({
   /**
    * 创建分红流水记录
    */
-  createProfitRecord: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    expenseId: z20.number().optional(),
-    amount: z20.string(),
+  createProfitRecord: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    expenseId: z21.number().optional(),
+    amount: z21.string(),
     // decimal类型需要字符串
-    transferDate: z20.string(),
-    transferMethod: z20.enum(["wechat", "alipay", "bank", "cash", "other"]),
-    transactionNo: z20.string().optional(),
-    status: z20.enum(["pending", "completed", "failed"]).optional(),
-    notes: z20.string().optional()
+    transferDate: z21.string(),
+    transferMethod: z21.enum(["wechat", "alipay", "bank", "cash", "other"]),
+    transactionNo: z21.string().optional(),
+    status: z21.enum(["pending", "completed", "failed"]).optional(),
+    notes: z21.string().optional()
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const result = await db.insert(partnerProfitRecords).values({
       partnerId: input.partnerId,
       expenseId: input.expenseId,
@@ -14026,26 +14290,26 @@ var partnerManagementRouter = router({
   /**
    * 更新分红流水记录状态
    */
-  updateProfitRecordStatus: protectedProcedure.input(z20.object({
-    id: z20.number(),
-    status: z20.enum(["pending", "completed", "failed"]),
-    notes: z20.string().optional()
+  updateProfitRecordStatus: protectedProcedure.input(z21.object({
+    id: z21.number(),
+    status: z21.enum(["pending", "completed", "failed"]),
+    notes: z21.string().optional()
   })).mutation(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const { id, ...updateData } = input;
-    await db.update(partnerProfitRecords).set(updateData).where(eq16(partnerProfitRecords.id, id));
+    await db.update(partnerProfitRecords).set(updateData).where(eq17(partnerProfitRecords.id, id));
     return { success: true };
   }),
   /**
    * 为合伙人分配城市
    */
-  assignCities: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityIds: z20.array(z20.number())
+  assignCities: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityIds: z21.array(z21.number())
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const existingCities = await db.select().from(partnerCities).where(inArray2(partnerCities.cityId, input.cityIds));
     const configMap = /* @__PURE__ */ new Map();
     existingCities.forEach((city) => {
@@ -14067,8 +14331,8 @@ var partnerManagementRouter = router({
     });
     await db.delete(partnerCities).where(inArray2(partnerCities.cityId, input.cityIds));
     await db.delete(partnerCities).where(
-      and12(
-        eq16(partnerCities.partnerId, input.partnerId),
+      and13(
+        eq17(partnerCities.partnerId, input.partnerId),
         not2(inArray2(partnerCities.cityId, input.cityIds.length > 0 ? input.cityIds : [0]))
       )
     );
@@ -14091,11 +14355,11 @@ var partnerManagementRouter = router({
   /**
    * 获取合伙人关联的城市列表
    */
-  getPartnerCities: protectedProcedure.input(z20.object({
-    partnerId: z20.number()
+  getPartnerCities: protectedProcedure.input(z21.object({
+    partnerId: z21.number()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const result = await db.select({
       id: partnerCities.id,
       partnerId: partnerCities.partnerId,
@@ -14104,25 +14368,25 @@ var partnerManagementRouter = router({
       contractEndDate: partnerCities.contractEndDate,
       contractStatus: partnerCities.contractStatus,
       createdAt: partnerCities.createdAt
-    }).from(partnerCities).leftJoin(cities, eq16(partnerCities.cityId, cities.id)).where(and12(
-      eq16(partnerCities.partnerId, input.partnerId),
-      eq16(partnerCities.contractStatus, "active")
+    }).from(partnerCities).leftJoin(cities, eq17(partnerCities.cityId, cities.id)).where(and13(
+      eq17(partnerCities.partnerId, input.partnerId),
+      eq17(partnerCities.contractStatus, "active")
     ));
     return result;
   }),
   /**
    * 获取合伙人的订单统计（按城市）
    */
-  getCityOrderStats: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    startDate: z20.string().optional(),
-    endDate: z20.string().optional()
+  getCityOrderStats: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    startDate: z21.string().optional(),
+    endDate: z21.string().optional()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const partnerCitiesList = await db.select({ cityId: partnerCities.cityId, cityName: cities.name }).from(partnerCities).leftJoin(cities, eq16(partnerCities.cityId, cities.id)).where(and12(
-      eq16(partnerCities.partnerId, input.partnerId),
-      eq16(partnerCities.contractStatus, "active")
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const partnerCitiesList = await db.select({ cityId: partnerCities.cityId, cityName: cities.name }).from(partnerCities).leftJoin(cities, eq17(partnerCities.cityId, cities.id)).where(and13(
+      eq17(partnerCities.partnerId, input.partnerId),
+      eq17(partnerCities.contractStatus, "active")
     ));
     if (partnerCitiesList.length === 0) {
       return [];
@@ -14142,7 +14406,7 @@ var partnerManagementRouter = router({
         totalTeacherFee: sql8`COALESCE(SUM(${orders.teacherFee}), 0)`,
         totalTransportFee: sql8`COALESCE(SUM(${orders.transportFee}), 0)`,
         totalPartnerFee: sql8`COALESCE(SUM(${orders.partnerFee}), 0)`
-      }).from(orders).where(and12(...conditions));
+      }).from(orders).where(and13(...conditions));
       if (result[0]) {
         stats.push({
           cityId: city.cityId,
@@ -14160,21 +14424,21 @@ var partnerManagementRouter = router({
   /**
    * 获取合伙人统计数据(用于列表展示)
    */
-  getPartnerStats: protectedProcedure.input(z20.object({
-    startDate: z20.string().optional(),
-    endDate: z20.string().optional()
+  getPartnerStats: protectedProcedure.input(z21.object({
+    startDate: z21.string().optional(),
+    endDate: z21.string().optional()
   }).optional()).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const allPartners = await db.select().from(partners).where(eq16(partners.isActive, true)).orderBy(desc5(partners.createdAt));
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const allPartners = await db.select().from(partners).where(eq17(partners.isActive, true)).orderBy(desc5(partners.createdAt));
     const stats = [];
     for (const partner of allPartners) {
       const partnerCitiesList = await db.select({
         cityId: partnerCities.cityId,
         cityName: cities.name
-      }).from(partnerCities).leftJoin(cities, eq16(partnerCities.cityId, cities.id)).where(and12(
-        eq16(partnerCities.partnerId, partner.id),
-        eq16(partnerCities.contractStatus, "active")
+      }).from(partnerCities).leftJoin(cities, eq17(partnerCities.cityId, cities.id)).where(and13(
+        eq17(partnerCities.partnerId, partner.id),
+        eq17(partnerCities.contractStatus, "active")
       ));
       let totalOrderCount = 0;
       let totalCourseAmount = 0;
@@ -14204,7 +14468,7 @@ var partnerManagementRouter = router({
           totalUtilityFee: sql8`COALESCE(SUM(${orders.utilityFee}), 0)`,
           totalConsumablesFee: sql8`COALESCE(SUM(${orders.consumablesFee}), 0)`,
           totalPartnerFee: sql8`COALESCE(SUM(${orders.partnerFee}), 0)`
-        }).from(orders).where(and12(...conditions));
+        }).from(orders).where(and13(...conditions));
         if (orderResult[0]) {
           totalOrderCount += Number(orderResult[0].orderCount);
           totalCourseAmount += Number(orderResult[0].totalAmount);
@@ -14216,7 +14480,7 @@ var partnerManagementRouter = router({
           totalConsumablesFee += Number(orderResult[0].totalConsumablesFee);
           totalPartnerFee += Number(orderResult[0].totalPartnerFee);
         }
-        const expenseConditions = [eq16(partnerExpenses.partnerId, partner.id), eq16(partnerExpenses.cityId, city.cityId)];
+        const expenseConditions = [eq17(partnerExpenses.partnerId, partner.id), eq17(partnerExpenses.cityId, city.cityId)];
         if (input?.startDate) {
           expenseConditions.push(sql8`${partnerExpenses.month} >= ${input.startDate}`);
         }
@@ -14225,7 +14489,7 @@ var partnerManagementRouter = router({
         }
         const expenseResult = await db.select({
           totalDeferredPayment: sql8`COALESCE(SUM(${partnerExpenses.deferredPayment}), 0)`
-        }).from(partnerExpenses).where(and12(...expenseConditions));
+        }).from(partnerExpenses).where(and13(...expenseConditions));
         if (expenseResult[0]) {
           totalDeferredPayment += Number(expenseResult[0].totalDeferredPayment);
         }
@@ -14234,8 +14498,8 @@ var partnerManagementRouter = router({
       const currentMonthProfit = await db.select({
         totalProfit: sql8`COALESCE(SUM(${partnerProfitRecords.amount}), 0)`
       }).from(partnerProfitRecords).where(
-        and12(
-          eq16(partnerProfitRecords.partnerId, partner.id),
+        and13(
+          eq17(partnerProfitRecords.partnerId, partner.id),
           sql8`DATE_FORMAT(${partnerProfitRecords.transferDate}, '%Y-%m') = ${currentMonth}`
         )
       );
@@ -14262,22 +14526,22 @@ var partnerManagementRouter = router({
   /**
    * 上传合同文件并智能识别（预览模式，不保存到数据库）
    */
-  uploadContract: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number(),
-    fileBase64: z20.string(),
+  uploadContract: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number(),
+    fileBase64: z21.string(),
     // Base64编码的PDF文件
-    fileName: z20.string()
+    fileName: z21.string()
   })).mutation(async ({ input, ctx }) => {
     try {
       const fileBuffer = Buffer.from(input.fileBase64, "base64");
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "NOT_IMPLEMENTED",
         message: "\u5408\u540C\u4E0A\u4F20\u529F\u80FD\u5DF2\u79FB\u9664\uFF0C\u7B49\u5F85\u91CD\u6784"
       });
     } catch (error) {
       console.error("\u5408\u540C\u4E0A\u4F20\u5931\u8D25:", error);
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "INTERNAL_SERVER_ERROR",
         message: `\u5408\u540C\u4E0A\u4F20\u5931\u8D25: ${error.message}`
       });
@@ -14286,45 +14550,45 @@ var partnerManagementRouter = router({
   /**
    * 保存用户确认后的合同信息
    */
-  saveContractInfo: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number(),
-    contractFileUrl: z20.string(),
-    contractInfo: z20.object({
-      contractStartDate: z20.string().optional(),
-      contractEndDate: z20.string().optional(),
-      contractSignDate: z20.string().optional(),
-      equityRatioPartner: z20.number().optional(),
-      equityRatioBrand: z20.number().optional(),
-      profitRatioStage1Partner: z20.number().optional(),
-      profitRatioStage1Brand: z20.number().optional(),
-      profitRatioStage2APartner: z20.number().optional(),
-      profitRatioStage2ABrand: z20.number().optional(),
-      profitRatioStage2BPartner: z20.number().optional(),
-      profitRatioStage2BBrand: z20.number().optional(),
-      profitRatioStage3Partner: z20.number().optional(),
-      profitRatioStage3Brand: z20.number().optional(),
-      brandUsageFee: z20.number().optional(),
-      brandAuthDeposit: z20.number().optional(),
-      managementFee: z20.number().optional(),
-      operationPositionFee: z20.number().optional(),
-      teacherRecruitmentFee: z20.number().optional(),
-      marketingFee: z20.number().optional(),
-      estimatedRentDeposit: z20.number().optional(),
-      estimatedPropertyFee: z20.number().optional(),
-      estimatedUtilityFee: z20.number().optional(),
-      estimatedRegistrationFee: z20.number().optional(),
-      estimatedRenovationFee: z20.number().optional(),
-      totalEstimatedCost: z20.number().optional(),
-      partnerBankName: z20.string().optional(),
-      partnerBankAccount: z20.string().optional(),
-      partnerAccountHolder: z20.string().optional(),
-      legalRepresentative: z20.string().nullable().optional(),
-      profitPaymentDay: z20.number().optional()
+  saveContractInfo: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number(),
+    contractFileUrl: z21.string(),
+    contractInfo: z21.object({
+      contractStartDate: z21.string().optional(),
+      contractEndDate: z21.string().optional(),
+      contractSignDate: z21.string().optional(),
+      equityRatioPartner: z21.number().optional(),
+      equityRatioBrand: z21.number().optional(),
+      profitRatioStage1Partner: z21.number().optional(),
+      profitRatioStage1Brand: z21.number().optional(),
+      profitRatioStage2APartner: z21.number().optional(),
+      profitRatioStage2ABrand: z21.number().optional(),
+      profitRatioStage2BPartner: z21.number().optional(),
+      profitRatioStage2BBrand: z21.number().optional(),
+      profitRatioStage3Partner: z21.number().optional(),
+      profitRatioStage3Brand: z21.number().optional(),
+      brandUsageFee: z21.number().optional(),
+      brandAuthDeposit: z21.number().optional(),
+      managementFee: z21.number().optional(),
+      operationPositionFee: z21.number().optional(),
+      teacherRecruitmentFee: z21.number().optional(),
+      marketingFee: z21.number().optional(),
+      estimatedRentDeposit: z21.number().optional(),
+      estimatedPropertyFee: z21.number().optional(),
+      estimatedUtilityFee: z21.number().optional(),
+      estimatedRegistrationFee: z21.number().optional(),
+      estimatedRenovationFee: z21.number().optional(),
+      totalEstimatedCost: z21.number().optional(),
+      partnerBankName: z21.string().optional(),
+      partnerBankAccount: z21.string().optional(),
+      partnerAccountHolder: z21.string().optional(),
+      legalRepresentative: z21.string().nullable().optional(),
+      profitPaymentDay: z21.number().optional()
     })
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     try {
       const convertedInfo = {};
       for (const [key, value] of Object.entries(input.contractInfo)) {
@@ -14337,9 +14601,9 @@ var partnerManagementRouter = router({
           convertedInfo[key] = value;
         }
       }
-      const existing = await db.select().from(partnerCities).where(and12(
-        eq16(partnerCities.partnerId, input.partnerId),
-        eq16(partnerCities.cityId, input.cityId)
+      const existing = await db.select().from(partnerCities).where(and13(
+        eq17(partnerCities.partnerId, input.partnerId),
+        eq17(partnerCities.cityId, input.cityId)
       )).limit(1);
       if (existing.length > 0) {
         await db.update(partnerCities).set({
@@ -14347,14 +14611,14 @@ var partnerManagementRouter = router({
           contractStatus: "active",
           ...convertedInfo,
           updatedBy: ctx.user.id
-        }).where(eq16(partnerCities.id, existing[0].id));
+        }).where(eq17(partnerCities.id, existing[0].id));
         if (input.contractInfo.partnerBankName || input.contractInfo.partnerBankAccount || input.contractInfo.partnerAccountHolder || input.contractInfo.profitPaymentDay) {
           await db.update(partners).set({
             accountName: input.contractInfo.partnerAccountHolder || void 0,
             bankName: input.contractInfo.partnerBankName || void 0,
             accountNumber: input.contractInfo.partnerBankAccount || void 0,
             profitPaymentDay: input.contractInfo.profitPaymentDay || void 0
-          }).where(eq16(partners.id, input.partnerId));
+          }).where(eq17(partners.id, input.partnerId));
         }
         return {
           success: true,
@@ -14375,7 +14639,7 @@ var partnerManagementRouter = router({
             bankName: input.contractInfo.partnerBankName || void 0,
             accountNumber: input.contractInfo.partnerBankAccount || void 0,
             profitPaymentDay: input.contractInfo.profitPaymentDay || void 0
-          }).where(eq16(partners.id, input.partnerId));
+          }).where(eq17(partners.id, input.partnerId));
         }
         return {
           success: true,
@@ -14384,7 +14648,7 @@ var partnerManagementRouter = router({
       }
     } catch (error) {
       console.error("\u4FDD\u5B58\u5408\u540C\u4FE1\u606F\u5931\u8D25:", error);
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "INTERNAL_SERVER_ERROR",
         message: `\u4FDD\u5B58\u5931\u8D25: ${error.message}`
       });
@@ -14393,15 +14657,15 @@ var partnerManagementRouter = router({
   /**
    * 获取合伙人-城市合同详情
    */
-  getContractInfo: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number()
+  getContractInfo: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const result = await db.select().from(partnerCities).where(and12(
-      eq16(partnerCities.partnerId, input.partnerId),
-      eq16(partnerCities.cityId, input.cityId)
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const result = await db.select().from(partnerCities).where(and13(
+      eq17(partnerCities.partnerId, input.partnerId),
+      eq17(partnerCities.cityId, input.cityId)
     )).limit(1);
     if (result.length === 0) {
       return null;
@@ -14411,43 +14675,43 @@ var partnerManagementRouter = router({
   /**
    * 更新合同信息
    */
-  updateContractInfo: protectedProcedure.input(z20.object({
-    partnerCityId: z20.number(),
-    contractStatus: z20.enum(["draft", "active", "expired", "terminated"]).optional(),
-    contractStartDate: z20.string().optional(),
-    contractEndDate: z20.string().optional(),
-    contractSignDate: z20.string().optional(),
-    equityRatioPartner: z20.number().optional(),
-    equityRatioBrand: z20.number().optional(),
-    profitRatioStage1Partner: z20.number().optional(),
-    profitRatioStage1Brand: z20.number().optional(),
-    profitRatioStage2APartner: z20.number().optional(),
-    profitRatioStage2ABrand: z20.number().optional(),
-    profitRatioStage2BPartner: z20.number().optional(),
-    profitRatioStage2BBrand: z20.number().optional(),
-    profitRatioStage3Partner: z20.number().optional(),
-    profitRatioStage3Brand: z20.number().optional(),
-    brandUsageFee: z20.number().optional(),
-    brandAuthDeposit: z20.number().optional(),
-    managementFee: z20.number().optional(),
-    operationPositionFee: z20.number().optional(),
-    teacherRecruitmentFee: z20.number().optional(),
-    marketingFee: z20.number().optional(),
-    totalEstimatedCost: z20.number().optional(),
-    partnerBankName: z20.string().optional(),
-    partnerBankAccount: z20.string().optional(),
-    partnerAccountHolder: z20.string().optional(),
-    partnerAlipayAccount: z20.string().optional(),
-    partnerWechatAccount: z20.string().optional(),
-    legalRepresentative: z20.string().optional(),
-    supervisor: z20.string().optional(),
-    financialOfficer: z20.string().optional(),
-    profitPaymentDay: z20.number().optional(),
-    profitPaymentRule: z20.string().optional(),
-    notes: z20.string().optional()
+  updateContractInfo: protectedProcedure.input(z21.object({
+    partnerCityId: z21.number(),
+    contractStatus: z21.enum(["draft", "active", "expired", "terminated"]).optional(),
+    contractStartDate: z21.string().optional(),
+    contractEndDate: z21.string().optional(),
+    contractSignDate: z21.string().optional(),
+    equityRatioPartner: z21.number().optional(),
+    equityRatioBrand: z21.number().optional(),
+    profitRatioStage1Partner: z21.number().optional(),
+    profitRatioStage1Brand: z21.number().optional(),
+    profitRatioStage2APartner: z21.number().optional(),
+    profitRatioStage2ABrand: z21.number().optional(),
+    profitRatioStage2BPartner: z21.number().optional(),
+    profitRatioStage2BBrand: z21.number().optional(),
+    profitRatioStage3Partner: z21.number().optional(),
+    profitRatioStage3Brand: z21.number().optional(),
+    brandUsageFee: z21.number().optional(),
+    brandAuthDeposit: z21.number().optional(),
+    managementFee: z21.number().optional(),
+    operationPositionFee: z21.number().optional(),
+    teacherRecruitmentFee: z21.number().optional(),
+    marketingFee: z21.number().optional(),
+    totalEstimatedCost: z21.number().optional(),
+    partnerBankName: z21.string().optional(),
+    partnerBankAccount: z21.string().optional(),
+    partnerAccountHolder: z21.string().optional(),
+    partnerAlipayAccount: z21.string().optional(),
+    partnerWechatAccount: z21.string().optional(),
+    legalRepresentative: z21.string().optional(),
+    supervisor: z21.string().optional(),
+    financialOfficer: z21.string().optional(),
+    profitPaymentDay: z21.number().optional(),
+    profitPaymentRule: z21.string().optional(),
+    notes: z21.string().optional()
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const {
       partnerCityId,
       contractStartDate,
@@ -14495,15 +14759,15 @@ var partnerManagementRouter = router({
       ...marketingFee !== void 0 ? { marketingFee: marketingFee.toString() } : {},
       ...totalEstimatedCost !== void 0 ? { totalEstimatedCost: totalEstimatedCost.toString() } : {},
       updatedBy: ctx.user.id
-    }).where(eq16(partnerCities.id, partnerCityId));
+    }).where(eq17(partnerCities.id, partnerCityId));
     return { success: true };
   }),
   /**
    * 计算并更新分红阶段和回本状态
    */
-  calculateProfitStage: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number()
+  calculateProfitStage: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number()
   })).mutation(async ({ input }) => {
     try {
       const result = await updateProfitStageAndRecoveryStatus(
@@ -14516,7 +14780,7 @@ var partnerManagementRouter = router({
       };
     } catch (error) {
       console.error("\u5206\u7EA2\u9636\u6BB5\u8BA1\u7B97\u5931\u8D25:", error);
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "INTERNAL_SERVER_ERROR",
         message: `\u5206\u7EA2\u9636\u6BB5\u8BA1\u7B97\u5931\u8D25: ${error.message}`
       });
@@ -14525,17 +14789,17 @@ var partnerManagementRouter = router({
   /**
    * 获取城市的费用承担配置
    */
-  getCityExpenseCoverage: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number()
+  getCityExpenseCoverage: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number()
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const result = await db.select({
       expenseCoverage: partnerCities.expenseCoverage
-    }).from(partnerCities).where(and12(
-      eq16(partnerCities.partnerId, input.partnerId),
-      eq16(partnerCities.cityId, input.cityId)
+    }).from(partnerCities).where(and13(
+      eq17(partnerCities.partnerId, input.partnerId),
+      eq17(partnerCities.cityId, input.cityId)
     )).limit(1);
     if (result.length === 0) {
       return {
@@ -14573,33 +14837,33 @@ var partnerManagementRouter = router({
   /**
    * 更新城市的费用承担配置
    */
-  updateCityExpenseCoverage: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number(),
-    expenseCoverage: z20.object({
-      rentFee: z20.boolean().optional(),
-      propertyFee: z20.boolean().optional(),
-      utilityFee: z20.boolean().optional(),
-      consumablesFee: z20.boolean().optional(),
-      cleaningFee: z20.boolean().optional(),
-      phoneFee: z20.boolean().optional(),
-      courierFee: z20.boolean().optional(),
-      promotionFee: z20.boolean().optional(),
-      teacherFee: z20.boolean().optional(),
-      transportFee: z20.boolean().optional(),
-      otherFee: z20.boolean().optional()
+  updateCityExpenseCoverage: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number(),
+    expenseCoverage: z21.object({
+      rentFee: z21.boolean().optional(),
+      propertyFee: z21.boolean().optional(),
+      utilityFee: z21.boolean().optional(),
+      consumablesFee: z21.boolean().optional(),
+      cleaningFee: z21.boolean().optional(),
+      phoneFee: z21.boolean().optional(),
+      courierFee: z21.boolean().optional(),
+      promotionFee: z21.boolean().optional(),
+      teacherFee: z21.boolean().optional(),
+      transportFee: z21.boolean().optional(),
+      otherFee: z21.boolean().optional()
       // 注意: deferredPayment(合同后付款)永远100%由合伙人承担,不需要在此配置
     })
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     try {
-      const existing = await db.select().from(partnerCities).where(and12(
-        eq16(partnerCities.partnerId, input.partnerId),
-        eq16(partnerCities.cityId, input.cityId)
+      const existing = await db.select().from(partnerCities).where(and13(
+        eq17(partnerCities.partnerId, input.partnerId),
+        eq17(partnerCities.cityId, input.cityId)
       )).limit(1);
       if (existing.length === 0) {
-        throw new TRPCError16({
+        throw new TRPCError17({
           code: "NOT_FOUND",
           message: "\u672A\u627E\u5230\u8BE5\u5408\u4F19\u4EBA-\u57CE\u5E02\u5173\u8054\u8BB0\u5F55"
         });
@@ -14607,7 +14871,7 @@ var partnerManagementRouter = router({
       await db.update(partnerCities).set({
         expenseCoverage: input.expenseCoverage,
         updatedBy: ctx.user.id
-      }).where(eq16(partnerCities.id, existing[0].id));
+      }).where(eq17(partnerCities.id, existing[0].id));
       const currentMonth = (/* @__PURE__ */ new Date()).toISOString().slice(0, 7);
       try {
         const { cityExpenseRouter: cityExpenseRouter2 } = await Promise.resolve().then(() => (init_cityExpenseRouter(), cityExpenseRouter_exports));
@@ -14622,7 +14886,7 @@ var partnerManagementRouter = router({
       return { success: true };
     } catch (error) {
       console.error("\u66F4\u65B0\u8D39\u7528\u627F\u62C5\u914D\u7F6E\u5931\u8D25:", error);
-      throw new TRPCError16({
+      throw new TRPCError17({
         code: "INTERNAL_SERVER_ERROR",
         message: `\u66F4\u65B0\u5931\u8D25: ${error.message}`
       });
@@ -14631,17 +14895,17 @@ var partnerManagementRouter = router({
   /**
    * 更新场地合同信息
    */
-  updateVenueContract: protectedProcedure.input(z20.object({
-    partnerCityId: z20.number(),
-    venueContractFileUrl: z20.string().optional(),
-    venueRentAmount: z20.number().optional(),
-    venueDeposit: z20.number().optional(),
-    venueLeaseStartDate: z20.string().optional(),
-    venueLeaseEndDate: z20.string().optional(),
-    venuePaymentCycle: z20.enum(["monthly", "bimonthly", "quarterly", "semiannual", "annual"]).optional()
+  updateVenueContract: protectedProcedure.input(z21.object({
+    partnerCityId: z21.number(),
+    venueContractFileUrl: z21.string().optional(),
+    venueRentAmount: z21.number().optional(),
+    venueDeposit: z21.number().optional(),
+    venueLeaseStartDate: z21.string().optional(),
+    venueLeaseEndDate: z21.string().optional(),
+    venuePaymentCycle: z21.enum(["monthly", "bimonthly", "quarterly", "semiannual", "annual"]).optional()
   })).mutation(async ({ input, ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const {
       partnerCityId,
       venueLeaseStartDate,
@@ -14657,24 +14921,24 @@ var partnerManagementRouter = router({
       ...venueRentAmount !== void 0 ? { venueRentAmount: venueRentAmount.toString() } : {},
       ...venueDeposit !== void 0 ? { venueDeposit: venueDeposit.toString() } : {},
       updatedBy: ctx.user.id
-    }).where(eq16(partnerCities.id, partnerCityId));
+    }).where(eq17(partnerCities.id, partnerCityId));
     return { success: true };
   }),
   /**
    * 从city_monthly_expenses表查询合伙人分红数据
    * 用于前端App显示合伙人在各城市的分红金额
    */
-  getCityMonthlyProfits: protectedProcedure.input(z20.object({
-    partnerId: z20.number(),
-    cityId: z20.number().optional(),
-    startDate: z20.string().optional(),
+  getCityMonthlyProfits: protectedProcedure.input(z21.object({
+    partnerId: z21.number(),
+    cityId: z21.number().optional(),
+    startDate: z21.string().optional(),
     // YYYY-MM format
-    endDate: z20.string().optional()
+    endDate: z21.string().optional()
     // YYYY-MM format
   })).query(async ({ input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    const partnerCityRecords = await db.select({ cityId: partnerCities.cityId }).from(partnerCities).where(eq16(partnerCities.partnerId, input.partnerId));
+    if (!db) throw new TRPCError17({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    const partnerCityRecords = await db.select({ cityId: partnerCities.cityId }).from(partnerCities).where(eq17(partnerCities.partnerId, input.partnerId));
     if (partnerCityRecords.length === 0) {
       return {
         records: [],
@@ -14685,7 +14949,7 @@ var partnerManagementRouter = router({
     const partnerCityIds = partnerCityRecords.map((r) => r.cityId);
     const conditions = [inArray2(cityMonthlyExpenses.cityId, partnerCityIds)];
     if (input.cityId) {
-      conditions.push(eq16(cityMonthlyExpenses.cityId, input.cityId));
+      conditions.push(eq17(cityMonthlyExpenses.cityId, input.cityId));
     }
     if (input.startDate) {
       conditions.push(sql8`${cityMonthlyExpenses.month} >= ${input.startDate}`);
@@ -14701,7 +14965,7 @@ var partnerManagementRouter = router({
       partnerShare: cityMonthlyExpenses.partnerShare,
       totalExpense: cityMonthlyExpenses.totalExpense,
       createdAt: cityMonthlyExpenses.createdAt
-    }).from(cityMonthlyExpenses).where(and12(...conditions)).orderBy(desc5(cityMonthlyExpenses.month));
+    }).from(cityMonthlyExpenses).where(and13(...conditions)).orderBy(desc5(cityMonthlyExpenses.month));
     const totalAmount = records.reduce((sum, record) => {
       return sum + Number(record.partnerShare || 0);
     }, 0);
@@ -14718,16 +14982,16 @@ init_cityExpenseRouter();
 
 // server/orderParseRouter.ts
 init_trpc();
-import { z as z21 } from "zod";
-import { TRPCError as TRPCError17 } from "@trpc/server";
+import { z as z22 } from "zod";
+import { TRPCError as TRPCError18 } from "@trpc/server";
 var orderParseRouter = router({
   /**
    * 解析订单文本（功能已停用）
    */
-  parseOrderText: protectedProcedure.input(z21.object({
-    text: z21.string().min(1, "\u8BA2\u5355\u6587\u672C\u4E0D\u80FD\u4E3A\u7A7A")
+  parseOrderText: protectedProcedure.input(z22.object({
+    text: z22.string().min(1, "\u8BA2\u5355\u6587\u672C\u4E0D\u80FD\u4E3A\u7A7A")
   })).mutation(async () => {
-    throw new TRPCError17({
+    throw new TRPCError18({
       code: "METHOD_NOT_SUPPORTED",
       message: "\u667A\u80FD\u89E3\u6790\u529F\u80FD\u5DF2\u505C\u7528\uFF0C\u8BF7\u4F7F\u7528\u624B\u52A8\u5F55\u5165\u6216 Gmail \u5BFC\u5165\u529F\u80FD"
     });
@@ -14738,8 +15002,8 @@ var orderParseRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z22 } from "zod";
-import { eq as eq18, and as and13 } from "drizzle-orm";
+import { z as z23 } from "zod";
+import { eq as eq19, and as and14 } from "drizzle-orm";
 
 // server/classroomMappingRules.ts
 var shanghaiClassroomRules = [
@@ -14906,7 +15170,7 @@ function standardizeClassroom(inputClassroom, inputCity) {
 // server/teacherMappingRules.ts
 init_db();
 init_schema();
-import { eq as eq17 } from "drizzle-orm";
+import { eq as eq18 } from "drizzle-orm";
 var teacherAliasCache = null;
 async function initTeacherAliasCache() {
   const database = await getDb();
@@ -14916,7 +15180,7 @@ async function initTeacherAliasCache() {
   const allTeachers = await database.select({
     name: teachers.name,
     aliases: teachers.aliases
-  }).from(teachers).where(eq17(teachers.isActive, true));
+  }).from(teachers).where(eq18(teachers.isActive, true));
   teacherAliasCache = /* @__PURE__ */ new Map();
   for (const teacher of allTeachers) {
     const standardName = teacher.name;
@@ -15085,7 +15349,7 @@ async function standardizeCityName(cityName) {
 }
 
 // server/dataCleaningRouter.ts
-import { TRPCError as TRPCError18 } from "@trpc/server";
+import { TRPCError as TRPCError19 } from "@trpc/server";
 var dataCleaningRouter = router({
   /**
    * 扫描需要清洗的订单
@@ -15094,7 +15358,7 @@ var dataCleaningRouter = router({
   scanOrders: protectedProcedure.query(async () => {
     const database = await getDb();
     if (!database) {
-      throw new TRPCError18({
+      throw new TRPCError19({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
@@ -15129,9 +15393,9 @@ var dataCleaningRouter = router({
       } else if (order.deliveryCity && (!order.deliveryRoom || order.deliveryRoom.trim() === "")) {
         try {
           const cityClassrooms = await database.select({ name: classrooms.name }).from(classrooms).where(
-            and13(
-              eq18(classrooms.cityName, order.deliveryCity),
-              eq18(classrooms.isActive, true)
+            and14(
+              eq19(classrooms.cityName, order.deliveryCity),
+              eq19(classrooms.isActive, true)
             )
           );
           if (cityClassrooms.length === 1) {
@@ -15181,13 +15445,13 @@ var dataCleaningRouter = router({
    * 执行数据清洗并更新数据库
    */
   cleanOrders: protectedProcedure.input(
-    z22.object({
-      orderIds: z22.array(z22.number()).min(1, "\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u8BA2\u5355")
+    z23.object({
+      orderIds: z23.array(z23.number()).min(1, "\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u8BA2\u5355")
     })
   ).mutation(async ({ input }) => {
     const database = await getDb();
     if (!database) {
-      throw new TRPCError18({
+      throw new TRPCError19({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
@@ -15205,7 +15469,7 @@ var dataCleaningRouter = router({
           deliveryCity: orders.deliveryCity,
           deliveryRoom: orders.deliveryRoom,
           deliveryTeacher: orders.deliveryTeacher
-        }).from(orders).where(eq18(orders.id, orderId)).limit(1);
+        }).from(orders).where(eq19(orders.id, orderId)).limit(1);
         if (!order) {
           failCount++;
           errors.push({ orderId, error: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
@@ -15226,9 +15490,9 @@ var dataCleaningRouter = router({
         } else if (order.deliveryCity && (!order.deliveryRoom || order.deliveryRoom.trim() === "")) {
           try {
             const cityClassrooms = await database.select({ name: classrooms.name }).from(classrooms).where(
-              and13(
-                eq18(classrooms.cityName, order.deliveryCity),
-                eq18(classrooms.isActive, true)
+              and14(
+                eq19(classrooms.cityName, order.deliveryCity),
+                eq19(classrooms.isActive, true)
               )
             );
             if (cityClassrooms.length === 1) {
@@ -15257,7 +15521,7 @@ var dataCleaningRouter = router({
           continue;
         }
         updateData.updatedAt = /* @__PURE__ */ new Date();
-        await database.update(orders).set(updateData).where(eq18(orders.id, orderId));
+        await database.update(orders).set(updateData).where(eq19(orders.id, orderId));
         successCount++;
         console.log(
           `[\u6570\u636E\u6E05\u6D17] \u8BA2\u5355${orderId} \u6E05\u6D17\u6210\u529F:`,
@@ -15288,10 +15552,10 @@ var dataCleaningRouter = router({
   /**
    * 预览单个订单的清洗结果
    */
-  previewClean: protectedProcedure.input(z22.object({ orderId: z22.number() })).query(async ({ input }) => {
+  previewClean: protectedProcedure.input(z23.object({ orderId: z23.number() })).query(async ({ input }) => {
     const database = await getDb();
     if (!database) {
-      throw new TRPCError18({
+      throw new TRPCError19({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
@@ -15302,15 +15566,15 @@ var dataCleaningRouter = router({
       orderNo: orders.orderNo,
       deliveryCity: orders.deliveryCity,
       deliveryRoom: orders.deliveryRoom
-    }).from(orders).where(eq18(orders.id, orderId)).limit(1);
+    }).from(orders).where(eq19(orders.id, orderId)).limit(1);
     if (!order) {
-      throw new TRPCError18({
+      throw new TRPCError19({
         code: "NOT_FOUND",
         message: "\u8BA2\u5355\u4E0D\u5B58\u5728"
       });
     }
     if (!order.deliveryRoom) {
-      throw new TRPCError18({
+      throw new TRPCError19({
         code: "BAD_REQUEST",
         message: "\u8BA2\u5355\u6CA1\u6709\u6559\u5BA4\u4FE1\u606F"
       });
@@ -15320,7 +15584,7 @@ var dataCleaningRouter = router({
       order.deliveryCity || void 0
     );
     if (!standardized) {
-      throw new TRPCError18({
+      throw new TRPCError19({
         code: "BAD_REQUEST",
         message: "\u65E0\u6CD5\u6807\u51C6\u5316\u6559\u5BA4\u540D\u79F0"
       });
@@ -15345,9 +15609,9 @@ var dataCleaningRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z23 } from "zod";
-import { eq as eq19, desc as desc6, and as and14 } from "drizzle-orm";
-import { TRPCError as TRPCError19 } from "@trpc/server";
+import { z as z24 } from "zod";
+import { eq as eq20, desc as desc6, and as and15 } from "drizzle-orm";
+import { TRPCError as TRPCError20 } from "@trpc/server";
 var MEMBERSHIP_CACHE_TTL_MS = 5 * 60 * 1e3;
 var membershipStatusCache = /* @__PURE__ */ new Map();
 function invalidateMembershipCache(userId) {
@@ -15361,13 +15625,13 @@ function generateMembershipOrderNo() {
 async function activateMembership(orderId, channelOrderNo) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [order] = await db.select().from(membershipOrders).where(eq19(membershipOrders.id, orderId)).limit(1);
+  const [order] = await db.select().from(membershipOrders).where(eq20(membershipOrders.id, orderId)).limit(1);
   if (!order) throw new Error("Order not found");
   if (order.status === "paid") return;
   const now = /* @__PURE__ */ new Date();
-  const [user] = await db.select().from(users).where(eq19(users.id, order.userId)).limit(1);
+  const [user] = await db.select().from(users).where(eq20(users.id, order.userId)).limit(1);
   if (!user) throw new Error("User not found");
-  const [plan] = await db.select().from(membershipPlans).where(eq19(membershipPlans.id, order.planId)).limit(1);
+  const [plan] = await db.select().from(membershipPlans).where(eq20(membershipPlans.id, order.planId)).limit(1);
   if (!plan) throw new Error("Plan not found");
   let activatedAt = now;
   let expiresAt;
@@ -15386,7 +15650,7 @@ async function activateMembership(orderId, channelOrderNo) {
     activatedAt,
     expiresAt,
     updatedAt: now
-  }).where(eq19(membershipOrders.id, orderId));
+  }).where(eq20(membershipOrders.id, orderId));
   await db.update(users).set({
     membershipStatus: "active",
     isMember: true,
@@ -15394,7 +15658,7 @@ async function activateMembership(orderId, channelOrderNo) {
     membershipActivatedAt: activatedAt,
     membershipExpiresAt: expiresAt,
     updatedAt: now
-  }).where(eq19(users.id, order.userId));
+  }).where(eq20(users.id, order.userId));
   invalidateMembershipCache(order.userId);
 }
 var membershipRouter = router({
@@ -15402,7 +15666,7 @@ var membershipRouter = router({
   listPlans: publicProcedure.query(async () => {
     const db = await getDb();
     if (!db) return { plans: [] };
-    const plans = await db.select().from(membershipPlans).where(eq19(membershipPlans.isActive, true)).orderBy(membershipPlans.sortOrder);
+    const plans = await db.select().from(membershipPlans).where(eq20(membershipPlans.isActive, true)).orderBy(membershipPlans.sortOrder);
     return {
       plans: plans.map((p) => ({
         id: p.id,
@@ -15423,15 +15687,15 @@ var membershipRouter = router({
       return cached.data;
     }
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
-    const [user] = await db.select().from(users).where(eq19(users.id, ctx.user.id)).limit(1);
-    if (!user) throw new TRPCError19({ code: "NOT_FOUND" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
+    const [user] = await db.select().from(users).where(eq20(users.id, ctx.user.id)).limit(1);
+    if (!user) throw new TRPCError20({ code: "NOT_FOUND" });
     ;
     const now = /* @__PURE__ */ new Date();
     let membershipStatus = user.membershipStatus;
     if (membershipStatus === "active" && user.membershipExpiresAt && user.membershipExpiresAt < now) {
       membershipStatus = "expired";
-      await db.update(users).set({ membershipStatus: "expired", isMember: false, updatedAt: now }).where(eq19(users.id, user.id));
+      await db.update(users).set({ membershipStatus: "expired", isMember: false, updatedAt: now }).where(eq20(users.id, user.id));
     }
     const daysRemaining = membershipStatus === "active" && user.membershipExpiresAt ? Math.max(
       0,
@@ -15441,9 +15705,9 @@ var membershipRouter = router({
     ) : null;
     let currentPlan = null;
     if (user.membershipOrderId) {
-      const [order] = await db.select({ planId: membershipOrders.planId }).from(membershipOrders).where(eq19(membershipOrders.id, user.membershipOrderId)).limit(1);
+      const [order] = await db.select({ planId: membershipOrders.planId }).from(membershipOrders).where(eq20(membershipOrders.id, user.membershipOrderId)).limit(1);
       if (order) {
-        const [plan] = await db.select().from(membershipPlans).where(eq19(membershipPlans.id, order.planId)).limit(1);
+        const [plan] = await db.select().from(membershipPlans).where(eq20(membershipPlans.id, order.planId)).limit(1);
         if (plan) {
           currentPlan = {
             id: plan.id,
@@ -15454,7 +15718,7 @@ var membershipRouter = router({
       }
     }
     let accountBalance = 0;
-    const [customer] = await db.select({ accountBalance: customers.accountBalance }).from(customers).where(eq19(customers.userId, user.id)).limit(1);
+    const [customer] = await db.select({ accountBalance: customers.accountBalance }).from(customers).where(eq20(customers.userId, user.id)).limit(1);
     if (customer?.accountBalance) {
       accountBalance = parseFloat(String(customer.accountBalance));
     }
@@ -15474,17 +15738,17 @@ var membershipRouter = router({
     return result;
   }),
   // ========== 创建会员订单 ===========
-  createOrder: protectedProcedure.input(z23.object({ planId: z23.number() })).mutation(async ({ ctx, input }) => {
+  createOrder: protectedProcedure.input(z24.object({ planId: z24.number() })).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const [plan] = await db.select().from(membershipPlans).where(
-      and14(
-        eq19(membershipPlans.id, input.planId),
-        eq19(membershipPlans.isActive, true)
+      and15(
+        eq20(membershipPlans.id, input.planId),
+        eq20(membershipPlans.isActive, true)
       )
     ).limit(1);
     if (!plan) {
-      throw new TRPCError19({ code: "NOT_FOUND", message: "\u5957\u9910\u4E0D\u5B58\u5728\u6216\u5DF2\u4E0B\u67B6" });
+      throw new TRPCError20({ code: "NOT_FOUND", message: "\u5957\u9910\u4E0D\u5B58\u5728\u6216\u5DF2\u4E0B\u67B6" });
     }
     const orderNo = generateMembershipOrderNo();
     const now = /* @__PURE__ */ new Date();
@@ -15509,29 +15773,29 @@ var membershipRouter = router({
   }),
   // ========== 预下单（获取支付参数）==========
   prepay: protectedProcedure.input(
-    z23.object({
-      orderId: z23.number(),
-      paymentChannel: z23.enum(["wechat", "alipay", "balance"])
+    z24.object({
+      orderId: z24.number(),
+      paymentChannel: z24.enum(["wechat", "alipay", "balance"])
     })
   ).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const [order] = await db.select().from(membershipOrders).where(
-      and14(
-        eq19(membershipOrders.id, input.orderId),
-        eq19(membershipOrders.userId, ctx.user.id)
+      and15(
+        eq20(membershipOrders.id, input.orderId),
+        eq20(membershipOrders.userId, ctx.user.id)
       )
     ).limit(1);
     if (!order) {
-      throw new TRPCError19({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
+      throw new TRPCError20({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
     }
     if (order.status !== "pending") {
-      throw new TRPCError19({
+      throw new TRPCError20({
         code: "BAD_REQUEST",
         message: `\u8BA2\u5355\u72B6\u6001\u5F02\u5E38\uFF1A${order.status}`
       });
     }
-    await db.update(membershipOrders).set({ paymentChannel: input.paymentChannel, updatedAt: /* @__PURE__ */ new Date() }).where(eq19(membershipOrders.id, input.orderId));
+    await db.update(membershipOrders).set({ paymentChannel: input.paymentChannel, updatedAt: /* @__PURE__ */ new Date() }).where(eq20(membershipOrders.id, input.orderId));
     if (input.paymentChannel === "balance") {
       await activateMembership(input.orderId, `BALANCE_${Date.now()}`);
       return {
@@ -15554,20 +15818,20 @@ var membershipRouter = router({
         orderNo: order.orderNo
       };
     }
-    throw new TRPCError19({ code: "BAD_REQUEST", message: "\u4E0D\u652F\u6301\u7684\u652F\u4ED8\u6E20\u9053" });
+    throw new TRPCError20({ code: "BAD_REQUEST", message: "\u4E0D\u652F\u6301\u7684\u652F\u4ED8\u6E20\u9053" });
   }),
   // ========== 查询订单状态（前端轮询用）==========
-  getOrderStatus: protectedProcedure.input(z23.object({ orderId: z23.number() })).query(async ({ ctx, input }) => {
+  getOrderStatus: protectedProcedure.input(z24.object({ orderId: z24.number() })).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const [order] = await db.select().from(membershipOrders).where(
-      and14(
-        eq19(membershipOrders.id, input.orderId),
-        eq19(membershipOrders.userId, ctx.user.id)
+      and15(
+        eq20(membershipOrders.id, input.orderId),
+        eq20(membershipOrders.userId, ctx.user.id)
       )
     ).limit(1);
     if (!order) {
-      throw new TRPCError19({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
+      throw new TRPCError20({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
     }
     return {
       status: order.status,
@@ -15577,44 +15841,44 @@ var membershipRouter = router({
     };
   }),
   // ========== 取消订单 ==========
-  cancelOrder: protectedProcedure.input(z23.object({ orderId: z23.number() })).mutation(async ({ ctx, input }) => {
+  cancelOrder: protectedProcedure.input(z24.object({ orderId: z24.number() })).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const [order] = await db.select().from(membershipOrders).where(
-      and14(
-        eq19(membershipOrders.id, input.orderId),
-        eq19(membershipOrders.userId, ctx.user.id)
+      and15(
+        eq20(membershipOrders.id, input.orderId),
+        eq20(membershipOrders.userId, ctx.user.id)
       )
     ).limit(1);
     if (!order) {
-      throw new TRPCError19({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
+      throw new TRPCError20({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
     }
     if (order.status !== "pending") {
-      throw new TRPCError19({
+      throw new TRPCError20({
         code: "BAD_REQUEST",
         message: "\u53EA\u80FD\u53D6\u6D88\u5F85\u652F\u4ED8\u7684\u8BA2\u5355"
       });
     }
-    await db.update(membershipOrders).set({ status: "cancelled", updatedAt: /* @__PURE__ */ new Date() }).where(eq19(membershipOrders.id, input.orderId));
+    await db.update(membershipOrders).set({ status: "cancelled", updatedAt: /* @__PURE__ */ new Date() }).where(eq20(membershipOrders.id, input.orderId));
     return { success: true };
   }),
   // ========== 查询用户自己的订单列表 ==========
   listOrders: protectedProcedure.input(
-    z23.object({
-      page: z23.number().default(1),
-      pageSize: z23.number().default(10),
-      status: z23.enum(["pending", "paid", "cancelled", "refunded"]).optional()
+    z24.object({
+      page: z24.number().default(1),
+      pageSize: z24.number().default(10),
+      status: z24.enum(["pending", "paid", "cancelled", "refunded"]).optional()
     })
   ).query(async ({ ctx, input }) => {
     const db = await getDb();
     if (!db) return { orders: [], total: 0, page: 1, pageSize: 10 };
     const conditions = [
-      eq19(membershipOrders.userId, ctx.user.id)
+      eq20(membershipOrders.userId, ctx.user.id)
     ];
     if (input.status) {
-      conditions.push(eq19(membershipOrders.status, input.status));
+      conditions.push(eq20(membershipOrders.status, input.status));
     }
-    const allOrders = await db.select().from(membershipOrders).where(and14(...conditions)).orderBy(desc6(membershipOrders.createdAt));
+    const allOrders = await db.select().from(membershipOrders).where(and15(...conditions)).orderBy(desc6(membershipOrders.createdAt));
     const total = allOrders.length;
     const offset = (input.page - 1) * input.pageSize;
     const paged = allOrders.slice(offset, offset + input.pageSize);
@@ -15638,20 +15902,20 @@ var membershipRouter = router({
   }),
   // ========== 管理员：查询所有会员订单 ==========
   adminListOrders: protectedProcedure.input(
-    z23.object({
-      page: z23.number().default(1),
-      pageSize: z23.number().default(20),
-      status: z23.enum(["pending", "paid", "cancelled", "refunded"]).optional()
+    z24.object({
+      page: z24.number().default(1),
+      pageSize: z24.number().default(20),
+      status: z24.enum(["pending", "paid", "cancelled", "refunded"]).optional()
     })
   ).query(async ({ ctx, input }) => {
     if (ctx.user.role !== "admin") {
-      throw new TRPCError19({ code: "FORBIDDEN" });
+      throw new TRPCError20({ code: "FORBIDDEN" });
     }
     const db = await getDb();
     if (!db) return { orders: [], total: 0, page: 1, pageSize: 20 };
     const conditions = [];
     if (input.status) {
-      conditions.push(eq19(membershipOrders.status, input.status));
+      conditions.push(eq20(membershipOrders.status, input.status));
     }
     const allOrders = await db.select({
       id: membershipOrders.id,
@@ -15667,7 +15931,7 @@ var membershipRouter = router({
       createdAt: membershipOrders.createdAt,
       userName: users.name,
       userPhone: users.phone
-    }).from(membershipOrders).leftJoin(users, eq19(membershipOrders.userId, users.id)).where(conditions.length > 0 ? and14(...conditions) : void 0).orderBy(desc6(membershipOrders.createdAt));
+    }).from(membershipOrders).leftJoin(users, eq20(membershipOrders.userId, users.id)).where(conditions.length > 0 ? and15(...conditions) : void 0).orderBy(desc6(membershipOrders.createdAt));
     const total = allOrders.length;
     const offset = (input.page - 1) * input.pageSize;
     const paged = allOrders.slice(offset, offset + input.pageSize);
@@ -15693,22 +15957,22 @@ var membershipRouter = router({
     };
   }),
   // ========== 管理员：手动激活会员 ==========
-  adminActivate: protectedProcedure.input(z23.object({ orderId: z23.number() })).mutation(async ({ ctx, input }) => {
+  adminActivate: protectedProcedure.input(z24.object({ orderId: z24.number() })).mutation(async ({ ctx, input }) => {
     if (ctx.user.role !== "admin") {
-      throw new TRPCError19({ code: "FORBIDDEN" });
+      throw new TRPCError20({ code: "FORBIDDEN" });
     }
     await activateMembership(input.orderId);
     return { success: true };
   }),
   // ========== 创建充値订单 ==========
   createRechargeOrder: protectedProcedure.input(
-    z23.object({
-      amount: z23.number().min(1).max(1e4),
-      paymentChannel: z23.enum(["wechat", "alipay"])
+    z24.object({
+      amount: z24.number().min(1).max(1e4),
+      paymentChannel: z24.enum(["wechat", "alipay"])
     })
   ).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const orderNo = `RCH${Date.now()}${Math.floor(Math.random() * 1e3).toString().padStart(3, "0")}`;
     const now = /* @__PURE__ */ new Date();
     const [result] = await db.insert(membershipOrders).values({
@@ -15745,19 +16009,19 @@ var membershipRouter = router({
         formHtml: `<form id="alipayForm" action="https://openapi.alipay.com/gateway.do" method="post"><input type="hidden" name="biz_content" value='{"out_trade_no":"${orderNo}","total_amount":"${input.amount}"}'></form><script>document.getElementById('alipayForm').submit();</script>`
       };
     }
-    throw new TRPCError19({ code: "BAD_REQUEST", message: "\u4E0D\u652F\u6301\u7684\u652F\u4ED8\u6E20\u9053" });
+    throw new TRPCError20({ code: "BAD_REQUEST", message: "\u4E0D\u652F\u6301\u7684\u652F\u4ED8\u6E20\u9053" });
   }),
   // ========== 查询充値订单状态 ==========
-  getRechargeOrderStatus: protectedProcedure.input(z23.object({ orderId: z23.number() })).query(async ({ ctx, input }) => {
+  getRechargeOrderStatus: protectedProcedure.input(z24.object({ orderId: z24.number() })).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const [order] = await db.select().from(membershipOrders).where(
-      and14(
-        eq19(membershipOrders.id, input.orderId),
-        eq19(membershipOrders.userId, ctx.user.id)
+      and15(
+        eq20(membershipOrders.id, input.orderId),
+        eq20(membershipOrders.userId, ctx.user.id)
       )
     ).limit(1);
-    if (!order) throw new TRPCError19({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
+    if (!order) throw new TRPCError20({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
     return {
       status: order.status,
       amount: Number(order.amount),
@@ -15766,26 +16030,26 @@ var membershipRouter = router({
   }),
   // ========== 模拟充値完成（开发测试用）==========
   // 生产环境应由支付回调触发，这里仅供测试
-  confirmRecharge: protectedProcedure.input(z23.object({ orderId: z23.number() })).mutation(async ({ ctx, input }) => {
+  confirmRecharge: protectedProcedure.input(z24.object({ orderId: z24.number() })).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const [order] = await db.select().from(membershipOrders).where(
-      and14(
-        eq19(membershipOrders.id, input.orderId),
-        eq19(membershipOrders.userId, ctx.user.id)
+      and15(
+        eq20(membershipOrders.id, input.orderId),
+        eq20(membershipOrders.userId, ctx.user.id)
       )
     ).limit(1);
-    if (!order) throw new TRPCError19({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
+    if (!order) throw new TRPCError20({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
     if (order.status === "paid") return { success: true, message: "\u5DF2\u5145\u5024\u6210\u529F" };
-    if (order.status !== "pending") throw new TRPCError19({ code: "BAD_REQUEST", message: "\u8BA2\u5355\u72B6\u6001\u5F02\u5E38" });
+    if (order.status !== "pending") throw new TRPCError20({ code: "BAD_REQUEST", message: "\u8BA2\u5355\u72B6\u6001\u5F02\u5E38" });
     const rechargeAmount = Number(order.amount);
     const now = /* @__PURE__ */ new Date();
-    await db.update(membershipOrders).set({ status: "paid", paymentDate: now, updatedAt: now }).where(eq19(membershipOrders.id, input.orderId));
-    const [customer] = await db.select({ id: customers.id, accountBalance: customers.accountBalance }).from(customers).where(eq19(customers.userId, ctx.user.id)).limit(1);
+    await db.update(membershipOrders).set({ status: "paid", paymentDate: now, updatedAt: now }).where(eq20(membershipOrders.id, input.orderId));
+    const [customer] = await db.select({ id: customers.id, accountBalance: customers.accountBalance }).from(customers).where(eq20(customers.userId, ctx.user.id)).limit(1);
     if (customer) {
       const currentBalance = parseFloat(String(customer.accountBalance || 0));
       const newBalance = currentBalance + rechargeAmount;
-      await db.update(customers).set({ accountBalance: newBalance.toFixed(2), updatedAt: now }).where(eq19(customers.id, customer.id));
+      await db.update(customers).set({ accountBalance: newBalance.toFixed(2), updatedAt: now }).where(eq20(customers.id, customer.id));
     } else {
       console.log(`[recharge] User ${ctx.user.id} recharged ${rechargeAmount} but no customer record found`);
     }
@@ -15793,23 +16057,23 @@ var membershipRouter = router({
   }),
   // ========== 管理员：管理套餐 ==========
   adminUpsertPlan: protectedProcedure.input(
-    z23.object({
-      id: z23.number().optional(),
-      name: z23.string().min(1),
-      description: z23.string().optional(),
-      duration: z23.number().min(1),
-      price: z23.number().min(0),
-      originalPrice: z23.number().optional(),
-      benefits: z23.array(z23.string()).optional(),
-      isActive: z23.boolean().default(true),
-      sortOrder: z23.number().default(0)
+    z24.object({
+      id: z24.number().optional(),
+      name: z24.string().min(1),
+      description: z24.string().optional(),
+      duration: z24.number().min(1),
+      price: z24.number().min(0),
+      originalPrice: z24.number().optional(),
+      benefits: z24.array(z24.string()).optional(),
+      isActive: z24.boolean().default(true),
+      sortOrder: z24.number().default(0)
     })
   ).mutation(async ({ ctx, input }) => {
     if (ctx.user.role !== "admin") {
-      throw new TRPCError19({ code: "FORBIDDEN" });
+      throw new TRPCError20({ code: "FORBIDDEN" });
     }
     const db = await getDb();
-    if (!db) throw new TRPCError19({ code: "INTERNAL_SERVER_ERROR" });
+    if (!db) throw new TRPCError20({ code: "INTERNAL_SERVER_ERROR" });
     const data = {
       name: input.name,
       description: input.description || null,
@@ -15822,7 +16086,7 @@ var membershipRouter = router({
       updatedAt: /* @__PURE__ */ new Date()
     };
     if (input.id) {
-      await db.update(membershipPlans).set(data).where(eq19(membershipPlans.id, input.id));
+      await db.update(membershipPlans).set(data).where(eq20(membershipPlans.id, input.id));
       return { id: input.id };
     } else {
       const [result] = await db.insert(membershipPlans).values({
@@ -15899,24 +16163,24 @@ var apiDiscoveryRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z24 } from "zod";
-import { TRPCError as TRPCError20 } from "@trpc/server";
-import { eq as eq20, and as and15, or as or4, sql as sql9, inArray as inArray3 } from "drizzle-orm";
+import { z as z25 } from "zod";
+import { TRPCError as TRPCError21 } from "@trpc/server";
+import { eq as eq21, and as and16, or as or5, sql as sql9, inArray as inArray3 } from "drizzle-orm";
 var schedulesRouter = router({
   /**
    * 获取老师排班可用性
    * 老师端接口：强制使用JWT中的userId，忽略前端传入的teacherId
    */
   getTeacherAvailability: protectedProcedure.input(
-    z24.object({
-      teacherId: z24.number().optional(),
+    z25.object({
+      teacherId: z25.number().optional(),
       // 忽略此参数
-      startDate: z24.string().optional(),
-      endDate: z24.string().optional()
+      startDate: z25.string().optional(),
+      endDate: z25.string().optional()
     }).optional()
   ).query(async ({ ctx, input }) => {
     if (!ctx.user.roles.includes("teacher")) {
-      throw new TRPCError20({
+      throw new TRPCError21({
         code: "FORBIDDEN",
         message: "Only teachers can access this endpoint"
       });
@@ -15954,9 +16218,9 @@ var schedulesRouter = router({
    * 获取指定城市和日期的可用时间段
    * 前端选择时间阶段调用此接口，过滤掉教室已满或无可用老师的时间段
    */
-  getAvailableTimeSlots: publicProcedure.input(z24.object({
-    cityId: z24.number().int().positive(),
-    date: z24.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+  getAvailableTimeSlots: publicProcedure.input(z25.object({
+    cityId: z25.number().int().positive(),
+    date: z25.string().regex(/^\d{4}-\d{2}-\d{2}$/)
     // YYYY-MM-DD
   })).query(async ({ input }) => {
     const { cityId, date: date2 } = input;
@@ -15977,40 +16241,40 @@ var schedulesRouter = router({
       for (const minute of minutes) {
         if (hour === 22 && minute > 30) break;
         const timeStr = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-        const cityTeachers = await db.select({ userId: userRoleCities.userId }).from(userRoleCities).where(and15(
-          eq20(userRoleCities.role, "teacher"),
+        const cityTeachers = await db.select({ userId: userRoleCities.userId }).from(userRoleCities).where(and16(
+          eq21(userRoleCities.role, "teacher"),
           sql9`JSON_CONTAINS(${userRoleCities.cities}, ${JSON.stringify([cityId.toString()])})`
         ));
         const teacherIds = cityTeachers.map((t2) => t2.userId);
         const startTimestamp = `${date2} ${timeStr}:00`;
         const endTimestamp = `${date2} ${String(hour + 1).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`;
-        const busyTeachers = await db.select({ teacherId: schedules.teacherId }).from(schedules).where(and15(
+        const busyTeachers = await db.select({ teacherId: schedules.teacherId }).from(schedules).where(and16(
           inArray3(schedules.teacherId, teacherIds),
-          or4(
-            and15(
+          or5(
+            and16(
               sql9`${schedules.startTime} <= ${startTimestamp}`,
               sql9`${schedules.endTime} > ${startTimestamp}`
             ),
-            and15(
+            and16(
               sql9`${schedules.startTime} < ${endTimestamp}`,
               sql9`${schedules.endTime} >= ${endTimestamp}`
             )
           )
         ));
         const hasTeacher = teacherIds.length > busyTeachers.length;
-        const cityClassrooms = await db.select({ id: classrooms.id }).from(classrooms).where(and15(
-          eq20(classrooms.cityId, cityId),
-          eq20(classrooms.isActive, true)
+        const cityClassrooms = await db.select({ id: classrooms.id }).from(classrooms).where(and16(
+          eq21(classrooms.cityId, cityId),
+          eq21(classrooms.isActive, true)
         ));
         const classroomIds = cityClassrooms.map((c) => c.id);
-        const busyClassrooms = await db.select({ classroomId: schedules.classroomId }).from(schedules).where(and15(
+        const busyClassrooms = await db.select({ classroomId: schedules.classroomId }).from(schedules).where(and16(
           inArray3(schedules.classroomId, classroomIds),
-          or4(
-            and15(
+          or5(
+            and16(
               sql9`${schedules.startTime} <= ${startTimestamp}`,
               sql9`${schedules.endTime} > ${startTimestamp}`
             ),
-            and15(
+            and16(
               sql9`${schedules.startTime} < ${endTimestamp}`,
               sql9`${schedules.endTime} >= ${endTimestamp}`
             )
@@ -16038,14 +16302,14 @@ var schedulesRouter = router({
    * 老师设置不接客时段
    * 老师端接口：强制使用JWT中的userId作为teacherId
    */
-  setUnavailability: protectedProcedure.input(z24.object({
-    startTime: z24.string().datetime(),
+  setUnavailability: protectedProcedure.input(z25.object({
+    startTime: z25.string().datetime(),
     // ISO 8601 format: "2026-02-24T14:00:00Z"
-    endTime: z24.string().datetime(),
-    reason: z24.string().max(200).optional()
+    endTime: z25.string().datetime(),
+    reason: z25.string().max(200).optional()
   })).mutation(async ({ ctx, input }) => {
     if (!ctx.user.roles.includes("teacher")) {
-      throw new TRPCError20({
+      throw new TRPCError21({
         code: "FORBIDDEN",
         message: "Only teachers can set unavailability"
       });
@@ -16055,7 +16319,7 @@ var schedulesRouter = router({
     const start = new Date(startTime);
     const end = new Date(endTime);
     if (start >= end) {
-      throw new TRPCError20({
+      throw new TRPCError21({
         code: "BAD_REQUEST",
         message: "End time must be after start time"
       });
@@ -16077,13 +16341,13 @@ var schedulesRouter = router({
    * 查看老师的不接客时段列表
    * 老师端接口：强制使用JWT中的userId作为teacherId
    */
-  listUnavailability: protectedProcedure.input(z24.object({
-    startDate: z24.string().optional(),
+  listUnavailability: protectedProcedure.input(z25.object({
+    startDate: z25.string().optional(),
     // YYYY-MM-DD
-    endDate: z24.string().optional()
+    endDate: z25.string().optional()
   }).optional()).query(async ({ ctx, input }) => {
     if (!ctx.user.roles.includes("teacher")) {
-      throw new TRPCError20({
+      throw new TRPCError21({
         code: "FORBIDDEN",
         message: "Only teachers can view unavailability"
       });
@@ -16091,14 +16355,14 @@ var schedulesRouter = router({
     const teacherId = ctx.user.id;
     const db = await getDb();
     if (!db) throw new Error("Database connection failed");
-    const conditions = [eq20(teacherUnavailability.teacherId, teacherId)];
+    const conditions = [eq21(teacherUnavailability.teacherId, teacherId)];
     if (input?.startDate) {
       conditions.push(sql9`${teacherUnavailability.endTime} >= ${input.startDate}`);
     }
     if (input?.endDate) {
       conditions.push(sql9`${teacherUnavailability.startTime} <= ${input.endDate}`);
     }
-    const result = await db.select().from(teacherUnavailability).where(and15(...conditions));
+    const result = await db.select().from(teacherUnavailability).where(and16(...conditions));
     return {
       success: true,
       data: result
@@ -16108,11 +16372,11 @@ var schedulesRouter = router({
    * 删除不接客时段
    * 老师端接口：强制使用JWT中的userId验证权限
    */
-  deleteUnavailability: protectedProcedure.input(z24.object({
-    id: z24.number().int().positive()
+  deleteUnavailability: protectedProcedure.input(z25.object({
+    id: z25.number().int().positive()
   })).mutation(async ({ ctx, input }) => {
     if (!ctx.user.roles.includes("teacher")) {
-      throw new TRPCError20({
+      throw new TRPCError21({
         code: "FORBIDDEN",
         message: "Only teachers can delete unavailability"
       });
@@ -16120,20 +16384,20 @@ var schedulesRouter = router({
     const teacherId = ctx.user.id;
     const db = await getDb();
     if (!db) throw new Error("Database connection failed");
-    const record = await db.select().from(teacherUnavailability).where(eq20(teacherUnavailability.id, input.id)).limit(1);
+    const record = await db.select().from(teacherUnavailability).where(eq21(teacherUnavailability.id, input.id)).limit(1);
     if (record.length === 0) {
-      throw new TRPCError20({
+      throw new TRPCError21({
         code: "NOT_FOUND",
         message: "Unavailability record not found"
       });
     }
     if (record[0].teacherId !== teacherId) {
-      throw new TRPCError20({
+      throw new TRPCError21({
         code: "FORBIDDEN",
         message: "You can only delete your own unavailability records"
       });
     }
-    await db.delete(teacherUnavailability).where(eq20(teacherUnavailability.id, input.id));
+    await db.delete(teacherUnavailability).where(eq21(teacherUnavailability.id, input.id));
     return {
       success: true,
       message: "Unavailability period deleted successfully"
@@ -16155,21 +16419,21 @@ var schedulesRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z25 } from "zod";
-import { eq as eq21, and as and16, sql as sql10 } from "drizzle-orm";
-import { TRPCError as TRPCError21 } from "@trpc/server";
+import { z as z26 } from "zod";
+import { eq as eq22, and as and17, sql as sql10 } from "drizzle-orm";
+import { TRPCError as TRPCError22 } from "@trpc/server";
 var analyticsRouter = router({
   /**
    * 获取流失客户统计
    */
   inactiveCustomers: protectedProcedure.input(
-    z25.object({
-      days: z25.number().optional().default(30)
+    z26.object({
+      days: z26.number().optional().default(30)
       // 多少天未消费算流失
     }).optional()
   ).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const days = input?.days || 30;
     const cutoffDate = /* @__PURE__ */ new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -16179,13 +16443,13 @@ var analyticsRouter = router({
    * 获取订单统计
    */
   orderStats: protectedProcedure.input(
-    z25.object({
-      startDate: z25.string().optional(),
-      endDate: z25.string().optional()
+    z26.object({
+      startDate: z26.string().optional(),
+      endDate: z26.string().optional()
     }).optional()
   ).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     let whereConditions = [];
     whereConditions.push(sql10`${orders.status} != 'cancelled'`);
     if (input?.startDate) {
@@ -16202,7 +16466,7 @@ var analyticsRouter = router({
       totalRevenue: sql10`COALESCE(SUM(${orders.courseAmount}), 0)`,
       totalPaymentAmount: sql10`COALESCE(SUM(${orders.paymentAmount}), 0)`,
       totalTeacherFee: sql10`COALESCE(SUM(${orders.teacherFee}), 0)`
-    }).from(orders).where(whereConditions.length > 0 ? and16(...whereConditions) : void 0);
+    }).from(orders).where(whereConditions.length > 0 ? and17(...whereConditions) : void 0);
     const stats = statsResult[0];
     const totalPaymentAmount = Number(stats.totalPaymentAmount) || 0;
     const totalTeacherFee = Number(stats.totalTeacherFee) || 0;
@@ -16228,13 +16492,13 @@ var analyticsRouter = router({
    * 多角色接口：根据JWT中的roles返回不同范围的数据
    */
   getDashboardStats: protectedProcedure.input(
-    z25.object({
-      startDate: z25.string().optional(),
-      endDate: z25.string().optional()
+    z26.object({
+      startDate: z26.string().optional(),
+      endDate: z26.string().optional()
     }).optional()
   ).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const userRoles = ctx.user.roles ? ctx.user.roles.split(",") : [];
     const userId = ctx.user.id;
     console.log("[analytics.getDashboardStats] User ID:", userId);
@@ -16274,9 +16538,9 @@ var analyticsRouter = router({
       };
     }
     if (userRoles.includes("cityPartner")) {
-      const partnerRecord = await db.select({ id: partners.id }).from(partners).where(eq21(partners.userId, userId)).limit(1);
+      const partnerRecord = await db.select({ id: partners.id }).from(partners).where(eq22(partners.userId, userId)).limit(1);
       if (partnerRecord.length === 0) {
-        throw new TRPCError21({
+        throw new TRPCError22({
           code: "NOT_FOUND",
           message: "Partner not found for current user"
         });
@@ -16285,9 +16549,9 @@ var analyticsRouter = router({
       const partnerCitiesRecords = await db.select({
         cityId: partnerCities.cityId,
         cityName: cities.name
-      }).from(partnerCities).leftJoin(cities, eq21(partnerCities.cityId, cities.id)).where(and16(
-        eq21(partnerCities.partnerId, partnerId),
-        eq21(partnerCities.contractStatus, "active")
+      }).from(partnerCities).leftJoin(cities, eq22(partnerCities.cityId, cities.id)).where(and17(
+        eq22(partnerCities.partnerId, partnerId),
+        eq22(partnerCities.contractStatus, "active")
       ));
       console.log("[analytics.getDashboardStats] Partner ID:", partnerId);
       console.log("[analytics.getDashboardStats] Managed Cities:", partnerCitiesRecords.map((c) => c.cityName));
@@ -16301,7 +16565,7 @@ var analyticsRouter = router({
         myCommission: "27500.00"
       };
     }
-    throw new TRPCError21({
+    throw new TRPCError22({
       code: "FORBIDDEN",
       message: "Insufficient permissions to access dashboard stats"
     });
@@ -16310,9 +16574,9 @@ var analyticsRouter = router({
    * 获取所有城市的统计数据
    */
   getAllCitiesWithStats: publicProcedure.input(
-    z25.object({
-      startDate: z25.string().optional(),
-      endDate: z25.string().optional()
+    z26.object({
+      startDate: z26.string().optional(),
+      endDate: z26.string().optional()
     }).optional()
   ).query(async ({ input }) => {
     const options = {};
@@ -16328,14 +16592,14 @@ var analyticsRouter = router({
    * 创建城市配置
    */
   createCityConfig: protectedProcedure.input(
-    z25.object({
-      city: z25.string(),
-      areaCode: z25.string().optional(),
-      description: z25.string().optional()
+    z26.object({
+      city: z26.string(),
+      areaCode: z26.string().optional(),
+      description: z26.string().optional()
     })
   ).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const maxSortOrderResult = await db.select({ maxSort: sql10`MAX(${cities.sortOrder})` }).from(cities);
     const maxSortOrder = maxSortOrderResult[0]?.maxSort || 0;
     const newSortOrder = maxSortOrder + 1;
@@ -16351,49 +16615,49 @@ var analyticsRouter = router({
    * 更新城市配置
    */
   updateCityPartnerConfig: protectedProcedure.input(
-    z25.object({
-      id: z25.number(),
-      areaCode: z25.string().optional(),
-      description: z25.string().optional()
+    z26.object({
+      id: z26.number(),
+      areaCode: z26.string().optional(),
+      description: z26.string().optional()
     })
   ).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     await db.update(cities).set({
       areaCode: input.areaCode || null,
       updatedAt: /* @__PURE__ */ new Date()
-    }).where(eq21(cities.id, input.id));
+    }).where(eq22(cities.id, input.id));
     return { success: true };
   }),
   /**
    * 删除城市配置
    */
   deleteCityConfig: protectedProcedure.input(
-    z25.object({
-      id: z25.number()
+    z26.object({
+      id: z26.number()
     })
   ).mutation(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     await db.update(cities).set({
       isActive: false,
       updatedAt: /* @__PURE__ */ new Date()
-    }).where(eq21(cities.id, input.id));
+    }).where(eq22(cities.id, input.id));
     return { success: true };
   }),
   /**
    * 获取城市财务统计数据
    */
   cityFinancialStats: protectedProcedure.input(
-    z25.object({
-      dateRange: z25.string().optional(),
-      startDate: z25.string().optional(),
-      endDate: z25.string().optional()
+    z26.object({
+      dateRange: z26.string().optional(),
+      startDate: z26.string().optional(),
+      endDate: z26.string().optional()
     }).optional()
   ).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    let whereConditions = [eq21(orders.status, "paid")];
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    let whereConditions = [eq22(orders.status, "paid")];
     if (input?.startDate && input?.endDate) {
       whereConditions.push(sql10`${orders.classDate} >= ${input.startDate}`);
       whereConditions.push(sql10`${orders.classDate} <= ${input.endDate}`);
@@ -16431,7 +16695,7 @@ var analyticsRouter = router({
       totalPropertyFee: sql10`SUM(${orders.propertyFee})`,
       totalUtilityFee: sql10`SUM(${orders.utilityFee})`,
       totalPartnerFee: sql10`SUM(${orders.partnerFee})`
-    }).from(orders).where(and16(...whereConditions)).groupBy(orders.deliveryCity);
+    }).from(orders).where(and17(...whereConditions)).groupBy(orders.deliveryCity);
     return stats.map((s) => {
       const totalRevenue = Number(s.totalRevenue) || 0;
       const teacherFee = Number(s.totalTeacherFee) || 0;
@@ -16479,12 +16743,12 @@ var analyticsRouter = router({
    */
   trafficSourceAnalysis: protectedProcedure.query(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const stats = await db.select({
       source: orders.trafficSource,
       orderCount: sql10`COUNT(*)`,
       totalRevenue: sql10`SUM(${orders.courseAmount})`
-    }).from(orders).where(eq21(orders.status, "paid")).groupBy(orders.trafficSource);
+    }).from(orders).where(eq22(orders.status, "paid")).groupBy(orders.trafficSource);
     return stats.map((s) => ({
       source: s.source || "\u672A\u77E5",
       orderCount: Number(s.orderCount) || 0,
@@ -16497,18 +16761,18 @@ var analyticsRouter = router({
    * 获取城市收入趋势数据
    */
   cityRevenueTrend: protectedProcedure.input(
-    z25.object({
-      cityId: z25.number().optional(),
-      months: z25.number().optional().default(12)
+    z26.object({
+      cityId: z26.number().optional(),
+      months: z26.number().optional().default(12)
     }).optional()
   ).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
     const monthsCount = input?.months || 12;
     const startDate = /* @__PURE__ */ new Date();
     startDate.setMonth(startDate.getMonth() - monthsCount);
     let whereConditions = [
-      eq21(orders.status, "paid"),
+      eq22(orders.status, "paid"),
       sql10`${orders.classDate} >= ${startDate.toISOString().split("T")[0]}`
     ];
     if (input?.cityId) {
@@ -16519,7 +16783,7 @@ var analyticsRouter = router({
       city: orders.deliveryCity,
       totalRevenue: sql10`SUM(${orders.courseAmount})`,
       orderCount: sql10`COUNT(*)`
-    }).from(orders).where(and16(...whereConditions)).groupBy(monthColumn, orders.deliveryCity).orderBy(monthColumn);
+    }).from(orders).where(and17(...whereConditions)).groupBy(monthColumn, orders.deliveryCity).orderBy(monthColumn);
     const monthsSet = /* @__PURE__ */ new Set();
     const citiesMap = /* @__PURE__ */ new Map();
     stats.forEach((s) => {
@@ -16560,14 +16824,14 @@ var analyticsRouter = router({
    * 获取城市收入汇总数据
    */
   cityRevenue: protectedProcedure.input(
-    z25.object({
-      startDate: z25.string().optional(),
-      endDate: z25.string().optional()
+    z26.object({
+      startDate: z26.string().optional(),
+      endDate: z26.string().optional()
     }).optional()
   ).query(async ({ ctx, input }) => {
     const db = await getDb();
-    if (!db) throw new TRPCError21({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-    let whereConditions = [eq21(orders.status, "paid")];
+    if (!db) throw new TRPCError22({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+    let whereConditions = [eq22(orders.status, "paid")];
     if (input?.startDate) {
       whereConditions.push(sql10`${orders.classDate} >= ${input.startDate}`);
     }
@@ -16578,7 +16842,7 @@ var analyticsRouter = router({
       city: orders.deliveryCity,
       totalRevenue: sql10`SUM(${orders.courseAmount})`,
       orderCount: sql10`COUNT(*)`
-    }).from(orders).where(and16(...whereConditions)).groupBy(orders.deliveryCity);
+    }).from(orders).where(and17(...whereConditions)).groupBy(orders.deliveryCity);
     return stats.map((s) => ({
       city: s.city || "\u672A\u77E5",
       totalRevenue: Number(s.totalRevenue) || 0,
@@ -16591,9 +16855,9 @@ var analyticsRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z26 } from "zod";
-import { eq as eq22, and as and17, or as or5, sql as sql11, asc as asc2 } from "drizzle-orm";
-import { TRPCError as TRPCError22 } from "@trpc/server";
+import { z as z27 } from "zod";
+import { eq as eq23, and as and18, or as or6, sql as sql11, asc as asc2 } from "drizzle-orm";
+import { TRPCError as TRPCError23 } from "@trpc/server";
 
 // server/orderNoGenerator.ts
 var CITY_AREA_CODES = {
@@ -16654,13 +16918,13 @@ var bookingRouter = router({
    * 返回可用的开始时间列表
    * 考虑教室容量和现有预约
    */
-  getAvailableSlots: publicProcedure.input(z26.object({
-    cityId: z26.number().int().positive(),
-    date: z26.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  getAvailableSlots: publicProcedure.input(z27.object({
+    cityId: z27.number().int().positive(),
+    date: z27.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     // YYYY-MM-DD
-    totalDuration: z26.number().positive(),
+    totalDuration: z27.number().positive(),
     // 总时长(小时)
-    teacherId: z26.number().int().positive().optional()
+    teacherId: z27.number().int().positive().optional()
     // 可选，指定老师
   })).query(async ({ input }) => {
     const { cityId, date: date2, totalDuration, teacherId } = input;
@@ -16671,9 +16935,9 @@ var bookingRouter = router({
       name: classrooms.name,
       sortOrder: classrooms.sortOrder,
       capacity: classrooms.capacity
-    }).from(classrooms).where(and17(
-      eq22(classrooms.cityId, cityId),
-      eq22(classrooms.isActive, true)
+    }).from(classrooms).where(and18(
+      eq23(classrooms.cityId, cityId),
+      eq23(classrooms.isActive, true)
     )).orderBy(asc2(classrooms.sortOrder));
     if (cityClassrooms.length === 0) {
       return {
@@ -16689,7 +16953,7 @@ var bookingRouter = router({
       startTime: schedules.startTime,
       endTime: schedules.endTime,
       teacherId: schedules.teacherId
-    }).from(schedules).where(and17(
+    }).from(schedules).where(and18(
       sql11`${schedules.startTime} >= ${dateStart}`,
       sql11`${schedules.startTime} < ${dateEnd}`
     ));
@@ -16781,13 +17045,13 @@ var bookingRouter = router({
    * 获取指定城市、时间段的可用教室
    * 按sortOrder优先级返回第一个可用的教室
    */
-  getAvailableClassroom: publicProcedure.input(z26.object({
-    cityId: z26.number().int().positive(),
-    date: z26.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  getAvailableClassroom: publicProcedure.input(z27.object({
+    cityId: z27.number().int().positive(),
+    date: z27.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     // YYYY-MM-DD
-    startTime: z26.string().regex(/^\d{2}:\d{2}$/),
+    startTime: z27.string().regex(/^\d{2}:\d{2}$/),
     // HH:mm
-    duration: z26.number().positive()
+    duration: z27.number().positive()
     // 课程时长(小时)
   })).query(async ({ input }) => {
     const { cityId, date: date2, startTime, duration } = input;
@@ -16804,9 +17068,9 @@ var bookingRouter = router({
       name: classrooms.name,
       sortOrder: classrooms.sortOrder,
       capacity: classrooms.capacity
-    }).from(classrooms).where(and17(
-      eq22(classrooms.cityId, cityId),
-      eq22(classrooms.isActive, true)
+    }).from(classrooms).where(and18(
+      eq23(classrooms.cityId, cityId),
+      eq23(classrooms.isActive, true)
     )).orderBy(asc2(classrooms.sortOrder));
     if (cityClassrooms.length === 0) {
       return {
@@ -16816,21 +17080,21 @@ var bookingRouter = router({
       };
     }
     for (const classroom of cityClassrooms) {
-      const bookings = await db.select({ id: schedules.id }).from(schedules).where(and17(
-        eq22(schedules.classroomId, classroom.id),
-        or5(
+      const bookings = await db.select({ id: schedules.id }).from(schedules).where(and18(
+        eq23(schedules.classroomId, classroom.id),
+        or6(
           // 新预约开始时间在现有预约时间段内
-          and17(
+          and18(
             sql11`${schedules.startTime} <= ${startTimestamp}`,
             sql11`${schedules.endTime} > ${startTimestamp}`
           ),
           // 新预约结束时间在现有预约时间段内
-          and17(
+          and18(
             sql11`${schedules.startTime} < ${endTimestamp}`,
             sql11`${schedules.endTime} >= ${endTimestamp}`
           ),
           // 新预约完全包含现有预约
-          and17(
+          and18(
             sql11`${schedules.startTime} >= ${startTimestamp}`,
             sql11`${schedules.endTime} <= ${endTimestamp}`
           )
@@ -16861,26 +17125,26 @@ var bookingRouter = router({
    * 自动分配教室（如果未指定）
    * 创建schedules记录和orders记录
    */
-  create: protectedProcedure.input(z26.object({
-    cityId: z26.number().int().positive(),
-    teacherId: z26.number().int().positive(),
-    date: z26.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  create: protectedProcedure.input(z27.object({
+    cityId: z27.number().int().positive(),
+    teacherId: z27.number().int().positive(),
+    date: z27.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     // YYYY-MM-DD
-    startTime: z26.string().regex(/^\d{2}:\d{2}$/),
+    startTime: z27.string().regex(/^\d{2}:\d{2}$/),
     // HH:mm
-    classroomId: z26.number().int().positive().optional(),
+    classroomId: z27.number().int().positive().optional(),
     // 可选，不传则自动分配
-    courseItems: z26.array(z26.object({
-      courseId: z26.number().int().positive(),
-      quantity: z26.number().int().positive().default(1),
-      duration: z26.number().positive(),
+    courseItems: z27.array(z27.object({
+      courseId: z27.number().int().positive(),
+      quantity: z27.number().int().positive().default(1),
+      duration: z27.number().positive(),
       // 课程时长(小时)
-      price: z26.number().positive()
+      price: z27.number().positive()
       // 课程单价
     })).min(1),
-    transportFee: z26.number().nonnegative().optional(),
+    transportFee: z27.number().nonnegative().optional(),
     // 车费（可选）
-    customerNote: z26.string().max(500).optional()
+    customerNote: z27.string().max(500).optional()
     // 客户备注
   })).mutation(async ({ ctx, input }) => {
     const { cityId, teacherId, date: date2, startTime, classroomId, courseItems, transportFee, customerNote } = input;
@@ -16889,27 +17153,27 @@ var bookingRouter = router({
     const now = /* @__PURE__ */ new Date();
     const [hours, minutes] = startTime.split(":").map(Number);
     if (minutes !== 0 && minutes !== 30) {
-      throw new TRPCError22({
+      throw new TRPCError23({
         code: "BAD_REQUEST",
         message: "\u5F00\u59CB\u65F6\u95F4\u5FC5\u987B\u662F\u6574\u70B9\u6216\u534A\u70B9\uFF08\u598210:00\u621610:30\uFF09"
       });
     }
     const bookingDateTime = /* @__PURE__ */ new Date(`${date2}T${startTime}:00`);
     if (bookingDateTime < now) {
-      throw new TRPCError22({
+      throw new TRPCError23({
         code: "BAD_REQUEST",
         message: "\u4E0D\u80FD\u9884\u7EA6\u8FC7\u53BB\u7684\u65F6\u95F4"
       });
     }
     const minBookingTime = new Date(now.getTime() + 2 * 60 * 60 * 1e3);
     if (bookingDateTime < minBookingTime) {
-      throw new TRPCError22({
+      throw new TRPCError23({
         code: "BAD_REQUEST",
         message: "\u9884\u7EA6\u65F6\u95F4\u5FC5\u987B\u5728\u5F53\u524D\u65F6\u95F42\u5C0F\u65F6\u4E4B\u540E"
       });
     }
     if (hours >= 23) {
-      throw new TRPCError22({
+      throw new TRPCError23({
         code: "BAD_REQUEST",
         message: "\u6700\u665A\u53EF\u9884\u7EA6\u65F6\u95F4\u4E3A23:00"
       });
@@ -16918,17 +17182,17 @@ var bookingRouter = router({
     const totalPrice = courseItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const endDateTime = new Date(bookingDateTime.getTime() + totalDuration * 60 * 60 * 1e3);
     const endTime = `${String(endDateTime.getHours()).padStart(2, "0")}:${String(endDateTime.getMinutes()).padStart(2, "0")}`;
-    const teacherResult = await db.select({ name: teachers.name }).from(teachers).where(eq22(teachers.id, teacherId)).limit(1);
+    const teacherResult = await db.select({ name: teachers.name }).from(teachers).where(eq23(teachers.id, teacherId)).limit(1);
     const teacherName = teacherResult[0]?.name || "";
     let finalClassroomId = classroomId;
     if (!finalClassroomId) {
-      const availableClassrooms = await db.select().from(classrooms).where(and17(
-        eq22(classrooms.cityId, cityId),
-        eq22(classrooms.isActive, true)
+      const availableClassrooms = await db.select().from(classrooms).where(and18(
+        eq23(classrooms.cityId, cityId),
+        eq23(classrooms.isActive, true)
       )).orderBy(asc2(classrooms.sortOrder)).limit(1);
       const availableClassroom = availableClassrooms[0];
       if (!availableClassroom) {
-        throw new TRPCError22({
+        throw new TRPCError23({
           code: "BAD_REQUEST",
           message: "\u8BE5\u57CE\u5E02\u6682\u65E0\u53EF\u7528\u6559\u5BA4"
         });
@@ -16938,57 +17202,57 @@ var bookingRouter = router({
     const startTimestamp = `${date2} ${startTime}:00`;
     const endTimestamp = `${date2} ${endTime}:00`;
     return await db.transaction(async (tx) => {
-      const classroomResult = await tx.select().from(classrooms).where(eq22(classrooms.id, finalClassroomId)).limit(1).for("update");
+      const classroomResult = await tx.select().from(classrooms).where(eq23(classrooms.id, finalClassroomId)).limit(1).for("update");
       const classroom = classroomResult[0];
       const cityName = classroom?.cityName || "";
       if (!classroom) {
-        throw new TRPCError22({
+        throw new TRPCError23({
           code: "BAD_REQUEST",
           message: "\u6559\u5BA4\u4E0D\u5B58\u5728"
         });
       }
-      const classroomBookings = await tx.select({ id: schedules.id }).from(schedules).where(and17(
-        eq22(schedules.classroomId, finalClassroomId),
-        or5(
-          and17(
+      const classroomBookings = await tx.select({ id: schedules.id }).from(schedules).where(and18(
+        eq23(schedules.classroomId, finalClassroomId),
+        or6(
+          and18(
             sql11`${schedules.startTime} <= ${startTimestamp}`,
             sql11`${schedules.endTime} > ${startTimestamp}`
           ),
-          and17(
+          and18(
             sql11`${schedules.startTime} < ${endTimestamp}`,
             sql11`${schedules.endTime} >= ${endTimestamp}`
           ),
-          and17(
+          and18(
             sql11`${schedules.startTime} >= ${startTimestamp}`,
             sql11`${schedules.endTime} <= ${endTimestamp}`
           )
         )
       ));
       if (classroomBookings.length >= (classroom.capacity || 1)) {
-        throw new TRPCError22({
+        throw new TRPCError23({
           code: "CONFLICT",
           message: "\u62B1\u6B49\uFF0C\u8BE5\u65F6\u95F4\u6BB5\u5DF2\u88AB\u5176\u4ED6\u7528\u6237\u9884\u7EA6\uFF0C\u8BF7\u9009\u62E9\u5176\u4ED6\u65F6\u95F4"
         });
       }
-      const teacherBookings = await tx.select({ id: schedules.id }).from(schedules).where(and17(
-        eq22(schedules.teacherId, teacherId),
-        or5(
-          and17(
+      const teacherBookings = await tx.select({ id: schedules.id }).from(schedules).where(and18(
+        eq23(schedules.teacherId, teacherId),
+        or6(
+          and18(
             sql11`${schedules.startTime} <= ${startTimestamp}`,
             sql11`${schedules.endTime} > ${startTimestamp}`
           ),
-          and17(
+          and18(
             sql11`${schedules.startTime} < ${endTimestamp}`,
             sql11`${schedules.endTime} >= ${endTimestamp}`
           ),
-          and17(
+          and18(
             sql11`${schedules.startTime} >= ${startTimestamp}`,
             sql11`${schedules.endTime} <= ${endTimestamp}`
           )
         )
       ));
       if (teacherBookings.length > 0) {
-        throw new TRPCError22({
+        throw new TRPCError23({
           code: "CONFLICT",
           message: "\u62B1\u6B49\uFF0C\u8BE5\u8001\u5E08\u5728\u6B64\u65F6\u95F4\u6BB5\u5DF2\u6709\u5176\u4ED6\u8BFE\u7A0B\u5B89\u6392\uFF0C\u8BF7\u9009\u62E9\u5176\u4ED6\u8001\u5E08\u6216\u65F6\u95F4"
         });
@@ -17019,7 +17283,7 @@ var bookingRouter = router({
       const orderId = Number(orderResult[0].insertId);
       const orderItemsData = [];
       for (const item of courseItems) {
-        const courseResult = await tx.select({ name: courses.name }).from(courses).where(eq22(courses.id, item.courseId)).limit(1);
+        const courseResult = await tx.select({ name: courses.name }).from(courses).where(eq23(courses.id, item.courseId)).limit(1);
         const courseName = courseResult[0]?.name || `\u8BFE\u7A0B${item.courseId}`;
         const orderItemResult = await tx.insert(orderItems).values({
           orderId,
@@ -17076,7 +17340,7 @@ var bookingRouter = router({
         deliveryCourseMap.set(itemData.courseName, count2 + itemData.quantity);
       }
       const deliveryCourseStr = Array.from(deliveryCourseMap.entries()).map(([courseName, count2]) => count2 > 1 ? `${courseName} x${count2}` : courseName).join(", ");
-      await tx.update(orders).set({ deliveryCourse: deliveryCourseStr }).where(eq22(orders.id, orderId));
+      await tx.update(orders).set({ deliveryCourse: deliveryCourseStr }).where(eq23(orders.id, orderId));
       return {
         success: true,
         data: {
@@ -17102,39 +17366,39 @@ var bookingRouter = router({
 init_trpc();
 init_db();
 init_schema();
-import { z as z27 } from "zod";
-import { TRPCError as TRPCError23 } from "@trpc/server";
-import { eq as eq23 } from "drizzle-orm";
-var PaymentChannelEnum = z27.enum(["wechat", "alipay", "balance"]);
-var OrderStatusEnum = z27.enum(["pending", "paid", "has_balance", "completed", "cancelled", "refunded"]);
+import { z as z28 } from "zod";
+import { TRPCError as TRPCError24 } from "@trpc/server";
+import { eq as eq24 } from "drizzle-orm";
+var PaymentChannelEnum = z28.enum(["wechat", "alipay", "balance"]);
+var OrderStatusEnum = z28.enum(["pending", "paid", "has_balance", "completed", "cancelled", "refunded"]);
 var paymentRouter = router({
   /**
    * 预下单接口
    * 向支付服务商进行预下单，获取前端拉起原生支付所需的参数
    */
   prepay: protectedProcedure.input(
-    z27.object({
-      orderId: z27.number().int().positive(),
+    z28.object({
+      orderId: z28.number().int().positive(),
       paymentChannel: PaymentChannelEnum
     })
   ).mutation(async ({ input, ctx }) => {
     const { orderId, paymentChannel } = input;
     const db = await getDb();
     if (!db) {
-      throw new TRPCError23({
+      throw new TRPCError24({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const [order] = await db.select().from(orders).where(eq23(orders.id, orderId)).limit(1);
+    const [order] = await db.select().from(orders).where(eq24(orders.id, orderId)).limit(1);
     if (!order) {
-      throw new TRPCError23({
+      throw new TRPCError24({
         code: "NOT_FOUND",
         message: "\u8BA2\u5355\u4E0D\u5B58\u5728"
       });
     }
     if (order.status !== "pending") {
-      throw new TRPCError23({
+      throw new TRPCError24({
         code: "BAD_REQUEST",
         message: `\u8BA2\u5355\u72B6\u6001\u4E0D\u6B63\u786E\uFF0C\u5F53\u524D\u72B6\u6001: ${order.status}`
       });
@@ -17147,7 +17411,7 @@ var paymentRouter = router({
       case "alipay":
         return await handleAlipayPrepay(order);
       default:
-        throw new TRPCError23({
+        throw new TRPCError24({
           code: "BAD_REQUEST",
           message: "\u4E0D\u652F\u6301\u7684\u652F\u4ED8\u6E20\u9053"
         });
@@ -17158,14 +17422,14 @@ var paymentRouter = router({
    * 供前端轮询使用
    */
   getStatus: publicProcedure.input(
-    z27.object({
-      orderId: z27.number().int().positive()
+    z28.object({
+      orderId: z28.number().int().positive()
     })
   ).query(async ({ input }) => {
     const { orderId } = input;
     const db = await getDb();
     if (!db) {
-      throw new TRPCError23({
+      throw new TRPCError24({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
@@ -17174,9 +17438,9 @@ var paymentRouter = router({
       status: orders.status,
       paymentDate: orders.paymentDate,
       paymentChannel: orders.paymentChannel
-    }).from(orders).where(eq23(orders.id, orderId)).limit(1);
+    }).from(orders).where(eq24(orders.id, orderId)).limit(1);
     if (!order) {
-      throw new TRPCError23({
+      throw new TRPCError24({
         code: "NOT_FOUND",
         message: "\u8BA2\u5355\u4E0D\u5B58\u5728"
       });
@@ -17192,25 +17456,25 @@ var paymentRouter = router({
    * 由支付回调Webhook调用
    */
   updateStatus: publicProcedure.input(
-    z27.object({
-      orderId: z27.number().int().positive(),
+    z28.object({
+      orderId: z28.number().int().positive(),
       status: OrderStatusEnum,
-      paymentDate: z27.string().optional(),
-      paymentChannel: z27.string().optional(),
-      channelOrderNo: z27.string().optional()
+      paymentDate: z28.string().optional(),
+      paymentChannel: z28.string().optional(),
+      channelOrderNo: z28.string().optional()
     })
   ).mutation(async ({ input }) => {
     const { orderId, status, paymentDate, paymentChannel, channelOrderNo } = input;
     const db = await getDb();
     if (!db) {
-      throw new TRPCError23({
+      throw new TRPCError24({
         code: "INTERNAL_SERVER_ERROR",
         message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25"
       });
     }
-    const [order] = await db.select().from(orders).where(eq23(orders.id, orderId)).limit(1);
+    const [order] = await db.select().from(orders).where(eq24(orders.id, orderId)).limit(1);
     if (!order) {
-      throw new TRPCError23({
+      throw new TRPCError24({
         code: "NOT_FOUND",
         message: "\u8BA2\u5355\u4E0D\u5B58\u5728"
       });
@@ -17227,7 +17491,7 @@ var paymentRouter = router({
       paymentChannel,
       channelOrderNo,
       updatedAt: /* @__PURE__ */ new Date()
-    }).where(eq23(orders.id, orderId));
+    }).where(eq24(orders.id, orderId));
     return {
       success: true,
       message: "\u8BA2\u5355\u72B6\u6001\u66F4\u65B0\u6210\u529F"
@@ -17244,7 +17508,7 @@ async function handleBalancePayment(orderId, userId) {
     paymentDate: /* @__PURE__ */ new Date(),
     paymentChannel: "balance",
     updatedAt: /* @__PURE__ */ new Date()
-  }).where(eq23(orders.id, orderId));
+  }).where(eq24(orders.id, orderId));
   return {
     success: true,
     message: "\u4F59\u989D\u652F\u4ED8\u6210\u529F"
@@ -17271,12 +17535,12 @@ init_timezone();
 init_roles();
 init_db();
 init_db();
-import { TRPCError as TRPCError25 } from "@trpc/server";
+import { TRPCError as TRPCError26 } from "@trpc/server";
 init_orderIdGenerator();
 init_channelOrderNoUtils();
 init_teacherFeeValidator();
 init_schema();
-import { eq as eq24 } from "drizzle-orm";
+import { eq as eq25 } from "drizzle-orm";
 var adminProcedure6 = protectedProcedure.use(({ ctx, next }) => {
   return next({ ctx });
 });
@@ -17307,6 +17571,7 @@ var appRouter = router({
   transportFeeFix: transportFeeFixRouter,
   parsingLearning: parsingLearningRouter,
   reconciliation: reconciliationRouter,
+  statementMatch: statementMatchRouter,
   salesCityPerformance: salesCityPerformanceRouter,
   teacherPayments: teacherPaymentRouter,
   partnerManagement: partnerManagementRouter,
@@ -17332,34 +17597,34 @@ var appRouter = router({
   // 审计日志
   auditLogs: router({
     // 获取所有审计日志
-    getAll: protectedProcedure.input(z28.object({
-      limit: z28.number().optional(),
-      offset: z28.number().optional()
+    getAll: protectedProcedure.input(z29.object({
+      limit: z29.number().optional(),
+      offset: z29.number().optional()
     }).optional()).query(async ({ input }) => {
       const limit = input?.limit || 100;
       const offset = input?.offset || 0;
       return getAllAuditLogs(limit, offset);
     }),
     // 按操作类型获取审计日志
-    getByType: protectedProcedure.input(z28.object({
-      operationType: z28.string(),
-      limit: z28.number().optional()
+    getByType: protectedProcedure.input(z29.object({
+      operationType: z29.string(),
+      limit: z29.number().optional()
     })).query(async ({ input }) => {
       const limit = input.limit || 50;
       return getAuditLogsByType(input.operationType, limit);
     }),
     // 按操作人获取审计日志
-    getByOperator: protectedProcedure.input(z28.object({
-      operatorId: z28.number(),
-      limit: z28.number().optional()
+    getByOperator: protectedProcedure.input(z29.object({
+      operatorId: z29.number(),
+      limit: z29.number().optional()
     })).query(async ({ input }) => {
       const limit = input.limit || 50;
       return getAuditLogsByOperator(input.operatorId, limit);
     }),
     // 按日期范围获取审计日志
-    getByDateRange: protectedProcedure.input(z28.object({
-      startDate: z28.string(),
-      endDate: z28.string()
+    getByDateRange: protectedProcedure.input(z29.object({
+      startDate: z29.string(),
+      endDate: z29.string()
     })).query(async ({ input }) => {
       const startDate = new Date(input.startDate);
       const endDate = new Date(input.endDate);
@@ -17375,24 +17640,24 @@ var appRouter = router({
     list: protectedProcedure.query(async () => {
       return getAllUsers();
     }),
-    updateRole: adminProcedure6.input(z28.object({
-      userId: z28.number(),
-      role: z28.enum(USER_ROLE_VALUES)
+    updateRole: adminProcedure6.input(z29.object({
+      userId: z29.number(),
+      role: z29.enum(USER_ROLE_VALUES)
     })).mutation(async ({ input }) => {
       await updateUserRole(input.userId, input.role);
       return { success: true };
     }),
     // 新多角色更新接口
-    updateRoles: adminProcedure6.input(z28.object({
-      userId: z28.number(),
-      roles: z28.array(z28.enum(USER_ROLE_VALUES)).min(1, "\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u89D2\u8272")
+    updateRoles: adminProcedure6.input(z29.object({
+      userId: z29.number(),
+      roles: z29.array(z29.enum(USER_ROLE_VALUES)).min(1, "\u81F3\u5C11\u9009\u62E9\u4E00\u4E2A\u89D2\u8272")
     })).mutation(async ({ input }) => {
       await updateUserRoles(input.userId, input.roles);
       return { success: true };
     }),
-    updateStatus: adminProcedure6.input(z28.object({
-      userId: z28.number(),
-      isActive: z28.boolean()
+    updateStatus: adminProcedure6.input(z29.object({
+      userId: z29.number(),
+      isActive: z29.boolean()
     })).mutation(async ({ input }) => {
       await updateUserStatus(input.userId, input.isActive);
       return { success: true };
@@ -17400,21 +17665,21 @@ var appRouter = router({
   }),
   // 订单管理
   orders: router({
-    list: protectedProcedure.input(z28.object({
-      paymentChannel: z28.string().optional(),
-      channelOrderNo: z28.string().optional()
+    list: protectedProcedure.input(z29.object({
+      paymentChannel: z29.string().optional(),
+      channelOrderNo: z29.string().optional()
     }).optional()).query(async ({ ctx, input }) => {
       const { getDataScope: getDataScope2 } = await Promise.resolve().then(() => (init_permissions(), permissions_exports));
       const scope = getDataScope2(ctx);
       if (input?.channelOrderNo && input.channelOrderNo.trim() !== "") {
         if (!scope.isAdmin && !scope.isFinance) {
-          throw new TRPCError25({ code: "FORBIDDEN", message: "\u65E0\u6743\u641C\u7D22\u6E20\u9053\u8BA2\u5355\u53F7" });
+          throw new TRPCError26({ code: "FORBIDDEN", message: "\u65E0\u6743\u641C\u7D22\u6E20\u9053\u8BA2\u5355\u53F7" });
         }
         return searchOrdersByChannelOrderNo(input.channelOrderNo);
       }
       if (input?.paymentChannel && input.paymentChannel !== "all") {
         if (!scope.isAdmin && !scope.isFinance) {
-          throw new TRPCError25({ code: "FORBIDDEN", message: "\u65E0\u6743\u6309\u652F\u4ED8\u6E20\u9053\u7B5B\u9009" });
+          throw new TRPCError26({ code: "FORBIDDEN", message: "\u65E0\u6743\u6309\u652F\u4ED8\u6E20\u9053\u7B5B\u9009" });
         }
         return getOrdersByPaymentChannel(input.paymentChannel);
       }
@@ -17430,19 +17695,19 @@ var appRouter = router({
         return [];
       }
     }),
-    getById: protectedProcedure.input(z28.object({ id: z28.number() })).query(async ({ ctx, input }) => {
+    getById: protectedProcedure.input(z29.object({ id: z29.number() })).query(async ({ ctx, input }) => {
       const { getDataScope: getDataScope2, checkResourceOwnership: checkResourceOwnership2 } = await Promise.resolve().then(() => (init_permissions(), permissions_exports));
       const scope = getDataScope2(ctx);
       const order = await getOrderById(input.id);
       if (!order) {
-        throw new TRPCError25({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
+        throw new TRPCError26({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
       }
       if (scope.isAdmin || scope.isFinance) {
         return order;
       }
       if (scope.isUser || scope.isSales) {
         if (order.salesId !== ctx.user.id) {
-          throw new TRPCError25({ code: "FORBIDDEN", message: "\u65E0\u6743\u67E5\u770B\u6B64\u8BA2\u5355" });
+          throw new TRPCError26({ code: "FORBIDDEN", message: "\u65E0\u6743\u67E5\u770B\u6B64\u8BA2\u5355" });
         }
         return order;
       }
@@ -17450,48 +17715,48 @@ var appRouter = router({
         const user = await getUserById(ctx.user.id);
         const teacherName = user?.name || user?.nickname || "";
         if (!order.deliveryTeacher || !order.deliveryTeacher.includes(teacherName)) {
-          throw new TRPCError25({ code: "FORBIDDEN", message: "\u65E0\u6743\u67E5\u770B\u6B64\u8BA2\u5355" });
+          throw new TRPCError26({ code: "FORBIDDEN", message: "\u65E0\u6743\u67E5\u770B\u6B64\u8BA2\u5355" });
         }
         return order;
       }
-      throw new TRPCError25({ code: "FORBIDDEN", message: "\u65E0\u6743\u67E5\u770B\u8BA2\u5355" });
+      throw new TRPCError26({ code: "FORBIDDEN", message: "\u65E0\u6743\u67E5\u770B\u8BA2\u5355" });
     }),
     // 更新订单支付状态
-    updateStatus: salesOrAdminProcedure2.input(z28.object({
-      id: z28.number(),
-      status: z28.enum(["pending", "paid", "completed", "cancelled", "refunded"])
+    updateStatus: salesOrAdminProcedure2.input(z29.object({
+      id: z29.number(),
+      status: z29.enum(["pending", "paid", "completed", "cancelled", "refunded"])
     })).mutation(async ({ input }) => {
       return updateOrderStatus(input.id, input.status);
     }),
     // 更新订单交付状态
-    updateDeliveryStatus: salesOrAdminProcedure2.input(z28.object({
-      id: z28.number(),
-      deliveryStatus: z28.enum(["pending", "accepted", "delivered"])
+    updateDeliveryStatus: salesOrAdminProcedure2.input(z29.object({
+      id: z29.number(),
+      deliveryStatus: z29.enum(["pending", "accepted", "delivered"])
     })).mutation(async ({ input, ctx }) => {
       return updateOrderDeliveryStatus(input.id, input.deliveryStatus, ctx.user.id);
     }),
     // 通用订单更新接口(简化版) - 仅用于更新状态和交付信息
-    updateFields: salesOrAdminProcedure2.input(z28.object({
-      id: z28.number(),
-      data: z28.object({
-        status: z28.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
-        deliveryStatus: z28.enum(["pending", "accepted", "delivered"]).optional(),
-        deliveryTeacher: z28.string().optional(),
-        deliveryCity: z28.string().optional(),
-        deliveryRoom: z28.string().optional(),
+    updateFields: salesOrAdminProcedure2.input(z29.object({
+      id: z29.number(),
+      data: z29.object({
+        status: z29.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+        deliveryStatus: z29.enum(["pending", "accepted", "delivered"]).optional(),
+        deliveryTeacher: z29.string().optional(),
+        deliveryCity: z29.string().optional(),
+        deliveryRoom: z29.string().optional(),
         // 交付教室(使用deliveryRoom字段)
-        deliveryCourse: z28.string().optional()
+        deliveryCourse: z29.string().optional()
       })
     })).mutation(async ({ input }) => {
       return updateOrder(input.id, input.data);
     }),
     // 老师端查询订单 - 查询已支付但未交付的订单
-    getTeacherOrders: protectedProcedure.input(z28.object({
-      page: z28.number().optional().default(1),
-      pageSize: z28.number().optional().default(10),
-      teacherName: z28.string().optional(),
+    getTeacherOrders: protectedProcedure.input(z29.object({
+      page: z29.number().optional().default(1),
+      pageSize: z29.number().optional().default(10),
+      teacherName: z29.string().optional(),
       // 可选:按老师名筛选
-      city: z28.string().optional()
+      city: z29.string().optional()
       // 可选:按城市筛选
     })).query(async ({ ctx, input }) => {
       const allOrders = await getTeacherPendingOrders(input.teacherName, input.city);
@@ -17500,58 +17765,58 @@ var appRouter = router({
       const orders2 = allOrders.slice(start, start + input.pageSize);
       return { orders: orders2, total };
     }),
-    parseTransferNotes: salesOrAdminProcedure2.input(z28.object({
-      text: z28.string()
+    parseTransferNotes: salesOrAdminProcedure2.input(z29.object({
+      text: z29.string()
     })).mutation(async () => {
-      throw new TRPCError25({
+      throw new TRPCError26({
         code: "METHOD_NOT_SUPPORTED",
         message: "\u8F6C\u8D26\u5907\u6CE8\u89E3\u6790\u529F\u80FD\u6682\u65F6\u4E0D\u53EF\u7528\uFF08\u7CFB\u7EDF\u7EF4\u62A4\u4E2D\uFF09"
       });
     }),
-    parseWechatBill: salesOrAdminProcedure2.input(z28.object({
-      rows: z28.array(z28.any()),
-      template: z28.enum(["wechat", "alipay", "custom"]).optional()
+    parseWechatBill: salesOrAdminProcedure2.input(z29.object({
+      rows: z29.array(z29.any()),
+      template: z29.enum(["wechat", "alipay", "custom"]).optional()
     })).mutation(async () => {
-      throw new TRPCError25({
+      throw new TRPCError26({
         code: "METHOD_NOT_SUPPORTED",
         message: "\u5FAE\u4FE1\u8D26\u5355\u89E3\u6790\u529F\u80FD\u6682\u65F6\u4E0D\u53EF\u7528\uFF08\u7CFB\u7EDF\u7EF4\u62A4\u4E2D\uFF09"
       });
     }),
     // 用户下单接口 - 允许所有登录用户创建订单
-    userCreate: protectedProcedure.input(z28.object({
-      customerName: z28.string(),
+    userCreate: protectedProcedure.input(z29.object({
+      customerName: z29.string(),
       // 客户名(必填)
-      customerPhone: z28.string().optional(),
+      customerPhone: z29.string().optional(),
       // 客户电话
-      customerWechat: z28.string().optional(),
+      customerWechat: z29.string().optional(),
       // 客户微信
-      paymentAmount: z28.string(),
+      paymentAmount: z29.string(),
       // 支付金额(必填)
-      courseAmount: z28.string(),
+      courseAmount: z29.string(),
       // 课程金额(必填)
-      paymentChannel: z28.string().optional(),
+      paymentChannel: z29.string().optional(),
       // 支付渠道
-      channelOrderNo: z28.string().optional(),
+      channelOrderNo: z29.string().optional(),
       // 渠道订单号
-      paymentDate: z28.string().optional(),
+      paymentDate: z29.string().optional(),
       // 支付日期
-      paymentTime: z28.string().optional(),
+      paymentTime: z29.string().optional(),
       // 支付时间
-      deliveryCity: z28.string().optional(),
+      deliveryCity: z29.string().optional(),
       // 交付城市
-      deliveryRoom: z28.string().optional(),
+      deliveryRoom: z29.string().optional(),
       // 交付教室
-      deliveryClassroomId: z28.number().optional(),
+      deliveryClassroomId: z29.number().optional(),
       // 交付教室ID
-      deliveryTeacher: z28.string().optional(),
+      deliveryTeacher: z29.string().optional(),
       // 交付老师
-      deliveryCourse: z28.string().optional(),
+      deliveryCourse: z29.string().optional(),
       // 交付课程
-      classDate: z28.string().optional(),
+      classDate: z29.string().optional(),
       // 上课日期
-      classTime: z28.string().optional(),
+      classTime: z29.string().optional(),
       // 上课时间
-      notes: z28.string().optional()
+      notes: z29.string().optional()
       // 备注
     })).mutation(async ({ input, ctx }) => {
       let orderNo = generateOrderNo(input.deliveryCity);
@@ -17561,7 +17826,7 @@ var appRouter = router({
         orderNo = generateOrderNo(input.deliveryCity, suffixStr);
         suffix++;
         if (suffix > 999) {
-          throw new TRPCError25({
+          throw new TRPCError26({
             code: "INTERNAL_SERVER_ERROR",
             message: "\u8BA2\u5355\u53F7\u751F\u6210\u5931\u8D25\uFF0C\u8BF7\u7A0D\u540E\u91CD\u8BD5"
           });
@@ -17571,7 +17836,7 @@ var appRouter = router({
         const exists = await checkChannelOrderNoExists(input.channelOrderNo);
         if (exists) {
           const existingOrder = await getOrderByChannelOrderNo(input.channelOrderNo);
-          throw new TRPCError25({
+          throw new TRPCError26({
             code: "BAD_REQUEST",
             message: `\u6E20\u9053\u8BA2\u5355\u53F7\u5DF2\u5B58\u5728: ${input.channelOrderNo}
 \u5173\u8054\u8BA2\u5355: ${existingOrder?.orderNo || "\u672A\u77E5"} (\u5BA2\u6237: ${existingOrder?.customerName || "\u672A\u77E5"})`
@@ -17620,10 +17885,10 @@ var appRouter = router({
       return { id, orderNo, success: true };
     }),
     // 获取当前用户的订单列表
-    myOrders: protectedProcedure.input(z28.object({
-      status: z28.enum(["all", "pending", "paid", "completed", "cancelled", "refunded"]).optional(),
-      limit: z28.number().optional(),
-      offset: z28.number().optional()
+    myOrders: protectedProcedure.input(z29.object({
+      status: z29.enum(["all", "pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+      limit: z29.number().optional(),
+      offset: z29.number().optional()
     }).optional()).query(async ({ ctx, input }) => {
       const allOrders = await getOrdersBySales(ctx.user.id);
       let filteredOrders = allOrders;
@@ -17639,48 +17904,48 @@ var appRouter = router({
         hasMore: offset + limit < filteredOrders.length
       };
     }),
-    create: salesOrAdminProcedure2.input(z28.object({
-      orderNo: z28.string().optional(),
-      customerId: z28.number().optional(),
+    create: salesOrAdminProcedure2.input(z29.object({
+      orderNo: z29.string().optional(),
+      customerId: z29.number().optional(),
       // 客户ID(用于余额扣款)
-      customerName: z28.string().optional(),
+      customerName: z29.string().optional(),
       // 允许客户名为空
-      salespersonId: z28.number().optional(),
+      salespersonId: z29.number().optional(),
       // 销售人员ID(关联salespersons表)
-      salesPerson: z28.string().optional(),
-      salesId: z28.number().optional(),
+      salesPerson: z29.string().optional(),
+      salesId: z29.number().optional(),
       // 销售人员ID(关联users表) - 后端自动填充
-      trafficSource: z28.string().optional(),
-      paymentAmount: z28.string(),
-      courseAmount: z28.string(),
-      accountBalance: z28.string().optional(),
-      useAccountBalance: z28.boolean().optional(),
+      trafficSource: z29.string().optional(),
+      paymentAmount: z29.string(),
+      courseAmount: z29.string(),
+      accountBalance: z29.string().optional(),
+      useAccountBalance: z29.boolean().optional(),
       // 是否使用账户余额支付
-      paymentCity: z28.string().optional(),
-      paymentChannel: z28.string().optional(),
-      channelOrderNo: z28.string().optional(),
-      paymentDate: z28.string().optional(),
-      paymentTime: z28.string().optional(),
-      teacherFee: z28.string().optional(),
-      transportFee: z28.string().optional(),
-      otherFee: z28.string().optional(),
-      partnerFee: z28.string().optional(),
-      finalAmount: z28.string().optional(),
-      balanceAmount: z28.string().optional(),
-      deliveryCity: z28.string().optional(),
-      deliveryRoom: z28.string().optional(),
-      deliveryTeacher: z28.string().optional(),
-      deliveryCourse: z28.string().optional(),
-      classDate: z28.string().optional(),
-      classTime: z28.string().optional(),
-      status: z28.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
-      deliveryStatus: z28.enum(["pending", "accepted", "delivered"]).optional(),
-      notes: z28.string().optional()
+      paymentCity: z29.string().optional(),
+      paymentChannel: z29.string().optional(),
+      channelOrderNo: z29.string().optional(),
+      paymentDate: z29.string().optional(),
+      paymentTime: z29.string().optional(),
+      teacherFee: z29.string().optional(),
+      transportFee: z29.string().optional(),
+      otherFee: z29.string().optional(),
+      partnerFee: z29.string().optional(),
+      finalAmount: z29.string().optional(),
+      balanceAmount: z29.string().optional(),
+      deliveryCity: z29.string().optional(),
+      deliveryRoom: z29.string().optional(),
+      deliveryTeacher: z29.string().optional(),
+      deliveryCourse: z29.string().optional(),
+      classDate: z29.string().optional(),
+      classTime: z29.string().optional(),
+      status: z29.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+      deliveryStatus: z29.enum(["pending", "accepted", "delivered"]).optional(),
+      notes: z29.string().optional()
     })).mutation(async ({ input, ctx }) => {
       if (input.customerName && input.customerName.trim() !== "") {
         const teacherNames = await getAllTeacherNames();
         if (teacherNames.includes(input.customerName.trim())) {
-          throw new TRPCError25({
+          throw new TRPCError26({
             code: "BAD_REQUEST",
             message: `\u5BA2\u6237\u540D\u4E0D\u80FD\u4F7F\u7528\u8001\u5E08\u540D\u5B57: ${input.customerName}`
           });
@@ -17690,7 +17955,7 @@ var appRouter = router({
       const courseAmountNum = input.courseAmount ? parseFloat(input.courseAmount) : 0;
       const teacherFeeValidation = validateTeacherFee(teacherFeeNum, courseAmountNum);
       if (!teacherFeeValidation.isValid) {
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "BAD_REQUEST",
           message: teacherFeeValidation.error || "\u8001\u5E08\u8D39\u7528\u9A8C\u8BC1\u5931\u8D25"
         });
@@ -17699,7 +17964,7 @@ var appRouter = router({
         const exists = await checkChannelOrderNoExists(input.channelOrderNo);
         if (exists) {
           const existingOrder = await getOrderByChannelOrderNo(input.channelOrderNo);
-          throw new TRPCError25({
+          throw new TRPCError26({
             code: "BAD_REQUEST",
             message: `\u6E20\u9053\u8BA2\u5355\u53F7\u5DF2\u5B58\u5728: ${input.channelOrderNo}
 \u5173\u8054\u8BA2\u5355: ${existingOrder?.orderNo || "\u672A\u77E5"} (\u5BA2\u6237: ${existingOrder?.customerName || "\u672A\u77E5"})`
@@ -17713,7 +17978,7 @@ var appRouter = router({
         orderNo = generateOrderNo(input.paymentCity || input.deliveryCity, suffixStr);
         suffix++;
         if (suffix > 999) {
-          throw new TRPCError25({
+          throw new TRPCError26({
             code: "INTERNAL_SERVER_ERROR",
             message: "\u8BA2\u5355\u53F7\u751F\u6210\u5931\u8D25,\u8BF7\u7A0D\u540E\u91CD\u8BD5"
           });
@@ -17732,7 +17997,7 @@ var appRouter = router({
             operatorName: ctx.user.name || ctx.user.nickname || "\u672A\u77E5"
           });
         } catch (error) {
-          throw new TRPCError25({
+          throw new TRPCError26({
             code: "BAD_REQUEST",
             message: error.message || "\u4F59\u989D\u6263\u6B3E\u5931\u8D25"
           });
@@ -17796,32 +18061,32 @@ var appRouter = router({
       const id = await createOrder(orderData);
       return { id, success: true };
     }),
-    batchCreate: salesOrAdminProcedure2.input(z28.object({
-      template: z28.enum(["wechat", "alipay", "custom"]),
-      orders: z28.array(z28.object({
-        salesperson: z28.string().optional(),
-        customerName: z28.string(),
-        deliveryTeacher: z28.string().optional(),
-        deliveryCourse: z28.string().optional(),
-        deliveryCity: z28.string().optional(),
-        deliveryRoom: z28.string().optional(),
-        classDate: z28.string().optional(),
-        classTime: z28.string().optional(),
-        paymentAmount: z28.string(),
-        paymentMethod: z28.string().optional(),
-        courseAmount: z28.string().optional(),
-        channelOrderNo: z28.string().optional(),
-        teacherFee: z28.string().optional(),
-        transportFee: z28.string().optional(),
-        notes: z28.string().optional(),
+    batchCreate: salesOrAdminProcedure2.input(z29.object({
+      template: z29.enum(["wechat", "alipay", "custom"]),
+      orders: z29.array(z29.object({
+        salesperson: z29.string().optional(),
+        customerName: z29.string(),
+        deliveryTeacher: z29.string().optional(),
+        deliveryCourse: z29.string().optional(),
+        deliveryCity: z29.string().optional(),
+        deliveryRoom: z29.string().optional(),
+        classDate: z29.string().optional(),
+        classTime: z29.string().optional(),
+        paymentAmount: z29.string(),
+        paymentMethod: z29.string().optional(),
+        courseAmount: z29.string().optional(),
+        channelOrderNo: z29.string().optional(),
+        teacherFee: z29.string().optional(),
+        transportFee: z29.string().optional(),
+        notes: z29.string().optional(),
         // 结构化备注字段(使用nullish()同时允许null和undefined)
-        noteTags: z28.string().nullish(),
-        discountInfo: z28.string().nullish(),
-        couponInfo: z28.string().nullish(),
-        membershipInfo: z28.string().nullish(),
-        paymentStatus: z28.string().nullish(),
-        specialNotes: z28.string().nullish(),
-        isVoided: z28.boolean().nullish()
+        noteTags: z29.string().nullish(),
+        discountInfo: z29.string().nullish(),
+        couponInfo: z29.string().nullish(),
+        membershipInfo: z29.string().nullish(),
+        paymentStatus: z29.string().nullish(),
+        specialNotes: z29.string().nullish(),
+        isVoided: z29.boolean().nullish()
       }))
     })).mutation(async ({ input, ctx }) => {
       let successCount = 0;
@@ -17906,36 +18171,36 @@ var appRouter = router({
       });
       return { successCount, failCount };
     }),
-    update: salesOrAdminProcedure2.input(z28.object({
-      id: z28.number(),
-      orderNo: z28.string().optional(),
-      customerName: z28.string().optional(),
-      salespersonId: z28.number().optional(),
-      salesPerson: z28.string().optional(),
-      trafficSource: z28.string().optional(),
-      paymentAmount: z28.string().optional(),
-      courseAmount: z28.string().optional(),
-      accountBalance: z28.string().optional(),
-      paymentCity: z28.string().optional(),
-      paymentChannel: z28.string().optional(),
-      channelOrderNo: z28.string().optional(),
-      paymentDate: z28.string().optional(),
-      paymentTime: z28.string().optional(),
-      teacherFee: z28.string().optional(),
-      transportFee: z28.string().optional(),
-      otherFee: z28.string().optional(),
-      partnerFee: z28.string().optional(),
-      finalAmount: z28.string().optional(),
-      balanceAmount: z28.string().optional(),
-      deliveryCity: z28.string().optional(),
-      deliveryRoom: z28.string().optional(),
-      deliveryTeacher: z28.string().optional(),
-      deliveryCourse: z28.string().optional(),
-      classDate: z28.string().optional(),
-      classTime: z28.string().optional(),
-      status: z28.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
-      deliveryStatus: z28.enum(["pending", "accepted", "delivered"]).optional(),
-      notes: z28.string().optional()
+    update: salesOrAdminProcedure2.input(z29.object({
+      id: z29.number(),
+      orderNo: z29.string().optional(),
+      customerName: z29.string().optional(),
+      salespersonId: z29.number().optional(),
+      salesPerson: z29.string().optional(),
+      trafficSource: z29.string().optional(),
+      paymentAmount: z29.string().optional(),
+      courseAmount: z29.string().optional(),
+      accountBalance: z29.string().optional(),
+      paymentCity: z29.string().optional(),
+      paymentChannel: z29.string().optional(),
+      channelOrderNo: z29.string().optional(),
+      paymentDate: z29.string().optional(),
+      paymentTime: z29.string().optional(),
+      teacherFee: z29.string().optional(),
+      transportFee: z29.string().optional(),
+      otherFee: z29.string().optional(),
+      partnerFee: z29.string().optional(),
+      finalAmount: z29.string().optional(),
+      balanceAmount: z29.string().optional(),
+      deliveryCity: z29.string().optional(),
+      deliveryRoom: z29.string().optional(),
+      deliveryTeacher: z29.string().optional(),
+      deliveryCourse: z29.string().optional(),
+      classDate: z29.string().optional(),
+      classTime: z29.string().optional(),
+      status: z29.enum(["pending", "paid", "completed", "cancelled", "refunded"]).optional(),
+      deliveryStatus: z29.enum(["pending", "accepted", "delivered"]).optional(),
+      notes: z29.string().optional()
     })).mutation(async ({ input }) => {
       const { id, ...updateData } = input;
       const processedData = {};
@@ -17970,7 +18235,7 @@ var appRouter = router({
       await updateOrder(id, processedData);
       return { success: true };
     }),
-    delete: protectedProcedure.input(z28.object({ id: z28.number() })).mutation(async ({ input, ctx }) => {
+    delete: protectedProcedure.input(z29.object({ id: z29.number() })).mutation(async ({ input, ctx }) => {
       try {
         console.log("[Production Debug] orders.delete \u5F00\u59CB\u6267\u884C", {
           id: input.id,
@@ -17989,14 +18254,14 @@ var appRouter = router({
           errorMessage: error instanceof Error ? error.message : String(error),
           errorStack: error instanceof Error ? error.stack : void 0
         });
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "\u5220\u9664\u8BA2\u5355\u5931\u8D25",
           cause: error
         });
       }
     }),
-    batchDelete: salesOrAdminProcedure2.input(z28.object({ ids: z28.array(z28.number()) })).mutation(async ({ input, ctx }) => {
+    batchDelete: salesOrAdminProcedure2.input(z29.object({ ids: z29.array(z29.number()) })).mutation(async ({ input, ctx }) => {
       try {
         console.log("[Orders] \u6279\u91CF\u5220\u9664\u8BF7\u6C42: ids=", input.ids, "user=", ctx.user.name);
         await batchDeleteOrders(input.ids);
@@ -18004,23 +18269,23 @@ var appRouter = router({
         return { success: true, count: input.ids.length };
       } catch (error) {
         console.error("[Orders] \u6279\u91CF\u5220\u9664\u5931\u8D25: ids=", input.ids, "error=", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: error instanceof Error ? error.message : "\u6279\u91CF\u5220\u9664\u8BA2\u5355\u5931\u8D25"
         });
       }
     }),
-    batchUpdateStatus: salesOrAdminProcedure2.input(z28.object({
-      ids: z28.array(z28.number()),
-      status: z28.enum(["pending", "paid", "completed", "cancelled", "refunded"])
+    batchUpdateStatus: salesOrAdminProcedure2.input(z29.object({
+      ids: z29.array(z29.number()),
+      status: z29.enum(["pending", "paid", "completed", "cancelled", "refunded"])
     })).mutation(async ({ input }) => {
       await batchUpdateOrderStatus(input.ids, input.status);
       return { success: true, count: input.ids.length };
     }),
     // 批量更新订单交付状态
-    batchUpdateDeliveryStatus: salesOrAdminProcedure2.input(z28.object({
-      ids: z28.array(z28.number()),
-      deliveryStatus: z28.enum(["pending", "accepted", "delivered"])
+    batchUpdateDeliveryStatus: salesOrAdminProcedure2.input(z29.object({
+      ids: z29.array(z29.number()),
+      deliveryStatus: z29.enum(["pending", "accepted", "delivered"])
     })).mutation(async ({ input }) => {
       for (const id of input.ids) {
         await updateOrder(id, { deliveryStatus: input.deliveryStatus });
@@ -18028,21 +18293,21 @@ var appRouter = router({
       return { success: true, count: input.ids.length };
     }),
     // 老师查看分配给自己的订单
-    getMyOrders: teacherProcedure3.input(z28.object({
-      deliveryStatus: z28.enum(["pending", "accepted", "delivered"]).optional()
+    getMyOrders: teacherProcedure3.input(z29.object({
+      deliveryStatus: z29.enum(["pending", "accepted", "delivered"]).optional()
     }).optional()).query(async ({ ctx, input }) => {
       return getTeacherOrders(ctx.user.id, input?.deliveryStatus);
     }),
     // 老师接单
-    acceptOrder: teacherProcedure3.input(z28.object({
-      orderId: z28.number()
+    acceptOrder: teacherProcedure3.input(z29.object({
+      orderId: z29.number()
     })).mutation(async ({ ctx, input }) => {
       const order = await getOrderById(input.orderId);
       if (!order) {
-        throw new TRPCError25({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
+        throw new TRPCError26({ code: "NOT_FOUND", message: "\u8BA2\u5355\u4E0D\u5B58\u5728" });
       }
       if (order.deliveryStatus !== "pending") {
-        throw new TRPCError25({ code: "BAD_REQUEST", message: "\u8BE5\u8BA2\u5355\u5DF2\u7ECF\u88AB\u63A5\u5355\u6216\u4EA4\u4ED8" });
+        throw new TRPCError26({ code: "BAD_REQUEST", message: "\u8BE5\u8BA2\u5355\u5DF2\u7ECF\u88AB\u63A5\u5355\u6216\u4EA4\u4ED8" });
       }
       await updateOrder(input.orderId, {
         deliveryStatus: "accepted",
@@ -18076,34 +18341,34 @@ var appRouter = router({
       }
       return { success: true, updatedCount };
     }),
-    getByDateRange: protectedProcedure.input(z28.object({
-      startDate: z28.string(),
-      endDate: z28.string()
+    getByDateRange: protectedProcedure.input(z29.object({
+      startDate: z29.string(),
+      endDate: z29.string()
     })).query(async ({ input }) => {
       return getOrdersByDateRange(input.startDate, input.endDate);
     }),
     // 批量补全渠道订单号
-    batchFillChannelOrderNo: adminProcedure6.input(z28.object({
-      onlyMissing: z28.boolean().optional(),
-      validateFormat: z28.boolean().optional(),
-      autoIdentifyChannel: z28.boolean().optional()
+    batchFillChannelOrderNo: adminProcedure6.input(z29.object({
+      onlyMissing: z29.boolean().optional(),
+      validateFormat: z29.boolean().optional(),
+      autoIdentifyChannel: z29.boolean().optional()
     })).mutation(async ({ input }) => {
       const { batchFillChannelOrderNo: batchFillChannelOrderNo2 } = await Promise.resolve().then(() => (init_channelOrderNoBatchFill(), channelOrderNoBatchFill_exports));
       const result = await batchFillChannelOrderNo2(input);
       return result;
     }),
     // 预览批量补全结果
-    previewBatchFillChannelOrderNo: adminProcedure6.input(z28.object({
-      onlyMissing: z28.boolean().optional()
+    previewBatchFillChannelOrderNo: adminProcedure6.input(z29.object({
+      onlyMissing: z29.boolean().optional()
     })).query(async ({ input }) => {
       const { previewBatchFillChannelOrderNo: previewBatchFillChannelOrderNo2 } = await Promise.resolve().then(() => (init_channelOrderNoBatchFill(), channelOrderNoBatchFill_exports));
       const result = await previewBatchFillChannelOrderNo2(input);
       return result;
     }),
     // 批量修正渠道订单号
-    batchUpdateChannelOrderNo: salesOrAdminProcedure2.input(z28.object({
-      orderIds: z28.array(z28.number()),
-      channelOrderNo: z28.string().optional()
+    batchUpdateChannelOrderNo: salesOrAdminProcedure2.input(z29.object({
+      orderIds: z29.array(z29.number()),
+      channelOrderNo: z29.string().optional()
       // 如果为空则清空
     })).mutation(async ({ input }) => {
       const db = await getDb();
@@ -18112,7 +18377,7 @@ var appRouter = router({
       const errors = [];
       for (const orderId of input.orderIds) {
         try {
-          await db.update(orders).set({ channelOrderNo: input.channelOrderNo || null }).where(eq24(orders.id, orderId));
+          await db.update(orders).set({ channelOrderNo: input.channelOrderNo || null }).where(eq25(orders.id, orderId));
           successCount++;
         } catch (err) {
           errors.push(`\u8BA2\u5355ID ${orderId}: ${err.message}`);
@@ -18126,8 +18391,8 @@ var appRouter = router({
       };
     }),
     // 批量验证渠道订单号格式
-    batchValidateChannelOrderNo: protectedProcedure.input(z28.object({
-      orderIds: z28.array(z28.number())
+    batchValidateChannelOrderNo: protectedProcedure.input(z29.object({
+      orderIds: z29.array(z29.number())
     })).query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25");
@@ -18149,10 +18414,10 @@ var appRouter = router({
       return results;
     }),
     // 导出对账报表
-    exportReconciliationReport: protectedProcedure.input(z28.object({
-      startDate: z28.string(),
-      endDate: z28.string(),
-      paymentChannel: z28.string().optional()
+    exportReconciliationReport: protectedProcedure.input(z29.object({
+      startDate: z29.string(),
+      endDate: z29.string(),
+      paymentChannel: z29.string().optional()
     })).query(async ({ input }) => {
       let orders2 = await getReconciliationReport(input.startDate, input.endDate);
       if (input.paymentChannel && input.paymentChannel !== "all") {
@@ -18188,8 +18453,8 @@ var appRouter = router({
       };
     }),
     // 批量重新计算合伙人费(针对选中的订单)
-    batchCalculatePartnerFee: protectedProcedure.input(z28.object({
-      orderIds: z28.array(z28.number())
+    batchCalculatePartnerFee: protectedProcedure.input(z29.object({
+      orderIds: z29.array(z29.number())
     })).mutation(async ({ input, ctx }) => {
       const { orderIds } = input;
       let updatedCount = 0;
@@ -18253,12 +18518,12 @@ var appRouter = router({
     }),
     // 导出Excel
     exportExcel: protectedProcedure.input(
-      z28.object({
-        orderIds: z28.array(z28.number()).optional(),
+      z29.object({
+        orderIds: z29.array(z29.number()).optional(),
         // 可选:指定订单ID列表
-        startDate: z28.string().optional(),
+        startDate: z29.string().optional(),
         // 可选:开始日期
-        endDate: z28.string().optional()
+        endDate: z29.string().optional()
         // 可选:结束日期
       })
     ).mutation(async ({ input }) => {
@@ -18340,7 +18605,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u5BFC\u51FAExcel\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u5BFC\u51FAExcel\u5931\u8D25"
         });
@@ -18415,7 +18680,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u4E0B\u8F7D\u6A21\u677F\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u4E0B\u8F7D\u6A21\u677F\u5931\u8D25"
         });
@@ -18427,19 +18692,19 @@ var appRouter = router({
     list: publicProcedure.query(async () => {
       return getAllTeachers();
     }),
-    getById: publicProcedure.input(z28.object({ id: z28.number() })).query(async ({ input }) => {
+    getById: publicProcedure.input(z29.object({ id: z29.number() })).query(async ({ input }) => {
       return getTeacherById(input.id);
     }),
     // 已废弃：不再通过此API创建老师，改为在用户管理中添加"老师"角色
-    create: adminProcedure6.input(z28.object({
-      userId: z28.number(),
+    create: adminProcedure6.input(z29.object({
+      userId: z29.number(),
       // 关联的用户ID
-      category: z28.string().optional(),
-      customerType: z28.string().optional(),
-      notes: z28.string().optional(),
-      contractEndDate: z28.union([z28.string(), z28.date()]).optional(),
-      joinDate: z28.union([z28.string(), z28.date()]).optional(),
-      aliases: z28.string().optional()
+      category: z29.string().optional(),
+      customerType: z29.string().optional(),
+      notes: z29.string().optional(),
+      contractEndDate: z29.union([z29.string(), z29.date()]).optional(),
+      joinDate: z29.union([z29.string(), z29.date()]).optional(),
+      aliases: z29.string().optional()
     })).mutation(async ({ input }) => {
       const teacherId = await createTeacher({
         userId: input.userId,
@@ -18453,21 +18718,21 @@ var appRouter = router({
       return { id: teacherId, success: true };
     }),
     // 只允许更新合同相关信息，基础信息在用户管理中修改
-    update: adminProcedure6.input(z28.object({
-      id: z28.number(),
-      data: z28.object({
-        category: z28.string().optional(),
-        customerType: z28.string().optional(),
-        notes: z28.string().optional(),
-        contractEndDate: z28.union([z28.string(), z28.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0),
-        joinDate: z28.union([z28.string(), z28.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0),
-        aliases: z28.string().optional(),
+    update: adminProcedure6.input(z29.object({
+      id: z29.number(),
+      data: z29.object({
+        category: z29.string().optional(),
+        customerType: z29.string().optional(),
+        notes: z29.string().optional(),
+        contractEndDate: z29.union([z29.string(), z29.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0),
+        joinDate: z29.union([z29.string(), z29.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0),
+        aliases: z29.string().optional(),
         // 别名(逗号分隔)
-        avatarUrl: z28.string().optional(),
+        avatarUrl: z29.string().optional(),
         // 头像 URL（通过头像编辑对话框更新）
-        teacherAttribute: z28.enum(["S", "M", "Switch"]).optional(),
+        teacherAttribute: z29.enum(["S", "M", "Switch"]).optional(),
         // 老师属性
-        hourlyRate: z28.string().optional()
+        hourlyRate: z29.string().optional()
         // 老师费用（课时费标准）
       })
     })).mutation(async ({ input }) => {
@@ -18475,47 +18740,47 @@ var appRouter = router({
       return { success: true };
     }),
     // 批量删除
-    batchDelete: adminProcedure6.input(z28.object({ ids: z28.array(z28.number()) })).mutation(async ({ input }) => {
+    batchDelete: adminProcedure6.input(z29.object({ ids: z29.array(z29.number()) })).mutation(async ({ input }) => {
       await batchDeleteTeachers(input.ids);
       return { success: true, deletedCount: input.ids.length };
     }),
     // 更新单个老师状态
-    updateStatus: adminProcedure6.input(z28.object({
-      id: z28.number(),
-      status: z28.string()
+    updateStatus: adminProcedure6.input(z29.object({
+      id: z29.number(),
+      status: z29.string()
     })).mutation(async ({ input }) => {
       await updateTeacherStatus(input.id, input.status);
       return { success: true };
     }),
     // 批量更新状态
-    batchUpdateStatus: adminProcedure6.input(z28.object({
-      ids: z28.array(z28.number()),
-      status: z28.string()
+    batchUpdateStatus: adminProcedure6.input(z29.object({
+      ids: z29.array(z29.number()),
+      status: z29.string()
     })).mutation(async ({ input }) => {
       await batchUpdateTeacherStatus(input.ids, input.status);
       return { success: true, updatedCount: input.ids.length };
     }),
     // Excel导入
-    importFromExcel: adminProcedure6.input(z28.object({
-      teachers: z28.array(z28.object({
-        id: z28.number().optional(),
+    importFromExcel: adminProcedure6.input(z29.object({
+      teachers: z29.array(z29.object({
+        id: z29.number().optional(),
         // 支持ID字段用于更新
-        name: z28.string().optional(),
-        nickname: z28.string().optional(),
-        phone: z28.string().optional(),
-        email: z28.string().optional(),
-        wechat: z28.string().optional(),
-        status: z28.string().optional(),
-        teacherAttribute: z28.enum(["S", "M", "Switch"]).optional(),
-        customerType: z28.string().optional(),
-        category: z28.string().optional(),
-        hourlyRate: z28.string().optional(),
-        bankAccount: z28.string().optional(),
-        bankName: z28.string().optional(),
-        aliases: z28.string().optional(),
+        name: z29.string().optional(),
+        nickname: z29.string().optional(),
+        phone: z29.string().optional(),
+        email: z29.string().optional(),
+        wechat: z29.string().optional(),
+        status: z29.string().optional(),
+        teacherAttribute: z29.enum(["S", "M", "Switch"]).optional(),
+        customerType: z29.string().optional(),
+        category: z29.string().optional(),
+        hourlyRate: z29.string().optional(),
+        bankAccount: z29.string().optional(),
+        bankName: z29.string().optional(),
+        aliases: z29.string().optional(),
         // 别名字段
-        notes: z28.string().optional(),
-        city: z28.string().optional().refine(
+        notes: z29.string().optional(),
+        city: z29.string().optional().refine(
           (val) => {
             if (!val || val.trim() === "") return true;
             const cities3 = val.split(";").map((c) => c.trim()).filter((c) => c !== "");
@@ -18523,8 +18788,8 @@ var appRouter = router({
           },
           { message: "\u8BF7\u8F93\u5165\u6709\u6548\u7684\u57CE\u5E02\u540D\u79F0,\u591A\u4E2A\u57CE\u5E02\u7528\u5206\u53F7\u5206\u9694" }
         ),
-        contractEndDate: z28.union([z28.string(), z28.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0),
-        joinDate: z28.union([z28.string(), z28.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0)
+        contractEndDate: z29.union([z29.string(), z29.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0),
+        joinDate: z29.union([z29.string(), z29.date()]).optional().transform((val) => val ? typeof val === "string" ? new Date(val) : val : void 0)
       }))
     })).mutation(async ({ input }) => {
       const { results, stats, notFoundErrors } = await batchCreateTeachers(input.teachers);
@@ -18542,17 +18807,17 @@ var appRouter = router({
       return getAllTeacherNames();
     }),
     // 获取单个老师统计数据
-    getStats: protectedProcedure.input(z28.object({
-      teacherId: z28.number(),
-      startDate: z28.date().optional(),
-      endDate: z28.date().optional()
+    getStats: protectedProcedure.input(z29.object({
+      teacherId: z29.number(),
+      startDate: z29.date().optional(),
+      endDate: z29.date().optional()
     })).query(async ({ input }) => {
       return getTeacherStats(input.teacherId, input.startDate, input.endDate);
     }),
     // 获取所有老师统计数据
-    getAllStats: protectedProcedure.input(z28.object({
-      startDate: z28.date().optional(),
-      endDate: z28.date().optional()
+    getAllStats: protectedProcedure.input(z29.object({
+      startDate: z29.date().optional(),
+      endDate: z29.date().optional()
     }).optional()).query(async ({ input }) => {
       return getAllTeachersStats(input?.startDate, input?.endDate);
     })
@@ -18602,17 +18867,17 @@ var appRouter = router({
     list: financeOrAdminProcedure4.query(async () => {
       return getAllReconciliations();
     }),
-    create: financeOrAdminProcedure4.input(z28.object({
-      periodStart: z28.string(),
-      periodEnd: z28.string(),
-      totalIncome: z28.string(),
-      totalExpense: z28.string(),
-      teacherFeeTotal: z28.string().optional(),
-      transportFeeTotal: z28.string().optional(),
-      otherFeeTotal: z28.string().optional(),
-      partnerFeeTotal: z28.string().optional(),
-      profit: z28.string(),
-      notes: z28.string().optional()
+    create: financeOrAdminProcedure4.input(z29.object({
+      periodStart: z29.string(),
+      periodEnd: z29.string(),
+      totalIncome: z29.string(),
+      totalExpense: z29.string(),
+      teacherFeeTotal: z29.string().optional(),
+      transportFeeTotal: z29.string().optional(),
+      otherFeeTotal: z29.string().optional(),
+      partnerFeeTotal: z29.string().optional(),
+      profit: z29.string(),
+      notes: z29.string().optional()
     })).mutation(async ({ input, ctx }) => {
       const id = await createReconciliation({
         periodStart: new Date(input.periodStart),
@@ -18629,11 +18894,11 @@ var appRouter = router({
       });
       return { id, success: true };
     }),
-    update: financeOrAdminProcedure4.input(z28.object({
-      id: z28.number(),
-      data: z28.object({
-        status: z28.enum(["draft", "confirmed"]).optional(),
-        notes: z28.string().optional()
+    update: financeOrAdminProcedure4.input(z29.object({
+      id: z29.number(),
+      data: z29.object({
+        status: z29.enum(["draft", "confirmed"]).optional(),
+        notes: z29.string().optional()
       })
     })).mutation(async ({ input }) => {
       await updateReconciliation(input.id, input.data);
@@ -18655,7 +18920,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u57CE\u5E02\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u57CE\u5E02\u5217\u8868\u5931\u8D25"
         });
@@ -18672,7 +18937,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u8BFE\u7A0B\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u8BFE\u7A0B\u5217\u8868\u5931\u8D25"
         });
@@ -18689,7 +18954,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u6559\u5BA4\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u6559\u5BA4\u5217\u8868\u5931\u8D25"
         });
@@ -18706,7 +18971,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u8001\u5E08\u540D\u79F0\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u8001\u5E08\u540D\u79F0\u5217\u8868\u5931\u8D25"
         });
@@ -18723,7 +18988,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u9500\u552E\u4EBA\u5458\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u9500\u552E\u4EBA\u5458\u5217\u8868\u5931\u8D25"
         });
@@ -18740,7 +19005,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u8001\u5E08\u5206\u7C7B\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u8001\u5E08\u5206\u7C7B\u5217\u8868\u5931\u8D25"
         });
@@ -18757,7 +19022,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u8BFE\u7A0B\u4EF7\u683C\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u8BFE\u7A0B\u4EF7\u683C\u5217\u8868\u5931\u8D25"
         });
@@ -18798,7 +19063,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u5143\u6570\u636E\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u5143\u6570\u636E\u5931\u8D25"
         });
@@ -18818,14 +19083,14 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u8BFE\u7A0B\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u8BFE\u7A0B\u5217\u8868\u5931\u8D25"
         });
       }
     }),
     // 根据ID获取课程详情(公开接口)
-    getById: publicProcedure.input(z28.object({ id: z28.number() })).query(async ({ input }) => {
+    getById: publicProcedure.input(z29.object({ id: z29.number() })).query(async ({ input }) => {
       try {
         const course = await getCourseById(input.id);
         if (!course) {
@@ -18841,7 +19106,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error(`\u83B7\u53D6\u8BFE\u7A0BID${input.id}\u5931\u8D25:`, error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u8BFE\u7A0B\u8BE6\u60C5\u5931\u8D25"
         });
@@ -18849,15 +19114,15 @@ var appRouter = router({
     }),
     // 创建课程(需要管理员权限)
     create: protectedProcedure.input(
-      z28.object({
-        name: z28.string().min(1, "\u8BFE\u7A0B\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A"),
-        alias: z28.string().optional(),
-        introduction: z28.string().max(20, "\u8BFE\u7A0B\u4ECB\u7ECD\u4E0D\u80FD\u8D85\u8FC720\u5B57").optional(),
-        description: z28.string().optional(),
-        price: z28.number().min(0, "\u8BFE\u7A0B\u4EF7\u683C\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
-        duration: z28.number().min(0, "\u8BFE\u7A0B\u65F6\u957F\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
-        level: z28.enum(["\u5165\u95E8", "\u6DF1\u5EA6", "\u8BA2\u5236", "\u5267\u672C"]),
-        isHot: z28.number().min(0).max(1).optional()
+      z29.object({
+        name: z29.string().min(1, "\u8BFE\u7A0B\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A"),
+        alias: z29.string().optional(),
+        introduction: z29.string().max(20, "\u8BFE\u7A0B\u4ECB\u7ECD\u4E0D\u80FD\u8D85\u8FC720\u5B57").optional(),
+        description: z29.string().optional(),
+        price: z29.number().min(0, "\u8BFE\u7A0B\u4EF7\u683C\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
+        duration: z29.number().min(0, "\u8BFE\u7A0B\u65F6\u957F\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
+        level: z29.enum(["\u5165\u95E8", "\u6DF1\u5EA6", "\u8BA2\u5236", "\u5267\u672C"]),
+        isHot: z29.number().min(0).max(1).optional()
       })
     ).mutation(async ({ input, ctx }) => {
       try {
@@ -18879,7 +19144,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u521B\u5EFA\u8BFE\u7A0B\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u521B\u5EFA\u8BFE\u7A0B\u5931\u8D25"
         });
@@ -18887,17 +19152,17 @@ var appRouter = router({
     }),
     // 更新课程(需要管理员权限)
     update: protectedProcedure.input(
-      z28.object({
-        id: z28.number(),
-        name: z28.string().min(1, "\u8BFE\u7A0B\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A").optional(),
-        alias: z28.string().optional(),
-        introduction: z28.string().max(20, "\u8BFE\u7A0B\u4ECB\u7ECD\u4E0D\u80FD\u8D85\u8FC720\u5B57").optional(),
-        description: z28.string().optional(),
-        price: z28.number().min(0, "\u8BFE\u7A0B\u4EF7\u683C\u4E0D\u80FD\u4E3A\u8D1F\u6570").optional(),
-        duration: z28.number().min(0, "\u8BFE\u7A0B\u65F6\u957F\u4E0D\u80FD\u4E3A\u8D1F\u6570").optional(),
-        level: z28.enum(["\u5165\u95E8", "\u6DF1\u5EA6", "\u8BA2\u5236", "\u5267\u672C"]).optional(),
-        isHot: z28.number().min(0).max(1).optional(),
-        teacherFee: z28.number().min(0, "\u8001\u5E08\u8D39\u7528\u4E0D\u80FD\u4E3A\u8D1F\u6570").nullable().optional()
+      z29.object({
+        id: z29.number(),
+        name: z29.string().min(1, "\u8BFE\u7A0B\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A").optional(),
+        alias: z29.string().optional(),
+        introduction: z29.string().max(20, "\u8BFE\u7A0B\u4ECB\u7ECD\u4E0D\u80FD\u8D85\u8FC720\u5B57").optional(),
+        description: z29.string().optional(),
+        price: z29.number().min(0, "\u8BFE\u7A0B\u4EF7\u683C\u4E0D\u80FD\u4E3A\u8D1F\u6570").optional(),
+        duration: z29.number().min(0, "\u8BFE\u7A0B\u65F6\u957F\u4E0D\u80FD\u4E3A\u8D1F\u6570").optional(),
+        level: z29.enum(["\u5165\u95E8", "\u6DF1\u5EA6", "\u8BA2\u5236", "\u5267\u672C"]).optional(),
+        isHot: z29.number().min(0).max(1).optional(),
+        teacherFee: z29.number().min(0, "\u8001\u5E08\u8D39\u7528\u4E0D\u80FD\u4E3A\u8D1F\u6570").nullable().optional()
       })
     ).mutation(async ({ input, ctx }) => {
       try {
@@ -18919,14 +19184,14 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u66F4\u65B0\u8BFE\u7A0B\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u66F4\u65B0\u8BFE\u7A0B\u5931\u8D25"
         });
       }
     }),
     // 切换课程启用状态(需要管理员权限)
-    toggleActive: protectedProcedure.input(z28.object({ id: z28.number() })).mutation(async ({ input, ctx }) => {
+    toggleActive: protectedProcedure.input(z29.object({ id: z29.number() })).mutation(async ({ input, ctx }) => {
       try {
         const newStatus = await toggleCourseActive(input.id);
         return {
@@ -18936,14 +19201,14 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u5207\u6362\u8BFE\u7A0B\u72B6\u6001\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u5207\u6362\u8BFE\u7A0B\u72B6\u6001\u5931\u8D25"
         });
       }
     }),
     // 删除课程(需要管理员权限)
-    delete: protectedProcedure.input(z28.object({ id: z28.number() })).mutation(async ({ input, ctx }) => {
+    delete: protectedProcedure.input(z29.object({ id: z29.number() })).mutation(async ({ input, ctx }) => {
       try {
         await deleteCourse(input.id);
         return {
@@ -18952,7 +19217,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u5220\u9664\u8BFE\u7A0B\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u5220\u9664\u8BFE\u7A0B\u5931\u8D25"
         });
@@ -18960,17 +19225,17 @@ var appRouter = router({
     }),
     // 批量导入课程(需要管理员权限)
     importFromExcel: protectedProcedure.input(
-      z28.object({
-        courses: z28.array(
-          z28.object({
-            name: z28.string().min(1, "\u8BFE\u7A0B\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A"),
-            alias: z28.string().optional(),
-            introduction: z28.string().max(20, "\u8BFE\u7A0B\u4ECB\u7ECD\u4E0D\u80FD\u8D85\u8FC720\u5B57").optional(),
-            description: z28.string().optional(),
-            price: z28.number().min(0, "\u8BFE\u7A0B\u4EF7\u683C\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
-            duration: z28.number().min(0, "\u8BFE\u7A0B\u65F6\u957F\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
-            level: z28.enum(["\u5165\u95E8", "\u6DF1\u5EA6", "\u8BA2\u5236", "\u5267\u672C"]),
-            isHot: z28.number().min(0).max(1).optional()
+      z29.object({
+        courses: z29.array(
+          z29.object({
+            name: z29.string().min(1, "\u8BFE\u7A0B\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A"),
+            alias: z29.string().optional(),
+            introduction: z29.string().max(20, "\u8BFE\u7A0B\u4ECB\u7ECD\u4E0D\u80FD\u8D85\u8FC720\u5B57").optional(),
+            description: z29.string().optional(),
+            price: z29.number().min(0, "\u8BFE\u7A0B\u4EF7\u683C\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
+            duration: z29.number().min(0, "\u8BFE\u7A0B\u65F6\u957F\u4E0D\u80FD\u4E3A\u8D1F\u6570"),
+            level: z29.enum(["\u5165\u95E8", "\u6DF1\u5EA6", "\u8BA2\u5236", "\u5267\u672C"]),
+            isHot: z29.number().min(0).max(1).optional()
           })
         )
       })
@@ -19007,7 +19272,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u6279\u91CF\u5BFC\u5165\u8BFE\u7A0B\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u6279\u91CF\u5BFC\u5165\u8BFE\u7A0B\u5931\u8D25"
         });
@@ -19023,44 +19288,44 @@ var appRouter = router({
         return classroomList;
       } catch (error) {
         console.error("\u83B7\u53D6\u6559\u5BA4\u5217\u8868\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u6559\u5BA4\u5217\u8868\u5931\u8D25"
         });
       }
     }),
     // 根据城市ID获取教室列表(公开接口)
-    getByCityId: publicProcedure.input(z28.object({ cityId: z28.number() })).query(async ({ input }) => {
+    getByCityId: publicProcedure.input(z29.object({ cityId: z29.number() })).query(async ({ input }) => {
       try {
         const classroomList = await getClassroomsByCityId(input.cityId);
         return classroomList;
       } catch (error) {
         console.error(`\u83B7\u53D6\u57CE\u5E02ID${input.cityId}\u7684\u6559\u5BA4\u5217\u8868\u5931\u8D25:`, error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u6559\u5BA4\u5217\u8868\u5931\u8D25"
         });
       }
     }),
     // 根据城市名称获取教室列表(公开接口)
-    getByCityName: publicProcedure.input(z28.object({ cityName: z28.string() })).query(async ({ input }) => {
+    getByCityName: publicProcedure.input(z29.object({ cityName: z29.string() })).query(async ({ input }) => {
       try {
         const classroomList = await getClassroomsByCityName(input.cityName);
         return classroomList;
       } catch (error) {
         console.error(`\u83B7\u53D6\u57CE\u5E02${input.cityName}\u7684\u6559\u5BA4\u5217\u8868\u5931\u8D25:`, error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u6559\u5BA4\u5217\u8868\u5931\u8D25"
         });
       }
     }),
     // 根据ID获取教室详情(公开接口)
-    getById: publicProcedure.input(z28.object({ id: z28.number() })).query(async ({ input }) => {
+    getById: publicProcedure.input(z29.object({ id: z29.number() })).query(async ({ input }) => {
       try {
         const classroom = await getClassroomById(input.id);
         if (!classroom) {
-          throw new TRPCError25({
+          throw new TRPCError26({
             code: "NOT_FOUND",
             message: `\u672A\u627E\u5230ID\u4E3A${input.id}\u7684\u6559\u5BA4`
           });
@@ -19073,12 +19338,12 @@ var appRouter = router({
     }),
     // 创建教室(需要管理员权限)
     create: protectedProcedure.input(
-      z28.object({
-        cityId: z28.number(),
-        cityName: z28.string(),
-        name: z28.string().min(1, "\u6559\u5BA4\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A"),
-        address: z28.string().min(1, "\u6559\u5BA4\u5730\u5740\u4E0D\u80FD\u4E3A\u7A7A"),
-        notes: z28.string().optional()
+      z29.object({
+        cityId: z29.number(),
+        cityName: z29.string(),
+        name: z29.string().min(1, "\u6559\u5BA4\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A"),
+        address: z29.string().min(1, "\u6559\u5BA4\u5730\u5740\u4E0D\u80FD\u4E3A\u7A7A"),
+        notes: z29.string().optional()
       })
     ).mutation(async ({ input, ctx }) => {
       try {
@@ -19098,7 +19363,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u521B\u5EFA\u6559\u5BA4\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u521B\u5EFA\u6559\u5BA4\u5931\u8D25"
         });
@@ -19106,11 +19371,11 @@ var appRouter = router({
     }),
     // 更新教室(需要管理员权限)
     update: protectedProcedure.input(
-      z28.object({
-        id: z28.number(),
-        name: z28.string().min(1, "\u6559\u5BA4\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A").optional(),
-        address: z28.string().min(1, "\u6559\u5BA4\u5730\u5740\u4E0D\u80FD\u4E3A\u7A7A").optional(),
-        notes: z28.string().optional()
+      z29.object({
+        id: z29.number(),
+        name: z29.string().min(1, "\u6559\u5BA4\u540D\u79F0\u4E0D\u80FD\u4E3A\u7A7A").optional(),
+        address: z29.string().min(1, "\u6559\u5BA4\u5730\u5740\u4E0D\u80FD\u4E3A\u7A7A").optional(),
+        notes: z29.string().optional()
       })
     ).mutation(async ({ input, ctx }) => {
       try {
@@ -19122,14 +19387,14 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u66F4\u65B0\u6559\u5BA4\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u66F4\u65B0\u6559\u5BA4\u5931\u8D25"
         });
       }
     }),
     // 切换教室启用状态(需要管理员权限)
-    toggleActive: protectedProcedure.input(z28.object({ id: z28.number() })).mutation(async ({ input, ctx }) => {
+    toggleActive: protectedProcedure.input(z29.object({ id: z29.number() })).mutation(async ({ input, ctx }) => {
       try {
         const newStatus = await toggleClassroomActive(input.id);
         return {
@@ -19139,14 +19404,14 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u5207\u6362\u6559\u5BA4\u72B6\u6001\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u5207\u6362\u6559\u5BA4\u72B6\u6001\u5931\u8D25"
         });
       }
     }),
     // 删除教室(需要管理员权限)
-    delete: protectedProcedure.input(z28.object({ id: z28.number() })).mutation(async ({ input, ctx }) => {
+    delete: protectedProcedure.input(z29.object({ id: z29.number() })).mutation(async ({ input, ctx }) => {
       try {
         await deleteClassroom(input.id);
         return {
@@ -19155,7 +19420,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u5220\u9664\u6559\u5BA4\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u5220\u9664\u6559\u5BA4\u5931\u8D25"
         });
@@ -19183,9 +19448,9 @@ var appRouter = router({
       };
     }),
     // App用户查询自己的账户流水
-    getMyTransactions: protectedProcedure.input(z28.object({
-      limit: z28.number().min(1).max(100).optional(),
-      offset: z28.number().min(0).optional()
+    getMyTransactions: protectedProcedure.input(z29.object({
+      limit: z29.number().min(1).max(100).optional(),
+      offset: z29.number().min(0).optional()
     }).optional()).query(async ({ ctx, input }) => {
       const customer = await getCustomerByUserId(ctx.user.id);
       if (!customer) {
@@ -19204,10 +19469,10 @@ var appRouter = router({
       };
     }),
     // 管理员/销售查询指定客户的余额
-    getCustomerBalance: protectedProcedure.input(z28.object({ customerId: z28.number() })).query(async ({ input }) => {
+    getCustomerBalance: protectedProcedure.input(z29.object({ customerId: z29.number() })).query(async ({ input }) => {
       const dbInstance = await getDb();
-      if (!dbInstance) throw new TRPCError25({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u521D\u59CB\u5316" });
-      const [cust] = await dbInstance.select().from(customers).where(eq24(customers.id, input.customerId));
+      if (!dbInstance) throw new TRPCError26({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u672A\u521D\u59CB\u5316" });
+      const [cust] = await dbInstance.select().from(customers).where(eq25(customers.id, input.customerId));
       if (!cust) {
         return { success: false, error: "\u5BA2\u6237\u4E0D\u5B58\u5728" };
       }
@@ -19223,10 +19488,10 @@ var appRouter = router({
       };
     }),
     // 管理员/销售查询指定客户的流水
-    getCustomerTransactions: protectedProcedure.input(z28.object({
-      customerId: z28.number(),
-      limit: z28.number().min(1).max(100).optional(),
-      offset: z28.number().min(0).optional()
+    getCustomerTransactions: protectedProcedure.input(z29.object({
+      customerId: z29.number(),
+      limit: z29.number().min(1).max(100).optional(),
+      offset: z29.number().min(0).optional()
     })).query(async ({ input }) => {
       const allTransactions = await getCustomerTransactions(input.customerId);
       const limit = input.limit || 20;
@@ -19241,10 +19506,10 @@ var appRouter = router({
       };
     }),
     // 客户充值(管理员/销售操作)
-    recharge: protectedProcedure.input(z28.object({
-      customerId: z28.number(),
-      amount: z28.number().positive("\u5145\u503C\u91D1\u989D\u5FC5\u987B\u5927\u4E8E0"),
-      notes: z28.string().optional()
+    recharge: protectedProcedure.input(z29.object({
+      customerId: z29.number(),
+      amount: z29.number().positive("\u5145\u503C\u91D1\u989D\u5FC5\u987B\u5927\u4E8E0"),
+      notes: z29.string().optional()
     })).mutation(async ({ input, ctx }) => {
       try {
         const result = await rechargeCustomerAccount({
@@ -19266,11 +19531,11 @@ var appRouter = router({
       }
     }),
     // 客户退款(管理员操作)
-    refund: protectedProcedure.input(z28.object({
-      customerId: z28.number(),
-      amount: z28.number().positive("\u9000\u6B3E\u91D1\u989D\u5FC5\u987B\u5927\u4E8E0"),
-      orderId: z28.number(),
-      orderNo: z28.string()
+    refund: protectedProcedure.input(z29.object({
+      customerId: z29.number(),
+      amount: z29.number().positive("\u9000\u6B3E\u91D1\u989D\u5FC5\u987B\u5927\u4E8E0"),
+      orderId: z29.number(),
+      orderNo: z29.string()
     })).mutation(async ({ input, ctx }) => {
       try {
         const result = await refundCustomerAccount({
@@ -19305,14 +19570,14 @@ var appRouter = router({
         };
       } catch (error) {
         console.error("\u83B7\u53D6\u57CE\u5E02\u5408\u4F19\u4EBA\u8D39\u914D\u7F6E\u5931\u8D25:", error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u57CE\u5E02\u5408\u4F19\u4EBA\u8D39\u914D\u7F6E\u5931\u8D25"
         });
       }
     }),
     // 根据城市名获取配置(公开接口)
-    getByCity: publicProcedure.input(z28.object({ city: z28.string() })).query(async ({ input }) => {
+    getByCity: publicProcedure.input(z29.object({ city: z29.string() })).query(async ({ input }) => {
       try {
         const config = await getCityPartnerConfigByCity(input.city);
         if (!config) {
@@ -19328,7 +19593,7 @@ var appRouter = router({
         };
       } catch (error) {
         console.error(`\u83B7\u53D6\u57CE\u5E02${input.city}\u7684\u5408\u4F19\u4EBA\u8D39\u914D\u7F6E\u5931\u8D25:`, error);
-        throw new TRPCError25({
+        throw new TRPCError26({
           code: "INTERNAL_SERVER_ERROR",
           message: "\u83B7\u53D6\u914D\u7F6E\u5931\u8D25"
         });
@@ -19362,7 +19627,7 @@ async function createContext(opts) {
 // server/_core/paymentWebhook.ts
 init_db();
 init_schema();
-import { eq as eq25 } from "drizzle-orm";
+import { eq as eq26 } from "drizzle-orm";
 import crypto from "crypto";
 async function handleWechatPaymentNotify(req, res) {
   try {
@@ -19419,7 +19684,7 @@ async function updateOrderStatus2(orderNo, data) {
   if (!db) {
     throw new Error("\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25");
   }
-  const [order] = await db.select().from(orders).where(eq25(orders.orderNo, orderNo)).limit(1);
+  const [order] = await db.select().from(orders).where(eq26(orders.orderNo, orderNo)).limit(1);
   if (!order) {
     console.error(`[Payment Webhook] \u8BA2\u5355\u4E0D\u5B58\u5728: ${orderNo}`);
     throw new Error("\u8BA2\u5355\u4E0D\u5B58\u5728");
@@ -19434,7 +19699,7 @@ async function updateOrderStatus2(orderNo, data) {
     channelOrderNo: data.channelOrderNo,
     paymentDate: new Date(data.paymentDate),
     updatedAt: /* @__PURE__ */ new Date()
-  }).where(eq25(orders.orderNo, orderNo));
+  }).where(eq26(orders.orderNo, orderNo));
   console.log(`[Payment Webhook] \u8BA2\u5355\u72B6\u6001\u66F4\u65B0\u6210\u529F: ${orderNo}`);
 }
 async function verifyWechatSignature(req) {
@@ -19477,7 +19742,7 @@ async function verifyAlipaySignature(req) {
 // server/_core/membershipWebhook.ts
 init_db();
 init_schema();
-import { eq as eq26 } from "drizzle-orm";
+import { eq as eq27 } from "drizzle-orm";
 import crypto2 from "crypto";
 async function handleMembershipWechatNotify(req, res) {
   try {
@@ -19528,7 +19793,7 @@ async function activateMembership2(orderNo, data) {
   if (!db) {
     throw new Error("\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25");
   }
-  const [memberOrder] = await db.select().from(membershipOrders).where(eq26(membershipOrders.orderNo, orderNo)).limit(1);
+  const [memberOrder] = await db.select().from(membershipOrders).where(eq27(membershipOrders.orderNo, orderNo)).limit(1);
   if (!memberOrder) {
     console.error(`[Membership Webhook] \u4F1A\u5458\u8BA2\u5355\u4E0D\u5B58\u5728: ${orderNo}`);
     throw new Error("\u4F1A\u5458\u8BA2\u5355\u4E0D\u5B58\u5728");
@@ -19545,12 +19810,12 @@ async function activateMembership2(orderNo, data) {
     channelOrderNo: data.channelOrderNo,
     paymentDate: now,
     updatedAt: now
-  }).where(eq26(membershipOrders.orderNo, orderNo));
-  const [currentUser] = await db.select().from(users).where(eq26(users.id, memberOrder.userId)).limit(1);
+  }).where(eq27(membershipOrders.orderNo, orderNo));
+  const [currentUser] = await db.select().from(users).where(eq27(users.id, memberOrder.userId)).limit(1);
   if (!currentUser) {
     throw new Error("\u7528\u6237\u4E0D\u5B58\u5728");
   }
-  const [plan] = await db.select().from(membershipPlans).where(eq26(membershipPlans.id, memberOrder.planId)).limit(1);
+  const [plan] = await db.select().from(membershipPlans).where(eq27(membershipPlans.id, memberOrder.planId)).limit(1);
   const durationDays = plan?.duration ?? 30;
   let expiresAt;
   if (currentUser.isMember && currentUser.membershipExpiresAt && currentUser.membershipExpiresAt > now) {
@@ -19567,7 +19832,7 @@ async function activateMembership2(orderNo, data) {
     membershipActivatedAt: now,
     membershipExpiresAt: expiresAt,
     updatedAt: now
-  }).where(eq26(users.id, memberOrder.userId));
+  }).where(eq27(users.id, memberOrder.userId));
   console.log(`[Membership Webhook] \u4F1A\u5458\u6FC0\u6D3B\u6210\u529F: userId=${memberOrder.userId}, expiresAt=${expiresAt.toISOString()}`);
 }
 async function verifyWechatSignature2(req) {
