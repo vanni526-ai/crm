@@ -6,6 +6,27 @@ import { membershipPlans, membershipOrders, users, customers } from "../drizzle/
 import { eq, desc, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
+// ========== membership.getStatus 内存缓存 ==========
+// 缓存 TTL 5 分钟，避免每次请求都查询多张表
+const MEMBERSHIP_CACHE_TTL_MS = 5 * 60 * 1000;
+interface MembershipCacheEntry {
+  data: {
+    isMember: boolean;
+    membershipStatus: string | null;
+    activatedAt: string | null;
+    expiresAt: string | null;
+    daysRemaining: number | null;
+    currentPlan: { id: number; name: string; benefits: string[] } | null;
+    accountBalance: number;
+  };
+  expiresAt: number;
+}
+const membershipStatusCache = new Map<number, MembershipCacheEntry>();
+
+export function invalidateMembershipCache(userId: number) {
+  membershipStatusCache.delete(userId);
+}
+
 // 生成会员订单号
 function generateMembershipOrderNo(): string {
   const timestamp = Date.now().toString();
@@ -89,6 +110,8 @@ export async function activateMembership(
       updatedAt: now,
     })
     .where(eq(users.id, order.userId));
+  // 清除该用户的 getStatus 缓存，确保下次请求返回最新状态
+  invalidateMembershipCache(order.userId);
 }
 
 export const membershipRouter = router({
@@ -118,17 +141,21 @@ export const membershipRouter = router({
   }),
 
   // ========== 查询当前用户会员状态 ==========
-  getStatus: protectedProcedure.query(async ({ ctx }) => {
+   getStatus: protectedProcedure.query(async ({ ctx }) => {
+    // 先检查缓存
+    const cached = membershipStatusCache.get(ctx.user.id);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.data;
+    }
+
     const db = await getDb();
     if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-
     const [user] = await db
       .select()
       .from(users)
       .where(eq(users.id, ctx.user.id))
       .limit(1);
-
-    if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+    if (!user) throw new TRPCError({ code: "NOT_FOUND" });;
 
     const now = new Date();
     let membershipStatus = user.membershipStatus;
@@ -194,7 +221,7 @@ export const membershipRouter = router({
       accountBalance = parseFloat(String(customer.accountBalance));
     }
 
-    return {
+    const result = {
       isMember: membershipStatus === "active",
       membershipStatus,
       activatedAt: user.membershipActivatedAt?.toISOString() || null,
@@ -203,9 +230,14 @@ export const membershipRouter = router({
       currentPlan,
       accountBalance,
     };
+    // 写入缓存， TTL 5 分钟
+    membershipStatusCache.set(ctx.user.id, {
+      data: result,
+      expiresAt: Date.now() + MEMBERSHIP_CACHE_TTL_MS,
+    });
+    return result;
   }),
-
-  // ========== 创建会员订单 ==========
+  // ========== 创建会员订单 ===========
   createOrder: protectedProcedure
     .input(z.object({ planId: z.number() }))
     .mutation(async ({ ctx, input }) => {

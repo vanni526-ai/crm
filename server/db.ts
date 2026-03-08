@@ -1,5 +1,6 @@
 import { eq, and, gte, lte, desc, asc, sql, between, isNotNull, isNull, ne, like, or, inArray, count, not } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2";
 import {
   InsertUser,
   users,
@@ -56,7 +57,13 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      // 使用 mysql2 createPool 并设置 timezone: "+08:00"
+      // 确保 Drizzle ORM 将所有 datetime 字段按北京时间解析，避免 +8 小时偏移
+      const pool = mysql.createPool({
+        uri: process.env.DATABASE_URL,
+        timezone: "+08:00",
+      } as mysql.PoolOptions);
+      _db = drizzle(pool);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;

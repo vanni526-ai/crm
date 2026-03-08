@@ -64,20 +64,19 @@ export const bookingRouter = router({
           sql`${schedules.startTime} < ${dateEnd}`
         ));
 
-      // Drizzle ORM 的 datetime 字段返回 Date 对象时，不做时区转换，直接把数据库中
-      // 存储的无时区时间（如 13:30）当作 UTC 返回（即 2026-03-05T13:30:00.000Z）。
-      // 修复：用 toISOString() 提取时间部分，拼成无时区字符串，与 slot 时间戳统一比较。
-      const toLocalTimestamp = (d: Date | string | null): string => {
+      // 数据库连接已设置 timezone: "+08:00"，Drizzle 返回的 Date 对象已是北京时间
+      // 直接用本地时间方法格式化为 "YYYY-MM-DD HH:mm:ss" 字符串用于冲突检测
+      const formatLocalTime = (d: Date | string | null): string => {
         if (!d) return '';
         if (typeof d === 'string') return d;
-        // toISOString() 返回 "2026-03-05T13:30:00.000Z"，直接提取日期和时间部分
-        return d.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+        const pad = (n: number) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
       };
 
       const existingBookings = existingBookingsRaw.map(b => ({
         ...b,
-        startTimeStr: toLocalTimestamp(b.startTime as Date | string | null),
-        endTimeStr: toLocalTimestamp(b.endTime as Date | string | null),
+        startTimeStr: formatLocalTime(b.startTime as Date | string | null),
+        endTimeStr: formatLocalTime(b.endTime as Date | string | null),
       }));
 
       // 3. 生成所有可能的时间段（从09:00到23:00，每30分钟一个时间点）
