@@ -5308,8 +5308,8 @@ var init_db = __esm({
 
 // server/_core/errorFormatter.ts
 function formatError(opts) {
-  const { error, type, path: path4, input } = opts;
-  console.error(`[tRPC Error] ${type} ${path4}:`, {
+  const { error, type, path: path2, input } = opts;
+  console.error(`[tRPC Error] ${type} ${path2}:`, {
     code: error.code,
     message: error.message,
     input,
@@ -6776,143 +6776,25 @@ var init_channelOrderNoBatchFill = __esm({
   }
 });
 
-// vite.config.ts
-var vite_config_exports = {};
-__export(vite_config_exports, {
-  default: () => vite_config_default
-});
-import { jsxLocPlugin } from "@builder.io/vite-plugin-jsx-loc";
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-import { defineConfig } from "vite";
-import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
-var plugins, vite_config_default;
-var init_vite_config = __esm({
-  "vite.config.ts"() {
-    "use strict";
-    plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
-    vite_config_default = defineConfig({
-      plugins,
-      resolve: {
-        alias: {
-          "@": path.resolve(import.meta.dirname, "client", "src"),
-          "@shared": path.resolve(import.meta.dirname, "shared"),
-          "@assets": path.resolve(import.meta.dirname, "attached_assets")
-        }
-      },
-      envDir: path.resolve(import.meta.dirname),
-      root: path.resolve(import.meta.dirname, "client"),
-      publicDir: path.resolve(import.meta.dirname, "client", "public"),
-      build: {
-        outDir: path.resolve(import.meta.dirname, "dist/public"),
-        emptyOutDir: true
-      },
-      server: {
-        host: true,
-        allowedHosts: [
-          ".manuspre.computer",
-          ".manus.computer",
-          ".manus-asia.computer",
-          ".manuscomputer.ai",
-          ".manusvm.computer",
-          "localhost",
-          "127.0.0.1"
-        ],
-        fs: {
-          strict: true,
-          deny: ["**/.*"]
-        }
-      }
-    });
-  }
-});
-
-// server/_core/vite.ts
-var vite_exports = {};
-__export(vite_exports, {
-  serveStatic: () => serveStatic,
-  setupVite: () => setupVite
-});
-import express from "express";
-import fs from "fs";
-import { nanoid } from "nanoid";
-import path2 from "path";
-async function setupVite(app, server) {
-  const { createServer: createViteServer } = await import("vite");
-  const viteConfigModule = await Promise.resolve().then(() => (init_vite_config(), vite_config_exports));
-  const viteConfig = viteConfigModule.default;
-  const serverOptions = {
-    middlewareMode: true,
-    hmr: { server },
-    allowedHosts: true
-  };
-  const vite = await createViteServer({
-    ...viteConfig,
-    configFile: false,
-    server: serverOptions,
-    appType: "custom"
-  });
-  app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
-    const url = req.originalUrl;
-    try {
-      const clientTemplate = path2.resolve(
-        import.meta.dirname,
-        "../..",
-        "client",
-        "index.html"
-      );
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`
-      );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
-    } catch (e) {
-      vite.ssrFixStacktrace(e);
-      next(e);
-    }
-  });
-}
-function serveStatic(app) {
-  const distPath = process.env.NODE_ENV === "development" ? path2.resolve(import.meta.dirname, "../..", "dist", "public") : path2.resolve(import.meta.dirname, "public");
-  if (!fs.existsSync(distPath)) {
-    console.error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
-    );
-  }
-  app.use(express.static(distPath));
-  app.use("*", (_req, res) => {
-    res.sendFile(path2.resolve(distPath, "index.html"));
-  });
-}
-var init_vite = __esm({
-  "server/_core/vite.ts"() {
-    "use strict";
-  }
-});
-
 // server/_core/serve-static.ts
 var serve_static_exports = {};
 __export(serve_static_exports, {
-  serveStatic: () => serveStatic2
+  serveStatic: () => serveStatic
 });
-import express2 from "express";
-import fs2 from "fs";
-import path3 from "path";
+import express from "express";
+import fs from "fs";
+import path from "path";
 import { fileURLToPath } from "url";
-function serveStatic2(app) {
-  const __dirname = import.meta.dirname ?? (typeof import.meta.url === "string" ? path3.dirname(fileURLToPath(import.meta.url)) : process.cwd());
+function serveStatic(app) {
+  const __dirname = import.meta.dirname ?? (typeof import.meta.url === "string" ? path.dirname(fileURLToPath(import.meta.url)) : process.cwd());
   const possiblePaths = [
-    path3.resolve(process.cwd(), "public"),
-    path3.resolve(__dirname, "public"),
-    path3.resolve(__dirname, "../", "../", "dist", "public"),
-    path3.resolve(__dirname, "..", "public"),
+    path.resolve(process.cwd(), "public"),
+    path.resolve(__dirname, "public"),
+    path.resolve(__dirname, "../", "../", "dist", "public"),
+    path.resolve(__dirname, "..", "public"),
     "/code/public"
   ];
-  let distPath = possiblePaths.find((p) => fs2.existsSync(p));
+  let distPath = possiblePaths.find((p) => fs.existsSync(p));
   if (!distPath) {
     console.error(
       `Could not find the build directory. Tried: ${possiblePaths.join(", ")}`
@@ -6923,10 +6805,10 @@ function serveStatic2(app) {
     return;
   }
   console.log(`[Static] Serving from: ${distPath}`);
-  app.use(express2.static(distPath));
+  app.use(express.static(distPath));
   app.use("*", (_req, res) => {
-    const indexPath = path3.resolve(distPath, "index.html");
-    if (fs2.existsSync(indexPath)) {
+    const indexPath = path.resolve(distPath, "index.html");
+    if (fs.existsSync(indexPath)) {
       res.sendFile(indexPath);
     } else {
       res.status(404).json({ error: "index.html not found" });
@@ -6941,7 +6823,7 @@ var init_serve_static = __esm({
 
 // server/_core/index.ts
 import "dotenv/config";
-import express3 from "express";
+import express2 from "express";
 import { createServer } from "http";
 import net from "net";
 import cors from "cors";
@@ -19932,7 +19814,7 @@ async function findAvailablePort(startPort = 3e3) {
   throw new Error(`No available port found starting from ${startPort}`);
 }
 async function startServer() {
-  const app = express3();
+  const app = express2();
   const server = createServer(app);
   app.use(cors({
     origin: (origin, callback) => {
@@ -19982,8 +19864,8 @@ async function startServer() {
     exposedHeaders: ["Authorization", "authorization", "X-Auth-Token", "x-auth-token"]
   }));
   app.options("*", cors());
-  app.use(express3.json({ limit: "50mb" }));
-  app.use(express3.urlencoded({ limit: "50mb", extended: true }));
+  app.use(express2.json({ limit: "50mb" }));
+  app.use(express2.urlencoded({ limit: "50mb", extended: true }));
   registerOAuthRoutes(app);
   app.post("/api/webhook/wechat-payment-notify", handleWechatPaymentNotify);
   app.post("/api/webhook/alipay-payment-notify", handleAlipayPaymentNotify);
@@ -20010,11 +19892,11 @@ async function startServer() {
     }
   });
   if (process.env.NODE_ENV === "development") {
-    const { setupVite: setupVite2 } = await Promise.resolve().then(() => (init_vite(), vite_exports));
-    await setupVite2(app, server);
+    const { setupVite } = await import("./vite");
+    await setupVite(app, server);
   } else {
-    const { serveStatic: serveStatic3 } = await Promise.resolve().then(() => (init_serve_static(), serve_static_exports));
-    serveStatic3(app);
+    const { serveStatic: serveStatic2 } = await Promise.resolve().then(() => (init_serve_static(), serve_static_exports));
+    serveStatic2(app);
   }
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
