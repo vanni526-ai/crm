@@ -1893,6 +1893,7 @@ __export(db_exports, {
   updateCityPartnerConfig: () => updateCityPartnerConfig,
   updateClassroom: () => updateClassroom,
   updateCourse: () => updateCourse,
+  updateCustomer: () => updateCustomer,
   updateOrder: () => updateOrder,
   updateOrderDeliveryStatus: () => updateOrderDeliveryStatus,
   updateOrderNo: () => updateOrderNo,
@@ -2301,6 +2302,11 @@ async function deleteCustomer(id) {
       console.log(`[deleteCustomer] Customer was linked to user ${customer.userId}`);
     }
   });
+}
+async function updateCustomer(id, data) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(customers).set(data).where(eq(customers.id, id));
 }
 async function checkOrderNoExists(orderNo) {
   const db = await getDb();
@@ -6378,6 +6384,15 @@ var init_cityExpenseRouter = __esm({
             message: `\u6279\u91CF\u5237\u65B0\u5931\u8D25: ${error.message}`
           });
         }
+      }),
+      /**
+       * 获取所有已有数据的月份列表（用于筛选下拉）
+       */
+      getMonths: protectedProcedure.query(async () => {
+        const db = await getDb();
+        if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
+        const result = await db.selectDistinct({ month: cityMonthlyExpenses.month }).from(cityMonthlyExpenses).orderBy(cityMonthlyExpenses.month);
+        return result.map((r) => r.month).reverse();
       })
     });
   }
@@ -9089,6 +9104,37 @@ var customerRouter = router({
       await deleteCustomer(id);
     }
     return { success: true, count: input.ids.length };
+  }),
+  // 新增客户
+  create: protectedProcedure.input(z9.object({
+    name: z9.string().min(1),
+    wechatId: z9.string().optional(),
+    phone: z9.string().optional(),
+    trafficSource: z9.string().optional(),
+    notes: z9.string().optional()
+  })).mutation(async ({ input, ctx }) => {
+    const id = await createCustomer({
+      name: input.name,
+      wechatId: input.wechatId || null,
+      phone: input.phone || null,
+      trafficSource: input.trafficSource || null,
+      notes: input.notes || null,
+      createdBy: ctx.user.id
+    });
+    return { id, success: true };
+  }),
+  // 更新客户信息
+  update: protectedProcedure.input(z9.object({
+    id: z9.number(),
+    name: z9.string().min(1).optional(),
+    wechatId: z9.string().optional(),
+    phone: z9.string().optional(),
+    trafficSource: z9.string().optional(),
+    notes: z9.string().optional()
+  })).mutation(async ({ input }) => {
+    const { id, ...data } = input;
+    await updateCustomer(id, data);
+    return { success: true };
   }),
   // 批量导入更新客户（仅ID匹配，只更新微信号/电话/流量来源/备注）
   batchImport: protectedProcedure.input(z9.object({
