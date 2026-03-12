@@ -218,7 +218,7 @@ export default function Cities() {
 
       {/* 城市业绩趋势图表 */}
       {cityTrends && cityTrends.length > 0 && (
-        <Card className="mb-6">
+        <Card className="mb-6 overflow-visible">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -246,7 +246,7 @@ export default function Cities() {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-visible pb-8">
             {(() => {
               // 准备图表数据
               const displayTrends = selectedTrendCity

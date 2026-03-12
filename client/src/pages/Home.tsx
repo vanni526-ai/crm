@@ -197,26 +197,32 @@ export default function Home() {
             <h2 className="text-xl font-semibold mb-4">系统说明</h2>
             <p className="text-sm text-muted-foreground mb-4">功能介绍</p>
             <div className="space-y-4">
-              <Card className="glass-card">
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">销售人员</h3>
-                  <p className="text-sm text-muted-foreground">可以登记客户订单、收款信息</p>
-                </CardContent>
-              </Card>
+              <Link href="/sales">
+                <Card className="glass-card cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">销售人员</h3>
+                    <p className="text-sm text-muted-foreground">可以登记客户订单、收款信息</p>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card className="glass-card">
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">财务人员</h3>
-                  <p className="text-sm text-muted-foreground">可以管理老师费用结算、财务对账</p>
-                </CardContent>
-              </Card>
+              <Link href="/finance">
+                <Card className="glass-card cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">财务人员</h3>
+                    <p className="text-sm text-muted-foreground">可以管理老师费用结算、财务对账</p>
+                  </CardContent>
+                </Card>
+              </Link>
 
-              <Card className="glass-card">
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">管理员</h3>
-                  <p className="text-sm text-muted-foreground">可以管理用户权限、查看所有数据</p>
-                </CardContent>
-              </Card>
+              <Link href="/users">
+                <Card className="glass-card cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="pt-6">
+                    <h3 className="font-semibold mb-2">管理员</h3>
+                    <p className="text-sm text-muted-foreground">可以管理用户权限、查看所有数据</p>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
           </div>
         </div>

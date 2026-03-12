@@ -648,6 +648,18 @@ export async function deleteCustomer(id: number) {
   });
 }
 
+export async function updateCustomer(id: number, data: Partial<{
+  name: string;
+  wechatId: string | null;
+  phone: string | null;
+  trafficSource: string | null;
+  notes: string | null;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(customers).set(data).where(eq(customers.id, id));
+}
+
 // ========== 订单管理 ==========
 
 export async function checkOrderNoExists(orderNo: string): Promise<boolean> {

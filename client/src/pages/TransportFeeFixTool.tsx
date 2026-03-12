@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { formatDateBJ } from "@/lib/timezone";
+import DashboardLayout from "@/components/DashboardLayout";
+import { useLocation } from "wouter";
 
 /**
  * 车费修复工具页面
@@ -16,6 +18,7 @@ import { formatDateBJ } from "@/lib/timezone";
 export default function TransportFeeFixTool() {
   const [selectedOrderIds, setSelectedOrderIds] = useState<number[]>([]);
   const [isFixing, setIsFixing] = useState(false);
+  const [, navigate] = useLocation();
 
   // 查询可能存在问题的订单
   const { data: issueOrders, isLoading, refetch } = trpc.transportFeeFix.detectIssues.useQuery();
@@ -70,17 +73,24 @@ export default function TransportFeeFixTool() {
 
   if (isLoading) {
     return (
-      <div className="container py-8">
-        <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <DashboardLayout>
+        <div className="container py-8">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
         </div>
-      </div>
+      </DashboardLayout>
     );
   }
 
   return (
+    <DashboardLayout>
     <div className="container py-8 space-y-6">
       <div>
+        <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="mb-2 -ml-2">
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          返回首页
+        </Button>
         <h1 className="text-3xl font-bold">车费修复工具</h1>
         <p className="text-muted-foreground mt-2">
           检测和修复历史订单中车费识别错误的问题
@@ -260,5 +270,6 @@ export default function TransportFeeFixTool() {
         </AlertDescription>
       </Alert>
     </div>
+    </DashboardLayout>
   );
 }

@@ -1068,4 +1068,18 @@ export const cityExpenseRouter = router({
         });
       }
     }),
+
+  /**
+   * 获取所有已有数据的月份列表（用于筛选下拉）
+   */
+  getMonths: protectedProcedure
+    .query(async () => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
+      const result = await db
+        .selectDistinct({ month: cityMonthlyExpenses.month })
+        .from(cityMonthlyExpenses)
+        .orderBy(cityMonthlyExpenses.month);
+      return result.map(r => r.month).reverse();
+    }),
 });

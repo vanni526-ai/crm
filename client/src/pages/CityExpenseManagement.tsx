@@ -46,6 +46,9 @@ export default function CityExpenseManagement() {
   // 获取城市列表
   const { data: cities } = trpc.cityExpense.getCities.useQuery();
   
+  // 获取所有已有月份（独立查询，不受筛选条件影响）
+  const { data: allMonths } = trpc.cityExpense.getMonths.useQuery();
+  
   // 获取费用账单列表
   const { data: expenses, isLoading } = trpc.cityExpense.list.useQuery({
     cityId: selectedCityId,
@@ -577,7 +580,7 @@ export default function CityExpenseManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">全部月份</SelectItem>
-                    {expenses && Array.from(new Set(expenses.map(e => e.month))).sort().reverse().map(month => (
+                    {allMonths?.map(month => (
                       <SelectItem key={month} value={month}>{month}</SelectItem>
                     ))}
                   </SelectContent>

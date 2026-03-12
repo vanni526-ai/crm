@@ -169,6 +169,43 @@ export const customerRouter = router({
       return { success: true, count: input.ids.length };
     }),
 
+  // 新增客户
+  create: protectedProcedure
+    .input(z.object({
+      name: z.string().min(1),
+      wechatId: z.string().optional(),
+      phone: z.string().optional(),
+      trafficSource: z.string().optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const id = await db.createCustomer({
+        name: input.name,
+        wechatId: input.wechatId || null,
+        phone: input.phone || null,
+        trafficSource: input.trafficSource || null,
+        notes: input.notes || null,
+        createdBy: ctx.user.id,
+      });
+      return { id, success: true };
+    }),
+
+  // 更新客户信息
+  update: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      name: z.string().min(1).optional(),
+      wechatId: z.string().optional(),
+      phone: z.string().optional(),
+      trafficSource: z.string().optional(),
+      notes: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db.updateCustomer(id, data);
+      return { success: true };
+    }),
+
   // 批量导入更新客户（仅ID匹配，只更新微信号/电话/流量来源/备注）
   batchImport: protectedProcedure
     .input(z.object({

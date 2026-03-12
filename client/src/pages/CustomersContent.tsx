@@ -34,25 +34,28 @@ export default function CustomersContent() {
   const utils = trpc.useUtils();
   const [filterParams, setFilterParams] = useState<any>({});
   const { data: customers, isLoading } = trpc.customers.list.useQuery(filterParams);
-  // const createCustomer = trpc.customers.create.useMutation({...});
-  const createCustomer = {
-    mutate: (data: any) => {
+  const createCustomer = trpc.customers.create.useMutation({
+    onSuccess: () => {
       utils.customers.list.invalidate();
       toast.success("客户创建成功");
       setCreateOpen(false);
       reset();
     },
-    isPending: false,
-  };
-  const updateCustomer = {
-    mutate: (data: any) => {
+    onError: (err) => {
+      toast.error("创建失败: " + err.message);
+    },
+  });
+  const updateCustomer = trpc.customers.update.useMutation({
+    onSuccess: () => {
       utils.customers.list.invalidate();
       toast.success("客户更新成功");
       setEditOpen(false);
       reset();
     },
-    isPending: false,
-  };
+    onError: (err) => {
+      toast.error("更新失败: " + err.message);
+    },
+  });
   const deleteCustomer = trpc.customers.delete.useMutation({
     onSuccess: () => {
       utils.customers.list.invalidate();
@@ -465,7 +468,7 @@ export default function CustomersContent() {
                   >
                     {showFilters ? "隐藏筛选" : "高级筛选"}
                   </Button>
-                  {(minSpent || maxSpent || minClassCount || maxClassCount || lastConsumptionDays || trafficSource) && (
+                  {(minSpent || maxSpent || minClassCount || maxClassCount || lastConsumptionDays || trafficSource || filterParams.highValue || filterParams.churned) && (
                     <Button
                       variant="ghost"
                       size="sm"
