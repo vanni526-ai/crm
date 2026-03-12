@@ -237,8 +237,8 @@ export default function Cities() {
                   onChange={(e) => setSelectedTrendCity(e.target.value || null)}
                 >
                   <option value="">所有城市</option>
-                  {cityTrends.map((trend) => (
-                    <option key={trend.city} value={trend.city}>
+                  {Array.from(new Map(cityTrends.map((t) => [t.city, t])).values()).map((trend, idx) => (
+                    <option key={`${trend.city}-${idx}`} value={trend.city}>
                       {trend.city}
                     </option>
                   ))}
