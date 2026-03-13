@@ -2633,7 +2633,10 @@ async function getAllTeachers() {
     name: users.name,
     nickname: users.nickname,
     phone: users.phone,
+    email: users.email,
+    wechat: users.wechat,
     customerType: users.customerType,
+    category: users.category,
     isActive: sql`1`,
     // users表没有isActive字段，默认为1
     avatarUrl: users.avatarUrl,
@@ -2642,8 +2645,18 @@ async function getAllTeachers() {
     // 添加teacherStatus字段，映射为status
     teacherNotes: users.teacherNotes,
     // users表的teacherNotes（多角色用户）
-    hourlyRate: users.hourlyRate
+    hourlyRate: users.hourlyRate,
     // 课时费标准
+    bankAccount: users.bankAccount,
+    // 银行账号
+    bankName: users.bankName,
+    // 开户行
+    aliases: users.aliases,
+    // 别名列表(JSON数组)
+    contractEndDate: users.contractEndDate,
+    // 合同到期时间
+    joinDate: users.joinDate
+    // 入职时间
   }).from(users).where(
     and(
       like(users.roles, "%teacher%"),
@@ -2692,30 +2705,26 @@ async function getAllTeachersForParser() {
 async function updateTeacher(id, data) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const updateData = { ...data };
+  const usersUpdateData = { updatedAt: /* @__PURE__ */ new Date() };
   if (data.aliases !== void 0) {
     if (data.aliases && data.aliases.trim() !== "") {
       const aliasesArray = data.aliases.split(",").map((a) => a.trim()).filter((a) => a !== "");
-      updateData.aliases = JSON.stringify(aliasesArray);
+      usersUpdateData.aliases = JSON.stringify(aliasesArray);
     } else {
-      updateData.aliases = null;
+      usersUpdateData.aliases = null;
     }
   }
   if (data.hourlyRate !== void 0) {
-    const hourlyRateValue = data.hourlyRate && data.hourlyRate.trim() !== "" ? data.hourlyRate : null;
-    await db.update(users).set({ hourlyRate: hourlyRateValue }).where(eq(users.id, id));
-    delete updateData.hourlyRate;
+    usersUpdateData.hourlyRate = data.hourlyRate && data.hourlyRate.trim() !== "" ? data.hourlyRate : null;
   }
-  const teachersUpdateData = { ...updateData };
-  delete teachersUpdateData.hourlyRate;
-  const teachersFields = ["category", "customerType", "notes", "contractEndDate", "joinDate", "aliases", "avatarUrl", "teacherAttribute"];
-  const hasTeachersUpdate = teachersFields.some((f) => teachersUpdateData[f] !== void 0);
-  if (hasTeachersUpdate) {
-    const teacherRecord = await db.select({ id: teachers.id }).from(teachers).where(eq(teachers.userId, id)).limit(1);
-    if (teacherRecord.length > 0) {
-      await db.update(teachers).set(teachersUpdateData).where(eq(teachers.id, teacherRecord[0].id));
-    }
-  }
+  if (data.category !== void 0) usersUpdateData.category = data.category || null;
+  if (data.customerType !== void 0) usersUpdateData.customerType = data.customerType || null;
+  if (data.notes !== void 0) usersUpdateData.teacherNotes = data.notes || null;
+  if (data.contractEndDate !== void 0) usersUpdateData.contractEndDate = data.contractEndDate || null;
+  if (data.joinDate !== void 0) usersUpdateData.joinDate = data.joinDate || null;
+  if (data.avatarUrl !== void 0) usersUpdateData.avatarUrl = data.avatarUrl || null;
+  if (data.teacherAttribute !== void 0) usersUpdateData.teacherAttribute = data.teacherAttribute || null;
+  await db.update(users).set(usersUpdateData).where(eq(users.id, id));
 }
 async function batchDeleteTeachers(ids) {
   const db = await getDb();
@@ -2779,15 +2788,45 @@ async function batchCreateTeachers(teacherList) {
 async function getAllTeacherNames() {
   const db = await getDb();
   if (!db) return [];
-  const result = await db.select({ name: teachers.name, aliases: teachers.aliases }).from(teachers).where(eq(teachers.isActive, true));
   const allNames = [];
-  result.forEach((r) => {
-    allNames.push(r.name);
+  const nameSet = /* @__PURE__ */ new Set();
+  const usersResult = await db.select({ name: users.name, aliases: users.aliases }).from(users).where(and(like(users.roles, "%teacher%"), isNull(users.deletedAt)));
+  usersResult.forEach((r) => {
+    if (r.name && !nameSet.has(r.name)) {
+      nameSet.add(r.name);
+      allNames.push(r.name);
+    }
     if (r.aliases) {
       try {
         const aliases = JSON.parse(r.aliases);
         if (Array.isArray(aliases)) {
-          allNames.push(...aliases);
+          aliases.forEach((a) => {
+            if (a && !nameSet.has(a)) {
+              nameSet.add(a);
+              allNames.push(a);
+            }
+          });
+        }
+      } catch (e) {
+      }
+    }
+  });
+  const teachersResult = await db.select({ name: teachers.name, aliases: teachers.aliases }).from(teachers).where(eq(teachers.isActive, true));
+  teachersResult.forEach((r) => {
+    if (r.name && !nameSet.has(r.name)) {
+      nameSet.add(r.name);
+      allNames.push(r.name);
+    }
+    if (r.aliases) {
+      try {
+        const aliases = JSON.parse(r.aliases);
+        if (Array.isArray(aliases)) {
+          aliases.forEach((a) => {
+            if (a && !nameSet.has(a)) {
+              nameSet.add(a);
+              allNames.push(a);
+            }
+          });
         }
       } catch (e) {
       }
