@@ -6391,8 +6391,18 @@ var init_cityExpenseRouter = __esm({
       getMonths: protectedProcedure.query(async () => {
         const db = await getDb();
         if (!db) throw new TRPCError16({ code: "INTERNAL_SERVER_ERROR", message: "\u6570\u636E\u5E93\u8FDE\u63A5\u5931\u8D25" });
-        const result = await db.selectDistinct({ month: cityMonthlyExpenses.month }).from(cityMonthlyExpenses).orderBy(cityMonthlyExpenses.month);
-        return result.map((r) => r.month).reverse();
+        const [expenseMonths, orderMonths] = await Promise.all([
+          db.execute(
+            sql7`SELECT DISTINCT month FROM ${cityMonthlyExpenses} ORDER BY month DESC`
+          ),
+          db.execute(
+            sql7`SELECT DISTINCT DATE_FORMAT(classDate, '%Y-%m') as month FROM ${orders} WHERE status = 'paid' AND classDate IS NOT NULL ORDER BY month DESC`
+          )
+        ]);
+        const expenseMonthList = expenseMonths[0].map((r) => r.month);
+        const orderMonthList = orderMonths[0].map((r) => r.month);
+        const allMonths = Array.from(/* @__PURE__ */ new Set([...expenseMonthList, ...orderMonthList])).sort().reverse();
+        return allMonths;
       })
     });
   }
