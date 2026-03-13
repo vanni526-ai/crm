@@ -1145,13 +1145,21 @@ export async function getAllTeachers() {
     name: users.name,
     nickname: users.nickname,
     phone: users.phone,
+    email: users.email,
+    wechat: users.wechat,
     customerType: users.customerType,
+    category: users.category,
     isActive: sql<number>`1`, // users表没有isActive字段，默认为1
     avatarUrl: users.avatarUrl,
     teacherAttribute: users.teacherAttribute,
     status: users.teacherStatus, // 添加teacherStatus字段，映射为status
     teacherNotes: users.teacherNotes, // users表的teacherNotes（多角色用户）
     hourlyRate: users.hourlyRate, // 课时费标准
+    bankAccount: users.bankAccount, // 银行账号
+    bankName: users.bankName, // 开户行
+    aliases: users.aliases, // 别名列表(JSON数组)
+    contractEndDate: users.contractEndDate, // 合同到期时间
+    joinDate: users.joinDate, // 入职时间
   }).from(users)
   .where(
     and(
@@ -1217,41 +1225,32 @@ export async function updateTeacher(id: number, data: Partial<InsertTeacher> & {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // 所有字段都更新到 users 表（getAllTeachers 从 users 表读取）
+  const usersUpdateData: any = { updatedAt: new Date() };
+  
   // 将aliases字符串转换为JSON数组
-  const updateData: any = { ...data };
   if (data.aliases !== undefined) {
     if (data.aliases && data.aliases.trim() !== '') {
-      // 将逗号分隔的字符串转换为数组
       const aliasesArray = data.aliases.split(',').map(a => a.trim()).filter(a => a !== '');
-      updateData.aliases = JSON.stringify(aliasesArray);
+      usersUpdateData.aliases = JSON.stringify(aliasesArray);
     } else {
-      updateData.aliases = null;
+      usersUpdateData.aliases = null;
     }
   }
   
-  // 如果有 hourlyRate，更新 users 表（老师列表从 users 表读取）
-  // id 在老师列表中对应的是 users.id
   if (data.hourlyRate !== undefined) {
-    const hourlyRateValue = data.hourlyRate && data.hourlyRate.trim() !== '' ? data.hourlyRate : null;
-    await db.update(users).set({ hourlyRate: hourlyRateValue as any }).where(eq(users.id, id));
-    delete updateData.hourlyRate; // 不写入 teachers 表
+    usersUpdateData.hourlyRate = data.hourlyRate && data.hourlyRate.trim() !== '' ? data.hourlyRate : null;
   }
+  if (data.category !== undefined) usersUpdateData.category = data.category || null;
+  if (data.customerType !== undefined) usersUpdateData.customerType = data.customerType || null;
+  if (data.notes !== undefined) usersUpdateData.teacherNotes = data.notes || null; // notes -> teacherNotes in users table
+  if (data.contractEndDate !== undefined) usersUpdateData.contractEndDate = data.contractEndDate || null;
+  if (data.joinDate !== undefined) usersUpdateData.joinDate = data.joinDate || null;
+  if (data.avatarUrl !== undefined) usersUpdateData.avatarUrl = data.avatarUrl || null;
+  if (data.teacherAttribute !== undefined) usersUpdateData.teacherAttribute = data.teacherAttribute || null;
   
-  // 过滤掉 hourlyRate 后再检查是否有其他字段需要更新 teachers 表
-  const teachersUpdateData = { ...updateData };
-  delete teachersUpdateData.hourlyRate;
-  
-  // 只有当有 teachers 表字段需要更新时才操作 teachers 表
-  const teachersFields = ['category', 'customerType', 'notes', 'contractEndDate', 'joinDate', 'aliases', 'avatarUrl', 'teacherAttribute'];
-  const hasTeachersUpdate = teachersFields.some(f => teachersUpdateData[f] !== undefined);
-  if (hasTeachersUpdate) {
-    // teachers 表的 id 字段是自增主键，但老师列表用的是 users.id
-    // 需要通过 userId 关联查找 teachers 表记录
-    const teacherRecord = await db.select({ id: teachers.id }).from(teachers).where(eq(teachers.userId, id)).limit(1);
-    if (teacherRecord.length > 0) {
-      await db.update(teachers).set(teachersUpdateData).where(eq(teachers.id, teacherRecord[0].id));
-    }
-  }
+  // 更新 users 表
+  await db.update(users).set(usersUpdateData).where(eq(users.id, id));
 }
 
 // 批量删除老师（软删除users表记录）
@@ -1349,17 +1348,54 @@ export async function batchCreateTeachers(teacherList: (Partial<InsertTeacher> &
 export async function getAllTeacherNames() {
   const db = await getDb();
   if (!db) return [];
-  const result = await db.select({ name: teachers.name, aliases: teachers.aliases }).from(teachers).where(eq(teachers.isActive, true));
   
   // 收集所有名字(包括真实名和别名)
   const allNames: string[] = [];
-  result.forEach(r => {
-    allNames.push(r.name);
+  const nameSet = new Set<string>();
+  
+  // 从 users 表读取老师名字和别名（主要数据来源）
+  const usersResult = await db.select({ name: users.name, aliases: users.aliases }).from(users)
+    .where(and(like(users.roles, '%teacher%'), isNull(users.deletedAt)));
+  
+  usersResult.forEach(r => {
+    if (r.name && !nameSet.has(r.name)) {
+      nameSet.add(r.name);
+      allNames.push(r.name);
+    }
     if (r.aliases) {
       try {
         const aliases = JSON.parse(r.aliases);
         if (Array.isArray(aliases)) {
-          allNames.push(...aliases);
+          aliases.forEach((a: string) => {
+            if (a && !nameSet.has(a)) {
+              nameSet.add(a);
+              allNames.push(a);
+            }
+          });
+        }
+      } catch (e) {
+        // 忽略JSON解析错误
+      }
+    }
+  });
+  
+  // 兼容旧数据：从 teachers 表读取老数据（避免重复）
+  const teachersResult = await db.select({ name: teachers.name, aliases: teachers.aliases }).from(teachers).where(eq(teachers.isActive, true));
+  teachersResult.forEach(r => {
+    if (r.name && !nameSet.has(r.name)) {
+      nameSet.add(r.name);
+      allNames.push(r.name);
+    }
+    if (r.aliases) {
+      try {
+        const aliases = JSON.parse(r.aliases);
+        if (Array.isArray(aliases)) {
+          aliases.forEach((a: string) => {
+            if (a && !nameSet.has(a)) {
+              nameSet.add(a);
+              allNames.push(a);
+            }
+          });
         }
       } catch (e) {
         // 忽略JSON解析错误

@@ -1,50 +1,54 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { getAllTeacherNames, createTeacher, updateTeacher, getDb } from './db';
-import { teachers } from '../drizzle/schema';
+import { getAllTeacherNames, updateTeacher, getDb } from './db';
+import { users } from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
 
 describe('老师别名功能', () => {
-  let testTeacherId: number;
+  let testUserId: number;
 
   beforeAll(async () => {
-    // 创建测试老师
-    testTeacherId = await createTeacher({
+    // 创建测试用户（老师角色）
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+    const result = await db.insert(users).values({
+      openId: `test_alias_teacher_${Date.now()}`,
       name: '测试老师',
       phone: '13800138000',
-      status: '活跃',
-      isActive: true,
+      roles: 'teacher',
+      role: 'teacher',
     });
+    testUserId = Number(result[0].insertId);
   });
 
   afterAll(async () => {
     // 清理测试数据
     const db = await getDb();
-    if (db && testTeacherId) {
-      await db.delete(teachers).where(eq(teachers.id, testTeacherId));
+    if (db && testUserId) {
+      await db.delete(users).where(eq(users.id, testUserId));
     }
   });
 
   it('应该能够为老师添加别名', async () => {
     // 添加别名
-    await updateTeacher(testTeacherId, {
+    await updateTeacher(testUserId, {
       aliases: '小测,测测,测试'
     });
 
-    // 验证别名已保存
+    // 验证别名已保存到 users 表
     const db = await getDb();
     if (!db) throw new Error('Database not available');
     
-    const result = await db.select().from(teachers).where(eq(teachers.id, testTeacherId)).limit(1);
-    const teacher = result[0];
+    const result = await db.select().from(users).where(eq(users.id, testUserId)).limit(1);
+    const user = result[0];
     
-    expect(teacher.aliases).toBeTruthy();
-    const aliases = JSON.parse(teacher.aliases!);
+    expect(user.aliases).toBeTruthy();
+    const aliases = JSON.parse(user.aliases!);
     expect(aliases).toEqual(['小测', '测测', '测试']);
   });
 
   it('getAllTeacherNames应该返回老师名和所有别名', async () => {
     // 添加别名
-    await updateTeacher(testTeacherId, {
+    await updateTeacher(testUserId, {
       aliases: '小测,测测'
     });
 
@@ -59,12 +63,12 @@ describe('老师别名功能', () => {
 
   it('应该能够清空别名', async () => {
     // 先添加别名
-    await updateTeacher(testTeacherId, {
+    await updateTeacher(testUserId, {
       aliases: '小测,测测'
     });
 
     // 清空别名
-    await updateTeacher(testTeacherId, {
+    await updateTeacher(testUserId, {
       aliases: ''
     });
 
@@ -72,15 +76,15 @@ describe('老师别名功能', () => {
     const db = await getDb();
     if (!db) throw new Error('Database not available');
     
-    const result = await db.select().from(teachers).where(eq(teachers.id, testTeacherId)).limit(1);
-    const teacher = result[0];
+    const result = await db.select().from(users).where(eq(users.id, testUserId)).limit(1);
+    const user = result[0];
     
-    expect(teacher.aliases).toBeNull();
+    expect(user.aliases).toBeNull();
   });
 
   it('应该正确处理别名中的空格', async () => {
     // 添加带空格的别名
-    await updateTeacher(testTeacherId, {
+    await updateTeacher(testUserId, {
       aliases: ' 小测 , 测测 , 测试 '
     });
 
@@ -88,17 +92,17 @@ describe('老师别名功能', () => {
     const db = await getDb();
     if (!db) throw new Error('Database not available');
     
-    const result = await db.select().from(teachers).where(eq(teachers.id, testTeacherId)).limit(1);
-    const teacher = result[0];
+    const result = await db.select().from(users).where(eq(users.id, testUserId)).limit(1);
+    const user = result[0];
     
-    expect(teacher.aliases).toBeTruthy();
-    const aliases = JSON.parse(teacher.aliases!);
+    expect(user.aliases).toBeTruthy();
+    const aliases = JSON.parse(user.aliases!);
     expect(aliases).toEqual(['小测', '测测', '测试']);
   });
 
   it('应该过滤掉空别名', async () => {
     // 添加包含空别名的字符串
-    await updateTeacher(testTeacherId, {
+    await updateTeacher(testUserId, {
       aliases: '小测,,测测,,'
     });
 
@@ -106,11 +110,11 @@ describe('老师别名功能', () => {
     const db = await getDb();
     if (!db) throw new Error('Database not available');
     
-    const result = await db.select().from(teachers).where(eq(teachers.id, testTeacherId)).limit(1);
-    const teacher = result[0];
+    const result = await db.select().from(users).where(eq(users.id, testUserId)).limit(1);
+    const user = result[0];
     
-    expect(teacher.aliases).toBeTruthy();
-    const aliases = JSON.parse(teacher.aliases!);
+    expect(user.aliases).toBeTruthy();
+    const aliases = JSON.parse(user.aliases!);
     expect(aliases).toEqual(['小测', '测测']);
   });
 });
