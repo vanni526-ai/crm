@@ -1104,39 +1104,65 @@ export default function Finance() {
           <Card className="glass-card">
             <CardHeader>
               <CardTitle>城市收益趋势</CardTitle>
-              <p className="text-sm text-muted-foreground">最近6个月收益变化</p>
+              <p className="text-sm text-muted-foreground">最近6个月收益变化（Top 10 城市）</p>
             </CardHeader>
             <CardContent>
-              {cityRevenueTrend && cityRevenueTrend.cities.length > 0 ? (
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={cityRevenueTrend.months.map((month, index) => {
-                    const dataPoint: any = { month: month.substring(5) + '月' };
-                    cityRevenueTrend.cities.forEach(city => {
-                      dataPoint[city.city] = city.data[index];
-                    });
-                    return dataPoint;
-                  })}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(value: number) => `¥${value.toLocaleString()}`} />
-                    <Legend />
-                    {cityRevenueTrend.cities.map((city, index) => {
-                      const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7c7c', '#a78bfa'];
-                      return (
-                        <Line
-                          key={city.city}
-                          type="monotone"
-                          dataKey={city.city}
-                          stroke={colors[index % colors.length]}
-                          strokeWidth={2}
-                          dot={{ r: 4 }}
+              {cityRevenueTrend && cityRevenueTrend.cities.length > 0 ? (() => {
+                // 按总收入排序，只取 Top 10 城市
+                const top10Cities = [...cityRevenueTrend.cities]
+                  .sort((a, b) => b.data.reduce((s, v) => s + v, 0) - a.data.reduce((s, v) => s + v, 0))
+                  .slice(0, 10);
+                const chartColors = [
+                  '#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6',
+                  '#ec4899', '#14b8a6', '#f97316', '#8b5cf6', '#06b6d4'
+                ];
+                const chartData = cityRevenueTrend.months.map((month, index) => {
+                  const dataPoint: any = { month: month.substring(5) + '月' };
+                  top10Cities.forEach(city => {
+                    dataPoint[city.city] = city.data[index];
+                  });
+                  return dataPoint;
+                });
+                return (
+                  <div style={{ overflowX: 'auto' }}>
+                    <ResponsiveContainer width="100%" height={420} minWidth={500}>
+                      <LineChart
+                        data={chartData}
+                        margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
+                        <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                        <YAxis
+                          tick={{ fontSize: 11 }}
+                          tickFormatter={(v: number) => v >= 10000 ? `${(v / 10000).toFixed(0)}万` : `${v}`}
+                          width={50}
                         />
-                      );
-                    })}
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
+                        <Tooltip
+                          formatter={(value: number, name: string) => [`¥${Number(value).toLocaleString()}`, name]}
+                          wrapperStyle={{ zIndex: 50 }}
+                        />
+                        <Legend
+                          layout="horizontal"
+                          verticalAlign="bottom"
+                          align="center"
+                          wrapperStyle={{ paddingTop: '12px', fontSize: '12px' }}
+                        />
+                        {top10Cities.map((city, index) => (
+                          <Line
+                            key={city.city}
+                            type="monotone"
+                            dataKey={city.city}
+                            stroke={chartColors[index % chartColors.length]}
+                            strokeWidth={2}
+                            dot={{ r: 3 }}
+                            activeDot={{ r: 5 }}
+                          />
+                        ))}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                );
+              })() : (
                 <div className="text-center text-muted-foreground py-8">
                   暂无数据
                 </div>

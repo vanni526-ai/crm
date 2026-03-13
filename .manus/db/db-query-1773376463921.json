@@ -1,0 +1,35 @@
+{
+  "query": "SELECT DATE_FORMAT(classDate, '%Y-%m') as month, deliveryCity, SUM(courseAmount) as totalRevenue FROM orders WHERE status = 'paid' AND classDate IS NOT NULL AND classDate >= '2025-03-13' GROUP BY DATE_FORMAT(classDate, '%Y-%m'), deliveryCity ORDER BY DATE_FORMAT(classDate, '%Y-%m') LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT DATE_FORMAT(classDate, '%Y-%m') as month, deliveryCity, SUM(courseAmount) as totalRevenue FROM orders WHERE status = 'paid' AND classDate IS NOT NULL AND classDate >= '2025-03-13' GROUP BY DATE_FORMAT(classDate, '%Y-%m'), deliveryCity ORDER BY DATE_FORMAT(classDate, '%Y-%m') LIMIT 5;",
+  "rows": [
+    {
+      "month": "2025-12",
+      "deliveryCity": "天津",
+      "totalRevenue": "7950.00"
+    },
+    {
+      "month": "2025-12",
+      "deliveryCity": "上海",
+      "totalRevenue": "3050.00"
+    },
+    {
+      "month": "2025-12",
+      "deliveryCity": "苏州",
+      "totalRevenue": "1200.00"
+    },
+    {
+      "month": "2025-12",
+      "deliveryCity": "NULL",
+      "totalRevenue": "4068.00"
+    },
+    {
+      "month": "2025-12",
+      "deliveryCity": "武汉",
+      "totalRevenue": "2400.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "month\tdeliveryCity\ttotalRevenue\n2025-12\t天津\t7950.00\n2025-12\t上海\t3050.00\n2025-12\t苏州\t1200.00\n2025-12\tNULL\t4068.00\n2025-12\t武汉\t2400.00\n",
+  "stderr": "",
+  "execution_time_ms": 1513
+}

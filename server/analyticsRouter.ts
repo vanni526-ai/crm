@@ -481,19 +481,21 @@ export const analyticsRouter = router({
         // TODO: 添加城市ID过滤
       }
 
-      const monthColumn = sql<string>`DATE_FORMAT(${orders.classDate}, '%Y-%m')`;
-      
-      const stats = await db
-        .select({
-          month: monthColumn,
-          city: orders.deliveryCity,
-          totalRevenue: sql<number>`SUM(${orders.courseAmount})`,
-          orderCount: sql<number>`COUNT(*)`,
-        })
-        .from(orders)
-        .where(and(...whereConditions))
-        .groupBy(monthColumn, orders.deliveryCity)
-        .orderBy(monthColumn);
+      // 使用 db.execute 直接执行原始 SQL，避免 Drizzle 0.44 的 groupBy isSingleTable 问题
+      // （Drizzle 在 select 中生成无表前缀的列名，但 groupBy 中有表前缀，导致 MySQL only_full_group_by 报错）
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const rawResult = await db.execute(
+        sql`SELECT DATE_FORMAT(${orders.classDate}, '%Y-%m') as month,
+          ${orders.deliveryCity} as city,
+          SUM(${orders.courseAmount}) as totalRevenue,
+          COUNT(*) as orderCount
+        FROM ${orders}
+        WHERE ${orders.status} = 'paid'
+          AND ${orders.classDate} >= ${startDateStr}
+        GROUP BY DATE_FORMAT(${orders.classDate}, '%Y-%m'), ${orders.deliveryCity}
+        ORDER BY DATE_FORMAT(${orders.classDate}, '%Y-%m')`
+      );
+      const stats = (rawResult[0] as unknown as Array<{ month: string; city: string; totalRevenue: string; orderCount: string }>);
 
       // 将扁平数据转换为前端期望的格式：{ cities: [...], months: [...] }
       const monthsSet = new Set<string>();

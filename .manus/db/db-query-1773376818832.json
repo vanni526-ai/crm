@@ -1,0 +1,40 @@
+{
+  "query": "SELECT DATE_FORMAT(classDate, '%Y-%m') as month, deliveryCity as city, SUM(courseAmount) as totalRevenue, COUNT(*) as orderCount FROM orders WHERE status = 'paid' AND classDate >= '2025-03-13' GROUP BY DATE_FORMAT(classDate, '%Y-%m'), deliveryCity ORDER BY DATE_FORMAT(classDate, '%Y-%m') LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT DATE_FORMAT(classDate, '%Y-%m') as month, deliveryCity as city, SUM(courseAmount) as totalRevenue, COUNT(*) as orderCount FROM orders WHERE status = 'paid' AND classDate >= '2025-03-13' GROUP BY DATE_FORMAT(classDate, '%Y-%m'), deliveryCity ORDER BY DATE_FORMAT(classDate, '%Y-%m') LIMIT 5;",
+  "rows": [
+    {
+      "month": "2025-12",
+      "city": "武汉",
+      "totalRevenue": "2400.00",
+      "orderCount": "1"
+    },
+    {
+      "month": "2025-12",
+      "city": "互联网课",
+      "totalRevenue": "900.00",
+      "orderCount": "1"
+    },
+    {
+      "month": "2025-12",
+      "city": "苏州",
+      "totalRevenue": "1200.00",
+      "orderCount": "1"
+    },
+    {
+      "month": "2025-12",
+      "city": "NULL",
+      "totalRevenue": "4068.00",
+      "orderCount": "2"
+    },
+    {
+      "month": "2025-12",
+      "city": "天津",
+      "totalRevenue": "7950.00",
+      "orderCount": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "month\tcity\ttotalRevenue\torderCount\n2025-12\t武汉\t2400.00\t1\n2025-12\t互联网课\t900.00\t1\n2025-12\t苏州\t1200.00\t1\n2025-12\tNULL\t4068.00\t2\n2025-12\t天津\t7950.00\t2\n",
+  "stderr": "",
+  "execution_time_ms": 1561
+}
