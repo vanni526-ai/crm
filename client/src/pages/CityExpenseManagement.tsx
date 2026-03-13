@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Edit, Trash2, Calendar, Download, Upload, FileDown, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -48,6 +48,13 @@ export default function CityExpenseManagement() {
   
   // 获取所有已有月份（独立查询，不受筛选条件影响）
   const { data: allMonths } = trpc.cityExpense.getMonths.useQuery();
+
+  // 当月份列表加载完成后，验证当前选中月份是否有效，无效则重置为"全部月份"
+  useEffect(() => {
+    if (allMonths && selectedMonth && !allMonths.includes(selectedMonth)) {
+      setSelectedMonth("");
+    }
+  }, [allMonths]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // 获取费用账单列表
   const { data: expenses, isLoading } = trpc.cityExpense.list.useQuery({
