@@ -16721,13 +16721,19 @@ var analyticsRouter = router({
     ];
     if (input?.cityId) {
     }
-    const monthColumn = sql10`DATE_FORMAT(${orders.classDate}, '%Y-%m')`;
-    const stats = await db.select({
-      month: monthColumn,
-      city: orders.deliveryCity,
-      totalRevenue: sql10`SUM(${orders.courseAmount})`,
-      orderCount: sql10`COUNT(*)`
-    }).from(orders).where(and17(...whereConditions)).groupBy(monthColumn, orders.deliveryCity).orderBy(monthColumn);
+    const startDateStr = startDate.toISOString().split("T")[0];
+    const rawResult = await db.execute(
+      sql10`SELECT DATE_FORMAT(${orders.classDate}, '%Y-%m') as month,
+          ${orders.deliveryCity} as city,
+          SUM(${orders.courseAmount}) as totalRevenue,
+          COUNT(*) as orderCount
+        FROM ${orders}
+        WHERE ${orders.status} = 'paid'
+          AND ${orders.classDate} >= ${startDateStr}
+        GROUP BY DATE_FORMAT(${orders.classDate}, '%Y-%m'), ${orders.deliveryCity}
+        ORDER BY DATE_FORMAT(${orders.classDate}, '%Y-%m')`
+    );
+    const stats = rawResult[0];
     const monthsSet = /* @__PURE__ */ new Set();
     const citiesMap = /* @__PURE__ */ new Map();
     stats.forEach((s) => {
