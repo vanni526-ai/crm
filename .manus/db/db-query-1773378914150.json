@@ -1,0 +1,13 @@
+{
+  "query": "SELECT DISTINCT month FROM city_monthly_expenses ORDER BY month DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user SQg17LQaPsV51m8.32b9e2c038f9 --database jtCSa4Dgw9WMNzinVreVWF --execute SELECT DISTINCT month FROM city_monthly_expenses ORDER BY month DESC;",
+  "rows": [
+    {
+      "month": "2026-01"
+    }
+  ],
+  "messages": [],
+  "stdout": "month\n2026-01\n",
+  "stderr": "",
+  "execution_time_ms": 1679
+}

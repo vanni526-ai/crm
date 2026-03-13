@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { router, protectedProcedure } from "./_core/trpc";
 import { getDb } from "./db";
-import { cityMonthlyExpenses, cities, partnerCities, partners } from "../drizzle/schema";
+import { cityMonthlyExpenses, cities, partnerCities, partners, orders } from "../drizzle/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import ExcelJS from "exceljs";
@@ -1076,10 +1076,19 @@ export const cityExpenseRouter = router({
     .query(async () => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "数据库连接失败" });
-      const result = await db
-        .selectDistinct({ month: cityMonthlyExpenses.month })
-        .from(cityMonthlyExpenses)
-        .orderBy(cityMonthlyExpenses.month);
-      return result.map(r => r.month).reverse();
+      // 合并 city_monthly_expenses 表和 orders 表中的月份，确保下拉框显示所有有数据的月份
+      const [expenseMonths, orderMonths] = await Promise.all([
+        db.execute(
+          sql`SELECT DISTINCT month FROM ${cityMonthlyExpenses} ORDER BY month DESC`
+        ),
+        db.execute(
+          sql`SELECT DISTINCT DATE_FORMAT(classDate, '%Y-%m') as month FROM ${orders} WHERE status = 'paid' AND classDate IS NOT NULL ORDER BY month DESC`
+        ),
+      ]);
+      const expenseMonthList = (expenseMonths[0] as unknown as Array<{ month: string }>).map(r => r.month);
+      const orderMonthList = (orderMonths[0] as unknown as Array<{ month: string }>).map(r => r.month);
+      // 合并去重并降序排列
+      const allMonths = Array.from(new Set([...expenseMonthList, ...orderMonthList])).sort().reverse();
+      return allMonths;
     }),
 });
