@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Calendar, Clock, Search } from "lucide-react";
+import { Plus, Calendar, Clock, Search, Filter } from "lucide-react";
 import { useState, useMemo } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { formatDateBJ, formatDateTimeBJ, formatTimeBJ } from "@/lib/timezone";
 import { useForm } from "react-hook-form";
@@ -72,6 +73,10 @@ export default function Schedules() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  // 按日期分组 Tab 的筛选器
+  const [filterTeacher, setFilterTeacher] = useState("");
+  const [filterCity, setFilterCity] = useState("");
+  const [filterCourseType, setFilterCourseType] = useState("");
 
   const {
     register,
@@ -105,11 +110,21 @@ export default function Schedules() {
     });
   }, [schedules, searchTerm]);
 
-  // 按日期分组
+  // 按日期分组的额外筛选（在 filteredSchedules 基础上再过滤）
+  const groupedFilteredSchedules = useMemo(() => {
+    return filteredSchedules.filter((s: any) => {
+      if (filterTeacher && filterTeacher !== "__all__" && s.teacherName !== filterTeacher) return false;
+      if (filterCity && filterCity !== "__all__" && s.matchedOrder?.deliveryCity !== filterCity) return false;
+      if (filterCourseType && filterCourseType !== "__all__" && s.courseType !== filterCourseType) return false;
+      return true;
+    });
+  }, [filteredSchedules, filterTeacher, filterCity, filterCourseType]);
+
+  // 按日期分组（倒序：最新日期在顶部）
   const groupedSchedules = useMemo(() => {
-    const grouped = new Map<string, typeof filteredSchedules>();
+    const grouped = new Map<string, typeof groupedFilteredSchedules>();
     
-    filteredSchedules.forEach((schedule) => {
+    groupedFilteredSchedules.forEach((schedule) => {
       const date = formatDateBJ(schedule.startTime);
       if (!grouped.has(date)) {
         grouped.set(date, []);
@@ -117,10 +132,20 @@ export default function Schedules() {
       grouped.get(date)!.push(schedule);
     });
 
+    // 倒序排列：最新日期在顶部
     return Array.from(grouped.entries()).sort((a, b) => {
-      return new Date(a[0]).getTime() - new Date(b[0]).getTime();
+      return new Date(b[0]).getTime() - new Date(a[0]).getTime();
     });
-  }, [filteredSchedules]);
+  }, [groupedFilteredSchedules]);
+
+  // 从数据中提取筛选选项
+  const filterOptions = useMemo(() => {
+    if (!schedules) return { teachers: [], cities: [], courseTypes: [] };
+    const teachers = Array.from(new Set(schedules.map(s => s.teacherName).filter((v): v is string => Boolean(v)))).sort();
+    const cities = Array.from(new Set((schedules as any[]).map((s: any) => s.matchedOrder?.deliveryCity).filter((v: any): v is string => Boolean(v)))).sort();
+    const courseTypes = Array.from(new Set(schedules.map(s => s.courseType).filter((v): v is string => Boolean(v)))).sort();
+    return { teachers, cities, courseTypes };
+  }, [schedules]);
 
   // 即将到来的排课
   const upcomingSchedules = useMemo(() => {
@@ -214,6 +239,59 @@ export default function Schedules() {
               </TabsList>
 
               <TabsContent value="grouped" className="mt-4">
+                {/* 筛选器 */}
+                <div className="flex flex-wrap items-center gap-3 mb-4 p-3 bg-muted/40 rounded-lg">
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Filter className="h-4 w-4" />
+                    筛选：
+                  </div>
+                  <Select value={filterTeacher} onValueChange={setFilterTeacher}>
+                    <SelectTrigger className="w-[140px] h-8 text-sm">
+                      <SelectValue placeholder="全部老师" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">全部老师</SelectItem>
+                      {filterOptions.teachers.map(t => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={filterCity} onValueChange={setFilterCity}>
+                    <SelectTrigger className="w-[130px] h-8 text-sm">
+                      <SelectValue placeholder="全部城市" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">全部城市</SelectItem>
+                      {filterOptions.cities.map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={filterCourseType} onValueChange={setFilterCourseType}>
+                    <SelectTrigger className="w-[150px] h-8 text-sm">
+                      <SelectValue placeholder="全部课程类型" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">全部课程类型</SelectItem>
+                      {filterOptions.courseTypes.map(ct => (
+                        <SelectItem key={ct} value={ct}>{ct}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {(filterTeacher || filterCity || filterCourseType) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-sm text-muted-foreground"
+                      onClick={() => { setFilterTeacher(""); setFilterCity(""); setFilterCourseType(""); }}
+                    >
+                      清除筛选
+                    </Button>
+                  )}
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    共 {groupedFilteredSchedules.length} 条
+                  </span>
+                </div>
                 {groupedSchedules.length > 0 ? (
                   <div className="space-y-6">
                     {groupedSchedules.map(([date, dateSchedules]) => (
