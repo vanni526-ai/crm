@@ -1124,11 +1124,11 @@ export default function Finance() {
                   return dataPoint;
                 });
                 return (
-                  <div style={{ overflowX: 'auto' }}>
-                    <ResponsiveContainer width="100%" height={420} minWidth={500}>
+                  <div style={{ width: '100%' }}>
+                    <ResponsiveContainer width="100%" height={380}>
                       <LineChart
                         data={chartData}
-                        margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                        margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
                         <XAxis dataKey="month" tick={{ fontSize: 12 }} />
@@ -1139,13 +1139,14 @@ export default function Finance() {
                         />
                         <Tooltip
                           formatter={(value: number, name: string) => [`¥${Number(value).toLocaleString()}`, name]}
-                          wrapperStyle={{ zIndex: 50 }}
+                          wrapperStyle={{ zIndex: 50, maxWidth: '200px' }}
+                          position={{ x: 60, y: 10 }}
                         />
                         <Legend
-                          layout="horizontal"
-                          verticalAlign="bottom"
-                          align="center"
-                          wrapperStyle={{ paddingTop: '12px', fontSize: '12px' }}
+                          layout="vertical"
+                          verticalAlign="middle"
+                          align="right"
+                          wrapperStyle={{ fontSize: '11px', paddingLeft: '8px', lineHeight: '20px', maxWidth: '90px', overflowY: 'auto', maxHeight: '360px' }}
                         />
                         {top10Cities.map((city, index) => (
                           <Line
@@ -1160,6 +1161,8 @@ export default function Finance() {
                         ))}
                       </LineChart>
                     </ResponsiveContainer>
+                    {/* 城市图例补充说明 */}
+                    <p className="text-xs text-muted-foreground text-center mt-1">显示收益最高的 Top 10 城市</p>
                   </div>
                 );
               })() : (
