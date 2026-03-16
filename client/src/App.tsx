@@ -45,10 +45,68 @@ import DataCleaning from "@/pages/DataCleaning";
 import MembershipH5 from "@/pages/MembershipH5";
 import Recharge from "@/pages/Recharge";
 
+// ===== 移动端App页面 =====
+import AppLogin from "./pages/app/AppLogin";
+// 用户端
+import UserHome from "./pages/app/user/UserHome";
+import UserBooking from "./pages/app/user/UserBooking";
+import UserOrders from "./pages/app/user/UserOrders";
+import UserWallet from "./pages/app/user/UserWallet";
+import UserProfile from "./pages/app/user/UserProfile";
+// 销售端
+import SalesHome from "./pages/app/sales/SalesHome";
+import SalesRegister from "./pages/app/sales/SalesRegister";
+import SalesCustomers from "./pages/app/sales/SalesCustomers";
+import SalesOrders from "./pages/app/sales/SalesOrders";
+import SalesCommission from "./pages/app/sales/SalesCommission";
+// 老师端
+import TeacherHome from "./pages/app/teacher/TeacherHome";
+import TeacherSchedule from "./pages/app/teacher/TeacherSchedule";
+import TeacherCourses from "./pages/app/teacher/TeacherCourses";
+import TeacherSettlement from "./pages/app/teacher/TeacherSettlement";
+import TeacherProfile from "./pages/app/teacher/TeacherProfile";
+// 管理员端
+import AdminHome from "./pages/app/admin/AdminHome";
+import AdminOrders from "./pages/app/admin/AdminOrders";
+import AdminCustomers from "./pages/app/admin/AdminCustomers";
+import AdminApproval from "./pages/app/admin/AdminApproval";
+import AdminStats from "./pages/app/admin/AdminStats";
+// 移动端App入口重定向
+import AppRedirect from "./pages/app/AppRedirect";
+
 
 function Router() {
   return (
     <Switch>
+      {/* ===== 移动端App路由（/app 前缀）===== */}
+      <Route path={"/app"} component={AppRedirect} />
+      <Route path={"/app/login"} component={AppLogin} />
+      {/* 用户端 */}
+      <Route path={"/app/user"} component={UserHome} />
+      <Route path={"/app/user/booking"} component={UserBooking} />
+      <Route path={"/app/user/orders"} component={UserOrders} />
+      <Route path={"/app/user/wallet"} component={UserWallet} />
+      <Route path={"/app/user/profile"} component={UserProfile} />
+      {/* 销售端 */}
+      <Route path={"/app/sales"} component={SalesHome} />
+      <Route path={"/app/sales/register"} component={SalesRegister} />
+      <Route path={"/app/sales/customers"} component={SalesCustomers} />
+      <Route path={"/app/sales/orders"} component={SalesOrders} />
+      <Route path={"/app/sales/commission"} component={SalesCommission} />
+      {/* 老师端 */}
+      <Route path={"/app/teacher"} component={TeacherHome} />
+      <Route path={"/app/teacher/schedule"} component={TeacherSchedule} />
+      <Route path={"/app/teacher/courses"} component={TeacherCourses} />
+      <Route path={"/app/teacher/settlement"} component={TeacherSettlement} />
+      <Route path={"/app/teacher/profile"} component={TeacherProfile} />
+      {/* 管理员端 */}
+      <Route path={"/app/admin"} component={AdminHome} />
+      <Route path={"/app/admin/orders"} component={AdminOrders} />
+      <Route path={"/app/admin/customers"} component={AdminCustomers} />
+      <Route path={"/app/admin/approval"} component={AdminApproval} />
+      <Route path={"/app/admin/stats"} component={AdminStats} />
+
+      {/* ===== 原有PC后台路由 ===== */}
       <Route path={"/"} component={Home} />
       <Route path={"/orders"} component={Orders} />
       <Route path={"/customer-management"} component={CustomerManagement} />
