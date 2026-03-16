@@ -207,3 +207,31 @@
     transform: scale(0.97);
   }
 }
+
+/* ===== 移动端App专用样式 ===== */
+
+/* 隐藏滚动条但保留滚动功能 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* iOS安全区域适配 */
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 移动端App页面禁用PC端的button缩放效果 */
+[class*="/app"] button:active,
+[class*="/app"] [role="button"]:active {
+  transform: none;
+}
+
+/* 移动端select样式修复 */
+select option {
+  background-color: #16161f;
+  color: white;
+}

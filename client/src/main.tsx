@@ -17,7 +17,12 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
-  window.location.href = "/login";
+  // 移动端App路由跳转到App登录页
+  if (window.location.pathname.startsWith("/app")) {
+    window.location.href = "/app/login";
+  } else {
+    window.location.href = "/login";
+  }
 };
 
 queryClient.getQueryCache().subscribe(event => {
