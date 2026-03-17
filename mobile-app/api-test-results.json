@@ -1,0 +1,224 @@
+[
+  {
+    "role": "管理员",
+    "api": "auth.login",
+    "status": "FAIL",
+    "detail": "用户名或密码错误"
+  },
+  {
+    "role": "销售",
+    "api": "auth.login",
+    "status": "FAIL",
+    "detail": "用户名或密码错误"
+  },
+  {
+    "role": "老师",
+    "api": "auth.login",
+    "status": "FAIL",
+    "detail": "用户名或密码错误"
+  },
+  {
+    "role": "用户",
+    "api": "auth.login",
+    "status": "FAIL",
+    "detail": "用户名或密码错误"
+  },
+  {
+    "role": "公共",
+    "api": "auth.me",
+    "status": "OK",
+    "detail": "null"
+  },
+  {
+    "role": "公共",
+    "api": "auth.verifyToken",
+    "status": "FAIL",
+    "detail": "[\n  {\n    \"expected\": \"string\",\n    \"code\": \"invalid_type\",\n    \"path\": [\n      \"token\"\n    ],\n    \"message\": \"Invalid input: expected string, received undefined\"\n  }\n]"
+  },
+  {
+    "role": "公共",
+    "api": "metadata.getCities",
+    "status": "OK",
+    "detail": "城市数: 19, 数据: [\"重庆\",\"大连\",\"东莞\",\"福州\",\"杭州\",\"济南\",\"南京\",\"宁波\",\"泉州\",\"上海\",\"深圳\",\"石家庄\",\"苏州\",\"太原\",\"天津\",\"无锡"
+  },
+  {
+    "role": "公共",
+    "api": "metadata.getAll",
+    "status": "OK",
+    "detail": "{\"success\":true,\"data\":{\"cities\":[\"重庆\",\"大连\",\"东莞\",\"福州\",\"杭州\",\"济南\",\"南京\",\"宁波\",\"泉州\",\"上海\",\"深圳\",\"石家庄\",\"苏州\","
+  },
+  {
+    "role": "公共",
+    "api": "teachers.list",
+    "status": "OK",
+    "detail": "老师数: 65"
+  },
+  {
+    "role": "公共",
+    "api": "courses.list",
+    "status": "OK",
+    "detail": "课程数: 29"
+  },
+  {
+    "role": "公共",
+    "api": "classrooms.list",
+    "status": "OK",
+    "detail": "教室数: 23"
+  },
+  {
+    "role": "公共",
+    "api": "classrooms.getByCityName",
+    "status": "OK",
+    "detail": "[{\"id\":76,\"cityId\":1,\"cityName\":\"上海\",\"name\":\"上海1101\",\"address\":\"上海普陀区中江路106号北岸长风i幢1101室\",\"isActive\":"
+  },
+  {
+    "role": "合伙人",
+    "api": "cityPartnerConfig.list",
+    "status": "OK",
+    "detail": "{\"success\":true,\"data\":[{\"id\":180002,\"city\":\"上海\",\"partnerFeeRate\":\"0.00\",\"areaCode\":\"021\",\"isActive\""
+  },
+  {
+    "role": "合伙人",
+    "api": "partnerManagement.getPartnerIdByUserId",
+    "status": "FAIL",
+    "detail": "Please login (10001)"
+  },
+  {
+    "role": "合伙人",
+    "api": "partnerManagement.getPartnerCities",
+    "status": "FAIL",
+    "detail": "Please login (10001)"
+  },
+  {
+    "role": "合伙人",
+    "api": "cityExpense.list",
+    "status": "FAIL",
+    "detail": "Please login (10001)"
+  },
+  {
+    "role": "合伙人",
+    "api": "analytics.getOverview",
+    "status": "FAIL",
+    "detail": "No procedure found on path \"analytics.getOverview\""
+  },
+  {
+    "role": "路由检查",
+    "api": "orders.myOrders",
+    "status": "OK",
+    "detail": "路由存在 (401): Please login (10001)"
+  },
+  {
+    "role": "路由检查",
+    "api": "customers.myCustomers",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "salespersons.getMyPerformance",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "salespersons.getPerformance",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "schedules.getMySchedules",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "teacherPayments.getMyPayments",
+    "status": "OK",
+    "detail": "路由存在 (401): Please login (10001)"
+  },
+  {
+    "role": "路由检查",
+    "api": "teacherPayments.getMyStats",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "orders.teacherCourses",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "orders.teacherCourseDetail",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "orders.acceptCourse",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "account.recharge",
+    "status": "OK",
+    "detail": "路由存在 (401): Please login (10001)"
+  },
+  {
+    "role": "路由检查",
+    "api": "auth.register",
+    "status": "OK",
+    "detail": "路由存在 (400): [\n  {\n    \"origin\": \"string\",\n    \"code\": \"too_small\",\n    \"minimum\": 11,\n    \"inclusive\": true,\n    \"path\": [\n      \"phone\"\n    ],\n    \"message\": \"手机号格式错误\"\n  },\n  {\n    \"origin\": \"string\""
+  },
+  {
+    "role": "路由检查",
+    "api": "auth.resetPassword",
+    "status": "OK",
+    "detail": "路由存在 (400): [\n  {\n    \"origin\": \"string\",\n    \"code\": \"too_small\",\n    \"minimum\": 11,\n    \"inclusive\": true,\n    \"path\": [\n      \"phone\"\n    ],\n    \"message\": \"手机号格式错误\"\n  },\n  {\n    \"origin\": \"string\""
+  },
+  {
+    "role": "路由检查",
+    "api": "auth.changePassword",
+    "status": "OK",
+    "detail": "路由存在 (401): Please login (10001)"
+  },
+  {
+    "role": "路由检查",
+    "api": "account.changePassword",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "account.updateProfile",
+    "status": "MISSING",
+    "detail": "路由不存在(404)"
+  },
+  {
+    "role": "路由检查",
+    "api": "orders.update",
+    "status": "OK",
+    "detail": "路由存在 (401): Please login (10001)"
+  },
+  {
+    "role": "路由检查",
+    "api": "customers.create",
+    "status": "OK",
+    "detail": "路由存在 (401): Please login (10001)"
+  },
+  {
+    "role": "路由检查",
+    "api": "customers.update",
+    "status": "OK",
+    "detail": "路由存在 (401): Please login (10001)"
+  },
+  {
+    "role": "路由检查",
+    "api": "notifications.submit",
+    "status": "OK",
+    "detail": "存在且可用 (200)"
+  }
+]

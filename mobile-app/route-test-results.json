@@ -1,0 +1,119 @@
+{
+  "missing": [
+    "orders.teacherCourses",
+    "orders.teacherCourseDetail",
+    "orders.acceptCourse",
+    "account.getProfile",
+    "account.updateProfile",
+    "account.changePassword",
+    "customers.getById",
+    "customers.myCustomers",
+    "salespersons.getPerformance",
+    "salespersons.getMyPerformance",
+    "salespersons.getMyStats",
+    "analytics.getOverview",
+    "analytics.getDashboard",
+    "analytics.getSalesStats",
+    "analytics.getRevenueStats",
+    "teacherPayments.getMyStats",
+    "teacherPayments.list",
+    "schedules.list",
+    "schedules.getMySchedules",
+    "schedules.create",
+    "schedules.update"
+  ],
+  "errors": [
+    {
+      "proc": "auth.changePassword",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "orders.myOrders",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "orders.list",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "orders.getById",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "orders.userCreate",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "orders.update",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "orders.updateStatus",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "account.getMyBalance",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "account.getMyTransactions",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "account.recharge",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "customers.list",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "customers.create",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "customers.update",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "salespersons.list",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "teacherPayments.getMyPayments",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "userManagement.list",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "partnerManagement.getPartnerIdByUserId",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "partnerManagement.getPartnerCities",
+      "detail": "Please login (10001)"
+    },
+    {
+      "proc": "cityExpense.list",
+      "detail": "Please login (10001)"
+    }
+  ],
+  "ok": [
+    "auth.me",
+    "auth.verifyToken",
+    "auth.register",
+    "auth.resetPassword",
+    "metadata.getCities",
+    "metadata.getAll",
+    "teachers.list",
+    "courses.list",
+    "classrooms.list",
+    "classrooms.getByCityName",
+    "notifications.submit",
+    "cityPartnerConfig.list",
+    "cityPartnerConfig.getByCity"
+  ],
+  "total": 53
+}
