@@ -1,0 +1,20 @@
+CREATE TABLE `courses` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`courseName` varchar(255) NOT NULL,
+	`courseType` varchar(100) NOT NULL,
+	`classDate` date NOT NULL,
+	`classTime` varchar(10) NOT NULL,
+	`duration` int NOT NULL,
+	`classroomAddress` text NOT NULL,
+	`classroomName` varchar(255) NOT NULL,
+	`studentName` varchar(100) NOT NULL,
+	`studentPhone` varchar(20) NOT NULL,
+	`status` enum('pending','accepted','completed','cancelled') NOT NULL DEFAULT 'pending',
+	`fee` decimal(10,2) NOT NULL,
+	`notes` text,
+	`teacherId` int,
+	`teacherName` varchar(100),
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `courses_id` PRIMARY KEY(`id`)
+);

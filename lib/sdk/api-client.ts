@@ -1,0 +1,1280 @@
+/**
+ * 课程交付CRM系统 - 统一API客户端SDK
+ * 
+ * 一次性解决以下问题:
+ * - 跨域问题(CORS)
+ * - 代理问题
+ * - 端口问题
+ * - 接口地址问题
+ * - 权限问题
+ * - 缓存问题
+ * - Token认证问题
+ * 
+ * 使用方法:
+ * ```typescript
+ * import { createApiClient } from './api-client';
+ * const api = createApiClient();
+ * 
+ * // 登录
+ * await api.auth.login({ username: 'test', password: '123456' });
+ * 
+ * // 调用API
+ * const orders = await api.orders.myOrders();
+ * ```
+ */
+
+// ============================================================================
+// 类型定义
+// ============================================================================
+
+export interface ApiClientConfig {
+  /** 是否自动检测环境并选择API地址 */
+  autoDetect?: boolean;
+  /** 手动指定API基础地址 */
+  baseUrl?: string;
+  /** Token存储方式 */
+  tokenStorage?: 'asyncStorage' | 'localStorage' | 'memory';
+  /** 请求超时时间(毫秒) */
+  timeout?: number;
+  /** 失败重试次数 */
+  retryCount?: number;
+  /** 是否启用调试日志 */
+  debug?: boolean;
+}
+
+export interface LoginInput {
+  username: string;
+  password: string;
+}
+
+export interface LoginResult {
+  success: boolean;
+  token?: string;
+  user?: {
+    id: number;
+    openId: string;
+    name: string;
+    role: string;
+  };
+  error?: string;
+}
+
+export interface CreateOrderInput {
+  customerName: string;
+  paymentAmount: string;
+  courseAmount?: string;
+  deliveryCity?: string;
+  deliveryCourse?: string;
+  teacherName?: string;
+  teacherFee?: string;
+  carFee?: string;
+  classDate?: string;
+  classTime?: string;
+  notes?: string;
+}
+
+export interface Order {
+  id: number;
+  orderNo: string;
+  customerName: string;
+  paymentAmount: string;
+  courseAmount: string;
+  deliveryCity: string;
+  deliveryCourse: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface ApiError extends Error {
+  code: 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'CONFLICT' | 'NETWORK_ERROR' | 'SERVER_ERROR' | 'UNKNOWN';
+  status?: number;
+  details?: unknown;
+}
+
+// ============================================================================
+// Token存储适配器
+// ============================================================================
+
+interface TokenStorage {
+  getToken(): Promise<string | null>;
+  setToken(token: string): Promise<void>;
+  removeToken(): Promise<void>;
+}
+
+class MemoryTokenStorage implements TokenStorage {
+  private token: string | null = null;
+
+  async getToken(): Promise<string | null> {
+    return this.token;
+  }
+
+  async setToken(token: string): Promise<void> {
+    this.token = token;
+  }
+
+  async removeToken(): Promise<void> {
+    this.token = null;
+  }
+}
+
+class LocalStorageTokenStorage implements TokenStorage {
+  private readonly key = 'crm_auth_token';
+
+  async getToken(): Promise<string | null> {
+    if (typeof localStorage === 'undefined') return null;
+    return localStorage.getItem(this.key);
+  }
+
+  async setToken(token: string): Promise<void> {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(this.key, token);
+  }
+
+  async removeToken(): Promise<void> {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.removeItem(this.key);
+  }
+}
+
+class AsyncStorageTokenStorage implements TokenStorage {
+  private readonly key = 'crm_auth_token';
+  private AsyncStorage: any = null;
+
+  constructor() {
+    // 延迟加载AsyncStorage,避免在Web环境报错
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      this.AsyncStorage = require('@react-native-async-storage/async-storage').default;
+    } catch {
+      // 如果加载失败,回退到内存存储
+      console.warn('[ApiClient] AsyncStorage not available, falling back to memory storage');
+    }
+  }
+
+  async getToken(): Promise<string | null> {
+    if (!this.AsyncStorage) return null;
+    return await this.AsyncStorage.getItem(this.key);
+  }
+
+  async setToken(token: string): Promise<void> {
+    if (!this.AsyncStorage) return;
+    await this.AsyncStorage.setItem(this.key, token);
+  }
+
+  async removeToken(): Promise<void> {
+    if (!this.AsyncStorage) return;
+    await this.AsyncStorage.removeItem(this.key);
+  }
+}
+
+// ============================================================================
+// 环境检测器
+// ============================================================================
+
+class EnvironmentDetector {
+  /**
+   * 自动检测当前运行环境并返回正确的API基础地址
+   */
+  static detectBaseUrl(): string {
+    // 1. 检查是否在React Native环境
+    if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+      return this.getReactNativeBaseUrl();
+    }
+
+    // 2. 检查是否在浏览器环境
+    if (typeof window !== 'undefined' && typeof window.location !== 'undefined') {
+      return this.getBrowserBaseUrl();
+    }
+
+    // 3. Node.js环境(测试)
+    return 'http://localhost:3000';
+  }
+
+  private static getReactNativeBaseUrl(): string {
+    // React Native环境下,需要使用实际的服务器地址
+    // 开发时使用本地IP,生产时使用生产服务器地址
+    
+    // 检查是否有全局配置
+    if (typeof global !== 'undefined' && (global as any).__CRM_API_URL__) {
+      return (global as any).__CRM_API_URL__;
+    }
+
+    // 尝试从 Expo Constants 获取开发服务器地址
+    try {
+      // @ts-ignore - Expo Constants may not be available in all environments
+      const Constants = require('expo-constants').default;
+      const manifest = Constants.expoConfig || Constants.manifest;
+      
+      console.log('[ApiClient] Expo manifest:', JSON.stringify(manifest?.hostUri));
+      
+      if (manifest?.hostUri) {
+        // hostUri 格式: "192.168.1.100:8081" 或 "xxx.manus.computer:8081"
+        const host = manifest.hostUri.split(':')[0];
+        console.log('[ApiClient] Extracted host:', host);
+        
+        // 检查是否是 Manus 沙箱环境
+        if (host.includes('manus.computer') || host.includes('manus-asia.computer')) {
+          // Manus 沙箱: 使用 3000 端口的代理服务器
+          const proxyHost = host.replace(/^8081-/, '3000-');
+          const baseUrl = `https://${proxyHost}`;
+          console.log('[ApiClient] Using Manus proxy:', baseUrl);
+          return baseUrl;
+        } else {
+          // 本地开发: 使用本地 IP + 3000 端口
+          const baseUrl = `http://${host}:3000`;
+          console.log('[ApiClient] Using local proxy:', baseUrl);
+          return baseUrl;
+        }
+      }
+    } catch (e) {
+      console.warn('[ApiClient] Failed to get Expo dev server URL:', e);
+    }
+
+    // 降级方案: 直接连接后端 API（可能会被 Cloudflare 拦截）
+    return 'https://crm.bdsm.com.cn';
+  }
+
+  private static getBrowserBaseUrl(): string {
+    const { hostname, port, protocol, origin } = window.location;
+
+    // 本地开发环境
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return `${protocol}//${hostname}:${port || '3000'}`;
+    }
+
+    // Manus沙箱预览环境 - 需要将8081端口替换为3000端口
+    if (hostname.includes('manus.computer') || hostname.includes('manus-asia.computer')) {
+      // 将 8081-xxx 替换为 3000-xxx
+      const newHostname = hostname.replace(/^8081-/, '3000-');
+      return `${protocol}//${newHostname}`;
+    }
+
+    // 生产环境
+    return origin;
+  }
+
+  /**
+   * 检测当前环境类型
+   */
+  static getEnvironmentType(): 'react-native' | 'browser' | 'node' {
+    if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+      return 'react-native';
+    }
+    if (typeof window !== 'undefined') {
+      return 'browser';
+    }
+    return 'node';
+  }
+}
+
+// ============================================================================
+// 请求拦截器
+// ============================================================================
+
+class RequestInterceptor {
+  private tokenStorage: TokenStorage;
+  private debug: boolean;
+
+  constructor(tokenStorage: TokenStorage, debug: boolean = false) {
+    this.tokenStorage = tokenStorage;
+    this.debug = debug;
+  }
+
+  /**
+   * 构建完整的请求URL,包含Token和防缓存参数
+   */
+  async buildUrl(baseUrl: string, path: string, params?: Record<string, any>): Promise<string> {
+    const url = new URL(path, baseUrl);
+
+    // 添加查询参数
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.set(key, String(value));
+        }
+      });
+    }
+
+    // 添加Token到URL参数(绕过CORS限制)
+    const token = await this.tokenStorage.getToken();
+    if (token) {
+      url.searchParams.set('token', token);
+    }
+
+    // 添加时间戳防止缓存
+    url.searchParams.set('_t', Date.now().toString());
+
+    if (this.debug) {
+      console.log('[ApiClient] Request URL:', url.toString());
+    }
+
+    return url.toString();
+  }
+
+  /**
+   * 构建请求头
+   */
+  async buildHeaders(): Promise<Record<string, string>> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // 同时在Header中添加Token(作为备用)
+    const token = await this.tokenStorage.getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['X-Auth-Token'] = token;
+    }
+
+    return headers;
+  }
+}
+
+// ============================================================================
+// 错误处理器
+// ============================================================================
+
+class ErrorHandler {
+  /**
+   * 将HTTP响应错误转换为ApiError
+   */
+  static fromResponse(response: Response, body?: any): ApiError {
+    const error = new Error() as ApiError;
+    error.status = response.status;
+    error.details = body;
+
+    switch (response.status) {
+      case 401:
+        error.code = 'UNAUTHORIZED';
+        error.message = '认证失败,请重新登录';
+        break;
+      case 403:
+        error.code = 'FORBIDDEN';
+        error.message = '没有权限执行此操作';
+        break;
+      case 404:
+        error.code = 'NOT_FOUND';
+        error.message = '请求的资源不存在';
+        break;
+      case 409:
+        error.code = 'CONFLICT';
+        // 使用后端返回的错误消息
+        error.message = body?.error?.json?.message || body?.message || '请求冲突';
+        break;
+      case 500:
+      case 502:
+      case 503:
+        error.code = 'SERVER_ERROR';
+        error.message = '服务器错误,请稍后重试';
+        break;
+      default:
+        error.code = 'UNKNOWN';
+        error.message = body?.message || `请求失败(${response.status})`;
+    }
+
+    return error;
+  }
+
+  /**
+   * 将网络错误转换为ApiError
+   */
+  static fromNetworkError(err: Error): ApiError {
+    const error = new Error() as ApiError;
+    error.code = 'NETWORK_ERROR';
+    error.message = '网络连接失败,请检查网络';
+    error.details = err;
+    return error;
+  }
+}
+
+// ============================================================================
+// tRPC客户端
+// ============================================================================
+
+class TrpcClient {
+  private baseUrl: string;
+  private interceptor: RequestInterceptor;
+  private timeout: number;
+  private retryCount: number;
+  private debug: boolean;
+
+  constructor(
+    baseUrl: string,
+    interceptor: RequestInterceptor,
+    timeout: number = 45000, // 默认45秒超时
+    retryCount: number = 4, // 默认4次重试
+    debug: boolean = false
+  ) {
+    this.baseUrl = baseUrl;
+    this.interceptor = interceptor;
+    this.timeout = timeout;
+    this.retryCount = retryCount;
+    this.debug = debug;
+  }
+
+  /**
+   * 执行tRPC查询
+   */
+  async query<T>(procedure: string, input?: any): Promise<T> {
+    // 检查是否需要使用代理路径
+    // 如果 baseUrl 不是直接连接后端，则使用代理路径
+    const useProxy = !this.baseUrl.includes('crm.bdsm.com.cn');
+    const path = useProxy ? `/api/proxy/trpc/${procedure}` : `/api/trpc/${procedure}`;
+    const params: Record<string, any> = {};
+    
+    if (input !== undefined) {
+      params.input = JSON.stringify({ json: input });
+    }
+
+    return this.request<T>('GET', path, params);
+  }
+
+  /**
+   * 执行tRPC变更
+   */
+  async mutate<T>(procedure: string, input?: any): Promise<T> {
+    // 检查是否需要使用代理路径
+    const useProxy = !this.baseUrl.includes('crm.bdsm.com.cn');
+    const path = useProxy ? `/api/proxy/trpc/${procedure}` : `/api/trpc/${procedure}`;
+    const body = input !== undefined ? { json: input } : undefined;
+
+    return this.request<T>('POST', path, undefined, body);
+  }
+
+  /**
+   * 执行HTTP请求
+   */
+  private async request<T>(
+    method: 'GET' | 'POST',
+    path: string,
+    params?: Record<string, any>,
+    body?: any
+  ): Promise<T> {
+    let lastError: ApiError | null = null;
+
+    for (let attempt = 0; attempt <= this.retryCount; attempt++) {
+      try {
+        const url = await this.interceptor.buildUrl(this.baseUrl, path, params);
+        const headers = await this.interceptor.buildHeaders();
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+        if (this.debug) {
+          console.log(`[ApiClient] ${method} ${url}`, body);
+        }
+
+        const response = await fetch(url, {
+          method,
+          headers,
+          body: body ? JSON.stringify(body) : undefined,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        const responseText = await response.text();
+        if (this.debug) {
+          console.log(`[ApiClient] Response status: ${response.status}`);
+          console.log(`[ApiClient] Response text (first 200 chars):`, responseText.substring(0, 200));
+        }
+        
+        const responseBody = JSON.parse(responseText);
+
+        if (!response.ok) {
+          throw ErrorHandler.fromResponse(response, responseBody);
+        }
+
+        // tRPC响应格式
+        if (responseBody.result?.data?.json !== undefined) {
+          return responseBody.result.data.json as T;
+        }
+
+        return responseBody as T;
+      } catch (err) {
+        if (this.debug) {
+          console.error(`[ApiClient] Raw error (attempt ${attempt + 1}/${this.retryCount + 1}):`, err);
+        }
+        
+        if (err instanceof Error && err.name === 'AbortError') {
+          lastError = ErrorHandler.fromNetworkError(new Error('请求超时'));
+        } else if ((err as ApiError).code) {
+          lastError = err as ApiError;
+          // 认证错误和冲突错误不重试
+          if (lastError.code === 'UNAUTHORIZED' || lastError.code === 'FORBIDDEN' || lastError.code === 'CONFLICT') {
+            throw lastError;
+          }
+        } else {
+          lastError = ErrorHandler.fromNetworkError(err as Error);
+        }
+
+        if (this.debug) {
+          console.warn(`[ApiClient] Request failed (attempt ${attempt + 1}/${this.retryCount + 1}):`, lastError);
+        }
+
+        // 等待后重试
+        if (attempt < this.retryCount) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        }
+      }
+    }
+
+    throw lastError;
+  }
+}
+
+// ============================================================================
+// API模块
+// ============================================================================
+
+class AuthApi {
+  private trpc: TrpcClient;
+  private tokenStorage: TokenStorage;
+
+  constructor(trpc: TrpcClient, tokenStorage: TokenStorage) {
+    this.trpc = trpc;
+    this.tokenStorage = tokenStorage;
+  }
+
+  /**
+   * 修改密码
+   */
+  async changePassword(input: { oldPassword: string; newPassword: string }): Promise<{ success: boolean; error?: string }> {
+    try {
+      const result = await this.trpc.mutate<{ success: boolean; error?: string }>('auth.changePassword', input);
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        error: (err as Error).message,
+      };
+    }
+  }
+
+  /**
+   * 重置密码
+   */
+  async resetPassword(input: { phone: string; code: string; newPassword: string }): Promise<{ success: boolean; error?: string }> {
+    try {
+      const result = await this.trpc.mutate<{ success: boolean; error?: string }>('auth.resetPassword', input);
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        error: (err as Error).message,
+      };
+    }
+  }
+
+  /**
+   * 注册新用户
+   */
+  async register(input: { phone: string; password: string; name?: string; nickname?: string }): Promise<LoginResult> {
+    try {
+      const result = await this.trpc.mutate<LoginResult>('auth.register', input);
+      
+      if (result.success && result.token) {
+        await this.tokenStorage.setToken(result.token);
+      }
+
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        error: (err as Error).message,
+      };
+    }
+  }
+
+  /**
+   * 用户名密码登录
+   */
+  async login(input: LoginInput): Promise<LoginResult> {
+    try {
+      const result = await this.trpc.mutate<LoginResult>('auth.login', input);
+      
+      if (result.success && result.token) {
+        await this.tokenStorage.setToken(result.token);
+      }
+
+      return result;
+    } catch (err) {
+      return {
+        success: false,
+        error: (err as Error).message,
+      };
+    }
+  }
+
+  /**
+   * 检查是否已登录
+   */
+  async isLoggedIn(): Promise<boolean> {
+    const token = await this.tokenStorage.getToken();
+    if (!token) return false;
+
+    try {
+      const user = await this.trpc.query<any>('auth.me');
+      return !!user;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * 获取当前用户信息
+   */
+  async me(): Promise<any> {
+    return this.trpc.query('auth.me');
+  }
+
+  /**
+   * 登出
+   */
+  async logout(): Promise<void> {
+    await this.tokenStorage.removeToken();
+    try {
+      await this.trpc.mutate('auth.logout');
+    } catch {
+      // 忽略登出错误
+    }
+  }
+
+  /**
+   * 刷新Token
+   * @returns 刷新结果,包含新Token和过期时间
+   */
+  async refreshToken(): Promise<{ success: boolean; token?: string; expiresIn?: number }> {
+    try {
+      const currentToken = await this.tokenStorage.getToken();
+      if (!currentToken) {
+        return { success: false };
+      }
+
+      const result = await this.trpc.mutate<{ success: boolean; token: string; expiresIn: number }>(
+        'auth.refreshToken',
+        { token: currentToken }
+      );
+      
+      if (result.success && result.token) {
+        await this.tokenStorage.setToken(result.token);
+        return {
+          success: true,
+          token: result.token,
+          expiresIn: result.expiresIn,
+        };
+      }
+      return { success: false };
+    } catch {
+      return { success: false };
+    }
+  }
+
+  /**
+   * 检查Token是否即将过期(小于1小时)
+   */
+  async isTokenExpiringSoon(): Promise<boolean> {
+    const token = await this.tokenStorage.getToken();
+    if (!token) return true;
+
+    try {
+      // 解析JWT获取过期时间
+      const parts = token.split('.');
+      if (parts.length !== 3) return true;
+
+      const payload = JSON.parse(atob(parts[1]));
+      const exp = payload.exp * 1000; // 转换为毫秒
+      const now = Date.now();
+      const oneHour = 60 * 60 * 1000;
+
+      return exp - now < oneHour;
+    } catch {
+      return true;
+    }
+  }
+
+  /**
+   * 自动刷新Token(如果即将过期)
+   * 建议在App启动时和每次API调用前调用
+   */
+  async autoRefreshIfNeeded(): Promise<void> {
+    if (await this.isTokenExpiringSoon()) {
+      await this.refreshToken();
+    }
+  }
+
+  /**
+   * 获取Token过期时间
+   * @returns 过期时间戳(毫秒),如果无Token则返回null
+   */
+  async getTokenExpiry(): Promise<number | null> {
+    const token = await this.tokenStorage.getToken();
+    if (!token) return null;
+
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+
+      const payload = JSON.parse(atob(parts[1]));
+      return payload.exp * 1000;
+    } catch {
+      return null;
+    }
+  }
+}
+
+class OrdersApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 创建订单(用户下单)
+   */
+  async userCreate(input: CreateOrderInput): Promise<{ id: number; orderNo: string; success: boolean }> {
+    return this.trpc.mutate('orders.userCreate', input);
+  }
+
+  /**
+   * 获取所有订单列表(admin用)
+   */
+  async list(params?: any): Promise<any[]> {
+    try {
+      const result = await this.trpc.query<any>('orders.list', params || {});
+      if (Array.isArray(result)) return result;
+      if (result?.data && Array.isArray(result.data)) return result.data;
+      if (result?.orders && Array.isArray(result.orders)) return result.orders;
+      return [];
+    } catch {
+      // 如果orders.list不存在，尝试myOrders
+      try {
+        const result = await this.trpc.query<any>('orders.myOrders', params || {});
+        if (Array.isArray(result)) return result;
+        if (result?.data && Array.isArray(result.data)) return result.data;
+        if (result?.orders && Array.isArray(result.orders)) return result.orders;
+        return [];
+      } catch { return []; }
+    }
+  }
+
+  /**
+   * 获取当前用户的订单列表
+   */
+  async myOrders(params?: {
+    status?: 'all' | 'pending' | 'paid' | 'completed' | 'cancelled' | 'refunded';
+    limit?: number;
+    offset?: number;
+  }): Promise<any[]> {
+    const result = await this.trpc.query<any>('orders.myOrders', params || {});
+    if (Array.isArray(result)) return result;
+    if (result?.data && Array.isArray(result.data)) return result.data;
+    if (result?.orders && Array.isArray(result.orders)) return result.orders;
+    return [];
+  }
+
+  /**
+   * 获取订单详情
+   */
+  async getById(id: number): Promise<Order> {
+    return this.trpc.query('orders.getById', { id });
+  }
+}
+
+class CoursesApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取课程列表
+   * @returns 课程列表,包含id、name、price、description等字段
+   */
+  async list(): Promise<any[]> {
+    const result = await this.trpc.query<any>('courses.list');
+    // 后端返回 {success, data: Course[], count}，提取data数组
+    if (Array.isArray(result)) return result;
+    if (result?.data && Array.isArray(result.data)) return result.data;
+    return [];
+  }
+
+  /**
+   * 根据ID获取课程详情
+   * @param id 课程ID
+   */
+  async getById(id: number): Promise<{ success: boolean; data: any }> {
+    return this.trpc.query('courses.getById', { id });
+  }
+}
+
+class TeachersApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取老师列表
+   * @returns 老师列表,包含id、name、city、customerType、isActive等字段
+   */
+  async list(): Promise<any[]> {
+    const result = await this.trpc.query<any>('teachers.list');
+    // 后端返回 Teacher[] 直接数组，或 {success, data, count}
+    if (Array.isArray(result)) return result;
+    if (result?.data && Array.isArray(result.data)) return result.data;
+    return [];
+  }
+
+  /**
+   * 根据ID获取老师详情
+   * @param id 老师ID
+   */
+  async getById(id: number): Promise<any> {
+    return this.trpc.query('teachers.getById', { id });
+  }
+}
+
+class ClassroomsApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取所有教室列表
+   * @returns 教室列表,包含id、name、cityId、cityName、address等字段
+   */
+  async list(): Promise<any[]> {
+    const result = await this.trpc.query<any>('classrooms.list');
+    if (Array.isArray(result)) return result;
+    if (result?.data && Array.isArray(result.data)) return result.data;
+    return [];
+  }
+
+  /**
+   * 根据城市ID获取教室列表
+   * @param cityId 城市ID
+   */
+  async getByCityId(cityId: number): Promise<any[]> {
+    return this.trpc.query('classrooms.getByCityId', { cityId });
+  }
+
+  /**
+   * 根据城市名称获取教室列表
+   * @param cityName 城市名称
+   */
+  async getByCityName(cityName: string): Promise<any[]> {
+    return this.trpc.query('classrooms.getByCityName', { cityName });
+  }
+}
+
+class MetadataApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取所有元数据(城市、课程、教室、老师名、销售人员等)
+   * 推荐在App启动时调用一次,缓存结果
+   */
+  async getAll(): Promise<{
+    success: boolean;
+    data: {
+      cities: string[];
+      courses: string[];
+      classrooms: string[];
+      teacherNames: string[];
+      salespeople: string[];
+      teacherCategories: string[];
+      courseAmounts: string[];
+    };
+    counts: {
+      cities: number;
+      courses: number;
+      classrooms: number;
+      teacherNames: number;
+      salespeople: number;
+    };
+  }> {
+    return this.trpc.query('metadata.getAll');
+  }
+
+  /**
+   * 获取城市列表
+   */
+  async getCities(): Promise<{ success: boolean; data: string[]; count: number }> {
+    return this.trpc.query('metadata.getCities');
+  }
+}
+
+// ============================================================================
+// 账户余额API
+// ============================================================================
+
+class AccountApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 查询当前用户余额
+   * @returns 余额信息,包含balance、customerId、customerName
+   */
+  async getMyBalance(): Promise<{
+    success: boolean;
+    data: {
+      balance: string;
+      customerId: number | null;
+      customerName: string | null;
+    };
+  }> {
+    return this.trpc.query('account.getMyBalance');
+  }
+
+  /**
+   * 查询当前用户流水
+   * @param options 分页参数
+   * @param options.limit 每页条数,默认20,范围1-100
+   * @param options.offset 偏移量,默认0
+   * @returns 流水列表和总数
+   */
+  async getMyTransactions(options?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<{
+    success: boolean;
+    data: {
+      transactions: Array<{
+        id: number;
+        customerId: number;
+        type: 'recharge' | 'consume' | 'refund';
+        amount: string;
+        balanceBefore: string;
+        balanceAfter: string;
+        orderId: number | null;
+        orderNo: string | null;
+        notes: string | null;
+        operatorId: number | null;
+        operatorName: string | null;
+        createdAt: string;
+      }>;
+      total: number;
+    };
+  }> {
+    return this.trpc.query('account.getMyTransactions', options || {});
+  }
+
+  /**
+   * 客户充值（管理员/销售操作）
+   * @param customerId 业务客户ID
+   * @param amount 充值金额，必须大于0
+   * @param notes 备注
+   * @returns 充值前后余额
+   */
+  async recharge(
+    customerId: number,
+    amount: number,
+    notes?: string
+  ): Promise<{
+    success: boolean;
+    data: {
+      balanceBefore: string;
+      balanceAfter: string;
+    };
+    error?: string;
+  }> {
+    return this.trpc.mutate('account.recharge', {
+      customerId,
+      amount,
+      notes,
+    });
+  }
+}
+
+/**
+ * 申请通知API
+ * 用于提交用户申请（成为老师/合伙人/员工）
+ */
+class NotificationsApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 提交申请
+   * @param userId 当前登录用户ID（未登录用户传0）
+   * @param userName 用户姓名
+   * @param userPhone 用户手机号
+   * @param type 申请类型：application
+   * @param title 标题（成为老师/合伙人/员工）
+   * @param content 申请内容（姓名、手机号、城市、申请理由）
+   * @returns 提交结果
+   */
+  async submit(params: {
+    userId: number;
+    userName: string;
+    userPhone: string;
+    type: 'application';
+    title: string;
+    content: string;
+  }): Promise<{
+    success: boolean;
+    id: number;
+  }> {
+    return this.trpc.mutate('notifications.submit', params);
+  }
+}
+
+class CityExpenseApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取城市月度费用账单列表
+   */
+  async list(params?: {
+    cityId?: number;
+    month?: string;
+    startMonth?: string;
+    endMonth?: string;
+  }): Promise<any[]> {
+    return this.trpc.query('cityExpense.list', params || {});
+  }
+
+  /**
+   * 获取单个费用账单详情
+   */
+  async getById(id: number): Promise<any> {
+    return this.trpc.query('cityExpense.getById', { id });
+  }
+}
+
+class CitiesApi {
+  private trpc: TrpcClient;
+
+  constructor(trpc: TrpcClient) {
+    this.trpc = trpc;
+  }
+
+  /**
+   * 获取城市列表(从metadata接口)
+   * @returns 城市名称数组
+   */
+  async list(): Promise<string[]> {
+    const result = await this.trpc.query<any>('metadata.getCities');
+    // 后端返回 {success, data: string[], count}，提取data数组
+    if (Array.isArray(result)) return result;
+    if (result?.data && Array.isArray(result.data)) return result.data;
+    return [];
+  }
+
+  /**
+   * 获取城市合伙人配置列表
+   * @returns 城市配置数组,包含id、city、partnerFeeRate、isActive等字段
+   */
+  async getPartnerConfigs(): Promise<{ success: boolean; data: any[]; count: number }> {
+    return this.trpc.query('cityPartnerConfig.list');
+  }
+
+  /**
+   * 根据城市名获取合伙人配置
+   * @param city 城市名称
+   */
+  async getPartnerConfigByCity(city: string): Promise<{ success: boolean; data: any; message?: string }> {
+    return this.trpc.query('cityPartnerConfig.getByCity', { city });
+  }
+}
+
+// ============================================================================
+// API客户端主类
+// ============================================================================
+
+export class ApiClient {
+  private config: Required<ApiClientConfig>;
+  private tokenStorage: TokenStorage;
+  private trpc: TrpcClient;
+
+  public readonly auth: AuthApi;
+  public readonly orders: OrdersApi;
+  public readonly courses: CoursesApi;
+  public readonly cities: CitiesApi;
+  public readonly cityExpense: CityExpenseApi;
+  public readonly teachers: TeachersApi;
+  public readonly classrooms: ClassroomsApi;
+  public readonly metadata: MetadataApi;
+  public readonly account: AccountApi;
+  public readonly notifications: NotificationsApi;
+  public readonly userManagement: { list: (params?: any) => Promise<{ users: any[]; total: number }> };
+  public readonly customers!: { list: (params?: any) => Promise<any> };
+
+  constructor(config: ApiClientConfig = {}) {
+    // 合并默认配置
+    this.config = {
+      autoDetect: config.autoDetect ?? true,
+      baseUrl: config.baseUrl ?? '',
+      tokenStorage: config.tokenStorage ?? 'asyncStorage',
+      timeout: config.timeout ?? 45000, // 增加到45秒，适应移动网络
+      retryCount: config.retryCount ?? 4, // 增加到4次重试，总共5次尝试
+      debug: config.debug ?? false,
+    };
+
+    // 初始化Token存储
+    this.tokenStorage = this.createTokenStorage();
+
+    // 确定API基础地址
+    const baseUrl = this.config.autoDetect
+      ? EnvironmentDetector.detectBaseUrl()
+      : this.config.baseUrl;
+
+    if (this.config.debug) {
+      console.log('[ApiClient] ========================================');
+      console.log('[ApiClient] Initialized with baseUrl:', baseUrl);
+      console.log('[ApiClient] Environment:', EnvironmentDetector.getEnvironmentType());
+      console.log('[ApiClient] ========================================');
+    }
+
+    // 初始化请求拦截器
+    const interceptor = new RequestInterceptor(this.tokenStorage, this.config.debug);
+
+    // 初始化tRPC客户端
+    this.trpc = new TrpcClient(
+      baseUrl,
+      interceptor,
+      this.config.timeout,
+      this.config.retryCount,
+      this.config.debug
+    );
+
+    // 初姻API模块
+    this.auth = new AuthApi(this.trpc, this.tokenStorage);
+    this.orders = new OrdersApi(this.trpc);
+    this.courses = new CoursesApi(this.trpc);
+    this.cities = new CitiesApi(this.trpc);
+    this.cityExpense = new CityExpenseApi(this.trpc);
+    this.teachers = new TeachersApi(this.trpc);
+    this.classrooms = new ClassroomsApi(this.trpc);
+    this.metadata = new MetadataApi(this.trpc);
+    this.account = new AccountApi(this.trpc);
+    this.notifications = new NotificationsApi(this.trpc);
+    // userManagement模块 - admin用户管理
+    const trpc = this.trpc;
+    // customers模块 - 客户管理
+    (this as any).customers = {
+      async list(params?: any): Promise<any[]> {
+        try {
+          const result = await trpc.query<any>('customers.list', params || {});
+          if (Array.isArray(result)) return result;
+          if (result?.data && Array.isArray(result.data)) return result.data;
+          if (result?.customers && Array.isArray(result.customers)) return result.customers;
+          return [];
+        } catch { return []; }
+      }
+    };
+    this.userManagement = {
+      async list(params?: any): Promise<{ users: any[]; total: number }> {
+        try {
+          const result = await trpc.query<any>('userManagement.list', params || {});
+          if (result?.users) return result;
+          if (result?.data) return { users: Array.isArray(result.data) ? result.data : [], total: result.total || result.count || 0 };
+          if (Array.isArray(result)) return { users: result, total: result.length };
+          return { users: [], total: 0 };
+        } catch {
+          return { users: [], total: 0 };
+        }
+      }
+    };
+  }
+
+  private createTokenStorage(): TokenStorage {
+    switch (this.config.tokenStorage) {
+      case 'localStorage':
+        return new LocalStorageTokenStorage();
+      case 'memory':
+        return new MemoryTokenStorage();
+      case 'asyncStorage':
+      default:
+        // 在非React Native环境下回退到localStorage
+        if (EnvironmentDetector.getEnvironmentType() !== 'react-native') {
+          return new LocalStorageTokenStorage();
+        }
+        return new AsyncStorageTokenStorage();
+    }
+  }
+
+  /**
+   * 获取当前API基础地址
+   */
+  getBaseUrl(): string {
+    return this.config.autoDetect
+      ? EnvironmentDetector.detectBaseUrl()
+      : this.config.baseUrl;
+  }
+
+  /**
+   * 获取当前环境类型
+   */
+  getEnvironmentType(): string {
+    return EnvironmentDetector.getEnvironmentType();
+  }
+
+  /**
+   * 手动设置Token(用于从其他来源恢复登录状态)
+   */
+  async setToken(token: string): Promise<void> {
+    await this.tokenStorage.setToken(token);
+  }
+
+  /**
+   * 获取当前Token
+   */
+  async getToken(): Promise<string | null> {
+    return this.tokenStorage.getToken();
+  }
+}
+
+// ============================================================================
+// 工厂函数
+// ============================================================================
+
+/**
+ * 创建API客户端实例
+ * 
+ * @example
+ * ```typescript
+ * // 自动检测环境
+ * const api = createApiClient();
+ * 
+ * // 手动指定配置
+ * const api = createApiClient({
+ *   baseUrl: 'https://api.example.com',
+ *   debug: true,
+ * });
+ * ```
+ */
+export function createApiClient(config?: ApiClientConfig): ApiClient {
+  return new ApiClient(config);
+}
+
+// 默认导出
+export default createApiClient;
+
+// 导出默认实例供全局使用
+export const api = createApiClient({
+  autoDetect: true,
+  tokenStorage: 'asyncStorage',
+  debug: true,
+});
