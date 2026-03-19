@@ -62,6 +62,8 @@ export default function MembershipH5() {
   const [tokenLoginDone, setTokenLoginDone] = useState(false);
   // tokenLoginPending: true 表示 token 登录正在进行中
   const [tokenLoginPending, setTokenLoginPending] = useState(false);
+  // tokenLoginFailed: true 表示 token 无效或过期
+  const [tokenLoginFailed, setTokenLoginFailed] = useState(false);
   const loginWithTokenMutation = trpc.auth.loginWithToken.useMutation();
   const tokenProcessed = useRef(false);
 
@@ -92,7 +94,8 @@ export default function MembershipH5() {
         await utils.auth.me.invalidate();
       })
       .catch(() => {
-        // token 无效或过期，静默失败，让用户看到未登录状态
+        // token 无效或过期，显示友好错误提示
+        setTokenLoginFailed(true);
       })
       .finally(() => {
         setTokenLoginPending(false);
@@ -232,6 +235,26 @@ export default function MembershipH5() {
           <div className="w-8 h-8 border-4 border-orange-400 border-t-transparent rounded-full animate-spin" />
           <div className="text-gray-400 text-base">正在验证身份…</div>
         </div>
+      </div>
+    );
+  }
+
+  // ---- Token 无效或过期（显示友好错误提示）----
+  if (tokenLoginFailed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-6">
+        <div className="text-6xl mb-6">⚠️</div>
+        <h2 className="text-xl font-bold text-gray-800 mb-3">身份验证失败</h2>
+        <p className="text-gray-500 text-center text-sm leading-relaxed mb-8">
+          登录链接已过期或无效，请返回《瀛姬App》重新进入会员页面。
+        </p>
+        <button
+          onClick={() => window.history.back()}
+          className="w-full max-w-xs py-3 rounded-2xl font-bold text-base text-white"
+          style={{ background: "linear-gradient(135deg, #FF8C00, #FF6B00)" }}
+        >
+          返回上一页
+        </button>
       </div>
     );
   }

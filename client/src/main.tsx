@@ -17,6 +17,9 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
 
   if (!isUnauthorized) return;
 
+  // /membership 页面由自身处理未登录状态（WebView Token 登录），不跳转到后台登录页
+  if (window.location.pathname.startsWith("/membership")) return;
+
   window.location.href = "/login";
 };
 
