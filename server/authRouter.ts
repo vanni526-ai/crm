@@ -808,6 +808,89 @@ export const authRouter = router({
     };
   }),
 
+  /**
+   * generateMembershipToken
+   * 供瀛姬App 服务端调用，为指定用户生成一个短期 JWT，
+   * 前端 WebView 携带该 token 打开 /membership?token=xxx 即可免登录进入会员页。
+   *
+   * 权限：protectedProcedure（需要已登录的 CRM admin 账号）
+   * 有效期：默认 10 分钟，可通过 expiresInMinutes 自定义（最大 60 分钟）
+   */
+  generateMembershipToken: protectedProcedure
+    .input(
+      z.object({
+        /** 目标用户 ID（即需要打开会员页的 App 用户） */
+        userId: z.number().int().positive("userId 必须为正整数"),
+        /** token 有效期（分钟），默认 10，最大 60 */
+        expiresInMinutes: z.number().int().min(1).max(60).optional().default(10),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      // 仅 admin 角色可调用
+      if (ctx.user.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "仅管理员可生成会员页 Token",
+        });
+      }
+      const drizzle = await getDb();
+      if (!drizzle) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "数据库连接失败",
+        });
+      }
+      // 查询目标用户是否存在且处于激活状态
+      const userList = await drizzle
+        .select({
+          id: users.id,
+          name: users.name,
+          phone: users.phone,
+          role: users.role,
+          isActive: users.isActive,
+          membershipStatus: users.membershipStatus,
+          membershipExpiresAt: users.membershipExpiresAt,
+        })
+        .from(users)
+        .where(eq(users.id, input.userId))
+        .limit(1);
+      if (userList.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `用户 ID ${input.userId} 不存在`,
+        });
+      }
+      const targetUser = userList[0];
+      if (!targetUser.isActive) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "目标用户账号已被禁用",
+        });
+      }
+      // 生成短期 JWT（payload 与 loginWithToken 消费侧保持一致）
+      const expiresInSeconds = input.expiresInMinutes * 60;
+      const token = jwt.sign(
+        {
+          id: targetUser.id,
+          name: targetUser.name,
+          role: targetUser.role,
+          purpose: "membership_webview", // 标记用途，便于审计
+        },
+        JWT_SECRET,
+        { expiresIn: expiresInSeconds }
+      );
+      const expiresAt = new Date(Date.now() + expiresInSeconds * 1000).toISOString();
+      return {
+        token,
+        expiresAt,
+        expiresInMinutes: input.expiresInMinutes,
+        userId: targetUser.id,
+        userName: targetUser.name,
+        /** 拼接好的完整 WebView URL，直接传给 App 打开即可 */
+        webviewUrl: `/membership?token=${token}`,
+      };
+    }),
+
   // App 传 JWT 免登录建立 H5 session
   loginWithToken: publicProcedure
     .input(
