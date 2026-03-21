@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "../_core/hooks/useAuth";
 
@@ -64,6 +64,10 @@ export default function MembershipH5() {
   const [tokenLoginPending, setTokenLoginPending] = useState(false);
   // tokenLoginFailed: true 表示 token 无效或过期
   const [tokenLoginFailed, setTokenLoginFailed] = useState(false);
+  // tokenLoginSuccess: true 表示 token 登录成功，等待 user 状态刷新
+  const [tokenLoginSuccess, setTokenLoginSuccess] = useState(false);
+  // pendingOpenMembership: token 登录成功后，用户已点击"立即开通"，等待 user 刷新后自动进入支付
+  const [pendingOpenMembership, setPendingOpenMembership] = useState(false);
   const loginWithTokenMutation = trpc.auth.loginWithToken.useMutation();
   const tokenProcessed = useRef(false);
 
@@ -89,8 +93,9 @@ export default function MembershipH5() {
         url.searchParams.delete("token");
         window.history.replaceState({}, "", url.toString());
 
+        // 标记 token 登录成功，等待 user 状态刷新
+        setTokenLoginSuccess(true);
         // 不 reload，直接 invalidate auth.me，让 useAuth 重新拉取用户状态
-        // 这样页面不会重新加载，用户体验更流畅
         await utils.auth.me.invalidate();
       })
       .catch(() => {
@@ -145,11 +150,17 @@ export default function MembershipH5() {
   const accountBalance = statusData?.accountBalance ?? 0;
 
   // 处理立即开通
-  const handleOpenMembership = () => {
+  const handleOpenMembership = useCallback(() => {
     // 如果 token 登录还在进行中，等待完成
     if (tokenLoginPending) return;
 
     if (!user) {
+      // token 登录刚刚成功，user 状态还在异步刷新中，先标记待处理，等 user 就绪后自动触发
+      if (tokenLoginSuccess) {
+        setPendingOpenMembership(true);
+        return;
+      }
+      // 真正未登录（没有 token 或 token 无效），跳转登录页
       window.location.href = "/login?redirect=/membership";
       return;
     }
@@ -158,7 +169,17 @@ export default function MembershipH5() {
     setSelectedPlan(plan);
     setErrorMsg("");
     setStep("confirm");
-  };
+  }, [tokenLoginPending, tokenLoginSuccess, user, yearPlan]);
+
+  // 当 pendingOpenMembership 为 true 且 user 已就绪，自动触发开通流程
+  useEffect(() => {
+    if (pendingOpenMembership && user && yearPlan) {
+      setPendingOpenMembership(false);
+      setSelectedPlan(yearPlan);
+      setErrorMsg("");
+      setStep("confirm");
+    }
+  }, [pendingOpenMembership, user, yearPlan]);
 
   // 判断余额是否充足
   const isBalanceSufficient = accountBalance >= (selectedPlan?.price ?? 0);
